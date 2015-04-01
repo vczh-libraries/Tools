@@ -10,16 +10,21 @@ namespace Codepack
 {
     class Program
     {
-        static string[] GetCppFiles(string projectFile)
+        static string[] GetCppFiles(string folder)
         {
-            string np = @"http://schemas.microsoft.com/developer/msbuild/2003";
-            XDocument document = XDocument.Load(projectFile);
-            return document
-                .Root
-                .Elements(XName.Get("ItemGroup", np))
-                .SelectMany(e => e.Elements(XName.Get("ClCompile", np)))
-                .Select(e => Path.GetFullPath(Path.GetDirectoryName(projectFile) + "\\" + e.Attribute("Include").Value))
-                .ToArray();
+            return Directory
+                .GetFiles(folder, "*.cpp", SearchOption.AllDirectories)
+                .Select(s => s.ToUpper())
+                .ToArray()
+                ;
+        }
+        static string[] GetHeaderFiles(string folder)
+        {
+            return Directory
+                .GetFiles(folder, "*.h", SearchOption.AllDirectories)
+                .Select(s => s.ToUpper())
+                .ToArray()
+                ;
         }
 
         static Dictionary<string, string[]> CategorizeCodeFiles(XDocument config, string[] files)
@@ -212,15 +217,27 @@ namespace Codepack
             string folder = Path.GetDirectoryName(Path.GetFullPath(args[0])) + "\\";
 
             // collect project files
-            string[] projectFiles = config.Root
-                .Element("projects")
-                .Elements("project")
+            string[] folders = config.Root
+                .Element("folders")
+                .Elements("folder")
                 .Select(e => Path.GetFullPath(folder + e.Attribute("path").Value))
                 .ToArray();
 
             // collect code files
-            string[] unprocessedCppFiles = projectFiles.SelectMany(GetCppFiles).Distinct().ToArray();
-            string[] unprocessedHeaderFiles = unprocessedCppFiles.SelectMany(GetIncludedFiles).Distinct().ToArray();
+            string[] unprocessedCppFiles = folders
+                .SelectMany(GetCppFiles)
+                .Distinct()
+                .ToArray();
+            string[] unprocessedHeaderFiles = folders
+                .SelectMany(GetHeaderFiles)
+                .Distinct()
+                .ToArray();
+            unprocessedHeaderFiles = folders
+                .SelectMany(GetHeaderFiles)
+                .Concat(unprocessedCppFiles)
+                .SelectMany(GetIncludedFiles)
+                .Concat(unprocessedHeaderFiles)
+                .Distinct().ToArray();
 
             // categorize code files
             var categorizedCppFiles = CategorizeCodeFiles(config, unprocessedCppFiles);
@@ -231,8 +248,8 @@ namespace Codepack
                 .Elements("codepair")
                 .ToDictionary(
                     e => e.Attribute("category").Value,
-                    e => Path.GetFullPath(outputFolder + e.Attribute("filename").Value
-                    ));
+                    e => Tuple.Create(Path.GetFullPath(outputFolder + "\\" + e.Attribute("filename").Value), bool.Parse(e.Attribute("generate").Value))
+                    );
 
             // calculate category dependencies
             var categoryDependencies = categorizedCppFiles
@@ -259,7 +276,7 @@ namespace Codepack
             // generate code pair header files
             foreach (var c in categoryOrder)
             {
-                string output = categorizedOutput[c] + ".h";
+                string output = categorizedOutput[c].Item1 + ".h";
                 List<string> includes = new List<string>();
                 foreach (var dep in categoryDependencies[c])
                 {
@@ -267,29 +284,35 @@ namespace Codepack
                 }
                 HashSet<string> systemIncludes = new HashSet<string>(includes.Distinct());
                 categorizedSystemIncludes.Add(c, systemIncludes);
-                Combine(
-                    categorizedHeaderFiles[c],
-                    output,
-                    systemIncludes,
-                    categoryDependencies[c]
-                        .Select(d => Path.GetFileName(categorizedOutput[d] + ".h"))
-                        .ToArray()
-                    );
+                if (categorizedOutput[c].Item2)
+                {
+                    Combine(
+                        categorizedHeaderFiles[c],
+                        output,
+                        systemIncludes,
+                        categoryDependencies[c]
+                            .Select(d => Path.GetFileName(categorizedOutput[d].Item1 + ".h"))
+                            .ToArray()
+                        );
+                }
             }
 
             // generate code pair cpp files
             foreach (var c in categoryOrder)
             {
-                string output = categorizedOutput[c];
-                string outputHeader = Path.GetFileName(output + ".h");
-                string outputCpp = output + ".cpp";
-                HashSet<string> systemIncludes = categorizedSystemIncludes[c];
-                Combine(
-                    categorizedCppFiles[c],
-                    outputCpp,
-                    systemIncludes,
-                    outputHeader
-                    );
+                if (categorizedOutput[c].Item2)
+                {
+                    string output = categorizedOutput[c].Item1;
+                    string outputHeader = Path.GetFileName(output + ".h");
+                    string outputCpp = output + ".cpp";
+                    HashSet<string> systemIncludes = categorizedSystemIncludes[c];
+                    Combine(
+                        categorizedCppFiles[c],
+                        outputCpp,
+                        systemIncludes,
+                        outputHeader
+                        );
+                }
             }
 
             // generate header files
