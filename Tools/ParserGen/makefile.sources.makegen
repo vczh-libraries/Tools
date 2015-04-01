@@ -1,4 +1,4 @@
-folder VLPP = ../../../Libraries/GacUI/Public/Source
+folder VLPP = ../../Import
 	h = Vlpp.h
 	cpp = Vlpp.cpp
 
