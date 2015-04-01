@@ -1,0 +1,11 @@
+Codepack.exe		<configuration-xml>
+CopyWebsite.exe		<url>				<root-default-file-name>	<output-folder (out)>
+Fpmacro.exe			<fpm-file-1>		<fpm-file-2>				...
+ParserGen.exe		<parser-file-1>		<parser-file-2>				...
+Recurcpy.exe		<source-folder>		<destination-folder>		include|exclude		<ext1> <ext2> ...
+GacGen.exe			<resource-file-1>
+
+PdbDump.exe			<pdb-file>			<xml-pdb-file (out)>
+LinkPdbXml.exe		<xml-pdb-file>		<xml-comment-file>			<xml-doc-file (out)>
+GenXmlDocRef.exe	<xml-doc-file>		<doc-folder (out)>			<root-unique-id>
+GenDocIndex.exe		HTML|META			<readable-doc-folder(out)>	<doc-folder>

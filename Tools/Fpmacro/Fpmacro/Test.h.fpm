@@ -1,0 +1,68 @@
+$$include:..\..\..\Source\Common.fpm
+
+$$define $TYPENAME_NULL($index) typename T$index = TupleNullItem
+$$define $TUPLE_ITEM($index) T$index f$index;
+$$define $TUPLE_COMPARE($index) f$index==value.f$index
+$$define $TUPLE_ASSIGN($index) f$index$(()p$index$())
+
+$$define $TUPLE_DECLARATION($count) $$begin
+$(/)***********************************************************************
+vl::Tuple<$TYPE_LIST($count)>
+***********************************************************************$(/)
+	template<$loopsep($count,0,$TYPENAME_ITEM,$(,))>
+	class Tuple<$TYPE_LIST($count)> : public Object
+	{
+	public:
+		$loop($count,0,$TUPLE_ITEM)
+$( )
+		Tuple()
+		{
+		}
+$( )
+		Tuple($PARAMETER_LIST($count))
+			:$loopsep($count,0,$TUPLE_ASSIGN,$(,))
+		{
+		}
+$( )
+		bool operator==(const Tuple<$TYPE_LIST($count)>& value)
+		{
+			return $loopsep($count,0,$TUPLE_COMPARE, && );
+		}
+$( )
+		bool operator!=(const Tuple<$TYPE_LIST($count)>& value)
+		{
+			return !($loopsep($count,0,$TUPLE_COMPARE, && ));
+		}
+	};
+$$end
+
+/***********************************************************************
+Vczh Library++ 3.0
+Developer: Zihan Chen(vczh)
+Framework::Tuple
+	
+本文件使用Vczh Functional Macro工具自动生成
+***********************************************************************/
+
+#ifndef VCZH_EVENT
+#define VCZH_EVENT
+
+namespace vl
+{
+	class TupleNullItem
+	{
+	};
+
+	template<$loopsep(11,0,$TYPENAME_NULL,$(,))>
+	class Tuple
+	{
+	};
+$$define $TUPLE_APPLY($count) $$begin
+$( )
+$TUPLE_DECLARATION($count)
+$( )
+$$end
+$loop($sub($MAX_FUNCTION_NUMBER(),1),1,$TUPLE_APPLY)
+}
+
+#endif

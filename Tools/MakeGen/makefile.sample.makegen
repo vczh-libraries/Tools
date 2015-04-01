@@ -1,0 +1,7 @@
+folder MAKEGEN = .
+	h = *.h
+	cpp = *.cpp
+
+dependency
+	MAKEGEN:h < GACUI:h
+	MAKEGEN:cpp < MAKEGEN:h
