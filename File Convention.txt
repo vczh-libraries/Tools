@@ -1,4 +1,4 @@
-This file convention are for all other repos under the same organization, except for Tools.
+This file convention are for all other repos under the same organization.
 See Vlpp for example.
 
 <Import>
@@ -7,6 +7,10 @@ See Vlpp for example.
     Generated compacted C++ files. These files will not contain the content from files in the <Import> folder. They will #include them instead, pretending all files are in the same folder.
 <Source>
     Source files.
+<Tools>
+    Source files for related tools. Tools should be compiled before using other repos depending on this repo.
+    BuildTools.bat: Run in Visual Studio Command Prompt to compile all tools
+    BuildToolsLinux.sh: Run in shell to compile all tools
 <Test>
     <Source>
         Unit test source files.
