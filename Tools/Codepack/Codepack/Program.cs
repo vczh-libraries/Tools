@@ -179,7 +179,7 @@ namespace Codepack
                                     writer.WriteLine(line);
                                 }
                             }
-                            else if (!line.Trim().StartsWith("///"))
+                            else
                             {
                                 match = IncludeRegex.Match(line);
                                 if (!match.Success)
