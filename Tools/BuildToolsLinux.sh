@@ -1,17 +1,18 @@
 #!/bin/bash
-cd MakeGen
+cd ../../Vlpp/Tools/MakeGen
 mkdir Bin
 mkdir Obj
 make clean
 make
-cd ..
-ln -f -s `pwd`/MakeGen/Bin/MakeGen /usr/local/bin/MakeGen
+ln -f -s `pwd`/Bin/MakeGen /usr/local/bin/MakeGen
 
-cd ParserGen
+cd ../ParserGen
+cp makefile makefile~
 MakeGen release makefile
 mkdir Bin
 mkdir Obj
 make clean
 make
-cd ..
-ln -f -s `pwd`/ParserGen/Bin/ParserGen /usr/local/bin/ParserGen
+cp makefile~ makefile
+rm makefile~
+ln -f -s `pwd`/Bin/ParserGen /usr/local/bin/ParserGen
