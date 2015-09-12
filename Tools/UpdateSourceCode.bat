@@ -10,4 +10,4 @@ cd ..\..\GacUI\Import
 call Import.bat
 cd ..\..\Tools\Import
 call Import.bat
-cd ..\..\GacUI\Document
+cd ..\Tools
