@@ -1,10 +1,12 @@
 copy ParserGen.exe ..\..\Release\Tools\ParserGen.exe
 copy GacGen.exe ..\..\Release\Tools\GacGen.exe
-cd ..\..\Release\Import
+pushd ..\..\Release\Import
 call Import.bat
-cd ..\..\GacUI\Document
+popd
+pushd ..\..\GacUI\Document
 call BuildDocument.bat
-cd ..\..\vczh-libraries.github.io\Doc\Data
+popd
+pushd ..\..\vczh-libraries.github.io\Doc\Data
 del *.xml /Q > NUL
 call CopyData.bat
-cd ..\..\..\Tools\Tools
+popd
