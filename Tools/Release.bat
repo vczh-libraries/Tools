@@ -1,12 +1,16 @@
 copy ParserGen.exe ..\..\Release\Tools\ParserGen.exe
 copy GacGen.exe ..\..\Release\Tools\GacGen.exe
-pushd ..\..\Release\Import
+pushd ..\..\Release
+pushd .\Import
 call Import.bat
 popd
-pushd ..\..\GacUI\Document
-call BuildDocument.bat
+pushd .\Tutorial
+call Codegen.bat
+pushd .\GacUI_HelloWorlds
+MSBUILD GacUI_HelloWorlds.sln /p:Configuration=Debug;Platform=Win32
 popd
-pushd ..\..\vczh-libraries.github.io\Doc\Data
-del *.xml /Q > NUL
-call CopyData.bat
+pushd .\GacUI_Layout
+MSBUILD GacUI_Layout.sln /p:Configuration=Debug;Platform=Win32
+popd
+popd
 popd
