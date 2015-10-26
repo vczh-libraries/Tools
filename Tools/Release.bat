@@ -7,10 +7,10 @@ popd
 pushd .\Tutorial
 call Codegen.bat
 pushd .\GacUI_HelloWorlds
-MSBUILD GacUI_HelloWorlds.sln /p:Configuration=Debug;Platform=Win32
+MSBUILD GacUI_HelloWorlds.sln /p:Configuration=Debug;Platform=Win32 /m:8
 popd
 pushd .\GacUI_Layout
-MSBUILD GacUI_Layout.sln /p:Configuration=Debug;Platform=Win32
+MSBUILD GacUI_Layout.sln /p:Configuration=Debug;Platform=Win32 /m:8
 popd
 popd
 popd
