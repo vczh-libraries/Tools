@@ -14,5 +14,9 @@ pushd .\GacUI_Layout
 MSBUILD GacUI_Layout.sln /p:Configuration=Debug;Platform=Win32 /m:8
 start Debug
 popd
+pushd .\GacUI_Controls
+MSBUILD GacUI_Controls.sln /p:Configuration=Debug;Platform=Win32 /m:8
+start Debug
+popd
 popd
 popd

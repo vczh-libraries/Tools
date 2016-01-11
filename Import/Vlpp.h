@@ -10600,18 +10600,18 @@ GeneralValueSerializer
 				{
 				}
 
-				ITypeDescriptor* GetOwnerTypeDescriptor()
+				ITypeDescriptor* GetOwnerTypeDescriptor()override
 				{
 					return ownedTypeDescriptor;
 				}
 
-				bool Validate(const WString& text)
+				bool Validate(const WString& text)override
 				{
 					T output;
 					return Deserialize(text, output);
 				}
 
-				bool Parse(const WString& input, Value& output)
+				bool Parse(const WString& input, Value& output)override
 				{
 					T value;
 					if(Deserialize(input, value))
@@ -10652,7 +10652,7 @@ GeneralValueSerializer
 					return false;
 				}
 
-				bool Serialize(const T& input, Value& output)
+				bool Serialize(const T& input, Value& output)override
 				{
 					WString text;
 					if(Serialize(input, text))
@@ -10663,7 +10663,7 @@ GeneralValueSerializer
 					return false;
 				}
 
-				bool Deserialize(const Value& input, T& output)
+				bool Deserialize(const Value& input, T& output)override
 				{
 					if(input.GetValueType()!=Value::Text)
 					{
@@ -10688,7 +10688,7 @@ TypedValueSerializer
 			protected:
 				T											defaultValue;
 
-				T GetDefaultValue()
+				T GetDefaultValue()override
 				{
 					return defaultValue;
 				}
@@ -16143,6 +16143,9 @@ namespace vl
 			WString						fullPath;
 
 			void						Initialize();
+
+			static void					GetPathComponents(WString path, collections::List<WString>& components);
+			static WString				ComponentsToPath(const collections::List<WString>& components);
 		public:
 #if defined VCZH_MSVC
 			static const wchar_t		Delimiter = L'\\';
@@ -16199,6 +16202,7 @@ namespace vl
 			/// <returns>The relative path.</returns>
 			/// <param name="_filePath">The referencing folder.</param>
 			WString						GetRelativePathFor(const FilePath& _filePath);
+
 		};
 
 		/// <summary>Representing a file reference.</summary>
