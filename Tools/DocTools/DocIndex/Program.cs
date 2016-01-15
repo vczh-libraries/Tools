@@ -124,20 +124,25 @@ namespace DocIndex
             foreach (var nsp in symbols)
             {
                 Console.WriteLine("t(*).xml: " + nsp.Key);
-                foreach (var st in nsp.Value)
+                var stGroup = nsp.Value
+                    .GroupBy(st => GetUrlNameForKey(symbolNames[st.Item1]))
+                    .ToDictionary(g => g.Key, g => g.ToArray());
+
+                foreach (var stGroupPair in stGroup)
                 {
-                    var urlName = symbolNames[st.Item1];
-                    var outputSymbol = CreateSymbolTree(namespaceNames[nsp.Key], urlName, st.Item2, symbolFileMapping);
-                    try
-                    {
-                        outputSymbol.Save(output + "t(" + urlName + ").xml");
-                    }
-                    catch (PathTooLongException)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Error: File path is too long: \"" + urlName + "\".");
-                        Console.ResetColor();
-                    }
+                    var urlName = stGroupPair.Key;
+                    var outputSymbol = new XDocument(
+                        new XElement("OverloadingSymbolTrees",
+                            stGroupPair.Value
+                                .Select(st =>
+                                    new XElement("OverloadingSymbolTree",
+                                        new XAttribute("Key", st.Item1),
+                                        CreateSymbolTree(namespaceNames[nsp.Key], urlName, st.Item2, symbolFileMapping).Root
+                                        )
+                                    )
+                            )
+                        );
+                    outputSymbol.Save(output + "t(" + urlName + ").xml");
                 }
             }
 
@@ -149,30 +154,43 @@ namespace DocIndex
             foreach (var nsp in symbols)
             {
                 Console.WriteLine("s(*).xml: " + nsp.Key);
-                foreach (var st in nsp.Value)
+                var stGroup = nsp.Value
+                    .GroupBy(st => GetUrlNameForKey(symbolNames[st.Item1]))
+                    .ToDictionary(g => g.Key, g => g.ToArray());
+
+                foreach (var stGroupPair in stGroup)
                 {
-                    var urlName = symbolNames[st.Item1];
-                    foreach (var decl in st.Item2)
+                    foreach (var st in stGroupPair.Value)
                     {
-                        FixSymbolLinks(decl, symbolFileMapping);
+                        foreach (var decl in st.Item2)
+                        {
+                            FixSymbolLinks(decl, symbolFileMapping);
+                        }
                     }
+                    var urlName = stGroupPair.Key;
                     var outputSymbol = new XDocument(
-                        new XElement("Symbols",
-                            st.Item2.Select(decl => decl.Serialize())
+                        new XElement("OverloadingSymbols",
+                            stGroupPair.Value
+                                .Select(st =>
+                                    new XElement("Symbols",
+                                        new XAttribute("Key", st.Item1),
+                                        st.Item2.Select(decl => decl.Serialize())
+                                        )
+                                    )
                             )
                         );
-                    try
-                    {
-                        outputSymbol.Save(output + "s(" + urlName + ").xml");
-                    }
-                    catch (PathTooLongException)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Error: File path is too long: \"" + urlName + "\".");
-                        Console.ResetColor();
-                    }
+                    outputSymbol.Save(output + "s(" + urlName + ").xml");
                 }
             }
+        }
+
+        static string GetUrlNameForKey(string key)
+        {
+            return new string(
+                key
+                    .TakeWhile(x => 'a' <= x && x <= 'z' || 'A' <= x && x <= 'Z' || '0' <= x && x <= '9' || x == '.' || x == '`' || x == '_')
+                    .ToArray()
+                );
         }
 
         static bool ContainsDocument(SymbolDecl decl)
