@@ -136,7 +136,7 @@ namespace DocIndex
                             stGroupPair.Value
                                 .Select(st =>
                                     new XElement("OverloadingSymbolTree",
-                                        new XAttribute("Key", st.Item1),
+                                        new XAttribute("Key", symbolNames[st.Item1]),
                                         CreateSymbolTree(namespaceNames[nsp.Key], urlName, st.Item2, symbolFileMapping).Root
                                         )
                                     )
@@ -173,7 +173,7 @@ namespace DocIndex
                             stGroupPair.Value
                                 .Select(st =>
                                     new XElement("Symbols",
-                                        new XAttribute("Key", st.Item1),
+                                        new XAttribute("Key", symbolNames[st.Item1]),
                                         st.Item2.Select(decl => decl.Serialize())
                                         )
                                     )
