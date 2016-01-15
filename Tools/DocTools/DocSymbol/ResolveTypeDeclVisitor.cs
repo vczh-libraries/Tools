@@ -193,7 +193,7 @@ namespace DocSymbol
             return type;
         }
 
-        public Dictionary<string, List<SymbolDecl>> GetSymbolContent(SymbolDecl symbol)
+        public Dictionary<string, List<SymbolDecl>> GetSymbolContent(SymbolDecl symbol, bool forChildSymbol)
         {
             if (symbol is NamespaceDecl)
             {
@@ -206,7 +206,7 @@ namespace DocSymbol
                 {
                     var template = symbol as TemplateDecl;
                     var typedef = (template == null ? symbol : template.Element) as TypedefDecl;
-                    if (typedef != null)
+                    if (typedef != null && forChildSymbol)
                     {
                         typedef.Type.Resolve(typedef.Parent, this);
                         var refType = FindRefType(typedef.Type);
@@ -218,7 +218,7 @@ namespace DocSymbol
                         {
                             var symbols = this.ResolvedTypes[refType];
                             content = symbols
-                                .Select(x => GetSymbolContent(x))
+                                .Select(x => GetSymbolContent(x, forChildSymbol))
                                 .Where(x => x != null)
                                 .SelectMany(x => x)
                                 .GroupBy(x => x.Key)
@@ -381,7 +381,7 @@ namespace DocSymbol
                     {
                         if (!(current is NamespaceDecl) && !(current is GlobalDecl))
                         {
-                            var content = this.Environment.GetSymbolContent(current);
+                            var content = this.Environment.GetSymbolContent(current, false);
                             var decls = FindSymbolInContent(decl, decl.Name, content, pass == 0, pass == 1 && !this.SupressError);
                             if (decls != null)
                             {
@@ -422,7 +422,7 @@ namespace DocSymbol
                 {
                     var parentDecls = this.Environment.ResolvedTypes[refType];
                     content = parentDecls
-                        .Select(x => this.Environment.GetSymbolContent(x))
+                        .Select(x => this.Environment.GetSymbolContent(x, true))
                         .Where(x => x != null)
                         .SelectMany(x => x)
                         .GroupBy(x => x.Key)
@@ -860,7 +860,7 @@ namespace DocSymbol
                             break;
                         }
 
-                        var content = this.Environment.GetSymbolContent(symbol);
+                        var content = this.Environment.GetSymbolContent(symbol, true);
                         if (content != null)
                         {
                             foreach (var item in content.Where(p => keys == null || !keys.Contains(p.Key)).SelectMany(x => x.Value))
