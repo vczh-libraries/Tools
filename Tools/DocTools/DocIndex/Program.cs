@@ -137,7 +137,7 @@ namespace DocIndex
                                 .Select(st =>
                                     new XElement("OverloadingSymbolTree",
                                         new XAttribute("Key", symbolNames[st.Item1]),
-                                        CreateSymbolTree(namespaceNames[nsp.Key], urlName, st.Item2, symbolFileMapping).Root
+                                        CreateSymbolTree(namespaceNames[nsp.Key], symbolNames[st.Item1], st.Item2, symbolFileMapping).Root
                                         )
                                     )
                             )
