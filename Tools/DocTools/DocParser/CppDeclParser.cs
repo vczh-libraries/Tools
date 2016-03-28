@@ -518,10 +518,24 @@ namespace DocParser
                                     Type = type,
                                     Function = Function.Function,
                                 };
-                                if (!CppParser.Token(tokens, ref index, ";"))
+
                                 {
-                                    CppParser.EnsureToken(tokens, ref index, "{");
-                                    CppParser.SkipUntil(tokens, ref index, "}");
+                                    var funcType = (FunctionTypeDecl)type;
+                                    var returnType = funcType.ReturnType as RefTypeDecl;
+                                    if (returnType != null && returnType.Name == "auto")
+                                    {
+                                        CppParser.EnsureToken(tokens, ref index, "-");
+                                        CppParser.EnsureToken(tokens, ref index, ">");
+
+                                        TypeDecl newReturnType = CppTypeParser.EnsureTypeWithoutName(tokens, ref index);
+                                        funcType.ReturnType = newReturnType;
+                                    }
+                                    
+                                    if (!CppParser.Token(tokens, ref index, ";"))
+                                    {
+                                        CppParser.EnsureToken(tokens, ref index, "{");
+                                        CppParser.SkipUntil(tokens, ref index, "}");
+                                    }
                                 }
 
                                 if (templateDecl != null)
