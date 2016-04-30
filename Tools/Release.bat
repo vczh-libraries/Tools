@@ -22,5 +22,9 @@ pushd .\GacUI_ControlTemplate
 MSBUILD GacUI_ControlTemplate.sln /p:Configuration=Debug;Platform=Win32 /m:8
 start Debug
 popd
+pushd .\GacUI_Xml
+MSBUILD GacUI_Xml.sln /p:Configuration=Debug;Platform=Win32 /m:8
+start Debug
+popd
 popd
 popd
