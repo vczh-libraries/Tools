@@ -1,0 +1,80 @@
+======================
+SETUP
+----------------------
+apt-get install
+
+htop
+cgdb
+manpages-posix-dev
+git
+vim
+apt-file
+clang
+openssh-server
+lcov
+----------------------
+.vimrc
+
+set tabstop=4
+set number
+set hlsearch
+set fileencodings=utf-8,ucs-bom,cp936
+set nocompatible
+filetype off
+----------------------
+github
+
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+// add id_rsa.pub to github
+ssh -T git@github.com
+
+git clone git@github.com:vczh-libraries/<every-repo>.git
+run Tools/Tools/BuildToolsLinux.sh
+----------------------
+.bashrc
+
+export PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\$ "
+======================
+CLANG-COMPLETE
+----------------------
+apt-get install
+
+libclang-dev
+----------------------
+vundle
+
+cd /usr/lib/llvm-3.6/lib
+ln -s libclang.so.1 libclang.so
+git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+----------------------
+.vimrc
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'gmarik/Vundle.vim'
+Plugin 'Rip-Rip/clang_complete'
+
+call vundle#end()
+filetype plugin indent on
+
+let g:clang_complete_open=1
+let g:clang_periodic_quickfix=1
+let g:clang_snippets=1
+let g:clang_close_preview=1
+let g:clang_library_path='/usr/lib/llvm-3.6/lib/'
+let g:clang_use_library=1
+let g:clang_user_options='-std=c++14'
+let g:neocomplcache_enable_at_startup=1
+----------------------
+vim
+
+:PluginInstall
+======================
+MISC
+
+make 2>&1 | tee make_log
+gedit make_log &
+nautilus .
