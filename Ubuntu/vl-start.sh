@@ -3,7 +3,7 @@
 cd vl
 
 export VPATH_CONTROL=${PWD}/vl
-export VDOWNLOAD=curl -H "Cache-Control: no-cache" -O
+export VDOWNLOAD="curl -H \"Cache-Control: no-cache\" -O"
 
 export PATH=${VPATH_CONTROL}:${PATH}
 
