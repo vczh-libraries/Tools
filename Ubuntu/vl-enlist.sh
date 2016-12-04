@@ -21,23 +21,24 @@ function Entry {
             popd
             exit 1
         fi
-        VFILE=~/Desktop/vle_${i}.desktop
+        local VFILE=~/Desktop/vle_${i}.desktop
         if ! [ -a ${VFILE} ]; then
             echo "Creating ${VFILE} ..."
             break
         fi
     done
 
-    VNAME="Enlistment (${PWD})"
+    local VNAME_USER=""
+    local VNAME="Enlistment (${PWD})"
     echo "Enter the display name (${VNAME}):"
     read VNAME_USER
     if ! [ "${VNAME_USER}" == "" ]; then
         VNAME=${VNAME_USER}
     fi
-    VPATH=${PWD}
+    local VPATH=${PWD}
 
-    VTEMPLATE=~/Desktop/vl/vle-template.desktop
-    VPATTERNS="s?<NAME>?${VNAME}?g;"$'\n'"s?<PATH>?${VPATH}?g;"
+    local VTEMPLATE=~/Desktop/vl/vle-template.desktop
+    local VPATTERNS="s?<NAME>?${VNAME}?g;"$'\n'"s?<PATH>?${VPATH}?g;"
     sed -e "${VPATTERNS}" "${VTEMPLATE}" > "${VFILE}"
     chmod u+x "${VFILE}"
 }
