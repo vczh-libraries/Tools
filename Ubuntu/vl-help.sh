@@ -1,10 +1,10 @@
 #!/bin/bash
 
-echo "vl-help"
+echo "vhelp"
 echo "    Help information for Vczh Libraries Control Panel."
-echo "vl-ssh.sh --help"
+echo "vssh --help"
 echo "    Quick way to setup ssh key for your github account."
-echo "vl-apt.sh --help"
+echo "vapt --help"
 echo "    Download necessary softwares."
-echo "vl-enlist.sh --help"
+echo "venlist --help"
 echo "    Enlist all repos from github."
