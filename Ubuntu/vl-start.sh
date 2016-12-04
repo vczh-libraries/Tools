@@ -18,4 +18,5 @@ if ! [ -a vl-enlist.sh ]; then
 fi
 
 cd ..
-echo Welcome to Vczh Libraries Control Panel!
+echo "Welcome to Vczh Libraries Control Panel!"
+echo "Use vl-help.sh for help information."
