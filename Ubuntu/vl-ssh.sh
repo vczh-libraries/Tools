@@ -6,6 +6,8 @@ function Help {
     echo "    Create a new rsa key (~/.ssh/id_rsa_vl)"
     echo "--submit"
     echo "    Submit the created key to your github account"
+    echo "--verify"
+    echo "    Verify ssh connection to github"
     echo "--remove"
     echo "    Remove the created key"
 }
@@ -33,11 +35,13 @@ function Submit {
         VTITLE="Vczh Libraries Control Panel - $(hostname)"
         VKEY=$(<~/.ssh/id_rsa_vl.pub)
         curl -u "${VUSERNAME}:${VPASSWORD}" --data '{"title":"'"${VTITLE}"'","key":"'"${VKEY}"'"}' https://api.github.com/user/keys
-        echo "Testing ssh connection to github"
-        ssh -T git@github.com
     else
         echo "Key (~/.ssh/id_rsa_vl) does not exist."
     fi
+}
+
+function Verify {
+    ssh -T git@github.com
 }
 
 function Remove {
@@ -64,6 +68,10 @@ case $1 in
 
     --submit)
     Submit
+    ;;
+
+    --verify)
+    Verify
     ;;
 
     --remove)
