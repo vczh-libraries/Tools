@@ -42,12 +42,12 @@ function Install {
     AptGetInstall lconv
     
     echo "Starting ssh service ..."
-    /etc/init.d/ssh start
+    sudo /etc/init.d/ssh start
 }
 
 function Remove {
     echo "Stopping ssh service ..."
-    /etc/init.d/ssh stop
+    sudo /etc/init.d/ssh stop
 
     AptGetRemove htop
     AptGetRemove cgdb
