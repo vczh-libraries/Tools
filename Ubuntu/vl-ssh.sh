@@ -32,8 +32,8 @@ function Submit {
         read VUSERNAME
         echo "Password:"
         read -s VPASSWORD
-        VTITLE="Vczh Libraries Control Panel - $(hostname)"
-        VKEY=$(<~/.ssh/id_rsa_vl.pub)
+        local VTITLE="Vczh Libraries Control Panel - $(hostname)"
+        local VKEY=$(<~/.ssh/id_rsa_vl.pub)
         curl -u "${VUSERNAME}:${VPASSWORD}" --data '{"title":"'"${VTITLE}"'","key":"'"${VKEY}"'"}' https://api.github.com/user/keys
     else
         echo "Key (~/.ssh/id_rsa_vl) does not exist."
