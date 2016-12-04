@@ -4,18 +4,17 @@ cd vl
 export VPATH_CONTROL=${PWD}
 export PATH=${VPATH_CONTROL}:${PATH}
 
-if ! [ -a vl-ssh.sh ]; then
-    curl -H "Cache-Control: no-cache" -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-ssh.sh
-    chmod u+x vl-ssh.sh
-fi
-if ! [ -a vl-apt.sh ]; then
-    curl -H "Cache-Control: no-cache" -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-apt.sh
-    chmod u+x vl-apt.sh
-fi
-if ! [ -a vl-enlist.sh ]; then
-    curl -H "Cache-Control: no-cache" -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-enlist.sh
-    chmod u+x vl-enlist.sh
-fi
+function get-script {
+    if ! [ -a $1 ]; then
+        curl -H "Cache-Control: no-cache" -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/$1
+        chmod u+x $1
+    fi
+}
+get-script vl-help.sh
+get-script vl-ssh.sh
+get-script vl-apt.sh
+get-script vl-enlist.sh
+unset -f get-script
 
 cd ..
 echo "Welcome to Vczh Libraries Control Panel!"
