@@ -67,11 +67,11 @@ case $1 in
     ;;
 
     --install)
-    Add
+    Install
     ;;
 
     --remove)
-    Submit
+    Remove
     ;;
 
     *)
