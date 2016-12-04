@@ -32,7 +32,7 @@ function Entry {
     echo "Enter the display name (${VNAME}):"
     read VNAME_USER
     if ! [ "${VNAME_USER}" == "" ]; then
-        VNAME=VNAME_USER
+        VNAME=${VNAME_USER}
     fi
     VPATH=${PWD}
 
