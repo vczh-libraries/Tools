@@ -1,7 +1,6 @@
 #!/bin/bash
 
-case $1 in
-    --help)
+function Help {
     echo "Usage:"
     echo "--add <email>"
     echo "    Create a new rsa key (~/.ssh/id_rsa_vl)"
@@ -9,34 +8,34 @@ case $1 in
     echo "    Submit the created key to your github account"
     echo "--remove"
     echo "    Remove the created key"
-    ;;
+}
 
-    --add)
+function Add {
     if [ -a ~/.ssh/id_rsa_vl ]; then
         echo "Key (~/.ssh/id_rsa_vl) has already been created."
     else
-        ssh-keygen -t rsa -b 4096 -C "$2" -f ~/.ssh/id_rsa_vl
+        ssh-keygen -t rsa -b 4096 -C "$1" -f ~/.ssh/id_rsa_vl
         eval "$(ssh-agent -s)"
         ssh-add ~/.ssh/id_rsa_vl
         ls ~/.ssh
     fi
-    ;;
+}
 
-    --submit)
+function Submit {
     if [ -a ~/.ssh/id_rsa_vl ]; then
         echo "Username:"
         read VUSERNAME
         echo "Password:"
         read -s VPASSWORD
-        VTITLE="$(hostname) Vczh Libraries Control Panel"
+        VTITLE="Vczh Libraries Control Panel - $(hostname)"
         VKEY=$(<~/.ssh/id_rsa_vl.pub)
         curl -u "${VUSERNAME}:${VPASSWORD}" --data '{"title":"'"${VTITLE}"'","key":"'"${VKEY}"'"}' https://api.github.com/user/keys
     else
         echo "Key (~/.ssh/id_rsa_vl) does not exist."
     fi
-    ;;
+}
 
-    --remove)
+function Remove {
     if [ -a ~/.ssh/id_rsa_vl ]; then
         ssh-add -d ~/.ssh/id_rsa_vl
         rm ~/.ssh/id_rsa_vl
@@ -45,6 +44,23 @@ case $1 in
     else
         echo "Key (~/.ssh/id_rsa_vl) does not exist."
     fi
+}
+
+case $1 in
+    --help)
+    Help
+    ;;
+
+    --add)
+    Add "$2"
+    ;;
+
+    --submit)
+    Submit
+    ;;
+
+    --remove)
+    Remove
     ;;
 
     *)
