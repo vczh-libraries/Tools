@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Vczh Libraries
+Comment=Vczh Libraries Control Panel for Github Repos
+Exec=gnome-terminal -e "bash -c 'echo Welcome to Vczh-Libraries!;$SHELL'"
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=Application;
