@@ -1,8 +1,8 @@
 #!/bin/bash
 
 cd vl
-export VPATH_CONTROL=$(PWD)/vl
-export PATH=$(VPATH_CONTROL):$(PATH)
+export VPATH_CONTROL=${PWD}/vl
+export PATH=${VPATH_CONTROL}:${PATH}
 curl -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-ssh.sh
 curl -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-apt.sh
 curl -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-enlist.sh
