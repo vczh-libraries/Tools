@@ -13,24 +13,30 @@ function GetScript {
     chmod u+x $1
 }
 
+function MakeDir {
+    if ! [ -d $1 ]; then
+        mkdir $1
+    fi
+}
+
 cd ./vl
 
-    mkdir ControlPanel
-    pushd ./ControlPanel
+    MakeDir ControlPanel
+    cd ./ControlPanel
         GetScript vl-help.sh
         GetScript vl-ssh.sh
         GetScript vl-apt.sh
         GetScript vl-enlist.sh
-    popd
+    cd ..
 
-    mkdir Enlistment
-    pushd ./Enlistment
-    popd
+    MakeDir Enlistment
+    cd ./Enlistment
+    cd ..
 
     GetScript vl-start-enlistment.sh
     GetFile vle-template.desktop
 
-popd
+cd ..
 
 unset -f GetScript
 
