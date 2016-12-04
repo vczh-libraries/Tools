@@ -24,7 +24,13 @@ case $1 in
 
     --submit)
     if [ -a ~/.ssh/id_rsa_vl ]; then
-        echo "--submit is under development"
+        echo "Username:"
+        read VUSERNAME
+        echo "Password:"
+        read -s VPASSWORD
+        VTITLE="$(hostname) Vczh Libraries Control Panel"
+        VKEY=$(<~/.ssh/id_rsa_vl.pub)
+        curl -u "${VUSERNAME}:${VPASSWORD}" --data '{"title":"'"${VTITLE}"'","key":"'"${VKEY}"'"}' https://api.github.com/user/keys
     else
         echo "Key (~/.ssh/id_rsa_vl) does not exist."
     fi
