@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd vl
-export VPATH_CONTROL=${PWD}/vl
+export VPATH_CONTROL=${PWD}
 export PATH=${VPATH_CONTROL}:${PATH}
 
 if ! [ -a vl-ssh.sh]; then
