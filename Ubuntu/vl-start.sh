@@ -1,11 +1,15 @@
 #!/bin/bash
 
 cd vl
+
 export VPATH_CONTROL=${PWD}/vl
+export VDOWNLOAD=curl -H "Cache-Control: no-cache" -O
+
 export PATH=${VPATH_CONTROL}:${PATH}
-curl -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-ssh.sh
-curl -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-apt.sh
-curl -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-enlist.sh
+
+${VDOWNLOAD} https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-ssh.sh
+${VDOWNLOAD} https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-apt.sh
+${VDOWNLOAD} https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-enlist.sh
 chmod u+x vl-*.sh
 cd ..
 
