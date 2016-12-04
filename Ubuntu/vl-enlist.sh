@@ -2,12 +2,18 @@
 
 function Help {
     echo "Usage:"
+    echo "--entry"
+    echo "    Create a desktop shortcut for operating this enlistment. This should be done in --enlist."
     echo "--enlist"
     echo "    Enlist all repos in the current directory."
 }
 
 function GitClone {
     git clone git@github.com:vczh-libraries/${1}.git
+}
+
+function Entry {
+    echo "Creating desktop entry for ${PWD} ..."
 }
 
 function Enlist {
@@ -23,11 +29,16 @@ function Enlist {
     GitClone Release
     GitClone XGac
     GitClone iGac
+    Entry
 }
 
 case $1 in
     --help)
     Help
+    ;;
+
+    --entry)
+    Entry
     ;;
 
     --enlist)
