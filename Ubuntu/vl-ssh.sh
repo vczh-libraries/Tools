@@ -16,7 +16,10 @@ function Add {
     else
         ssh-keygen -t rsa -b 4096 -C "$1" -f ~/.ssh/id_rsa_vl
         eval "$(ssh-agent -s)"
-        ssh-add ~/.ssh/id_rsa_vl
+        pushd ~/.ssh
+        ssh-add id_rsa_vl
+        popd
+        echo "All files in ~/.ssh:"
         ls ~/.ssh
     fi
 }
@@ -30,6 +33,8 @@ function Submit {
         VTITLE="Vczh Libraries Control Panel - $(hostname)"
         VKEY=$(<~/.ssh/id_rsa_vl.pub)
         curl -u "${VUSERNAME}:${VPASSWORD}" --data '{"title":"'"${VTITLE}"'","key":"'"${VKEY}"'"}' https://api.github.com/user/keys
+        echo "Testing ssh connection to github"
+        ssh -T git@github.com
     else
         echo "Key (~/.ssh/id_rsa_vl) does not exist."
     fi
@@ -37,7 +42,9 @@ function Submit {
 
 function Remove {
     if [ -a ~/.ssh/id_rsa_vl ]; then
-        ssh-add -d ~/.ssh/id_rsa_vl
+        pushd ~/.ssh
+        ssh-add -d id_rsa_vl
+        popd
         rm ~/.ssh/id_rsa_vl
         rm ~/.ssh/id_rsa_vl.pub
         ls ~/.ssh
