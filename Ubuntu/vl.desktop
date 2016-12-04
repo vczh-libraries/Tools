@@ -2,7 +2,7 @@
 Version=1.0
 Name=Vczh Libraries
 Comment=Vczh Libraries Control Panel for Github Repos
-Exec=gnome-terminal -e "bash -c 'cd ~/Desktop;if ! [ -d vl ];then mkdir vl;cd vl;curl -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-start.sh;chmod u+x vl-start.sh;cd ..;fi;./vl/vl-start.sh;$SHELL'"
+Exec=gnome-terminal -e "bash -c 'cd ~/Desktop;if ! [ -d vl ];then mkdir vl;cd vl;curl -H \"Cache-Control: no-cache\" -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/vl-start.sh;chmod u+x vl-start.sh;cd ..;fi;./vl/vl-start.sh;$SHELL'"
 Icon=utilities-terminal
 Terminal=false
 Type=Application
