@@ -9,31 +9,37 @@ function GetFile {
 }
 
 function GetScript {
-    GetFile "$1"
-    chmod u+x $1
-}
+    VFOLDER=$1
+    shift
+    VPREFIX=$1
+    shift
+    VITEMS=("${@}")
 
-function MakeDir {
-    if ! [ -d $1 ]; then
-        mkdir $1
+    if ! [ -d $VFOLDER ]; then
+        mkdir $VFOLDER
     fi
+    cd ./$VFOLDER
+
+    for i in "${VITEMS[@]}"; do
+        VFILE="v${i}"
+        VURL="https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/${VPREFIX}-${i}.sh"
+        if ! [ -a $VFILE ]; then
+            curl -H "Cache-Control: no-cache" -o "${VFILE}" "${VURL}"
+            chmod u+x $VFILE
+        fi
+    done
+    
+    cd ..
 }
 
 cd ./vl
 
-    MakeDir ControlPanel
-    cd ./ControlPanel
-        GetScript vl-help.sh
-        GetScript vl-ssh.sh
-        GetScript vl-apt.sh
-        GetScript vl-enlist.sh
-    cd ..
+    GetScript ControlPanel vl help ssh apt enlist
+    GetScript Enlistment vle help
 
-    MakeDir Enlistment
-    cd ./Enlistment
-    cd ..
+    GetFile vl-start-enlistment.sh
+    chmod u+x vl-start-enlistment.sh
 
-    GetScript vl-start-enlistment.sh
     GetFile vle-template.desktop
 
 cd ..
@@ -41,4 +47,4 @@ cd ..
 unset -f GetScript
 
 echo "Welcome to Vczh Libraries Control Panel!"
-echo "Use vl-help.sh for help information."
+echo "Use vhelp for help information."
