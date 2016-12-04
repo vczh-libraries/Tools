@@ -9,11 +9,11 @@ function GetFile {
 }
 
 function GetScript {
-    VFOLDER=$1
+    local VFOLDER=$1
     shift
-    VPREFIX=$1
+    local VPREFIX=$1
     shift
-    VITEMS=("${@}")
+    local VITEMS=("${@}")
 
     if ! [ -d $VFOLDER ]; then
         mkdir $VFOLDER
@@ -21,8 +21,8 @@ function GetScript {
     cd ./$VFOLDER
 
     for i in "${VITEMS[@]}"; do
-        VFILE="v${i}"
-        VURL="https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/${VPREFIX}-${i}.sh"
+        local VFILE="v${i}"
+        local VURL="https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/${VPREFIX}-${i}.sh"
         if ! [ -a $VFILE ]; then
             curl -H "Cache-Control: no-cache" -o "${VFILE}" "${VURL}"
             chmod u+x $VFILE
