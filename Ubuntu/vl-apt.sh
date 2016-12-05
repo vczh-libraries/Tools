@@ -12,6 +12,7 @@ function Help {
     echo "        clang"
     echo "        openssh-server"
     echo "        lcov"
+    echo "        vim"
     echo "--remove"
     echo "    Remove all required softwares"
 }
@@ -40,6 +41,7 @@ function Install {
     AptGetInstall clang
     AptGetInstall openssh-server
     AptGetInstall lcov
+    AptGetInstall vim
     
     echo "Starting ssh service ..."
     sudo /etc/init.d/ssh start
@@ -57,6 +59,7 @@ function Remove {
     AptGetRemove clang
     AptGetRemove openssh-server
     AptGetRemove lcov
+    AptGetRemove vim
 
     AptGetAutoRemove
 }
