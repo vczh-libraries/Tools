@@ -52,6 +52,7 @@ function PromptCommand {
 
     PS1="${TITLE}${USER}${GITREF}$ "
 }
+export -f PromptCommand
 export PROMPT_COMMAND="PromptCommand"
 
 echo "Welcome to Vczh Libraries Control Panel!"
