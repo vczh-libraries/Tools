@@ -10,32 +10,29 @@ function Help {
     echo "    Go to the \"Source\" folder of this project"
 }
 
-function Fail {
-    echo $1
-    popd > /dev/null
-    exit 1
-}
-
 function Go {
     local VPROJ="${VROOT}/$2"
     if ! [ -d $VPROJ ]; then
         echo "Folder \"${VPROJ}\" does not exist."
-        exit 1
+        return 1
     fi
 
     pushd $VPROJ > /dev/null
     local GITHEAD="$(git symbolic-ref HEAD 2>/dev/null)"
     if [ "${GITHEAD}" == "" ]; then
-        Fail "\"${VPROJ}\" is not a valid git repo."
+        echo "\"${VPROJ}\" is not a valid git repo."
+        popd > /dev/null
+        return 1
     fi
 
     local VPATH="${VPROJ}/$1"
     if ! [ -d $VPATH ]; then
-        Fail "Folder \"${VPATH}\" does not exist."
+        echo Fail "Folder \"${VPATH}\" does not exist."
+        popd > /dev/null
+        return 1
     fi
 
     popd > /dev/null
-    echo $VPATH
     cd $VPATH
 }
 
@@ -52,7 +49,7 @@ case $1 in
     Go "Test/Linux" $2
     ;;
 
-    t)
+    s)
     Go "Source" $2
     ;;
 
