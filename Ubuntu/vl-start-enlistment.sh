@@ -1,8 +1,19 @@
 #!/bin/bash
 
 export VROOT=${PWD}
-alias VRESET='cd $VROOT; source ~/Desktop/vl/vl-start-enlistment.sh'
 export PATH=~/Desktop/vl/Enlistment:${PATH}
+
+function vreset {
+    pushd $VROOT > /dev/null
+    source ~/Desktop/vl/vl-start-enlistment.sh
+    popd > /dev/null
+}
+export -f vreset
+
+function vgo {
+    source vgo "$@"
+}
+export -f vgo
 
 export VC_BLACK='\033[00;30m'
 export VC_RED='\033[00;31m'
