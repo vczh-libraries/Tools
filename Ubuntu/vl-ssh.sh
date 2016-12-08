@@ -18,9 +18,9 @@ function Add {
     else
         ssh-keygen -t rsa -b 4096 -C "$1" -f ~/.ssh/id_rsa_vl
         eval "$(ssh-agent -s)"
-        pushd ~/.ssh
+        pushd ~/.ssh > /dev/null
         ssh-add id_rsa_vl
-        popd
+        popd > /dev/null
         echo "All files in ~/.ssh:"
         ls ~/.ssh
     fi
@@ -46,9 +46,9 @@ function Verify {
 
 function Remove {
     if [ -a ~/.ssh/id_rsa_vl ]; then
-        pushd ~/.ssh
+        pushd ~/.ssh > /dev/null
         ssh-add -d id_rsa_vl
-        popd
+        popd > /dev/null
         rm ~/.ssh/id_rsa_vl
         rm ~/.ssh/id_rsa_vl.pub
         ls ~/.ssh
