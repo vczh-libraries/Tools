@@ -66,5 +66,11 @@ function PromptCommand {
 export -f PromptCommand
 export PROMPT_COMMAND="PromptCommand"
 
+if [ -a ~/.ssh/id_rsa_vl ]; then
+    pushd ~/.ssh > /dev/null
+    ssh-add id_rsa_vl
+    popd > /dev/null
+fi
+
 echo "Welcome to Vczh Libraries Control Panel!"
 echo "Use vhelp for help information."
