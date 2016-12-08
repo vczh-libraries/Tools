@@ -2,6 +2,11 @@
 
 export PATH=${PWD}/vl/ControlPanel:${PATH}
 
+function vssh {
+    source vssh "$@"
+}
+export -f vssh
+
 function GetFile {
     if ! [ -a $1 ]; then
         curl -H "Cache-Control: no-cache" -O https://raw.githubusercontent.com/vczh-libraries/Tools/master/Ubuntu/$1
@@ -44,6 +49,7 @@ cd ./vl
 
 cd ..
 
+unset -f GetFile
 unset -f GetScript
 
 echo "Welcome to Vczh Libraries Control Panel!"
