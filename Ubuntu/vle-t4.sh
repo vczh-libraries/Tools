@@ -2,8 +2,10 @@
 
 function Help {
     echo "Usage:"
+    echo "--preprocess <t4-template-file>"
+    echo "    Preprocess the template file and print to standard output."
     echo "--evaluate <t4-template-file>"
-    echo "    Evaluate the template file and print to standard output."
+    echo "    Evaluate the preprocessed template file and print to standard output."
 }
 
 function Error {
@@ -12,8 +14,26 @@ function Error {
     exit 1
 }
 
+function Preprocess {
+    PATTERN='^\s*<#@\s*include\s*"([^"]*)"\s*#>\s*$'
+    cat $1 | while read -r LINE; do
+        INCLUDE_STAT=`echo "${LINE}" | grep -E ${PATTERN}`
+        if [[ "$INCLUDE_STAT" == "" ]]; then
+            echo "${LINE}"
+        else
+            INCLUDE_FILE=`echo "${LINE}" | sed -r -e 's%'${PATTERN}'%\1%g'`
+            INCLUDE_DIR=`dirname ${INCLUDE_FILE}`
+            INCLUDE_NAME=`basename ${INCLUDE_FILE}`
+
+            eval INCLUDE_DIR=$INCLUDE_DIR
+            pushd ${INCLUDE_DIR} > /dev/null
+            vt4 --preprocess "${INCLUDE_NAME}"
+            popd > /dev/null
+        fi
+    done
+}
+
 function Evaluate {
-    IFS=
     STATE_TEXT=1
     STATE_CODE=2
     STATE_EXPR=3
@@ -83,9 +103,14 @@ function Evaluate {
     done
 }
 
+IFS=
 case $1 in
     --help)
     Help
+    ;;
+
+    --preprocess)
+    Preprocess $2
     ;;
 
     --evaluate)
