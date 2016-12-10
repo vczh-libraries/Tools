@@ -23,6 +23,7 @@ COVERAGE?=NO
 pre-build:
 	if ! [ -d ./Bin ]; then mkdir ./Bin; fi
 	if ! [ -d ./Obj ]; then mkdir ./Obj; fi
+	if ! [ -d ./Coverage ]; then mkdir ./Coverage; fi
 <#for FOLDER in "${FOLDERS[@]}"; do#>
 	if ! [ -d <#= $FOLDER #> ]; then mkdir <#= $FOLDER #>; fi
 <#done#>
@@ -30,6 +31,7 @@ pre-build:
 clean:
 	if [ -d ./Bin ]; then rm -r ./Bin; fi
 	if [ -d ./Obj ]; then rm -r ./Obj; fi
+	if [ -d ./Coverage ]; then rm -r ./Coverage; fi
 <#for FOLDER in "${FOLDERS[@]}"; do#>
 	if [ -d ./<#= $FOLDER #> ]; then rm -r <#= $FOLDER #>; fi
 <#done#>
