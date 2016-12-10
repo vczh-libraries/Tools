@@ -4,7 +4,7 @@
 CONTENT=`cat $1`
 
 # extract all cpp files
-PATTERN='<ClCompile\s+Include="([^"]+.cpp)"\s*/\s*>'
+PATTERN='<ClCompile\s+Include="([^"]+.cpp)"\s*/?\s*>'
 COMPILES=`echo "${CONTENT}" | grep -E ${PATTERN}`
 CPPS=`echo "${COMPILES}" | sed -r -e 's%\s*'${PATTERN}'\s*%\1%g'`
 
