@@ -18,6 +18,7 @@ O_FILES=`echo ${O_FILES}`
 
 .PHONY: all clean pre-build
 .DEFAULT_GOAL := all
+COVERAGE?=NO
 
 pre-build:
 	if ! [ -d ./Bin ]; then mkdir ./Bin; fi
@@ -36,10 +37,18 @@ clean:
 all:pre-build <#= ${TARGETS[@]} #>
 
 <#= $CPP_TARGET #>:<#= ${O_FILES} #>
+ifeq ($(COVERAGE),NO)
 	clang++ -std=c++14 -pthread -g -o $@ $^
+else
+	g++ -std=c++11 -g -fprofile-arcs -pthread -o $@ $^
+endif
 
 <#echo "${CPP_FILES}" | while read -r CPP_FILE; do#>
 
 ./Obj/<#= `vutil_CppDependencies ${CPP_FILE}` #>
+ifeq ($(COVERAGE),NO)
 	clang++ -std=c++14 -g -o $@ -c $<
+else
+	g++ -std=c++11 -g -fprofile-arcs -ftest-coverage -o $@ -c $<
+endif
 <#done#>
