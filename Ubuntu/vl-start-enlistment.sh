@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export VROOT=${PWD}
-export PATH=~/Desktop/vl/Enlistment:${PATH}
+export PATH=${VCPROOT}/vl/Enlistment:${PATH}
 
 function vreset {
     pushd $VROOT > /dev/null
