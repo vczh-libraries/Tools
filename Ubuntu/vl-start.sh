@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export VCPROOT=${PWD}
 export PATH=${PWD}/vl/ControlPanel:${PATH}
 
 function vssh {
