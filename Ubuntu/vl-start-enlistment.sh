@@ -5,7 +5,7 @@ export PATH=${VCPROOT}/vl/Enlistment:${PATH}
 
 function vreset {
     pushd $VROOT > /dev/null
-    source ~/Desktop/vl/vl-start-enlistment.sh
+    source ${VCPROOT}/vl/vl-start-enlistment.sh
     popd > /dev/null
 }
 export -f vreset
