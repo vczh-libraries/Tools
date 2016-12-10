@@ -8,6 +8,8 @@ function Help {
     echo "    Go to the \"Test/Linux\" folder of this project."
     echo "s <project>"
     echo "    Go to the \"Source\" folder of this project"
+    echo "u [<project>]"
+    echo "    Get the latset code of this project, or all projects if it is not specified."
 }
 
 function Go {
@@ -36,6 +38,26 @@ function Go {
     cd $VPATH
 }
 
+function Update {
+    if [ "$1" == "" ]; then
+        Update Tools
+        Update Vlpp
+        Update Workflow
+        Update GacUI
+        Update GacJS
+        Update Release
+        Update XGac
+        Update iGac
+    else
+        pushd . > /dev/null
+        Go "" $1
+        if [ "$PWD" == "${VROOT}/$1" ]; then
+            git pull origin master
+        fi
+        popd > /dev/null
+    fi
+}
+
 case $1 in
     --help)
     Help
@@ -51,6 +73,10 @@ case $1 in
 
     s)
     Go "Source" $2
+    ;;
+
+    u)
+    Update $2
     ;;
 
     *)
