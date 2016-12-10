@@ -16,12 +16,9 @@ function Entry {
     for i in `seq 1 101`; do
         if [ "$i" == "101" ]; then
             echo "You have too many enlistments!"
-            pushd ~/Desktop
-            ls *.desktop
-            popd
             exit 1
         fi
-        local VFILE=~/Desktop/vle_${i}.desktop
+        local VFILE=${VCPROOT}/vle_${i}.desktop
         if ! [ -a ${VFILE} ]; then
             echo "Creating ${VFILE} ..."
             break
@@ -38,14 +35,14 @@ function Entry {
     local VPATH=${PWD}
 
     local VTEMPLATE=~/Desktop/vl/vle-template.desktop
-    local VPATTERNS="s?<NAME>?${VNAME}?g;"$'\n'"s?<PATH>?${VPATH}?g;"
+    local VPATTERNS="s?<NAME>?${VNAME}?g;"$'\n'"s?<PATH>?${VPATH}?g;"$'\n'"s?<VCPROOT>?${VCPROOT}?g;"
     sed -e "${VPATTERNS}" "${VTEMPLATE}" > "${VFILE}"
     chmod u+x "${VFILE}"
 }
 
 function Enlist {
-    if [ ${PWD} == ~/Desktop ]; then
-        echo "I don't think you want to enlist repos in your desktop folder."
+    if [ ${PWD} == ${VCPROOT} ]; then
+        echo "Repos cannot be enlisted in the folder for *.desktop files."
         exit 1
     fi
     GitClone Tools
