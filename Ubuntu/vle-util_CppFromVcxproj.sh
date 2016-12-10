@@ -11,6 +11,6 @@ CPPS=`echo "${COMPILES}" | sed -r -e 's%\s*'${PATTERN}'\s*%\1%g'`
 # refine file names
 CPPS=`echo "${CPPS}" | sed -e 's%[\]%/%g'`
 CPPS=`echo "${CPPS}" | sed -e 's%^%'${PWD}/$(dirname $1)/'%g'`
-echo "${CPPS}" | while read CPP; do
+echo "${CPPS}" | while read -r CPP; do
     realpath --relative-to="${PWD}" ${CPP}
 done
