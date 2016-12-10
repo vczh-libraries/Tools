@@ -40,7 +40,7 @@ function GetScript {
 cd ./vl
 
     GetScript ControlPanel vl help ssh apt enlist
-    GetScript Enlistment vle help go
+    GetScript Enlistment vle help go vutil_CppFromVcxproj
 
     GetFile vl-start-enlistment.sh
     chmod u+x vl-start-enlistment.sh
