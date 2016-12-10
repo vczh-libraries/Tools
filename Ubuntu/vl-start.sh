@@ -46,6 +46,7 @@ cd ./vl
     chmod u+x vl-start-enlistment.sh
 
     GetFile vle-template.desktop
+    GetFile vmake-cpp
 
 cd ..
 
