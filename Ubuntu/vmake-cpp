@@ -12,7 +12,7 @@ done
 printf -v CPP_FILES "%s\n" "${CPP_FILES[@]}"
 CPP_FILES=${CPP_FILES%?}
 
-O_FILES=`echo "${CPP_FILES}" | sed -r -e 's%.+?/(.+?).cpp%./Obj/\1.o%g'`
+O_FILES=`echo "${CPP_FILES}" | sed -r -e 's%([^/]*/)*([^/]+).cpp%./Obj/\2.o%g'`
 O_FILES=`echo ${O_FILES}`
 #>
 
