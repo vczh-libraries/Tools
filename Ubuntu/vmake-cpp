@@ -12,16 +12,18 @@ done
 printf -v CPP_FILES "%s\n" "${CPP_FILES[@]}"
 CPP_FILES=${CPP_FILES%?}
 
-O_FILES=`echo "${CPP_FILES}" | sed -r -e 's%.+?/(.+?).cpp%./Obj/\1.o%g'`
+O_FILES=`echo "${CPP_FILES}" | sed -r -e 's%([^/]*/)*([^/]+).cpp%./Obj/\2.o%g'`
 O_FILES=`echo ${O_FILES}`
 #>
 
 .PHONY: all clean pre-build
 .DEFAULT_GOAL := all
+COVERAGE?=NO
 
 pre-build:
 	if ! [ -d ./Bin ]; then mkdir ./Bin; fi
 	if ! [ -d ./Obj ]; then mkdir ./Obj; fi
+	if ! [ -d ./Coverage ]; then mkdir ./Coverage; fi
 <#for FOLDER in "${FOLDERS[@]}"; do#>
 	if ! [ -d <#= $FOLDER #> ]; then mkdir <#= $FOLDER #>; fi
 <#done#>
@@ -29,6 +31,7 @@ pre-build:
 clean:
 	if [ -d ./Bin ]; then rm -r ./Bin; fi
 	if [ -d ./Obj ]; then rm -r ./Obj; fi
+	if [ -d ./Coverage ]; then rm -r ./Coverage; fi
 <#for FOLDER in "${FOLDERS[@]}"; do#>
 	if [ -d ./<#= $FOLDER #> ]; then rm -r <#= $FOLDER #>; fi
 <#done#>
@@ -36,10 +39,18 @@ clean:
 all:pre-build <#= ${TARGETS[@]} #>
 
 <#= $CPP_TARGET #>:<#= ${O_FILES} #>
+ifeq ($(COVERAGE),NO)
 	clang++ -std=c++14 -pthread -g -o $@ $^
+else
+	g++ -std=c++11 -g -fprofile-arcs -pthread -o $@ $^
+endif
 
 <#echo "${CPP_FILES}" | while read -r CPP_FILE; do#>
 
 ./Obj/<#= `vutil_CppDependencies ${CPP_FILE}` #>
+ifeq ($(COVERAGE),NO)
 	clang++ -std=c++14 -g -o $@ -c $<
+else
+	g++ -std=c++11 -g -fprofile-arcs -ftest-coverage -o $@ -c $<
+endif
 <#done#>
