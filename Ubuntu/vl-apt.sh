@@ -42,6 +42,7 @@ function Install {
     AptGetInstall openssh-server
     AptGetInstall lcov
     AptGetInstall vim
+    AptGetInstall compizconfig-settings-manager
     # AptGetInstall xfce4
     # AptGetInstall xrdp
     
@@ -69,6 +70,7 @@ function Remove {
     AptGetRemove openssh-server
     AptGetRemove lcov
     AptGetRemove vim
+    AptGetRemove compizconfig-settings-manager
     # AptGetRemove xfce4
     # AptGetRemove xrdp
 
