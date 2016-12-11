@@ -48,6 +48,7 @@ cd ./vl
 
     GetFile vle-template.desktop
     GetFile vmake-cpp
+    GetFile makefile-cpp
 
 cd ..
 
