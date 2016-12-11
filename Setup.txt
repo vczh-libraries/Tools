@@ -11,8 +11,8 @@ reboot
 Input Method
 
 sudo apt-get install ibus-sunpinyin
-# Settings->TextEntry: add Chinese (SunPinyin) (IBus)
 ibus restart
+# Settings->TextEntry: add Chinese (SunPinyin) (IBus)
 # Use [Win]+[Space] to switch between input methods
 ----------------------
 .vimrc
