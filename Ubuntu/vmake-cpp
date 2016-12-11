@@ -15,10 +15,10 @@ CPP_FILES=${CPP_FILES%?}
 O_FILES=`echo "${CPP_FILES}" | sed -r -e 's%([^/]*/)*([^/]+).cpp%./Obj/\2.o%g'`
 O_FILES=`echo ${O_FILES}`
 #>
-
 .PHONY: all clean pre-build
 .DEFAULT_GOAL := all
-COVERAGE?=NO
+
+include $(VCPROOT)/vl/makefile-cpp
 
 pre-build:
 	if ! [ -d ./Bin ]; then mkdir ./Bin; fi
@@ -39,18 +39,9 @@ clean:
 all:pre-build <#= ${TARGETS[@]} #>
 
 <#= $CPP_TARGET #>:<#= ${O_FILES} #>
-ifeq ($(COVERAGE),NO)
-	clang++ -std=c++14 -pthread -g -o $@ $^
-else
-	g++ -std=c++11 -g -fprofile-arcs -pthread -o $@ $^
-endif
-
+	$(CPP_LINK)
 <#echo "${CPP_FILES}" | while read -r CPP_FILE; do#>
 
 ./Obj/<#= `vutil_CppDependencies ${CPP_FILE}` #>
-ifeq ($(COVERAGE),NO)
-	clang++ -std=c++14 -g -o $@ -c $<
-else
-	g++ -std=c++11 -g -fprofile-arcs -ftest-coverage -o $@ -c $<
-endif
+	$(CPP_COMPILE)
 <#done#>
