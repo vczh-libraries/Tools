@@ -1,10 +1,19 @@
 ======================
-SCREEN-RESOLUTION
+ENVIRONMENT
 ----------------------
+Screen Resolution
+
 sudo gedit /etc/default/grub
 CRUB_CMDLINE_LINUX_DEFAULT="quiet splash video=hyperv_fb:1920x1080"
 sudo update-grub
 reboot
+----------------------
+Input Method
+
+sudo apt-get install ibus-sunpinyin
+# Settings->TextEntry: add Chinese (SunPinyin) (IBus)
+ibus restart
+# Use [Win]+[Space] to switch between input methods
 ----------------------
 .vimrc
 
