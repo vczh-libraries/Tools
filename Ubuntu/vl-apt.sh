@@ -42,20 +42,20 @@ function Install {
     AptGetInstall openssh-server
     AptGetInstall lcov
     AptGetInstall vim
-    AptGetInstall xfce4
-    AptGetInstall xrdp
+    # AptGetInstall xfce4
+    # AptGetInstall xrdp
     
     echo "Starting ssh service ..."
     sudo /etc/init.d/ssh start
     
-    echo "Starting xrdp service ..."
-    echo xfce4-session >~/.xsession
-    sudo service xrdp restart
+    # echo "Starting xrdp service ..."
+    # echo xfce4-session >~/.xsession
+    # sudo service xrdp restart
 }
 
 function Remove {
-    echo "Stopping ssh service ..."
-    sudo /etc/init.d/ssh stop
+    # echo "Stopping ssh service ..."
+    # sudo /etc/init.d/ssh stop
 
     echo "Stopping xrdp service ..."
     sudo service xrdp stop
@@ -69,8 +69,8 @@ function Remove {
     AptGetRemove openssh-server
     AptGetRemove lcov
     AptGetRemove vim
-    AptGetRemove xfce4
-    AptGetRemove xrdp
+    # AptGetRemove xfce4
+    # AptGetRemove xrdp
 
     AptGetAutoRemove
 }
