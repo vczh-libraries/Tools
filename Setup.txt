@@ -1,17 +1,10 @@
 ======================
-SETUP
+SCREEN-RESOLUTION
 ----------------------
-apt-get install
-
-htop
-cgdb
-manpages-posix-dev
-git
-vim
-apt-file
-clang
-openssh-server
-lcov
+sudo gedit /etc/default/grub
+CRUB_CMDLINE_LINUX_DEFAULT="quiet splash video=hyperv_fb:1920x1080"
+sudo update-grub
+reboot
 ----------------------
 .vimrc
 
@@ -21,21 +14,6 @@ set hlsearch
 set fileencodings=utf-8,ucs-bom,cp936
 set nocompatible
 filetype off
-----------------------
-github
-
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_rsa
-// add id_rsa.pub to github
-ssh -T git@github.com
-
-git clone git@github.com:vczh-libraries/<every-repo>.git
-run Tools/Tools/BuildToolsLinux.sh
-----------------------
-.bashrc
-
-export PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\$ "
 ======================
 CLANG-COMPLETE
 ----------------------
