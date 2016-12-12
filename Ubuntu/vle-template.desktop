@@ -2,7 +2,7 @@
 Version=1.0
 Name=<NAME>
 Comment=Vczh Libraries Control Panel for Github Repos: <PATH>
-Exec=gnome-terminal -e "bash -c 'cd <PATH>;export VCPROOT=<VCPROOT>; source ${VCPROOT}/vl/vl-start-enlistment.sh;$SHELL'"
+Exec=gnome-terminal -e "bash -c 'source <PATH>/load.sh;$SHELL'"
 Icon=utilities-terminal
 Terminal=false
 Type=Application
