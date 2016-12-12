@@ -67,6 +67,7 @@ export -f PromptCommand
 export PROMPT_COMMAND="PromptCommand"
 
 if [ -a ~/.ssh/id_rsa_vl ]; then
+    eval "$(ssh-agent -s)"
     pushd ~/.ssh > /dev/null
     ssh-add id_rsa_vl
     popd > /dev/null
