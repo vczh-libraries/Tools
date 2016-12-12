@@ -34,10 +34,13 @@ function Entry {
     fi
     local VPATH=${PWD}
 
-    local VTEMPLATE=${VCPROOT}/vl/vle-template.desktop
     local VPATTERNS="s?<NAME>?${VNAME}?g;"$'\n'"s?<PATH>?${VPATH}?g;"$'\n'"s?<VCPROOT>?${VCPROOT}?g;"
-    sed -e "${VPATTERNS}" "${VTEMPLATE}" > "${VFILE}"
+
+    sed -e "${VPATTERNS}" "${VCPROOT}/vl/vle-template.desktop" > "${VFILE}"
     chmod u+x "${VFILE}"
+
+    sed -e "${VPATTERNS}" "${VCPROOT}/vl/vle-template.sh" > "${VPATH}/load.sh"
+    chmod u+x "${VPATH}/load.sh"
 }
 
 function Enlist {
