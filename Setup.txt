@@ -16,6 +16,10 @@ ibus restart
 # Settings->TextEntry: add new input methods
 # Use [Win]+[Space] to switch
 ----------------------
+X Server
+
+dbus-launch gedit &
+----------------------
 .vimrc
 
 set tabstop=4
