@@ -18,6 +18,12 @@ O_FILES=`echo ${O_FILES}`
 .PHONY: all clean pre-build
 .DEFAULT_GOAL := all
 
+<#if ! [ "$CPP_COMPILE_OPTIONS" == "" ]; then#>
+CPP_COMPILE_OPTIONS=<#= $CPP_COMPILE_OPTIONS #>
+<#fi#>
+<#if ! [ "$CPP_LINK_OPTIONS" == "" ]; then#>
+CPP_LINK_OPTIONS = <#= $CPP_LINK_OPTIONS #>
+<#fi#>
 include $(VCPROOT)/vl/makefile-cpp
 
 pre-build:
@@ -42,6 +48,6 @@ all:pre-build <#= ${TARGETS[@]} #>
 	$(CPP_LINK)
 <#echo "${CPP_FILES}" | while read -r CPP_FILE; do#>
 
-./Obj/<#= `vutil_CppDependencies ${CPP_FILE}` #>
+./Obj/<#= `vutil_CppDependencies "${CPP_COMPILE_OPTIONS}" ${CPP_FILE}` #>
 	$(CPP_COMPILE)
 <#done#>
