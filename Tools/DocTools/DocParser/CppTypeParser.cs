@@ -602,7 +602,7 @@ namespace DocParser
                 index = oldIndex;
             }
 
-            if (CppParser.Token(tokens, ref index, ">") || CppParser.Token(tokens, ref index, ">"))
+            if (CppParser.Token(tokens, ref index, ">") || CppParser.Token(tokens, ref index, ","))
             {
                 index--;
             }
