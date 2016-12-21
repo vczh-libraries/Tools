@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # read the input *.vcxproj
+if [ "$1" == "" ]; then
+    exit 0
+fi
 CONTENT=`cat $1`
 
 # extract all cpp files
