@@ -9,7 +9,7 @@ namespace DocParser
 {
     public static class CppTypeParser
     {
-        static bool ParseMiniType(string[] tokens, ref int index, out TypeDecl decl)
+        public static bool ParseMiniType(string[] tokens, ref int index, out TypeDecl decl)
         {
             decl = null;
             if (CppParser.Token(tokens, ref index, "const"))
@@ -113,7 +113,7 @@ namespace DocParser
                                 {
                                     while (true)
                                     {
-                                        genericDecl.TypeArguments.Add(EnsureTypeWithoutName(tokens, ref index));
+                                        genericDecl.TypeArguments.Add(EnsureTypeWithoutNameInTemplate(tokens, ref index));
 
                                         if (CppParser.Token(tokens, ref index, ">"))
                                         {
@@ -160,7 +160,7 @@ namespace DocParser
             }
         }
 
-        static TypeDecl EnsureMiniType(string[] tokens, ref int index)
+        public static TypeDecl EnsureMiniType(string[] tokens, ref int index)
         {
             TypeDecl decl = null;
             if (!ParseMiniType(tokens, ref index, out decl))
@@ -587,6 +587,40 @@ namespace DocParser
                 throw new ArgumentException("Failed to parse.");
             }
             return decl;
+        }
+
+        public static TypeDecl EnsureTypeWithoutNameInTemplate(string[] tokens, ref int index)
+        {
+            int oldIndex = index;
+            TypeDecl type = null;
+            try
+            {
+                type = EnsureTypeWithoutName(tokens, ref index);
+            }
+            catch (ArgumentException)
+            {
+                index = oldIndex;
+            }
+
+            if (CppParser.Token(tokens, ref index, ">") || CppParser.Token(tokens, ref index, ">"))
+            {
+                index--;
+            }
+            else
+            {
+                index = oldIndex;
+                CppParser.SkipUntilInTemplate(tokens, ref index, ">", ",");
+                index--;
+
+                type = new ConstantTypeDecl
+                {
+                    Value = tokens
+                        .Skip(oldIndex)
+                        .Take(index - oldIndex)
+                        .Aggregate((a, b) => a + " " + b),
+                };
+            }
+            return type;
         }
 
         public static TypeDecl EnsureTypeWithName(string[] tokens, ref int index, out string name)

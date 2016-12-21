@@ -115,7 +115,7 @@ namespace DocParser
                             {
                                 while (true)
                                 {
-                                    templateDecl.Specialization.Add(CppTypeParser.EnsureTypeWithoutName(tokens, ref index));
+                                    templateDecl.Specialization.Add(CppTypeParser.EnsureTypeWithoutNameInTemplate(tokens, ref index));
                                     if (CppParser.Token(tokens, ref index, ">"))
                                     {
                                         break;
@@ -283,24 +283,7 @@ namespace DocParser
                                     while (true)
                                     {
                                         int oldIndex = index;
-                                        try
-                                        {
-                                            templateDecl.Specialization.Add(CppTypeParser.EnsureTypeWithoutName(tokens, ref index));
-                                        }
-                                        catch (ArgumentException)
-                                        {
-                                            index = oldIndex;
-                                            CppParser.SkipUntilInTemplate(tokens, ref index, ",", ">");
-                                            index--;
-
-                                            templateDecl.Specialization.Add(new ConstantTypeDecl
-                                            {
-                                                Value = tokens
-                                                    .Skip(oldIndex)
-                                                    .Take(index - oldIndex)
-                                                    .Aggregate((a, b) => a + " " + b),
-                                            });
-                                        }
+                                        templateDecl.Specialization.Add(CppTypeParser.EnsureTypeWithoutNameInTemplate(tokens, ref index));
                                         if (CppParser.Token(tokens, ref index, ">"))
                                         {
                                             break;
@@ -530,7 +513,7 @@ namespace DocParser
                                         TypeDecl newReturnType = CppTypeParser.EnsureTypeWithoutName(tokens, ref index);
                                         funcType.ReturnType = newReturnType;
                                     }
-                                    
+
                                     if (!CppParser.Token(tokens, ref index, ";"))
                                     {
                                         CppParser.EnsureToken(tokens, ref index, "{");
@@ -605,12 +588,25 @@ namespace DocParser
                     {
                         if (CppParser.Token(tokens, ref index, ":"))
                         {
-                            CppParser.SkipUntil(tokens, ref index, "{");
+                            do
+                            {
+                                CppTypeParser.EnsureMiniType(tokens, ref index);
+                                if (CppParser.Token(tokens, ref index, "("))
+                                {
+                                    CppParser.SkipUntil(tokens, ref index, ")");
+                                }
+                                else if (CppParser.Token(tokens, ref index, "{"))
+                                {
+                                    CppParser.SkipUntil(tokens, ref index, "}");
+                                }
+                                else
+                                {
+                                    throw new ArgumentException("Failed to parse.");
+                                }
+                            }
+                            while (CppParser.Token(tokens, ref index, ","));
                         }
-                        else
-                        {
-                            CppParser.EnsureToken(tokens, ref index, "{");
-                        }
+                        CppParser.EnsureToken(tokens, ref index, "{");
                         CppParser.SkipUntil(tokens, ref index, "}");
                     }
 
