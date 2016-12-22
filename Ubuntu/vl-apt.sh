@@ -10,6 +10,7 @@ function Help {
     echo "        git"
     echo "        apt-file"
     echo "        clang"
+    echo "        libc++-dev"
     echo "        openssh-server"
     echo "        lcov"
     echo "        vim"
@@ -39,6 +40,7 @@ APTGET_TARGETS=(
     git
     apt-file
     clang
+    libc++-dev
     openssh-server
     lcov
     vim
