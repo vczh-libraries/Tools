@@ -32,19 +32,25 @@ function AptGetAutoRemove {
     sudo apt-get autoremove --assume-yes > /dev/null
 }
 
+APTGET_TARGETS=(
+    htop
+    cgdb
+    manpages-posix-dev
+    git
+    apt-file
+    clang
+    openssh-server
+    lcov
+    vim
+    compizconfig-settings-manager
+    )
+# xfce4
+# xrdp
+
 function Install {
-    AptGetInstall htop
-    AptGetInstall cgdb
-    AptGetInstall manpages-posix-dev
-    AptGetInstall git
-    AptGetInstall apt-file
-    AptGetInstall clang
-    AptGetInstall openssh-server
-    AptGetInstall lcov
-    AptGetInstall vim
-    AptGetInstall compizconfig-settings-manager
-    # AptGetInstall xfce4
-    # AptGetInstall xrdp
+    for i in "${APTGET_TARGETS[@]}"; do
+        AptGetInstall $i
+    done
     
     echo "Starting ssh service ..."
     sudo /etc/init.d/ssh start
@@ -55,24 +61,15 @@ function Install {
 }
 
 function Remove {
-    # echo "Stopping ssh service ..."
-    # sudo /etc/init.d/ssh stop
+    echo "Stopping ssh service ..."
+    sudo /etc/init.d/ssh stop
 
-    echo "Stopping xrdp service ..."
-    sudo service xrdp stop
-
-    AptGetRemove htop
-    AptGetRemove cgdb
-    AptGetRemove manpages-posix-dev
-    AptGetRemove git
-    AptGetRemove apt-file
-    AptGetRemove clang
-    AptGetRemove openssh-server
-    AptGetRemove lcov
-    AptGetRemove vim
-    AptGetRemove compizconfig-settings-manager
-    # AptGetRemove xfce4
-    # AptGetRemove xrdp
+    # echo "Stopping xrdp service ..."
+    # sudo service xrdp stop
+    
+    for i in "${APTGET_TARGETS[@]}"; do
+        AptGetRemove $i
+    done
 
     AptGetAutoRemove
 }
