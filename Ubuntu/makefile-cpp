@@ -1,13 +1,13 @@
 COVERAGE?=NO
 
 ifeq ($(COVERAGE),NO)
-CPP_LINK=clang++ -std=c++14 -pthread -g $(CPP_COMPILE_OPTIONS) -o $@ $^
+CPP_LINK=clang++ -std=c++14 --stdlib=libc++ -pthread -g $(CPP_COMPILE_OPTIONS) -o $@ $^
 else
 CPP_LINK=g++ -std=c++14 -g -fprofile-arcs -pthread $(CPP_LINK_OPTIONS) -o $@ $^
 endif
 
 ifeq ($(COVERAGE),NO)
-CPP_COMPILE=clang++ -std=c++14 -g $(CPP_COMPILE_OPTIONS) -o $@ -c $<
+CPP_COMPILE=clang++ -std=c++14 --stdlib=libc++ -g $(CPP_COMPILE_OPTIONS) -o $@ -c $<
 else
 CPP_COMPILE=g++ -std=c++14 -g -fprofile-arcs -ftest-coverage $(CPP_COMPILE_OPTIONS) -o $@ -c $<
 endif
