@@ -6,6 +6,8 @@ function Help {
     echo "    Create a desktop shortcut for operating this enlistment. This should be done in --enlist."
     echo "--enlist"
     echo "    Enlist all repos in the current directory."
+    echo "--fix"
+    echo "    Enlist repos that does not exist in the current directory."
 }
 
 function GitClone {
@@ -43,20 +45,29 @@ function Entry {
     chmod u+x "${VPATH}/load.sh"
 }
 
+GITHUB_REPOS=(Tools Vlpp Workflow GacUI GacJS Release XGac iGac vczh-libraries.github.io)
+
 function Enlist {
     if [ ${PWD} == ${VCPROOT} ]; then
         echo "Repos cannot be enlisted in the folder for *.desktop files."
         exit 1
     fi
-    GitClone Tools
-    GitClone Vlpp
-    GitClone Workflow
-    GitClone GacUI
-    GitClone GacJS
-    GitClone Release
-    GitClone XGac
-    GitClone iGac
+    for i in "${GITHUB_REPOS[@]}"; do
+        GitClone $i
+    done
     Entry
+}
+
+function Fix {
+    if ! [ -a load.sh ]; then
+        echo "If you want to create a new enlistment, use --enlist."
+        exit 1
+    fi
+    for i in "${GITHUB_REPOS[@]}"; do
+        if ! [ -d "$i" ]; then
+            GitClone $i
+        fi
+    done
 }
 
 case $1 in
@@ -70,6 +81,10 @@ case $1 in
 
     --enlist)
     Enlist
+    ;;
+
+    --fix)
+    Fix
     ;;
 
     *)
