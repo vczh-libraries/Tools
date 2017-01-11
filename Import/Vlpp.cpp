@@ -3015,7 +3015,7 @@ Thread
 
 	void Thread::SetCPU(vint index)
 	{
-		SetThreadAffinityMask(internalData->handle, (1<<index));
+		SetThreadAffinityMask(internalData->handle, ((vint)1 << index));
 	}
 
 /***********************************************************************
@@ -14381,8 +14381,8 @@ namespace vl
 			using namespace vl::parsing::json;
 
 #define PARSING_TOKEN_FIELD(NAME)\
-			CLASS_MEMBER_EXTERNALMETHOD_INVOKETEMPLATE(get_##NAME, NO_PARAMETER, vl::WString(ClassType::*)(), [](ClassType* node) { return node->NAME.value; }, L"*")\
-			CLASS_MEMBER_EXTERNALMETHOD_INVOKETEMPLATE(set_##NAME, { L"value" }, void(ClassType::*)(const vl::WString&), [](ClassType* node, const vl::WString& value) { node->NAME.value = value; }, L"*")\
+			CLASS_MEMBER_EXTERNALMETHOD_TEMPLATE(get_##NAME, NO_PARAMETER, vl::WString(ClassType::*)(), [](ClassType* node) { return node->NAME.value; }, L"*", L"*")\
+			CLASS_MEMBER_EXTERNALMETHOD_TEMPLATE(set_##NAME, { L"value" }, void(ClassType::*)(const vl::WString&), [](ClassType* node, const vl::WString& value) { node->NAME.value = value; }, L"*", L"*")\
 			CLASS_MEMBER_PROPERTY_REFERENCETEMPLATE(NAME, get_##NAME, set_##NAME, L"$This->$Name.value")\
 
 			IMPL_TYPE_INFO_RENAME(vl::parsing::json::JsonNode, system::JsonNode)
@@ -15407,8 +15407,8 @@ namespace vl
 			using namespace vl::parsing::xml;
 
 #define PARSING_TOKEN_FIELD(NAME)\
-			CLASS_MEMBER_EXTERNALMETHOD_INVOKETEMPLATE(get_##NAME, NO_PARAMETER, vl::WString(ClassType::*)(), [](ClassType* node) { return node->NAME.value; }, L"*")\
-			CLASS_MEMBER_EXTERNALMETHOD_INVOKETEMPLATE(set_##NAME, { L"value" }, void(ClassType::*)(const vl::WString&), [](ClassType* node, const vl::WString& value) { node->NAME.value = value; }, L"*")\
+			CLASS_MEMBER_EXTERNALMETHOD_TEMPLATE(get_##NAME, NO_PARAMETER, vl::WString(ClassType::*)(), [](ClassType* node) { return node->NAME.value; }, L"*", L"*")\
+			CLASS_MEMBER_EXTERNALMETHOD_TEMPLATE(set_##NAME, { L"value" }, void(ClassType::*)(const vl::WString&), [](ClassType* node, const vl::WString& value) { node->NAME.value = value; }, L"*", L"*")\
 			CLASS_MEMBER_PROPERTY_REFERENCETEMPLATE(NAME, get_##NAME, set_##NAME, L"$This->$Name.value")\
 
 			IMPL_TYPE_INFO_RENAME(vl::parsing::xml::XmlNode, system::XmlNode)
@@ -15552,6 +15552,8 @@ namespace vl
 DescriptableObject
 ***********************************************************************/
 
+#ifndef VCZH_DEBUG_NO_REFLECTION
+
 		bool DescriptableObject::IsAggregated()
 		{
 			return aggregationInfo != nullptr;
@@ -15629,9 +15631,11 @@ DescriptableObject
 			aggregationInfo = new DescriptableObject*[size + 2];
 			memset(aggregationInfo, 0, sizeof(*aggregationInfo) * (size + 2));
 		}
+#endif
 
 		void DescriptableObject::FinalizeAggregation()
 		{
+#ifndef VCZH_DEBUG_NO_REFLECTION
 			if (IsAggregated())
 			{
 				if (auto root = GetAggregationRoot())
@@ -15652,21 +15656,25 @@ DescriptableObject
 					}
 				}
 			}
+#endif
 		}
 
 		DescriptableObject::DescriptableObject()
 			:referenceCounter(0)
 			, sharedPtrDestructorProc(0)
+#ifndef VCZH_DEBUG_NO_REFLECTION
 			, objectSize(0)
 			, typeDescriptor(0)
 			, destructing(false)
 			, aggregationInfo(nullptr)
 			, aggregationSize(-1)
+#endif
 		{
 		}
 
 		DescriptableObject::~DescriptableObject()
 		{
+#ifndef VCZH_DEBUG_NO_REFLECTION
 			destructing = true;
 			if (IsAggregated())
 			{
@@ -15693,12 +15701,17 @@ DescriptableObject
 				}
 				delete[] aggregationInfo;
 			}
+#endif
 		}
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 
 		description::ITypeDescriptor* DescriptableObject::GetTypeDescriptor()
 		{
 			return typeDescriptor?*typeDescriptor:0;
 		}
+
+#endif
 
 		Ptr<Object> DescriptableObject::GetInternalProperty(const WString& name)
 		{
@@ -15748,6 +15761,7 @@ DescriptableObject
 
 		bool DescriptableObject::Dispose(bool forceDisposing)
 		{
+#ifndef VCZH_DEBUG_NO_REFLECTION
 			if (IsAggregated())
 			{
 				if (auto root = GetAggregationRoot())
@@ -15755,6 +15769,7 @@ DescriptableObject
 					return root->Dispose(forceDisposing);
 				}
 			}
+#endif
 
 			if (referenceCounter > 0 && forceDisposing)
 			{
@@ -15772,6 +15787,8 @@ DescriptableObject
 			}
 		}
 
+#ifndef VCZH_DEBUG_NO_REFLECTION
+
 		DescriptableObject* DescriptableObject::SafeGetAggregationRoot()
 		{
 			if (IsAggregated())
@@ -15784,6 +15801,8 @@ DescriptableObject
 			return this;
 		}
 
+#endif
+
 /***********************************************************************
 description::Value
 ***********************************************************************/
@@ -15793,31 +15812,46 @@ description::Value
 			Value::Value(DescriptableObject* value)
 				:valueType(value ? RawPtr :Null)
 				,rawPtr(nullptr)
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				,typeDescriptor(0)
+#endif
 			{
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				if (value)
 				{
 					rawPtr = value->SafeGetAggregationRoot();
 				}
+#else
+				rawPtr = value;
+#endif
 			}
 
 			Value::Value(Ptr<DescriptableObject> value)
 				:valueType(value ? SharedPtr : Null)
 				,rawPtr(nullptr)
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				,typeDescriptor(0)
+#endif
 			{
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				if (value)
 				{
 					rawPtr = value->SafeGetAggregationRoot();
 					sharedPtr = rawPtr;
 				}
+#else
+				rawPtr = value.Obj();
+				sharedPtr = value;
+#endif
 			}
 
 			Value::Value(Ptr<IBoxedValue> value, ITypeDescriptor* associatedTypeDescriptor)
 				:valueType(value ? BoxedValue : Null)
 				, rawPtr(nullptr)
 				, boxedValue(value)
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				, typeDescriptor(associatedTypeDescriptor)
+#endif
 			{
 			}
 
@@ -15851,6 +15885,7 @@ description::Value
 						return 1;
 					case Value::BoxedValue:
 						{
+#ifndef VCZH_DEBUG_NO_REFLECTION
 							auto aSt = a.GetTypeDescriptor()->GetSerializableType();
 							auto bSt = b.GetTypeDescriptor()->GetSerializableType();
 							if (aSt)
@@ -15923,6 +15958,13 @@ description::Value
 									}
 								}
 							}
+#else
+								auto pa = a.GetBoxedValue().Obj();
+								auto pb = b.GetBoxedValue().Obj();
+								if (pa < pb) return -1;
+								if (pa > pb) return 1;
+								return 0;
+#endif
 						}
 					default:
 						return 1;
@@ -15943,7 +15985,9 @@ description::Value
 			Value::Value()
 				:valueType(Null)
 				,rawPtr(0)
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				,typeDescriptor(0)
+#endif
 			{
 			}
 
@@ -15952,7 +15996,9 @@ description::Value
 				,rawPtr(value.rawPtr)
 				,sharedPtr(value.sharedPtr)
 				,boxedValue(value.boxedValue ? value.boxedValue->Copy() : nullptr)
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				,typeDescriptor(value.typeDescriptor)
+#endif
 			{
 			}
 
@@ -15962,7 +16008,9 @@ description::Value
 				rawPtr = value.rawPtr;
 				sharedPtr = value.sharedPtr;
 				boxedValue = value.boxedValue ? value.boxedValue->Copy() : nullptr;
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				typeDescriptor = value.typeDescriptor;
+#endif
 				return *this;
 			}
 
@@ -15985,6 +16033,13 @@ description::Value
 			{
 				return boxedValue;
 			}
+
+			bool Value::IsNull()const
+			{
+				return valueType == Null;
+			}
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 
 			ITypeDescriptor* Value::GetTypeDescriptor()const
 			{
@@ -16013,11 +16068,6 @@ description::Value
 				default:
 					return L"null";
 				}
-			}
-
-			bool Value::IsNull()const
-			{
-				return valueType==Null;
 			}
 
 			bool Value::CanConvertTo(ITypeDescriptor* targetType, ValueType targetValueType)const
@@ -16074,6 +16124,8 @@ description::Value
 				return CanConvertTo(targetType->GetTypeDescriptor(), targetValueType);
 			}
 
+#endif
+
 			Value Value::From(DescriptableObject* value)
 			{
 				return Value(value);
@@ -16088,6 +16140,8 @@ description::Value
 			{
 				return Value(value, type);
 			}
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 
 			IMethodInfo* Value::SelectMethod(IMethodGroupInfo* methodGroup, collections::Array<Value>& arguments)
 			{
@@ -16230,6 +16284,19 @@ description::Value
 				return eventInfo->Attach(*this, proxy);
 			}
 
+			bool Value::DetachEvent(const WString& name, Ptr<IEventHandler> handler)const
+			{
+				ITypeDescriptor* type = GetTypeDescriptor();
+				if (!type) throw ArgumentNullException(L"thisObject", name);
+
+				IEventInfo* eventInfo = type->GetEventByName(name, true);
+				if (!eventInfo) throw MemberNotExistsException(name, type);
+
+				return eventInfo->Detach(*this, handler);
+			}
+
+#endif
+
 			bool Value::DeleteRawPtr()
 			{
 				if(valueType!=RawPtr) return false;
@@ -16238,6 +16305,8 @@ description::Value
 				*this=Value();
 				return true;
 			}
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 
 /***********************************************************************
 description::TypeManager
@@ -16761,6 +16830,23 @@ Cpp Helper Functions
 				}
 			}
 
+			WString CppGetClosureTemplate(IMethodInfo* method)
+			{
+				if (auto cpp = method->GetCpp())
+				{
+					return cpp->GetClosureTemplate();
+				}
+
+				if (method->IsStatic())
+				{
+					return WString(L"::vl::Func<$Func>(&$Type::$Name)", false);
+				}
+				else
+				{
+					return WString(L"::vl::Func<$Func>($This, &$Type::$Name)", false);
+				}
+			}
+
 			WString CppGetInvokeTemplate(IMethodInfo* method)
 			{
 				if (auto cpp = method->GetCpp())
@@ -16782,28 +16868,22 @@ Cpp Helper Functions
 				}
 			}
 
-			WString CppGetHandlerType(IEventInfo* ev)
-			{
-				auto cpp = ev->GetCpp();
-				return cpp == nullptr ? WString(L"::vl::Ptr<::vl::EventHandler>", false) : cpp->GetHandlerType();
-			}
-
 			WString CppGetAttachTemplate(IEventInfo* ev)
 			{
 				auto cpp = ev->GetCpp();
-				return cpp == nullptr ? WString(L"$This->$Name.Add($Handler)", false) : cpp->GetAttachTemplate();
+				return cpp == nullptr ? WString(L"::vl::__vwsn::EventAttach($This->$Name, $Handler)", false) : cpp->GetAttachTemplate();
 			}
 
 			WString CppGetDetachTemplate(IEventInfo* ev)
 			{
 				auto cpp = ev->GetCpp();
-				return cpp == nullptr ? WString(L"$This->$Name.Remove($Handler)", false) : cpp->GetDetachTemplate();
+				return cpp == nullptr ? WString(L"::vl::__vwsn::EventDetach($This->$Name, $Handler)", false) : cpp->GetDetachTemplate();
 			}
 
 			WString CppGetInvokeTemplate(IEventInfo* ev)
 			{
 				auto cpp = ev->GetCpp();
-				return cpp == nullptr ? WString(L"$This->$Name($Arguments)", false) : cpp->GetInvokeTemplate();
+				return cpp == nullptr ? WString(L"::vl::__vwsn::EventInvoke($This->$Name)($Arguments)", false) : cpp->GetInvokeTemplate();
 			}
 
 			bool CppExists(ITypeDescriptor* type)
@@ -16839,6 +16919,8 @@ Cpp Helper Functions
 				auto cpp = ev->GetCpp();
 				return cpp == nullptr || cpp->GetInvokeTemplate() != L"*";
 			}
+
+#endif
 
 /***********************************************************************
 IValueEnumerable
@@ -16913,6 +16995,8 @@ namespace vl
 	{
 		namespace description
 		{
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 
 /***********************************************************************
 TypeDescriptorTypeInfo
@@ -17337,121 +17421,8 @@ MethodGroupInfoImpl
 			}
 
 /***********************************************************************
-EventInfoImpl::EventHandlerImpl
-***********************************************************************/
-
-			EventInfoImpl::EventHandlerImpl::EventHandlerImpl(EventInfoImpl* _ownerEvent, DescriptableObject* _ownerObject, Ptr<IValueFunctionProxy> _handler)
-				:ownerEvent(_ownerEvent)
-				, ownerObject(_ownerObject)
-				, handler(_handler)
-				, attached(true)
-			{
-			}
-
-			EventInfoImpl::EventHandlerImpl::~EventHandlerImpl()
-			{
-			}
-
-			IEventInfo* EventInfoImpl::EventHandlerImpl::GetOwnerEvent()
-			{
-				return ownerEvent;
-			}
-
-			Value EventInfoImpl::EventHandlerImpl::GetOwnerObject()
-			{
-				return Value::From(ownerObject);
-			}
-
-			bool EventInfoImpl::EventHandlerImpl::IsAttached()
-			{
-				return attached;
-			}
-
-			bool EventInfoImpl::EventHandlerImpl::Detach()
-			{
-				if(attached)
-				{
-					attached=false;
-					ownerEvent->DetachInternal(ownerObject, this);
-					ownerEvent->RemoveEventHandler(ownerObject, this);
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			void EventInfoImpl::EventHandlerImpl::Invoke(const Value& thisObject, collections::Array<Value>& arguments)
-			{
-				if(thisObject.IsNull())
-				{
-					throw ArgumentNullException(L"thisObject", this);
-				}
-				Ptr<IValueList> eventArgs = IValueList::Create();
-				FOREACH(Value, argument, arguments)
-				{
-					eventArgs->Add(argument);
-				}
-				handler->Invoke(eventArgs);
-				arguments.Resize(eventArgs->GetCount());
-				for (vint i = 0; i < arguments.Count(); i++)
-				{
-					arguments[i] = eventArgs->Get(i);
-				}
-			}
-			
-			Ptr<DescriptableObject> EventInfoImpl::EventHandlerImpl::GetDescriptableTag()
-			{
-				return descriptableTag;
-			}
-
-			void EventInfoImpl::EventHandlerImpl::SetDescriptableTag(Ptr<DescriptableObject> _tag)
-			{
-				descriptableTag = _tag;
-			}
-
-			Ptr<Object> EventInfoImpl::EventHandlerImpl::GetObjectTag()
-			{
-				return objectTag;
-			}
-
-			void EventInfoImpl::EventHandlerImpl::SetObjectTag(Ptr<Object> _tag)
-			{
-				objectTag = _tag;
-			}
-
-/***********************************************************************
 EventInfoImpl
 ***********************************************************************/
-
-			const wchar_t* EventInfoImpl::EventHandlerListInternalPropertyName = L"List<EventInfoImpl::EventHandlerImpl>";
-
-			void EventInfoImpl::AddEventHandler(DescriptableObject* thisObject, Ptr<IEventHandler> eventHandler)
-			{
-				WString key=EventHandlerListInternalPropertyName;
-				Ptr<EventHandlerList> value=thisObject->GetInternalProperty(key).Cast<EventHandlerList>();
-				if(!value)
-				{
-					value=new EventHandlerList;
-					thisObject->SetInternalProperty(key, value);
-				}
-				value->Add(eventHandler);
-			}
-			
-			void EventInfoImpl::RemoveEventHandler(DescriptableObject* thisObject, IEventHandler* eventHandler)
-			{
-				WString key=EventHandlerListInternalPropertyName;
-				Ptr<EventHandlerList> value=thisObject->GetInternalProperty(key).Cast<EventHandlerList>();
-				if(value)
-				{
-					value->Remove(eventHandler);
-					if(value->Count()==0)
-					{
-						thisObject->SetInternalProperty(key, 0);
-					}
-				}
-			}
 
 			EventInfoImpl::EventInfoImpl(ITypeDescriptor* _ownerTypeDescriptor, const WString& _name)
 				:ownerTypeDescriptor(_ownerTypeDescriptor)
@@ -17502,21 +17473,41 @@ EventInfoImpl
 				{
 					throw ArgumentTypeMismtatchException(L"thisObject", ownerTypeDescriptor, Value::RawPtr, thisObject);
 				}
+
 				DescriptableObject* rawThisObject=thisObject.GetRawPtr();
 				if(rawThisObject)
 				{
-					Ptr<EventHandlerImpl> eventHandler=new EventHandlerImpl(this, rawThisObject, handler);
-					AddEventHandler(rawThisObject, eventHandler);
-					AttachInternal(rawThisObject, eventHandler.Obj());
-					return eventHandler;
+					return AttachInternal(rawThisObject, handler);
 				}
 				else
 				{
-					return 0;
+					return nullptr;
 				}
 			}
 
-			void EventInfoImpl::Invoke(const Value& thisObject, collections::Array<Value>& arguments)
+			bool EventInfoImpl::Detach(const Value& thisObject, Ptr<IEventHandler> handler)
+			{
+				if (thisObject.IsNull())
+				{
+					throw ArgumentNullException(L"thisObject", this);
+				}
+				else if (!thisObject.CanConvertTo(ownerTypeDescriptor, Value::RawPtr))
+				{
+					throw ArgumentTypeMismtatchException(L"thisObject", ownerTypeDescriptor, Value::RawPtr, thisObject);
+				}
+
+				DescriptableObject* rawThisObject = thisObject.GetRawPtr();
+				if (rawThisObject)
+				{
+					return DetachInternal(rawThisObject, handler);
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			void EventInfoImpl::Invoke(const Value& thisObject, Ptr<IValueList> arguments)
 			{
 				if(thisObject.IsNull())
 				{
@@ -17526,6 +17517,7 @@ EventInfoImpl
 				{
 					throw ArgumentTypeMismtatchException(L"thisObject", ownerTypeDescriptor, Value::RawPtr, thisObject);
 				}
+
 				DescriptableObject* rawThisObject=thisObject.GetRawPtr();
 				if(rawThisObject)
 				{
@@ -18084,18 +18076,11 @@ Function Related
 				{
 				}
 
-				void UnboxSpecifiedParameter(collections::Array<Value>& arguments, vint index)
-				{
-				}
-
 				void AddValueToList(Ptr<IValueList> arguments)
 				{
 				}
-
-				void AddValueToArray(collections::Array<Value>& arguments, vint index)
-				{
-				}
 			}
+#endif
 		}
 	}
 }
@@ -18115,6 +18100,8 @@ namespace vl
 	{
 		namespace description
 		{
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 
 /***********************************************************************
 TypeDescriptorImplBase
@@ -18297,9 +18284,13 @@ ValueTypeDescriptorBase
 				return 0;
 			}
 
+#endif
+
 /***********************************************************************
 TypeName
 ***********************************************************************/
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 			
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::Sys,							system::Sys)
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::Math,						system::Math)
@@ -18354,6 +18345,8 @@ TypeName
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::IMethodGroupInfo,			system::reflection::MethodGroupInfo)
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::TypeDescriptorFlags,			system::reflection::TypeDescriptorFlags)
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::ITypeDescriptor,				system::reflection::TypeDescriptor)
+
+#endif
 
 /***********************************************************************
 TypedValueSerializerProvider
@@ -18746,6 +18739,8 @@ DateTimeValueSerializer
 Helper Functions
 ***********************************************************************/
 
+#ifndef VCZH_DEBUG_NO_REFLECTION
+
 			vint ITypeDescriptor_GetTypeDescriptorCount()
 			{
 				return GetGlobalTypeManager()->GetTypeDescriptorCount();
@@ -18766,9 +18761,35 @@ Helper Functions
 				return value.GetTypeDescriptor();
 			}
 
+#else
+
+			vint ITypeDescriptor_GetTypeDescriptorCount()
+			{
+				return 0;
+			}
+
+			ITypeDescriptor* ITypeDescriptor_GetTypeDescriptor(vint index)
+			{
+				return nullptr;
+			}
+
+			ITypeDescriptor* ITypeDescriptor_GetTypeDescriptor(const WString& name)
+			{
+				return nullptr;
+			}
+
+			ITypeDescriptor* ITypeDescriptor_GetTypeDescriptor(const Value& value)
+			{
+				return nullptr;
+			}
+
+#endif
+
 /***********************************************************************
 LoadPredefinedTypes
 ***********************************************************************/
+
+#ifndef VCZH_DEBUG_NO_REFLECTION
 
 #define _ ,	
 			
@@ -19022,12 +19043,7 @@ LoadPredefinedTypes
 			END_INTERFACE_MEMBER(IMemberInfo)
 
 			BEGIN_INTERFACE_MEMBER_NOPROXY(IEventHandler)
-				CLASS_MEMBER_PROPERTY_READONLY_FAST(OwnerEvent)
-				CLASS_MEMBER_PROPERTY_READONLY_FAST(OwnerObject)
-				
 				CLASS_MEMBER_METHOD(IsAttached, NO_PARAMETER)
-				CLASS_MEMBER_METHOD(Detach, NO_PARAMETER)
-				CLASS_MEMBER_METHOD(Invoke, {L"thisObject" _ L"arguments"})
 			END_INTERFACE_MEMBER(IEventHandler)
 
 			BEGIN_INTERFACE_MEMBER_NOPROXY(IEventInfo)
@@ -19200,14 +19216,18 @@ LoadPredefinedTypes
 				}
 			};
 
+#endif
+
 			bool LoadPredefinedTypes()
 			{
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				ITypeManager* manager=GetGlobalTypeManager();
 				if(manager)
 				{
 					Ptr<ITypeLoader> loader=new PredefinedTypeLoader;
 					return manager->AddTypeLoader(loader);
 				}
+#endif
 				return false;
 			}
 		}
