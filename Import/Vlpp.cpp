@@ -15959,10 +15959,17 @@ description::Value
 								}
 							}
 #else
-								auto pa = a.GetBoxedValue().Obj();
-								auto pb = b.GetBoxedValue().Obj();
-								if (pa < pb) return -1;
-								if (pa > pb) return 1;
+								auto pa = a.GetBoxedValue();
+								auto pb = b.GetBoxedValue();
+								switch (pa->ComparePrimitive(pb))
+								{
+								case IBoxedValue::Smaller: return -1;
+								case IBoxedValue::Greater: return 1;
+								case IBoxedValue::Equal: return 0;
+								default:;
+								}
+								if (pa.Obj() < pb.Obj()) return -1;
+								if (pa.Obj() > pb.Obj()) return 1;
 								return 0;
 #endif
 						}
@@ -16900,7 +16907,7 @@ Cpp Helper Functions
 				}
 				else if (auto method = prop->GetGetter())
 				{
-					return !CppExists(method);
+					return CppExists(method);
 				}
 				else
 				{
@@ -16978,6 +16985,47 @@ IValueDictionary
 				Ptr<Dictionary<Value, Value>> dictionary=new Dictionary<Value, Value>;
 				CopyFrom(*dictionary.Obj(), values);
 				return new ValueDictionaryWrapper<Ptr<Dictionary<Value, Value>>>(dictionary);
+			}
+
+/***********************************************************************
+IValueException
+***********************************************************************/
+
+			class DefaultValueException : public Object, public IValueException
+			{
+			protected:
+				WString				message;
+
+			public:
+				DefaultValueException(const WString& _message)
+					:message(_message)
+				{
+				}
+
+#pragma push_macro("GetMessage")
+#if defined GetMessage
+#undef GetMessage
+#endif
+				WString GetMessage()override
+				{
+					return message;
+				}
+#pragma pop_macro("GetMessage")
+
+				bool GetFatal()override
+				{
+					return false;
+				}
+
+				Ptr<IValueReadonlyList> GetCallStack()override
+				{
+					return nullptr;
+				}
+			};
+
+			Ptr<IValueException> IValueException::Create(const WString& message)
+			{
+				return new DefaultValueException(message);
 			}
 		}
 	}
@@ -18061,6 +18109,7 @@ TypeDescriptorImpl
 				Load();
 				return constructorGroup.Obj();
 			}
+#endif
 
 /***********************************************************************
 Function Related
@@ -18072,15 +18121,16 @@ Function Related
 				{
 				}
 
+#ifndef VCZH_DEBUG_NO_REFLECTION
 				void UnboxSpecifiedParameter(MethodInfoImpl* methodInfo, collections::Array<Value>& arguments, vint index)
 				{
 				}
+#endif
 
 				void AddValueToList(Ptr<IValueList> arguments)
 				{
 				}
 			}
-#endif
 		}
 	}
 }
@@ -18330,7 +18380,7 @@ TypeName
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::IValueException,				system::Exception)
 
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::IBoxedValue,					system::reflection::BoxedValue)
-			IMPL_TYPE_INFO_RENAME(vl::reflection::description::IValueType::CompareResult,	system::reflection::ValueType::CompareResult)
+			IMPL_TYPE_INFO_RENAME(vl::reflection::description::IBoxedValue::CompareResult,	system::reflection::ValueType::CompareResult)
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::IValueType,					system::reflection::ValueType)
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::IEnumType,					system::reflection::EnumType)
 			IMPL_TYPE_INFO_RENAME(vl::reflection::description::ISerializableType,			system::reflection::SerializableType)
@@ -18353,11 +18403,11 @@ TypedValueSerializerProvider
 ***********************************************************************/
 
 #define DEFINE_COMPARE(TYPENAME)\
-			IValueType::CompareResult TypedValueSerializerProvider<TYPENAME>::Compare(const TYPENAME& a, const TYPENAME& b)\
+			IBoxedValue::CompareResult TypedValueSerializerProvider<TYPENAME>::Compare(const TYPENAME& a, const TYPENAME& b)\
 			{\
-				if (a < b) return IValueType::Smaller;\
-				if (a > b) return IValueType::Greater;\
-				return IValueType::Equal;\
+				if (a < b) return IBoxedValue::Smaller;\
+				if (a > b) return IBoxedValue::Greater;\
+				return IBoxedValue::Equal;\
 			}\
 
 			DEFINE_COMPARE(vuint8_t)
@@ -18988,8 +19038,8 @@ LoadPredefinedTypes
 				CLASS_MEMBER_METHOD(Copy, NO_PARAMETER)
 			END_INTERFACE_MEMBER(IBoxedValue)
 
-			BEGIN_ENUM_ITEM(IValueType::CompareResult)
-				ENUM_ITEM_NAMESPACE(IValueType)
+			BEGIN_ENUM_ITEM(IBoxedValue::CompareResult)
+				ENUM_ITEM_NAMESPACE(IBoxedValue)
 
 				ENUM_NAMESPACE_ITEM(Smaller)
 				ENUM_NAMESPACE_ITEM(Greater)
@@ -19194,7 +19244,7 @@ LoadPredefinedTypes
 					ADD_TYPE_INFO(IValueException)
 
 					ADD_TYPE_INFO(IBoxedValue)
-					ADD_TYPE_INFO(IValueType::CompareResult)
+					ADD_TYPE_INFO(IBoxedValue::CompareResult)
 					ADD_TYPE_INFO(IValueType)
 					ADD_TYPE_INFO(IEnumType)
 					ADD_TYPE_INFO(ISerializableType)
