@@ -91,6 +91,15 @@ namespace DocParser
                 CppParser.Token(tokens, ref index, "typename");
                 if (CppParser.Id(tokens, ref index, out token))
                 {
+                    if (token == "L" && index < tokens.Length)
+                    {
+                        if (tokens[index].StartsWith("\""))
+                        {
+                            token += tokens[index];
+                            index++;
+                        }
+                    }
+
                     decl = new RefTypeDecl
                     {
                         Name = token,
