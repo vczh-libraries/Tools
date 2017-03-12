@@ -50,9 +50,10 @@ function Update {
         Update iGac
     else
         pushd . > /dev/null
+        echo "******************************** Pulling from $1"
         Go "" $1
         if [ "$PWD" == "${VROOT}/$1" ]; then
-            git pull origin master
+            git pull --all
         fi
         popd > /dev/null
     fi
