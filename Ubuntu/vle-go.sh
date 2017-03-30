@@ -48,6 +48,7 @@ function Update {
         Update Release
         Update XGac
         Update iGac
+        Update vczh-libraries.github.io
     else
         pushd . > /dev/null
         echo "******************************** Pulling from $1"
