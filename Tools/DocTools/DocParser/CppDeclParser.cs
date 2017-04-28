@@ -543,6 +543,10 @@ namespace DocParser
                                 {
                                     CppParser.SkipUntil(tokens, ref index, ";");
                                 }
+                                else if (CppParser.Token(tokens, ref index, "{"))
+                                {
+                                    CppParser.SkipUntil(tokens, ref index, "}");
+                                }
                                 else
                                 {
                                     CppParser.EnsureToken(tokens, ref index, ";");
