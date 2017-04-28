@@ -51,11 +51,22 @@ function Update {
         Update vczh-libraries.github.io
     else
         pushd . > /dev/null
-        echo "******************************** Pulling from $1"
+        printf "${VC_LIGHTGREEN}Pulling from ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
         Go "" $1
         if [ "$PWD" == "${VROOT}/$1" ]; then
             git pull --all
         fi
+
+        local GITHEAD="$(git symbolic-ref HEAD 2>/dev/null)"
+        local CURRENT_BRANCH="${GITHEAD##refs/heads/}"
+        local BRANCHES=($(git branch | sed -r -e 's/^..//g'))
+        for BRANCH in "${BRANCHES[@]}"; do
+            printf "${VC_LIGHTGREEN}Updating branch: ${VC_LIGHTCYAN}${BRANCH}${VC_DEFAULT}\n"
+            git checkout $BRANCH
+            git pull origin $BRANCH
+        done
+        git checkout $CURRENT_BRANCH
+
         popd > /dev/null
     fi
 }
