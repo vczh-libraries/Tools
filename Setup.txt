@@ -33,6 +33,10 @@ sudo apt-get update
 sudo apt-get upgrade
 
 https://code.visualstudio.com/docs/setup/linux
+  download dep
+  sudo dpkg -i <file>.deb
+  sudo apt-get install -f
+
 sudo apt-get install nodejs
 sudo apt-get install npm
 sudo ln -s `which nodejs` /usr/bin/node
