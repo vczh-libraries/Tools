@@ -47,12 +47,15 @@ tsconfig.json
 
 {
   "compilerOptions": {
-    "target":"es5",
-    "module":"commonjs",
-    "sourceMap":true,
-    "ourDir":"bin",
-    "rootDir":"src",
-    "strict":true
+  "target":"es5",
+  "module":"commonjs",
+  "sourceMap":true,
+  "ourDir":"bin",
+  "rootDirs":["src"],
+  "strict":true,
+  "moduleResolution":"node",
+  "typeRoots":["/usr/local/lib/node_modules/@types"],
+  "types":["node"]
   }
 }
 ----------------------
@@ -64,9 +67,7 @@ tsconfig.json
   "program":"${workspaceRoot}/src/server.ts",
   "outFiles":["${workspaceRoot}/bin/*.js",
   "sourceMaps":true,
-  "moduleResolution":"node",
-  "typeRoots":["/usr/local/lib/node_modules/@types"],
-  "types":["node"]
+  "preLaunchTask":"tsc" // ask vscode to generate tasks.json: ">Tasks: Configure Task Runner"
 }
 ======================
 CLANG-COMPLETE
