@@ -63,7 +63,10 @@ tsconfig.json
   "cwd":"${workspaceRoot}",
   "program":"${workspaceRoot}/src/server.ts",
   "outFiles":["${workspaceRoot}/bin/*.js",
-  "sourceMaps":true
+  "sourceMaps":true,
+  "moduleResolution":"node",
+  "typeRoots":["/usr/local/lib/node_modules/@types"],
+  "types":["node"]
 }
 ======================
 CLANG-COMPLETE
