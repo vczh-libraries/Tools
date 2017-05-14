@@ -28,6 +28,15 @@ set hlsearch
 set fileencodings=utf-8,ucs-bom,cp936
 set nocompatible
 filetype off
+----------------------
+sudo apt-get update
+sudo apt-get upgrade
+
+https://code.visualstudio.com/docs/setup/linux
+sudo apt-get install nodejs
+sudo apt-get install npm
+sudo ln -s `which nodejs` /usr/bin/node
+sudo npm install -g typescript
 ======================
 CLANG-COMPLETE
 ----------------------
