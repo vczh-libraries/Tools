@@ -41,6 +41,30 @@ sudo apt-get install nodejs
 sudo apt-get install npm
 sudo ln -s `which nodejs` /usr/bin/node
 sudo npm install -g typescript
+sudo npm install @types/node --save-dev
+----------------------
+tsconfig.json
+
+{
+  "compilerOptions": {
+    "target":"es5",
+    "module":"commonjs",
+    "sourceMap":true,
+    "ourDir":"bin",
+    "rootDir":"src",
+    "strict":true
+  }
+}
+----------------------
+.vscode/launch.json
+
+// diff to default
+{
+  "cwd":"${workspaceRoot}",
+  "program":"${workspaceRoot}/src/server.ts",
+  "outFiles":["${workspaceRoot}/bin/*.js",
+  "sourceMaps":true
+}
 ======================
 CLANG-COMPLETE
 ----------------------
