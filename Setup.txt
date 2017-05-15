@@ -51,7 +51,11 @@ tsconfig.json
   "module":"commonjs",
   "sourceMap":true,
   "ourDir":"bin",
-  "rootDirs":["src"],
+  "baseUrl": ".",
+  "paths":{
+    "<NAME>":"[<FOLDERS>],
+    ...
+  }
   "strict":true,
   "moduleResolution":"node",
   "typeRoots":["/usr/local/lib/node_modules/@types"],
