@@ -41,6 +41,7 @@ sudo apt-get install nodejs
 sudo apt-get install npm
 sudo ln -s `which nodejs` /usr/bin/node
 sudo npm install -g typescript
+sudo npm install -g tslint # tslint --type-check -c tslint.json -p tsconfig.json
 sudo npm install @types/node --save-dev
 ----------------------
 tsconfig.json
