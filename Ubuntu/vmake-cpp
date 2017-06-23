@@ -1,5 +1,12 @@
 <#
-CPP_FILES=($(vutil_CppFromVcxproj $CPP_VCXPROJ))
+if ! [ "$CPP_VCXPROJ" == "" ]; then
+    CPP_FILES=($(vutil_CppFromVcxproj $CPP_VCXPROJ))
+fi
+
+for CPP_VCXPROJ_ITEM in "${CPP_VCXPROJS[@]}"; do
+	CPP_FILES_FROM_VCXPROJ=($(vutil_CppFromVcxproj $CPP_VCXPROJ_ITEM))
+    CPP_FILES=(${CPP_FILES[@]} ${CPP_FILES_FROM_VCXPROJ[@]})
+done
 
 for CPP_REMOVE in "${CPP_REMOVES[@]}"; do
     CPP_FILES=(${CPP_FILES[@]/$CPP_REMOVE})
