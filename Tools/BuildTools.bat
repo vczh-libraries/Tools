@@ -1,11 +1,17 @@
-mkdir .Output
+rmdir /S /Q .\.Output
+rmdir /S /Q .\.vs
+del *.wait.tmp
+del *.exe
+del *.dll
 
-MSBUILD DocTools\DocTools.sln									/p:Configuration=Release;OutputPath=..\..\.Output\
-MSBuild ..\..\Vlpp\Tools\CodePack\CodePack\CodePack.vcxproj		/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\
-MSBuild ..\..\Vlpp\Tools\ParserGen\ParserGen\ParserGen.vcxproj	/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\
-MSBuild ..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj	/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\
-MSBuild ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj			/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\GacGen(x32)\
-MSBuild ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj			/p:Configuration=Release;Platform=x64;OutDir=..\..\..\..\Tools\Tools\.Output\GacGen(x64)\
+start RunAndLock %RANDOM% "MSBUILD DocTools\DocTools.sln									/p:Configuration=Release;OutputPath=..\..\.Output\"
+start RunAndLock %RANDOM% "MSBuild ..\..\Vlpp\Tools\CodePack\CodePack\CodePack.vcxproj		/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\"
+start RunAndLock %RANDOM% "MSBuild ..\..\Vlpp\Tools\ParserGen\ParserGen\ParserGen.vcxproj	/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\"
+start RunAndLock %RANDOM% "MSBuild ..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj	/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\"
+start RunAndLock %RANDOM% "MSBuild ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj			/p:Configuration=Release;Platform=x86;OutDir=..\..\..\..\Tools\Tools\.Output\GacGen(x32)\"
+start RunAndLock %RANDOM% "MSBuild ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj			/p:Configuration=Release;Platform=x64;OutDir=..\..\..\..\Tools\Tools\.Output\GacGen(x64)\"
+
+call WaitForLock
 
 copy .Output\*.exe *.exe
 copy .Output\*.dll *.dll
