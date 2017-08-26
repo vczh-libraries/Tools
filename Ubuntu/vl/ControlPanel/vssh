@@ -2,6 +2,8 @@
 
 function Help {
     echo "Usage:"
+    echo "--fix"
+    echo "    Fix public key lost for Ubuntu on Windows"
     echo "--add <email>"
     echo "    Create a new rsa key (~/.ssh/id_rsa_vl)"
     echo "--submit"
@@ -12,15 +14,19 @@ function Help {
     echo "    Remove the created key"
 }
 
+function Fix {
+    eval "$(ssh-agent -s)"
+    pushd ~/.ssh > /dev/null
+    ssh-add id_rsa_vl
+    popd > /dev/null
+}
+
 function Add {
     if [ -a ~/.ssh/id_rsa_vl ]; then
         echo "Key (~/.ssh/id_rsa_vl) has already been created."
     else
         ssh-keygen -t rsa -b 4096 -C "$1" -f ~/.ssh/id_rsa_vl
-        eval "$(ssh-agent -s)"
-        pushd ~/.ssh > /dev/null
-        ssh-add id_rsa_vl
-        popd > /dev/null
+        Fix
         echo "All files in ~/.ssh:"
         ls ~/.ssh
     fi
@@ -60,6 +66,10 @@ function Remove {
 case $1 in
     --help)
     Help
+    ;;
+
+    --fix)
+    Fix
     ;;
 
     --add)
