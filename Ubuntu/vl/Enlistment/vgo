@@ -59,7 +59,7 @@ function Update {
 
         local GITHEAD="$(git symbolic-ref HEAD 2>/dev/null)"
         local CURRENT_BRANCH="${GITHEAD##refs/heads/}"
-        local BRANCHES=($(git branch | sed -r -e 's/^..//g'))
+        local BRANCHES=($(git branch -r | grep -v '.*->.*' | sed -r -e 's/^..origin\///g'))
         for BRANCH in "${BRANCHES[@]}"; do
             printf "${VC_LIGHTGREEN}Updating branch: ${VC_LIGHTCYAN}${BRANCH}${VC_DEFAULT}\n"
             git checkout $BRANCH
