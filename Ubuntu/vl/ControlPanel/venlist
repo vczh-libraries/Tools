@@ -20,7 +20,7 @@ function Entry {
             echo "You have too many enlistments!"
             exit 1
         fi
-        local VFILE=${VCPROOT}/vle_${i}.desktop
+        local VFILE=${VCPWD}/vle_${i}.desktop
         if ! [ -a ${VFILE} ]; then
             echo "Creating ${VFILE} ..."
             break
@@ -36,7 +36,7 @@ function Entry {
     fi
     local VPATH=${PWD}
 
-    local VPATTERNS="s?<NAME>?${VNAME}?g;"$'\n'"s?<PATH>?${VPATH}?g;"$'\n'"s?<VCPROOT>?${VCPROOT}?g;"
+    local VPATTERNS="s?<NAME>?${VNAME}?g;"$'\n'"s?<PATH>?${VPATH}?g;"$'\n'"s?<VCPROOT>?${VCPROOT}?g;"$'\n'"s?<VCPWD>?${VCPWD}?g;"
 
     sed -e "${VPATTERNS}" "${VCPROOT}/vl/vle-template.desktop" > "${VFILE}"
     chmod u+x "${VFILE}"
@@ -48,7 +48,7 @@ function Entry {
 GITHUB_REPOS=(Tools Vlpp Workflow GacUI GacJS Release XGac iGac vczh-libraries.github.io)
 
 function Enlist {
-    if [ ${PWD} == ${VCPROOT} ]; then
+    if [ ${PWD}/Tools/Ubuntu/vl/.. == ${VCPROOT} ]; then
         echo "Repos cannot be enlisted in the folder for *.desktop files."
         exit 1
     fi

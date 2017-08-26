@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=code
+Comment=Vczh Libraries Control Panel for Github Repos: /home/vczh/Desktop/code
+Exec=gnome-terminal -e "bash -c 'source /home/vczh/Desktop/code/load.sh;$SHELL'"
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=Application;
