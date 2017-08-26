@@ -1,4 +1,4 @@
-pushd ..\..\Release
+pushd ..\..\Release\Tutorial
 
 pushd .\GacUI_HelloWorlds
 MSBUILD GacUI_HelloWorlds.sln /p:Configuration=Debug;Platform=Win32 /m:8

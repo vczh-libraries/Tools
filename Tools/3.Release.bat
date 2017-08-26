@@ -5,8 +5,6 @@ popd
 
 @for /D /R ..\..\Release\Tutorial %%i in (.) do @ (
 	if exist %%i\Codegen.bat (
-		pushd %%i
-		call Codegen.bat
-		popd
+		call %%i\Codegen.bat
 	)
 )
