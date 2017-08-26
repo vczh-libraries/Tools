@@ -1,6 +1,8 @@
 #!/bin/bash
 
-export VCPROOT=`dirname ${BASH_SOURCE[0]}`/..
+pushd $(dirname ${BASH_SOURCE[0]}) > /dev/null
+export VCPROOT=`pwd`/..
+popd > /dev/null
 export VCPWD=${VCPROOT}/../..
 export PATH=${VCPROOT}/vl/ControlPanel:${PATH}
 
