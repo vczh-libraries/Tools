@@ -1,24 +1,18 @@
 pushd ..\..\Release\Tutorial
 
-pushd .\GacUI_HelloWorlds
-MSBUILD GacUI_HelloWorlds.sln /p:Configuration=Debug;Platform=Win32 /m:8
-start Debug
-popd
-pushd .\GacUI_Layout
-MSBUILD GacUI_Layout.sln /p:Configuration=Debug;Platform=Win32 /m:8
-start Debug
-popd
-pushd .\GacUI_Controls
-MSBUILD GacUI_Controls.sln /p:Configuration=Debug;Platform=Win32 /m:8
-start Debug
-popd
-pushd .\GacUI_ControlTemplate
-MSBUILD GacUI_ControlTemplate.sln /p:Configuration=Debug;Platform=Win32 /m:8
-start Debug
-popd
-pushd .\GacUI_Xml
-MSBUILD GacUI_Xml.sln /p:Configuration=Debug;Platform=Win32 /m:8
-start Debug
-popd
+call :BuildTutorial GacUI_HelloWorlds
+call :BuildTutorial GacUI_Layout
+call :BuildTutorial GacUI_Controls
+call :BuildTutorial GacUI_ControlTemplate
+call :BuildTutorial GacUI_Xml
 
 popd
+goto :eof
+
+:BuildTutorial
+pushd .\%~1
+MSBUILD %~1.sln /p:Configuration=Debug;Platform=Win32 /m:8
+MSBUILD %~1.sln /p:Configuration=Release;Platform=Win32 /m:8
+start Release
+popd
+exit /b
