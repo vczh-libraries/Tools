@@ -1,11 +1,5 @@
-copy ParserGen.exe ..\..\Release\Tools\ParserGen.exe
-copy GacGen.exe ..\..\Release\Tools\GacGen.exe
 pushd ..\..\Release
-pushd .\Import
-call Import.bat
-popd
-pushd .\Tutorial
-call Codegen.bat
+
 pushd .\GacUI_HelloWorlds
 MSBUILD GacUI_HelloWorlds.sln /p:Configuration=Debug;Platform=Win32 /m:8
 start Debug
@@ -26,5 +20,5 @@ pushd .\GacUI_Xml
 MSBUILD GacUI_Xml.sln /p:Configuration=Debug;Platform=Win32 /m:8
 start Debug
 popd
-popd
+
 popd
