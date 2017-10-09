@@ -22,7 +22,14 @@ function Test-Single-Binary-Rename($Source, $Target) {
 }
 
 function Import-Project($ProjectName, [String[]]$Dependencies) {
-    
+    Write-Host "Importing $ProjectName ..."
+    Push-Location ..\..\$ProjectName\Import | Out-Null
+    foreach ($dep in $Dependencies) {
+        Write-Host "    From $dep"
+        Copy-Item ..\..\$dep\Release\*.h .
+        Copy-Item ..\..\$dep\Release\*.cpp .
+    }
+    Pop-Location | Out-Null
 }
 
 function Release-Project($ProjectName) {
@@ -58,6 +65,9 @@ function Update-And-Build-Tools {
         Update-Parser ..\..\Workflow\Source\Expression\WfExpression.parser.txt
         Update-Parser ..\..\GacUI\Source\Compiler\InstanceQuery\GuiInstanceQuery_Parser.parser.txt
 
+        # Release Vlpp
+        Release-Project Vlpp
+
         # Release Workflow
         Import-Project Workflow ("Vlpp")
         Release-Project Workflow
@@ -67,10 +77,13 @@ function Update-And-Build-Tools {
         # Release GacUI
         Import-Project GacUI ("Vlpp","Workflow")
         Release-Project GacUI
-        Build-Sln ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x86 OutDir "GacGen(x32)"
-        Build-Sln ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64 OutDir "GacGen(x64)"
+        Build-Sln ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x86 OutDir "GacGen(x32)\"
         Test-Single-Binary-Rename "GacGen(x32)\GacGen.exe" GacGen32.exe
+        Build-Sln ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64 OutDir "GacGen(x64)\"
         Test-Single-Binary-Rename "GacGen(x64)\GacGen.exe" GacGen64.exe
+
+        # Update Skins
+        Release-Project GacUI
     }
     catch {
         Write-Host $_.Exception.Message -ForegroundColor Red
@@ -88,3 +101,4 @@ New-Item .\.Output -ItemType directory | Out-Null
 Update-And-Build-Tools
 
 Pop-Location | Out-Null
+[Console]::ResetColor()
