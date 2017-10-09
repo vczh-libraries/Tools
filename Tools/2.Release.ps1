@@ -40,10 +40,33 @@ try {
         }
     }
 
-    # Build
-    Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse |%{
-        Build-Sln $_.FullName "Debug" "Win32"
-        Build-Sln $_.FullName "Release" "Win32"
+    # Debug Build
+    Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
+        if ($_.FullName.IndexOf("\Lib\") -eq -1) {
+            Build-Sln $_.FullName "Debug" "Win32" "OutDir" "$($_.DirectoryName)\Debug\"
+        }
+    }
+
+    # Check Debug Build
+    $failed = $false
+    Get-ChildItem -Path .\Tutorial -Filter *.vcxproj -Recurse | %{
+        if ($_.FullName.IndexOf("\Lib\") -eq -1) {
+            $exe_file = "$($_.DirectoryName)\..\Debug\$($_.BaseName).exe"
+            if (!(Test-Path $exe_file)) {
+                Write-Host "Binary not found: $exe_file" -ForegroundColor Red
+                $failed = $true
+            }
+        }
+    }
+    if ($failed) {
+        throw "Failed"
+    }
+
+    # Release Build
+    Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
+        if ($_.FullName.IndexOf("\Lib\") -eq -1) {
+            Build-Sln $_.FullName "Release" "Win32" "OutDir" "$($_.DirectoryName)\Release\"
+        }
     }
     start .\Tutorial\GacUI_HelloWorlds\Release
     start .\Tutorial\GacUI_Layout\Release

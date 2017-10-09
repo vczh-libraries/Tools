@@ -1,7 +1,12 @@
-function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir", $OutputFolder="") {
+function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir", [String]$OutputFolder="") {
     Write-Host "Building $SolutionFile ..."
     $vsdevcmd = "$($env:VS140COMNTOOLS)VsDevCmd.bat"
-    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 /t:Rebuild /p:Configuration=`"$Configuration`";Platform=`"$Platform`";$OutputVar=`"$PSScriptRoot\.Output\$OutputFolder"
+    if ($OutputFolder.IndexOf(":\") -eq -1) {
+        $output_dir = "$OutputVar=`"$PSScriptRoot\.Output\$OutputFolder"
+    } else {
+        $output_dir = "$OutputVar=`"$OutputFolder"
+    }
+    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 /t:Rebuild /p:Configuration=$Configuration;Platform=$Platform;$($output_dir)"
     $cmd_arguments = "`"`"$vsdevcmd`" & $msbuild_arguments"
     $wait_process = Start-Process $env:ComSpec -ArgumentList "/c $cmd_arguments" -PassThru
     $wait_process.WaitForExit()
