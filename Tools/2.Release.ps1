@@ -39,6 +39,17 @@ try {
             & $PSScriptRoot\GacGen.ps1 -FileName $_.FullName
         }
     }
+
+    # Build
+    Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse |%{
+        Build-Sln $_.FullName "Debug" "Win32"
+        Build-Sln $_.FullName "Release" "Win32"
+    }
+    start .\Tutorial\GacUI_HelloWorlds\Release
+    start .\Tutorial\GacUI_Layout\Release
+    start .\Tutorial\GacUI_Controls\Release
+    start .\Tutorial\GacUI_ControlTemplate\Release
+    start .\Tutorial\GacUI_Xml\Release
 }
 catch {
     Write-Host $_.Exception.Message -ForegroundColor Red
