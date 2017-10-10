@@ -10,6 +10,10 @@ function Clean-Binaries {
     New-Item .\.Output -ItemType directory | Out-Null
 }
 
+# Prevent from displaying "Debug or Close Application" dialog on crash
+$dontshowui_key = "HKCU:\Software\Microsoft\Windows\Windows Error Reporting"
+$dontshowui_value = (Get-ItemProperty $dontshowui_key).DontShowUI
+Set-ItemProperty $dontshowui_key -Name DontShowUI -Value 1
 Push-Location $PSScriptRoot | Out-Null
 
 try {
@@ -30,4 +34,5 @@ catch {
 }
 
 Pop-Location | Out-Null
+Set-ItemProperty $dontshowui_key -Name DontShowUI -Value $dontshowui_value
 [Console]::ResetColor()
