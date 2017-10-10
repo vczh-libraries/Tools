@@ -18,6 +18,7 @@ function Update-And-Build-Tools {
     Test-Single-Binary ParserGen.exe
 
     # Update Parsers
+    Update-Parser ..\..\Vlpp\Test\Source\Parser.Calculator\Parser.Calculator.parser.txt
     Update-Parser ..\..\Vlpp\Source\Parsing\Xml\ParsingXml.parser.txt
     Update-Parser ..\..\Vlpp\Source\Parsing\Json\ParsingJson.parser.txt
     Update-Parser ..\..\Workflow\Source\Expression\WfExpression.parser.txt
