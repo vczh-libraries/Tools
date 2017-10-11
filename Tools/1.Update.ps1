@@ -1,3 +1,7 @@
+param (
+    [String]$Project = ""
+)
+
 . $PSScriptRoot\UpdateVlpp.ps1
 . $PSScriptRoot\UpdateWorkflow.ps1
 . $PSScriptRoot\UpdateGacUI.ps1
@@ -17,17 +21,25 @@ Set-ItemProperty $dontshowui_key -Name DontShowUI -Value 1
 Push-Location $PSScriptRoot | Out-Null
 
 try {
-    Write-Host Clean-Binaries -ForegroundColor Blue -BackgroundColor White
-    Clean-Binaries
+    if ($Project -eq "") {
+        Write-Host Clean-Binaries -ForegroundColor Blue -BackgroundColor White
+        Clean-Binaries
+    }
 
-    Write-Host Update-Vlpp -ForegroundColor Blue -BackgroundColor White
-    Update-Vlpp
+    if (($Project -eq "") -or ($Project -eq "Vlpp")) {
+        Write-Host Update-Vlpp -ForegroundColor Blue -BackgroundColor White
+        Update-Vlpp
+    }
 
-    Write-Host Update-Workflow -ForegroundColor Blue -BackgroundColor White
-    Update-Workflow
+    if (($Project -eq "") -or ($Project -eq "Workflow")) {
+        Write-Host Update-Workflow -ForegroundColor Blue -BackgroundColor White
+        Update-Workflow
+    }
 
-    Write-Host Update-GacUI -ForegroundColor Blue -BackgroundColor White
-    Update-GacUI
+    if (($Project -eq "") -or ($Project -eq "GacUI")) {
+        Write-Host Update-GacUI -ForegroundColor Blue -BackgroundColor White
+        Update-GacUI
+    }
 }
 catch {
     Write-Host $_.Exception.Message -ForegroundColor Red
