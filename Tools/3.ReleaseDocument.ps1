@@ -53,6 +53,13 @@ try {
 
     # Building Index
     Write-Host "Building Index ..."
+    Start-Process-And-Wait (,("$PSScriptRoot\.Output\DocResolver.exe", "`"x86, Windows`" `"$PSScriptRoot\.Output\Doc\x86\Headers.ast.xml`" `"x64, Windows`" `"$PSScriptRoot\.Output\Doc\x64\Headers.ast.xml`" `"$PSScriptRoot\.Output\Doc\Resolved.ast.xml`"")) $true
+    Start-Process-And-Wait (,("$PSScriptRoot\.Output\DocIndex.exe", "`"$PSScriptRoot\.Output\Doc\Resolved.ast.xml`" `"$PSScriptRoot\.Output\Doc\Index`"")) $true
+
+    # Copy
+    Write-Host "Copy files to $PSScriptRoot\..\..\vczh-libraries.github.io\Doc\Data"
+    Remove-Item "$PSScriptRoot\..\..\vczh-libraries.github.io\Doc\Data\*.*" -Force | Out-Null
+    Copy-Item "$PSScriptRoot\.Output\Doc\Index\*.*" "$PSScriptRoot\..\..\vczh-libraries.github.io\Doc\Data" | Out-Null
 }
 catch {
     Write-Host $_.Exception.Message -ForegroundColor Red
