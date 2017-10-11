@@ -1,5 +1,3 @@
-. $PSScriptRoot\Common.ps1
-
 function Test-Vlpp-Platform($platform, $outDir) {
     Build-Sln ..\..\Vlpp\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
     if (!(Test-Path "$outDir\UnitTest.exe")) {

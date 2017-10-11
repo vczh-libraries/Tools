@@ -2,6 +2,7 @@ param (
     [String]$Project = ""
 )
 
+. $PSScriptRoot\Common.ps1
 . $PSScriptRoot\UpdateVlpp.ps1
 . $PSScriptRoot\UpdateWorkflow.ps1
 . $PSScriptRoot\UpdateGacUI.ps1
