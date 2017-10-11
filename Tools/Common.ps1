@@ -1,14 +1,4 @@
-function Start-Process-And-Wait([String[][]] $Pairs) {
-    $processes = New-Object System.Diagnostics.Process[] $Pairs.Length
-    for ($i = 0; $i -lt $Pairs.Length; $i++) {
-        $processes[$i] = Start-Process $Pairs[$i][0] -ArgumentList $Pairs[$i][1] -PassThru
-    }
-
-    foreach ($process in $processes) {
-        $process.WaitForExit()
-        $process.Close()
-    }
-}
+. $PSScriptRoot\StartProcess.ps1
 
 function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir", [String]$OutputFolder="") {
     Write-Host "Building $SolutionFile ..."
@@ -18,7 +8,7 @@ function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir"
     } else {
         $output_dir = "$OutputVar=`"$OutputFolder"
     }
-    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 /t:Rebuild /p:Configuration=$Configuration;Platform=$Platform;$($output_dir)"
+    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 /t:Rebuild /p:Configuration=`"$Configuration`";Platform=`"$Platform`";$($output_dir)"
     $cmd_arguments = "`"`"$vsdevcmd`" & $msbuild_arguments"
     Start-Process-And-Wait (,($env:ComSpec, "/c $cmd_arguments"))
 }

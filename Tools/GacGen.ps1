@@ -1,6 +1,9 @@
 param (
     [String]$FileName
 )
+
+. $PSScriptRoot\StartProcess.ps1
+
 Write-Host "Compiling GacUI Resource: $FileName ..."
 Start-Process-And-Wait (("$PSScriptRoot\GacGen32.exe", "/P $FileName"), ("$PSScriptRoot\GacGen64.exe", "/P $FileName"))
 
@@ -25,5 +28,5 @@ Get-ChildItem -Path $x32_folder -ErrorAction SilentlyContinue | %{
 $deploy = "$($FileName).log\x32\Deploy.bat"
 if (Test-Path -Path $deploy) {
     Write-Host "    Deploying ..."
-    Start-Process-And-Wait (,($env:ComSpec, "/c `"$deploy`""))
+    Start-Process-And-Wait (,($env:ComSpec, "/c `"$deploy`"")) $true
 }
