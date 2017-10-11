@@ -17,11 +17,11 @@ function Test-Workflow {
 }
 
 function Update-Workflow {
-    # Run test cases
-    Test-Workflow
-
     # Update Parsers
     Update-Parser ..\..\Workflow\Source\Expression\WfExpression.parser.txt
+
+    # Run test cases
+    Test-Workflow
 
     # Release Workflow
     Import-Project Workflow ("Vlpp")
