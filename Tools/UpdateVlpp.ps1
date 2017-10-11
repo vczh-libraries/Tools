@@ -1,23 +1,23 @@
 . $PSScriptRoot\Common.ps1
 
-function Run-Unit-Test-Platform($platform, $outDir) {
+function Test-Vlpp-Platform($platform, $outDir) {
     Build-Sln ..\..\Vlpp\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
     if (!(Test-Path "$outDir\UnitTest.exe")) {
         throw "Failed"
     }
 
     Write-Host "Executing Unit Test ($platform) ..."
-    Start-Process-And-Wait (,("$outDir\UnitTest.exe", "")) $false $outDir
+    Start-Process-And-Wait (,("$outDir\UnitTest.exe", ""))
 }
 
-function Run-Unit-Test {
-    Run-Unit-Test-Platform x86 "$PSScriptRoot\..\..\Vlpp\Test\UnitTest\Release"
-    Run-Unit-Test-Platform x64 "$PSScriptRoot\..\..\Vlpp\Test\UnitTest\x64\Release"
+function Test-Vlpp {
+    Test-Vlpp-Platform x86 "$PSScriptRoot\..\..\Vlpp\Test\UnitTest\Release"
+    Test-Vlpp-Platform x64 "$PSScriptRoot\..\..\Vlpp\Test\UnitTest\x64\Release"
 }
 
 function Update-Vlpp {
     # Run test cases
-    Run-Unit-Test
+    Test-Vlpp
 
     # Build CodePack.exe
     Build-Sln ..\..\Vlpp\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
@@ -38,5 +38,5 @@ function Update-Vlpp {
     Release-Project Vlpp
 
     # Run test cases again
-    Run-Unit-Test
+    Test-Vlpp
 }
