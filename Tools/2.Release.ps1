@@ -33,8 +33,7 @@ try {
     Get-ChildItem -Path .\Tutorial -Filter Resource.xml -Recurse | %{
         if ($_.FullName.IndexOf("\GacUI_HelloWorlds\Xml\") -ne -1) {
             Write-Host "Compiling GacUI Resource (x86): $($_.FullName) ..."
-            $gacgen32 = Start-Process $PSScriptRoot\GacGen32.exe -ArgumentList "`"$($_.FullName)`"" -PassThru
-            $gacgen32.WaitForExit()
+            Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "`"$($_.FullName)`""))
         } else {
             & $PSScriptRoot\GacGen.ps1 -FileName $_.FullName
         }

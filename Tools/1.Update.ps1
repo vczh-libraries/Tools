@@ -10,8 +10,8 @@ function Clean-Binaries {
     Write-Host "Cleaning ..."
     Remove-Item .\*.exe -Force | Out-Null
     Remove-Item .\*.dll -Force | Out-Null
-    Remove-Item .\.Output -Force -Recurse | Out-Null
-    New-Item .\.Output -ItemType directory | Out-Null
+    Remove-Item .\.Output -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
+    New-Item .\.Output -ItemType directory -ErrorAction SilentlyContinue | Out-Null
 }
 
 # Prevent from displaying "Debug or Close Application" dialog on crash
