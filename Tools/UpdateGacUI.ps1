@@ -10,7 +10,7 @@ function Test-GacUI-Platform($platform, $outDir) {
 
 function Test-GacUI {
     Test-GacUI-Platform x86 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Release"
-    Test-GacUI-Platform x64 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\x64\Release"
+    # Test-GacUI-Platform x64 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\x64\Release"
 }
 
 function Update-GacUI {
