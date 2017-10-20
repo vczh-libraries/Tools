@@ -21,6 +21,7 @@ try {
     Copy-Item $PSScriptRoot\GacGen32.exe .\Tools
     Copy-Item $PSScriptRoot\GacGen64.exe .\Tools
     Copy-Item $PSScriptRoot\GacGen.ps1 .\Tools
+    Copy-Item $PSScriptRoot\StartProcess.ps1 .\Tools
 
     # ControlTemplate\BlackSkin
     Write-Host "Deploying Tutorial\GacUI_ControlTemplate\BlackSkin ..."
