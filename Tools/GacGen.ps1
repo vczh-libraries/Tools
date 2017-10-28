@@ -5,7 +5,8 @@ param (
 . $PSScriptRoot\StartProcess.ps1
 
 Write-Host "Compiling GacUI Resource: $FileName ..."
-Start-Process-And-Wait (("$PSScriptRoot\GacGen32.exe", "/P $FileName"), ("$PSScriptRoot\GacGen64.exe", "/P $FileName"))
+Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "/P $FileName"))
+Start-Process-And-Wait (,("$PSScriptRoot\GacGen64.exe", "/P $FileName"))
 
 if (Test-Path -Path "$($FileName).log\x32\Error.txt") {
     throw "Failed to compile GacUI Resource (x86): $FileName"
