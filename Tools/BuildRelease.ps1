@@ -5,7 +5,7 @@ function Build-Release([Bool] $PopupFolders) {
 
     try {
         # Import
-        Write-Host "Copying Source Code ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Copying Source Code ..."
         New-Item .\Import\Skins -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         New-Item .\Import\Skins\DarkSkin -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         Copy-Item ..\Vlpp\Release\*.h .\Import
@@ -17,7 +17,7 @@ function Build-Release([Bool] $PopupFolders) {
         Copy-Item ..\GacUI\Release\DarkSkin* .\Import\Skins\DarkSkin
 
         # Deploy
-        Write-Host "Deploying Binaries ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Deploying Binaries ..."
         Copy-Item $PSScriptRoot\CppMerge.exe .\Tools
         Copy-Item $PSScriptRoot\GacGen32.exe .\Tools
         Copy-Item $PSScriptRoot\GacGen64.exe .\Tools
@@ -25,14 +25,14 @@ function Build-Release([Bool] $PopupFolders) {
         Copy-Item $PSScriptRoot\StartProcess.ps1 .\Tools
 
         # ControlTemplate\BlackSkin
-        Write-Host "Deploying Tutorial\GacUI_ControlTemplate\BlackSkin ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Deploying Tutorial\GacUI_ControlTemplate\BlackSkin ..."
         Push-Location $PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\BlackSkin\UI | Out-Null
         Remove-Item .\FullControlTest -Force -Recurse | Out-Null
         Copy-Item $PSScriptRoot\..\..\GacUI\Test\GacUISrc\Host\Resources\FullControlTest . -Recurse | Out-Null
         Pop-Location
 
         # GacGen
-        Write-Host "Compiling Resources ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Compiling Resources ..."
         Get-ChildItem -Path .\Tutorial -Filter Resource.xml -Recurse | %{
             if ($_.FullName.IndexOf("\GacUI_HelloWorlds\Xml\") -ne -1) {
                 Write-Host "Compiling GacUI Resource (x86): $($_.FullName) ..."
@@ -43,7 +43,7 @@ function Build-Release([Bool] $PopupFolders) {
         }
 
         # Debug Build
-        Write-Host "Create Debug Builds ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Create Debug Builds ..."
         Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
             if ($_.FullName.IndexOf("\Lib\") -eq -1) {
                 Build-Sln $_.FullName "Debug" "Win32" "OutDir" "$($_.DirectoryName)\Debug\"
@@ -51,7 +51,7 @@ function Build-Release([Bool] $PopupFolders) {
         }
 
         # Check Debug Build
-        Write-Host "Checking Debug Builds ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Checking Debug Builds ..."
         $failed = $false
         Get-ChildItem -Path .\Tutorial -Filter *.vcxproj -Recurse | %{
             if ($_.FullName.IndexOf("\Lib\") -eq -1) {
@@ -67,7 +67,7 @@ function Build-Release([Bool] $PopupFolders) {
         }
 
         # Release Build
-        Write-Host "Create Release Builds ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Create Release Builds ..."
         Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
             if ($_.FullName.IndexOf("\Lib\") -eq -1) {
                 Build-Sln $_.FullName "Release" "Win32" "OutDir" "$($_.DirectoryName)\Release\"

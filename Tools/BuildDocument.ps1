@@ -1,5 +1,5 @@
 function Parse-Header($Platform) {
-    Write-Host "Compiling $Platform Headers ..." -ForegroundColor Blue -BackgroundColor White
+    Write-Host "Compiling $Platform Headers ..."
     Start-Process-And-Wait (,("$PSScriptRoot\.Output\DocPreprocess.exe", "`"$PSScriptRoot\.Output\Doc\$Platform\Headers.txt`" `"$PSScriptRoot\.Output\Doc\Headers.h`" `"$PSScriptRoot\.Output\Doc`"")) $true
     Start-Process-And-Wait (,("$PSScriptRoot\.Output\DocTokenizer.exe", "`"$PSScriptRoot\.Output\Doc\$Platform\Headers.txt`" `"$PSScriptRoot\.Output\Doc\$Platform\Headers.tokens.txt`"")) $true
     Start-Process-And-Wait (,("$PSScriptRoot\.Output\DocParser.exe", "`"$PSScriptRoot\.Output\Doc\$Platform\Headers.tokens.txt`" `"$PSScriptRoot\.Output\Doc\$Platform\Headers.ast.xml`"")) $true
@@ -10,7 +10,7 @@ function Build-Document {
 
     try {
         # Cleaning
-        Write-Host "Cleaning ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Cleaning ..."
         Build-Sln .\DocTools\DocTools.sln "Release" "Any CPU" "OutputPath"
         Remove-Item .\.Output\Doc -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
         New-Item .\.Output\Doc -ItemType directory -ErrorAction SilentlyContinue | Out-Null
@@ -29,7 +29,7 @@ function Build-Document {
         New-Item .\Index -ItemType directory | Out-Null
 
         # Preprocess Headers
-        Write-Host "Preprocess Headers ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Preprocess Headers ..."
         $vsdevcmd = "$($env:VS140COMNTOOLS)VsDevCmd.bat"
 
         $msbuild_arguments = "cl.exe `"`"$PSScriptRoot\.Output\Doc\Headers.h`" /D WIN32 /D _DEBUG /D WINDOWS /D _UNICODE /D UNICODE /P /C"
@@ -47,12 +47,12 @@ function Build-Document {
         Parse-Header x64
 
         # Building Index
-        Write-Host "Building Index ..." -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Building Index ..."
         Start-Process-And-Wait (,("$PSScriptRoot\.Output\DocResolver.exe", "`"x86, Windows`" `"$PSScriptRoot\.Output\Doc\x86\Headers.ast.xml`" `"x64, Windows`" `"$PSScriptRoot\.Output\Doc\x64\Headers.ast.xml`" `"$PSScriptRoot\.Output\Doc\Resolved.ast.xml`"")) $true
         Start-Process-And-Wait (,("$PSScriptRoot\.Output\DocIndex.exe", "`"$PSScriptRoot\.Output\Doc\Resolved.ast.xml`" `"$PSScriptRoot\.Output\Doc\Index`"")) $true
 
         # Copy
-        Write-Host "Copy files to $PSScriptRoot\..\..\vczh-libraries.github.io\Doc\Data" -ForegroundColor Blue -BackgroundColor White
+        Write-Host "Copy files to $PSScriptRoot\..\..\vczh-libraries.github.io\Doc\Data"
         Remove-Item "$PSScriptRoot\..\..\vczh-libraries.github.io\Doc\Data\*.*" -Force | Out-Null
         Copy-Item "$PSScriptRoot\.Output\Doc\Index\*.*" "$PSScriptRoot\..\..\vczh-libraries.github.io\Doc\Data" | Out-Null
     }
