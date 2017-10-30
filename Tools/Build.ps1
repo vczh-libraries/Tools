@@ -52,12 +52,13 @@ try {
 
             $time_finished = [DateTime]::Now
             Write-Host Finished! -ForegroundColor Blue -BackgroundColor White
-            Write-Host "Clean    : $time_clean, Elapsed $((New-TimeSpan $time_clean $time_vlpp).ToString())"
-            Write-Host "Vlpp     : $time_vlpp, Elapsed $((New-TimeSpan $time_clean $time_workflow).ToString())"
-            Write-Host "Workflow : $time_workflow, Elapsed $((New-TimeSpan $time_clean $time_gacui).ToString())"
-            Write-Host "GacUI    : $time_gacui, Elapsed $((New-TimeSpan $time_clean $time_release).ToString())"
-            Write-Host "Release  : $time_release, Elapsed $((New-TimeSpan $time_clean $time_document).ToString())"
-            Write-Host "Document : $time_document, Elapsed $((New-TimeSpan $time_clean $time_finished).ToString())"
+            Write-Host "Clean    : $time_clean, Elapsed: $((New-TimeSpan $time_clean $time_vlpp).ToString())"
+            Write-Host "Vlpp     : $time_vlpp, Elapsed: $((New-TimeSpan $time_vlpp $time_workflow).ToString())"
+            Write-Host "Workflow : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
+            Write-Host "GacUI    : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_release).ToString())"
+            Write-Host "Release  : $time_release, Elapsed: $((New-TimeSpan $time_release $time_document).ToString())"
+            Write-Host "Document : $time_document, Elapsed: $((New-TimeSpan $time_document $time_finished).ToString())"
+            Write-Host "Total    : $((New-TimeSpan $time_clean $time_finished).ToString())"
 
         }
         "Clean" {
