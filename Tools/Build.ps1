@@ -44,7 +44,7 @@ try {
 
             $time_release = [DateTime]::Now
             Write-Host Build-Release -ForegroundColor Blue -BackgroundColor White
-            Build-Release false; [Console]::ResetColor()
+            Build-Release $False; [Console]::ResetColor()
 
             $time_document = [DateTime]::Now
             Write-Host Build-Document -ForegroundColor Blue -BackgroundColor White
@@ -79,7 +79,7 @@ try {
         }
         "Release" {
             Write-Host Build-Release -ForegroundColor Blue -BackgroundColor White
-            Build-Release true;
+            Build-Release $True;
         }
         "Document" {
             Write-Host Build-Document -ForegroundColor Blue -BackgroundColor White
