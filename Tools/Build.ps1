@@ -44,6 +44,10 @@ try {
             Write-Host Build-Document -ForegroundColor Blue -BackgroundColor White
             Build-Document; [Console]::ResetColor()
         }
+        "Clean" {
+            Write-Host Clean-Binaries -ForegroundColor Blue -BackgroundColor White
+            Clean-Binaries
+        }
         "Vlpp" {
             Write-Host Update-Vlpp -ForegroundColor Blue -BackgroundColor White
             Update-Vlpp
@@ -65,7 +69,7 @@ try {
             Build-Document;
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, Workflow, GacUI, Release, Document."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Clean, Vlpp, Workflow, GacUI, Release, Document."
         }
     }
 }
