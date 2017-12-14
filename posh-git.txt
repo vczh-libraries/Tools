@@ -1,0 +1,5 @@
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+PowerShellGet\Install-Module posh-git -Scope CurrentUser
+Update-Module posh-git
+
+Append "Import-Module posh-git" to file $profile
