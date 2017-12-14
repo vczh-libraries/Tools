@@ -1,4 +1,4 @@
-Add to PATH: `C:\Users\<YOUR-NAME>\AppData\Local\GitHubDesktop\app-<VERSION>\resources\app\git\cmd` to user the same git.exe as GithubDesktop
+Add to PATH: `C:\Users\<YOUR-NAME>\AppData\Local\GitHubDesktop\app-<VERSION>\resources\app\git\cmd` to use the same git.exe as GithubDesktop
 
 ```
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
