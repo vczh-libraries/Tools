@@ -11,7 +11,7 @@ function Build-Document {
     try {
         # Cleaning
         Write-Host "Cleaning ..."
-        Build-Sln .\DocTools\DocTools.sln "Release" "Any CPU" "OutputPath"
+        Build-Sln $PSScriptRoot\.\DocTools\DocTools.sln "Release" "Any CPU" "OutputPath"
         Remove-Item .\.Output\Doc -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
         New-Item .\.Output\Doc -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         Copy-Item ..\..\Vlpp\Release\*.h .\.Output\Doc
