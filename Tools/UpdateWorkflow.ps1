@@ -9,16 +9,16 @@ function Test-Workflow-Platform($platform, $vcxproj, $outDir, $executable) {
 }
 
 function Test-Workflow {
-    Test-Workflow-Platform x86 ..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest.exe"
-    Test-Workflow-Platform x64 ..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest.exe"
-    Test-Workflow-Platform x86 ..\..\Workflow\Test\UnitTest\UnitTest_MergeCpp\UnitTest_MergeCpp.vcxproj     "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_MergeCpp.exe"
-    Test-Workflow-Platform x86 ..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_CppCodegen.exe"
-    Test-Workflow-Platform x64 ..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest_CppCodegen.exe"
+    Test-Workflow-Platform x86 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest.exe"
+    Test-Workflow-Platform x64 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest.exe"
+    Test-Workflow-Platform x86 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_MergeCpp\UnitTest_MergeCpp.vcxproj     "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_MergeCpp.exe"
+    Test-Workflow-Platform x86 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_CppCodegen.exe"
+    Test-Workflow-Platform x64 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest_CppCodegen.exe"
 }
 
 function Update-Workflow {
     # Update Parsers
-    Update-Parser ..\..\Workflow\Source\Expression\WfExpression.parser.txt
+    Update-Parser $PSScriptRoot\..\..\Workflow\Source\Expression\WfExpression.parser.txt
 
     # Run test cases
     Test-Workflow
@@ -26,6 +26,6 @@ function Update-Workflow {
     # Release Workflow
     Import-Project Workflow ("Vlpp")
     Release-Project Workflow
-    Build-Sln ..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj Release x86
+    Build-Sln $PSScriptRoot\..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj Release x86
     Test-Single-Binary CppMerge.exe
 }
