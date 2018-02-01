@@ -1,5 +1,5 @@
 function Test-Vlpp-Platform($platform, $outDir) {
-    Build-Sln ..\..\Vlpp\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
+    Build-Sln $PSScriptRoot\..\..\Vlpp\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
     if (!(Test-Path "$outDir\UnitTest.exe")) {
         throw "Failed"
     }
@@ -18,19 +18,19 @@ function Update-Vlpp {
     Test-Vlpp
 
     # Build CodePack.exe
-    Build-Sln ..\..\Vlpp\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
+    Build-Sln $PSScriptRoot\..\..\Vlpp\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
     Test-Single-Binary CodePack.exe
 
     # Release Vlpp
     Release-Project Vlpp
 
     # Build ParserGen.exe
-    Build-Sln ..\..\Vlpp\Tools\ParserGen\ParserGen\ParserGen.vcxproj Release x86
+    Build-Sln $PSScriptRoot\..\..\Vlpp\Tools\ParserGen\ParserGen\ParserGen.vcxproj Release x86
     Test-Single-Binary ParserGen.exe
 
     # Update Parsers
-    Update-Parser ..\..\Vlpp\Source\Parsing\Xml\ParsingXml.parser.txt
-    Update-Parser ..\..\Vlpp\Source\Parsing\Json\ParsingJson.parser.txt
+    Update-Parser $PSScriptRoot\..\..\Vlpp\Source\Parsing\Xml\ParsingXml.parser.txt
+    Update-Parser $PSScriptRoot\..\..\Vlpp\Source\Parsing\Json\ParsingJson.parser.txt
 
     # Release Vlpp
     Release-Project Vlpp
