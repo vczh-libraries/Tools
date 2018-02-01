@@ -1,5 +1,5 @@
 function Test-GacUI-Platform($platform, $outDir) {
-    Build-Sln ..\..\GacUI\Test\GacUISrc\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
+    Build-Sln $PSScriptRoot\..\..\GacUI\Test\GacUISrc\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
     if (!(Test-Path "$outDir\UnitTest.exe")) {
         throw "Failed"
     }
@@ -15,7 +15,7 @@ function Test-GacUI {
 
 function Update-GacUI {
     # Update Parsers
-    Update-Parser ..\..\GacUI\Source\Compiler\InstanceQuery\GuiInstanceQuery_Parser.parser.txt
+    Update-Parser $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\GuiInstanceQuery_Parser.parser.txt
 
     # Run test cases
     Test-GacUI
@@ -23,14 +23,14 @@ function Update-GacUI {
     # Release GacUI
     Import-Project GacUI ("Vlpp","Workflow")
     Release-Project GacUI
-    Build-Sln ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x86 OutDir "GacGen(x32)\"
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x86 OutDir "GacGen(x32)\"
     Test-Single-Binary-Rename "GacGen(x32)\GacGen.exe" GacGen32.exe
-    Build-Sln ..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64 OutDir "GacGen(x64)\"
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64 OutDir "GacGen(x64)\"
     Test-Single-Binary-Rename "GacGen(x64)\GacGen.exe" GacGen64.exe
 
     # Update DarkSkin
     Write-Host "Update GacUI::DarkSkin ..."
-    Push-Location ..\..\GacUI\Source\Skins\DarkSkin | Out-Null
+    Push-Location $PSScriptRoot\..\..\GacUI\Source\Skins\DarkSkin | Out-Null
     try {
         Remove-Item *.xml
         Copy-Item ..\..\..\Test\GacUISrc\Host\Resources\DarkSkin\*.xml .
