@@ -30,15 +30,20 @@ function Build-Document {
 
         # Preprocess Headers
         Write-Host "Preprocess Headers ..."
-        $vsdevcmd = "$($env:VS140COMNTOOLS)VsDevCmd.bat"
+        $vsdevcmd = $env:VLPP_VSDEVCMD_PATH
+        if ($vsdevcmd -eq $null) {
+            throw "You have to add an environment variable named VLPP_VSDEVCMD_PATH and set its value to the path of VsDevCmd.bat (e.g. C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat)"
+        }
 
-        $msbuild_arguments = "cl.exe `"`"$PSScriptRoot\.Output\Doc\Headers.h`" /D WIN32 /D _DEBUG /D WINDOWS /D _UNICODE /D UNICODE /P /C"
-        $cmd_arguments = "`"`"$vsdevcmd`" & $msbuild_arguments"
+        $cdcmd = "cd `"$PSScriptRoot\.Output\Doc\`""
+
+        $msbuild_arguments = "cl.exe `"Headers.h /D WIN32 /D _DEBUG /D WINDOWS /D _UNICODE /D UNICODE /P /C"
+        $cmd_arguments = "`"`"$vsdevcmd`" & $cdcmd & $msbuild_arguments"
         Start-Process-And-Wait (,($env:ComSpec, "/c $cmd_arguments"))
         Move-Item -Path .\Headers.i -Destination .\x86\Headers.txt
     
-        $msbuild_arguments = "cl.exe `"`"$PSScriptRoot\.Output\Doc\Headers.h`" /D _WIN64 /D WIN32 /D _DEBUG /D WINDOWS /D _UNICODE /D UNICODE /P /C"
-        $cmd_arguments = "`"`"$vsdevcmd`" & $msbuild_arguments"
+        $msbuild_arguments = "cl.exe `"Headers.h /D _WIN64 /D WIN32 /D _DEBUG /D WINDOWS /D _UNICODE /D UNICODE /P /C"
+        $cmd_arguments = "`"`"$vsdevcmd`" & $cdcmd & $msbuild_arguments"
         Start-Process-And-Wait (,($env:ComSpec, "/c $cmd_arguments"))
         Move-Item -Path .\Headers.i -Destination .\x64\Headers.txt
 
