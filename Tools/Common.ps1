@@ -18,22 +18,22 @@ function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir"
 }
 
 function Test-Single-Binary($FileName) {
-    if (!(Test-Path -Path .\.Output\$FileName)) {
+    if (!(Test-Path -Path $PSScriptRoot\.Output\$FileName)) {
         throw "Failed"
     }
-    Copy .\.Output\$FileName $FileName
+    Copy $PSScriptRoot\.Output\$FileName $PSScriptRoot\Tools\Tools\$FileName
 }
 
 function Test-Single-Binary-Rename($Source, $Target) {
-    if (!(Test-Path -Path .\.Output\$Source)) {
+    if (!(Test-Path -Path $PSScriptRoot\.Output\$Source)) {
         throw "Failed"
     }
-    Copy .\.Output\$Source $Target
+    Copy $PSScriptRoot\.Output\$Source $PSScriptRoot\Tools\Tools\$Target
 }
 
 function Import-Project($ProjectName, [String[]]$Dependencies) {
     Write-Host "Importing $ProjectName ..."
-    Push-Location ..\..\$ProjectName\Import | Out-Null
+    Push-Location $PSScriptRoot\..\..\$ProjectName\Import | Out-Null
     foreach ($dep in $Dependencies) {
         Write-Host "    From $dep"
         Copy-Item ..\..\$dep\Release\*.h .
