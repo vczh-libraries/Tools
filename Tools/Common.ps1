@@ -21,14 +21,14 @@ function Test-Single-Binary($FileName) {
     if (!(Test-Path -Path $PSScriptRoot\.Output\$FileName)) {
         throw "Failed"
     }
-    Copy $PSScriptRoot\.Output\$FileName $PSScriptRoot\Tools\Tools\$FileName
+    Copy $PSScriptRoot\.Output\$FileName $PSScriptRoot\$FileName
 }
 
 function Test-Single-Binary-Rename($Source, $Target) {
     if (!(Test-Path -Path $PSScriptRoot\.Output\$Source)) {
         throw "Failed"
     }
-    Copy $PSScriptRoot\.Output\$Source $PSScriptRoot\Tools\Tools\$Target
+    Copy $PSScriptRoot\.Output\$Source $PSScriptRoot\$Target
 }
 
 function Import-Project($ProjectName, [String[]]$Dependencies) {
