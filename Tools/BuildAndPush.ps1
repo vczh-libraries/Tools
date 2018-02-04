@@ -46,6 +46,7 @@ function UpdateProject([ScriptBlock]$update, [String]$name) {
     Set-Location ..\$name | Out-Null
     if (RepoNeedUpdate) {
         Write-Host "Building repo: $name ..." -ForegroundColor Blue -BackgroundColor White
+        git pull origin master
         Invoke-Command $update
         PushProject $name
     }
