@@ -12,7 +12,7 @@ param (
 function RepoNeedUpdate {
     git remote update | Out-Null
     $commit_aheads = $(git rev-list --left-right --count origin/master...master)
-    if ($commit_aheads -eq "0       0") {
+    if ($commit_aheads -eq "0`t0") {
         return $false
     }
     return $true
