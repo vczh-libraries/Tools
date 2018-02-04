@@ -44,7 +44,7 @@ function Import-Project($ProjectName, [String[]]$Dependencies) {
 
 function Release-Project($ProjectName) {
     Write-Host "Releasing $ProjectName ..."
-    Start-Process-And-Wait (,("$PSScriptRoot\CodePack.exe", "..\..\$ProjectName\Release\CodegenConfig.xml"))
+    Start-Process-And-Wait (,("$PSScriptRoot\CodePack.exe", "$PSScriptRoot\..\..\$ProjectName\Release\CodegenConfig.xml"))
 }
 
 function Update-Parser($FileName) {
