@@ -9,7 +9,7 @@ function Test-GacUI-Platform($platform, $outDir) {
 }
 
 function Test-GacUI {
-    Test-GacUI-Platform x86 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Release"
+    Test-GacUI-Platform Win32 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Release"
     # Test-GacUI-Platform x64 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\x64\Release"
 }
 
@@ -23,9 +23,9 @@ function Update-GacUI {
     # Release GacUI
     Import-Project GacUI ("Vlpp","Workflow")
     Release-Project GacUI
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x86 OutDir "GacGen(x32)\"
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32 OutDir "GacGen(x32)\"
     Test-Single-Binary-Rename "GacGen(x32)\GacGen.exe" GacGen32.exe
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64 OutDir "GacGen(x64)\"
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64   OutDir "GacGen(x64)\"
     Test-Single-Binary-Rename "GacGen(x64)\GacGen.exe" GacGen64.exe
 
     # Update DarkSkin
