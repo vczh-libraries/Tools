@@ -9,11 +9,11 @@ function Test-Workflow-Platform($platform, $vcxproj, $outDir, $executable) {
 }
 
 function Test-Workflow {
-    Test-Workflow-Platform x86 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest.exe"
-    Test-Workflow-Platform x64 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest.exe"
-    Test-Workflow-Platform x86 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_MergeCpp\UnitTest_MergeCpp.vcxproj     "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_MergeCpp.exe"
-    Test-Workflow-Platform x86 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_CppCodegen.exe"
-    Test-Workflow-Platform x64 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest_CppCodegen.exe"
+    Test-Workflow-Platform Win32 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest.exe"
+    Test-Workflow-Platform x64   $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest\UnitTest.vcxproj                       "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest.exe"
+    Test-Workflow-Platform Win32 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_MergeCpp\UnitTest_MergeCpp.vcxproj     "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_MergeCpp.exe"
+    Test-Workflow-Platform Win32 $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"     "UnitTest_CppCodegen.exe"
+    Test-Workflow-Platform x64   $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest_CppCodegen.exe"
 }
 
 function Update-Workflow {
