@@ -14,6 +14,8 @@ function Help {
     echo "        openssh-server"
     echo "        lcov"
     echo "        vim"
+    echo "        curl"
+    echo "        compizconfig-settings-manager"
     echo "--remove"
     echo "    Remove all required softwares"
 }
@@ -44,6 +46,7 @@ APTGET_TARGETS=(
     openssh-server
     lcov
     vim
+    curl
     compizconfig-settings-manager
     )
 # xfce4
