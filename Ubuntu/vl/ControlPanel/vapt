@@ -15,6 +15,7 @@ function Help {
     echo "        lcov"
     echo "        vim"
     echo "        curl"
+    echo "        build-essential"
     echo "        compizconfig-settings-manager"
     echo "--remove"
     echo "    Remove all required softwares"
@@ -47,6 +48,7 @@ APTGET_TARGETS=(
     lcov
     vim
     curl
+    build-essential
     compizconfig-settings-manager
     )
 # xfce4
