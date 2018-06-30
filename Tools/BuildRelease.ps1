@@ -34,12 +34,7 @@ function Build-Release([Bool] $PopupFolders) {
         # GacGen
         Write-Host "Compiling Resources ..."
         Get-ChildItem -Path .\Tutorial -Filter Resource.xml -Recurse | %{
-            if ($_.FullName.IndexOf("\GacUI_HelloWorlds\Xml\") -ne -1) {
-                Write-Host "Compiling GacUI Resource (x86): $($_.FullName) ..."
-                Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "`"$($_.FullName)`""))
-            } else {
-                & $PSScriptRoot\GacGen.ps1 -FileName $_.FullName
-            }
+            & $PSScriptRoot\GacGen.ps1 -FileName $_.FullName
         }
 
         # Debug Build
