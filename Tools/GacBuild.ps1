@@ -13,6 +13,7 @@ try {
     if (-not (Test-Path -Path $FileName)) {
         throw "Input does not exist: $FileName"
     }
+    $FileName = (Resolve-Path -Path $FileName).Path
     Remove-Item -Path "$($FileName).log" -Recurse | Out-Null
     New-Item -ItemType Directory "$($FileName).log" | Out-Null
 
@@ -25,7 +26,7 @@ try {
     Get-Content "$($FileName).log\ResourceFiles.txt" | ForEach-Object {
         $input_file = Join-Path -Path $search_directory -ChildPath $_
         $output_file = "$($FileName).log\$($_ -replace '\\','_')"
-        Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "/D `"$($input_file)`" `"$($output_file)`""))
+        Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "/D `"$($input_file)`" `"$($output_file)`"")) $true
     }
 }
 catch {
