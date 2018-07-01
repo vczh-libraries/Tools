@@ -21,7 +21,7 @@ function Build-Release([Bool] $PopupFolders) {
         Copy-Item $PSScriptRoot\CppMerge.exe .\Tools
         Copy-Item $PSScriptRoot\GacGen32.exe .\Tools
         Copy-Item $PSScriptRoot\GacGen64.exe .\Tools
-        Copy-Item $PSScriptRoot\GacGen.ps1 .\Tools
+        Copy-Item $PSScriptRoot\Gac*.ps1 .\Tools
         Copy-Item $PSScriptRoot\StartProcess.ps1 .\Tools
 
         # ControlTemplate\BlackSkin
