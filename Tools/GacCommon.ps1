@@ -85,10 +85,24 @@ function EnumerateAnonymousResources([HashTable] $ResourceDumps, [String] $Outpu
     [System.IO.File]::WriteAllLines($OutputFileName, (ForceArray $file_names))
 }
 
-function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputFileName) {
+function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputNameInOrder, [String] $OutputDependencies) {
     Write-Host "Finding named resource files ..."
-    $file_names = $ResourceDumps.Keys | Where-Object {
-        return (ForceArray (Select-Xml -Xml $ResourceDumps[$_] -XPath "//ResourceMetadata/ResourceMetadata/@Name"))[0].Node.Value -ne ""
-    } | Sort-Object
-    [System.IO.File]::WriteAllLines($OutputFileName, (ForceArray $file_names))
+
+    $name_to_file_map = @{}
+    $name_to_dep_map = @{}
+    $ResourceDumps.Keys | ForEach-Object {
+        $xml = $ResourceDumps[$_]
+        $name = (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/@Name").Node.Value
+        if ($name -ne "") {
+            $deps = (ForceArray (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/Dependencies/Resource/@Name")).Node.Value
+            $name_to_file_map[$name] = $_
+            $name_to_dep_map[$name] = $deps
+        }
+    }
+
+    Write-Host ($name_to_file_map | Out-String)
+    Write-Host ($name_to_dep_map | Out-String)
+
+    $file_names = $name_to_file_map.Values | Sort-Object
+    [System.IO.File]::WriteAllLines($OutputNameInOrder, $file_names)
 }

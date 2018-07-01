@@ -35,10 +35,11 @@ try {
     $build_candidates_file = "$($FileName).log\BuildCandidates.txt"
     $anonymous_file = "$($FileName).log\ResourceAnonymousFiles.txt"
     $named_file = "$($FileName).log\ResourceNamedFiles.txt"
+    $dep_file = "$($FileName).log\ResourceNamedDependencies.txt"
 
     EnumerateBuildCandidates $resource_dumps $build_candidates_file
     EnumerateAnonymousResources $resource_dumps $anonymous_file
-    EnumerateNamedResources $resource_dumps $named_file
+    EnumerateNamedResources $resource_dumps $named_file dep_file
 
     if ($dump) {
         Write-Host "Dumps:"
