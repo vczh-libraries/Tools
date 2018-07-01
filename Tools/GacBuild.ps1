@@ -41,7 +41,11 @@ try {
     if (-not $dump) {
         Write-Host "Rebuilding all outdated binaries ..."
         Get-Content $build_candidates_file | ForEach-Object {
-            & $PSScriptRoot\GacGen.ps1 -FileName $_
+            try {
+                & $PSScriptRoot\GacGen.ps1 -FileName $_
+            } catch {
+                Write-Host $_.Exception.Message -ForegroundColor Red
+            }
         }
     }
 }
