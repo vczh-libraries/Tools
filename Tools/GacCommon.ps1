@@ -10,8 +10,9 @@ function SelectXml([Xml] $xml, [String] $path) {
 }
 
 function EnumerateResourceFiles([String] $FileName) {
+    Write-Host "Searching for all resource files ..."
+
     [Xml]$gacui_xml = Get-Content $FileName
-    Write-Host "Searching for all GacUI Xml Resource files: $FileName ..."
     $excludes = (SelectXml $gacui_xml "//GacUI/Exclude/@Pattern").Node.Value
     $search_directory = Split-Path -Parent (Resolve-Path $FileName)
     $resource_files = (Get-ChildItem $search_directory -Filter "*.xml" -Recurse | ForEach-Object {
@@ -26,6 +27,8 @@ function EnumerateResourceFiles([String] $FileName) {
 }
 
 function DumpResourceFiles([String] $FileName, [HashTable]$ResourceDumpFiles) {
+    Write-Host "Dumping all resource files ..."
+
     $search_directory = Split-Path -Parent (Resolve-Path $FileName)
     Get-Content "$($FileName).log\ResourceFiles.txt" | ForEach-Object {
         $input_file = Join-Path -Path $search_directory -ChildPath $_
@@ -41,4 +44,20 @@ function DumpResourceFiles([String] $FileName, [HashTable]$ResourceDumpFiles) {
             throw "Failed to dump GacUI Xml Resource File: " + $input_file
         }
     }
+}
+
+function NeedBuild([Xml] $Dump) {
+    $input_files = (SelectXml $Dump "//ResourceMetadata/Inputs/Input/@Path").Node.Value
+    $output_files = (SelectXml $Dump "//ResourceMetadata/Outputs/Output/@Path").Node.Value
+
+    if (($output_files | Where-Object { -not [System.IO.File]::Exists($_) }) -ne $null) {
+        return $true
+    }
+}
+
+function EnumerateBuildCandidates([HashTable] $ResourceDumps) {
+    Write-Host "Finding resource files that need rebuild ..."
+    $build_candidates = $ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] }
+    if ($build_candidates -eq $null) { $build_candidates = @() }
+    [System.IO.File]::WriteAllLines("$($FileName).log\BuildCandidates.txt", ($build_candidates | Sort-Object))
 }

@@ -29,6 +29,8 @@ try {
     $resource_dump_files.Keys | ForEach-Object {
         $resource_dumps[$_] = [Xml](Get-Content $resource_dump_files[$_])
     }
+
+    EnumerateBuildCandidates $resource_dumps
 }
 catch {
     Write-Host $_.Exception.Message -ForegroundColor Red
