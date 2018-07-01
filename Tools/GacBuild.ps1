@@ -51,7 +51,7 @@ try {
         Write-Host "Rebuilding all outdated binaries ..."
         $build_candidates = Get-Content $build_candidates_file
 
-        (@() + (Get-Content $anonymous_file) + (Get-Content $named_file)) | ForEach-Object {
+        (@() + (ForceArray (Get-Content $anonymous_file)) + (ForceArray(Get-Content $named_file))) | ForEach-Object {
             try {
                 if ($build_candidates -contains $_) {
                     Write-Host "[BUILD] $($_)"
