@@ -5,7 +5,7 @@ param (
 . $PSScriptRoot\StartProcess.ps1
 
 Write-Host "Compiling GacUI Resource: $FileName ..."
-Remove-Item -Path "$($FileName).log" -Recurse | Out-Null
+Remove-Item -Path "$($FileName).log" -Recurse -ErrorAction Ignore | Out-Null
 Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "/P $FileName"))
 Start-Process-And-Wait (,("$PSScriptRoot\GacGen64.exe", "/P $FileName"))
 
