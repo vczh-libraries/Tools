@@ -35,17 +35,18 @@ try {
     $build_candidates_file = "$($FileName).log\BuildCandidates.txt"
     $anonymous_file = "$($FileName).log\ResourceAnonymousFiles.txt"
     $named_file = "$($FileName).log\ResourceNamedFiles.txt"
-    $dep_file = "$($FileName).log\ResourceNamedDependencies.txt"
+    $mapping_file = "$($FileName).log\ResourceNamedMapping.txt"
 
     EnumerateBuildCandidates $resource_dumps $build_candidates_file
     EnumerateAnonymousResources $resource_dumps $anonymous_file
-    EnumerateNamedResources $resource_dumps $named_file dep_file
+    EnumerateNamedResources $resource_dumps $named_file $mapping_file
 
     if ($dump) {
         Write-Host "Dumps:"
         Write-Host "    $($build_candidates_file)"
         Write-Host "    $($anonymous_file)"
         Write-Host "    $($named_file)"
+        Write-Host "    $($mapping_file)"
     }
 
     if (-not $dump) {
@@ -56,7 +57,7 @@ try {
             try {
                 if ($build_candidates -contains $_) {
                     Write-Host "[BUILD] $($_)"
-                    & $PSScriptRoot\GacGen.ps1 -FileName $_
+                    & $PSScriptRoot\GacGen.ps1 -FileName $_ -MappingFileName $mapping_file
                 } else {
                     Write-Host "[SKIPPED] $($_)"
                 }
