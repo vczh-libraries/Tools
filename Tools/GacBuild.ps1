@@ -3,6 +3,7 @@ param (
 )
 
 . $PSScriptRoot\StartProcess.ps1
+. $PSScriptRoot\GacBuildEnumerate.ps1
 
 # Prevent from displaying "Debug or Close Application" dialog on crash
 $dontshowui_key = "HKCU:\Software\Microsoft\Windows\Windows Error Reporting"
@@ -17,7 +18,7 @@ try {
     Remove-Item -Path "$($FileName).log" -Recurse | Out-Null
     New-Item -ItemType Directory "$($FileName).log" | Out-Null
 
-    & $PSScriptRoot\GacBuildEnumerate.ps1 -FileName $FileName
+    EnumerateResourceFiles $FileName
     if (-not (Test-Path -Path "$($FileName).log\ResourceFiles.txt")) {
         throw "Failed to enumerate GacUI Xml Resource files"
     }
