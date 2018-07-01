@@ -60,10 +60,17 @@ function NeedBuild([Xml] $Dump) {
     $output_file_times = $output_files | ForEach-Object {
         [System.IO.FileInfo]::new($_).LastWriteTimeUtc
     }
+    
+    if (-not ($input_file_times -is [System.Array])) {
+        $input_file_times = @($input_file_times)
+    }
 
     $outdated = $output_file_times | Where-Object {
-        $output = $output_file_times
-        return ($input_file_times | Where-Object { $_ -gt $output } -ne $null)
+        $output = $_
+        $modifieds = $input_file_times | Where-Object {
+            return $_ -gt $output
+        }
+        return $modifieds -ne $null
     }
 
     return $outdated -ne $null
@@ -71,7 +78,7 @@ function NeedBuild([Xml] $Dump) {
 
 function EnumerateBuildCandidates([String] $FileName, [HashTable] $ResourceDumps) {
     Write-Host "Finding resource files that need rebuild ..."
-    $build_candidates = $ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] }
+    $build_candidates = $ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] } | Sort-Object
     if ($build_candidates -eq $null) { $build_candidates = @() }
-    [System.IO.File]::WriteAllLines("$($FileName).log\BuildCandidates.txt", ($build_candidates | Sort-Object))
+    [System.IO.File]::WriteAllLines("$($FileName).log\BuildCandidates.txt", $build_candidates)
 }
