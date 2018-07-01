@@ -1,5 +1,7 @@
+[CmdLetBinding()]
 param (
-    [String]$FileName
+    [String]$FileName,
+    [Switch]$Dump
 )
 
 . $PSScriptRoot\StartProcess.ps1
@@ -30,7 +32,10 @@ try {
         $resource_dumps[$_] = [Xml](Get-Content $resource_dump_files[$_])
     }
 
-    EnumerateBuildCandidates $resource_dumps
+    EnumerateBuildCandidates $FileName $resource_dumps
+    if ($dump) {
+        Write-Host "Dumps: $($FileName).log\BuildCandidates.txt"
+    }
 }
 catch {
     Write-Host $_.Exception.Message -ForegroundColor Red

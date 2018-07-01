@@ -53,9 +53,23 @@ function NeedBuild([Xml] $Dump) {
     if (($output_files | Where-Object { -not [System.IO.File]::Exists($_) }) -ne $null) {
         return $true
     }
+
+    $input_file_times = $input_files | ForEach-Object {
+        [System.IO.FileInfo]::new($_).LastWriteTimeUtc
+    }
+    $output_file_times = $output_files | ForEach-Object {
+        [System.IO.FileInfo]::new($_).LastWriteTimeUtc
+    }
+
+    $outdated = $output_file_times | Where-Object {
+        $output = $output_file_times
+        return ($input_file_times | Where-Object { $_ -gt $output } -ne $null)
+    }
+
+    return $outdated -ne $null
 }
 
-function EnumerateBuildCandidates([HashTable] $ResourceDumps) {
+function EnumerateBuildCandidates([String] $FileName, [HashTable] $ResourceDumps) {
     Write-Host "Finding resource files that need rebuild ..."
     $build_candidates = $ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] }
     if ($build_candidates -eq $null) { $build_candidates = @() }
