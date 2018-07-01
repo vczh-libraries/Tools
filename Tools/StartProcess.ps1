@@ -34,3 +34,14 @@ function Start-Process-And-Wait([String[][]] $Pairs, [Boolean]$Inline = $false, 
         throw "One or more processes crash"
     }
 }
+
+function SelectXml([Xml] $xml, [String] $path) {
+    $nodes = Select-Xml -Xml $xml -XPath $path
+    if ($nodes -eq $null) {
+        return ,@()
+    } elseif ($nodes -is [array]) {
+        return $nodes
+    } else {
+        return @($nodes)
+    }
+}

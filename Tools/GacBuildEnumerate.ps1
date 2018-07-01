@@ -2,16 +2,7 @@ param (
     [String]$FileName
 )
 
-function SelectXml([Xml] $xml, [String] $path) {
-    $nodes = Select-Xml -Xml $xml -XPath $path
-    if ($nodes -eq $null) {
-        return ,@()
-    } elseif ($nodes -is [array]) {
-        return $nodes
-    } else {
-        return @($nodes)
-    }
-}
+. $PSScriptRoot\StartProcess.ps1
 
 [Xml]$gacui_xml = Get-Content $FileName
 Write-Host "Searching for all GacUI Xml Resource files: $FileName ..."
