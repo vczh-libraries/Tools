@@ -33,8 +33,15 @@ try {
     }
 
     EnumerateBuildCandidates $FileName $resource_dumps
+    $build_candidates_file = "$($FileName).log\BuildCandidates.txt"
     if ($dump) {
-        Write-Host "Dumps: $($FileName).log\BuildCandidates.txt"
+        Write-Host "Dumps: $($build_candidates_file)"
+    }
+
+    if (-not $dump) {
+        Get-Content $build_candidates_file | ForEach-Object {
+            & $PSScriptRoot\GacGen.ps1 -FileName $_
+        }
     }
 }
 catch {
