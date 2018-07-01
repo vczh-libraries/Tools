@@ -3,7 +3,7 @@ param (
 )
 
 . $PSScriptRoot\StartProcess.ps1
-. $PSScriptRoot\GacBuildEnumerate.ps1
+. $PSScriptRoot\GacCommon.ps1
 
 # Prevent from displaying "Debug or Close Application" dialog on crash
 $dontshowui_key = "HKCU:\Software\Microsoft\Windows\Windows Error Reporting"
@@ -23,23 +23,11 @@ try {
         throw "Failed to enumerate GacUI Xml Resource files"
     }
     
-    $resource_files = @{}
+    $resource_dump_files = @{}
     $resource_dumps = @{}
-    $search_directory = Split-Path -Parent (Resolve-Path $FileName)
-    Get-Content "$($FileName).log\ResourceFiles.txt" | ForEach-Object {
-        $input_file = Join-Path -Path $search_directory -ChildPath $_
-        $output_file = "$($FileName).log\$($_ -replace '\\','_')"
-        $resource_files[$input_file] = $output_file
-    }
-
-    $resource_files.Keys | ForEach-Object {
-        $input_file = $_
-        $output_file = $resource_files[$_]
-        Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "/D `"$($input_file)`" `"$($output_file)`"")) $true
-        if (-not (Test-Path -Path $output_file)) {
-            throw "Failed to dump GacUI Xml Resource File: " + $input_file
-        }
-        $resource_dumps[$input_file] = [Xml](Get-Content $output_file)
+    DumpResourceFiles $FileName $resource_dump_files
+    $resource_dump_files.Keys | ForEach-Object {
+        $resource_dumps[$_] = [Xml](Get-Content $resource_dump_files[$_])
     }
 }
 catch {

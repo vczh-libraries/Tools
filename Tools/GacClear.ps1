@@ -3,7 +3,7 @@ param (
 )
 
 . $PSScriptRoot\StartProcess.ps1
-. $PSScriptRoot\GacBuildEnumerate.ps1
+. $PSScriptRoot\GacCommon.ps1
 
 # Prevent from displaying "Debug or Close Application" dialog on crash
 $dontshowui_key = "HKCU:\Software\Microsoft\Windows\Windows Error Reporting"

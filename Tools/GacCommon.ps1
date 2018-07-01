@@ -24,3 +24,21 @@ function EnumerateResourceFiles([String] $FileName) {
     })
     [System.IO.File]::WriteAllLines("$($FileName).log\ResourceFiles.txt", $resource_files)
 }
+
+function DumpResourceFiles([String] $FileName, [HashTable]$ResourceDumpFiles) {
+    $search_directory = Split-Path -Parent (Resolve-Path $FileName)
+    Get-Content "$($FileName).log\ResourceFiles.txt" | ForEach-Object {
+        $input_file = Join-Path -Path $search_directory -ChildPath $_
+        $output_file = "$($FileName).log\$($_ -replace '\\','_')"
+        $ResourceDumpFiles[$input_file] = $output_file
+    }
+
+    $ResourceDumpFiles.Keys | ForEach-Object {
+        $input_file = $_
+        $output_file = $ResourceDumpFiles[$_]
+        Start-Process-And-Wait (,("$PSScriptRoot\GacGen32.exe", "/D `"$($input_file)`" `"$($output_file)`"")) $true
+        if (-not (Test-Path -Path $output_file)) {
+            throw "Failed to dump GacUI Xml Resource File: " + $input_file
+        }
+    }
+}
