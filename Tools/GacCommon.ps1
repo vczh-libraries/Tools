@@ -76,9 +76,27 @@ function NeedBuild([Xml] $Dump) {
     return $outdated -ne $null
 }
 
-function EnumerateBuildCandidates([String] $FileName, [HashTable] $ResourceDumps) {
+function EnumerateBuildCandidates([HashTable] $ResourceDumps, [String] $OutputFileName) {
     Write-Host "Finding resource files that need rebuild ..."
     $build_candidates = $ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] } | Sort-Object
     if ($build_candidates -eq $null) { $build_candidates = @() }
-    [System.IO.File]::WriteAllLines("$($FileName).log\BuildCandidates.txt", $build_candidates)
+    [System.IO.File]::WriteAllLines($OutputFileName, $build_candidates)
+}
+
+function EnumerateAnonymousResources([HashTable] $ResourceDumps, [String] $OutputFileName) {
+    Write-Host "Finding anonymouse resource files ..."
+    $file_names = $ResourceDumps.Keys | Where-Object {
+        return (SelectXml $ResourceDumps[$_] "//ResourceMetadata/ResourceMetadata/@Name")[0].Node.Value -eq ""
+    } | Sort-Object
+    if ($file_names -eq $null) { $file_names = @() }
+    [System.IO.File]::WriteAllLines($OutputFileName, $file_names)
+}
+
+function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputFileName) {
+    Write-Host "Finding named resource files ..."
+    $file_names = $ResourceDumps.Keys | Where-Object {
+        return (SelectXml $ResourceDumps[$_] "//ResourceMetadata/ResourceMetadata/@Name")[0].Node.Value -ne ""
+    } | Sort-Object
+    if ($file_names -eq $null) { $file_names = @() }
+    [System.IO.File]::WriteAllLines($OutputFileName, $file_names)
 }
