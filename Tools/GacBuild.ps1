@@ -1,6 +1,6 @@
 [CmdLetBinding()]
 param (
-    [String]$FileName,
+    [Parameter(Mandatory=$true)][String]$FileName,
     [Switch]$Dump
 )
 
