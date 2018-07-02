@@ -48,7 +48,7 @@ function Build-Release([Bool] $PopupFolders) {
         Write-Host "Checking Debug Builds ..."
         $failed = $false
         Get-ChildItem -Path .\Tutorial -Filter *.vcxproj -Recurse | %{
-            if ($_.FullName.IndexOf("\Lib\") -eq -1) {
+            if (($_.FullName.IndexOf("\Lib\") -eq -1) -or ($_.FullName.IndexOf("\DocumentEditor\") -eq -1)) {
                 $exe_file = "$($_.DirectoryName)\..\Debug\$($_.BaseName).exe"
                 if (!(Test-Path $exe_file)) {
                     Write-Host "Binary not found: $exe_file" -ForegroundColor Red
