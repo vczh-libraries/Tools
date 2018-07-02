@@ -1,3 +1,42 @@
+<#
+Do an incremental build to all GacUI Xml Resource files directly or indirectly in the folder containing $FileName.
+If you set -Dump, then this scripts stops before the real building process, it outputs following files for debug:
+    $($FileName).log\ResourceFiles.txt: All resource files that are found
+    $($FileName).log\BuildCandidates.txt: All resource files that are outdated, so they will be build
+    $($FileName).log\ResourceAnonymousFiles.txt: All anonymous resource files
+    $($FileName).log\ResourceNamedFiles.txt: All named resource files in the correct order sorted using dependencies
+    $($FileName).log\ResourceNamedMapping.txt: Resource name to full path mappings for GacGen.exe /P <resource-xml> <HERE>
+
+$FileName should points to an Xml file with this format:
+<GacUI>
+    <Exclude Pattern="...."/>
+    ...
+</GacUI>
+
+GacBuild.ps1 searches all GacUI Xml Resource files, but whose full patch matches one of the pattern will be ignored.
+You should use "/" instead of "\" in the pattern attribute.
+
+In order to make your resource file, be able to depend on others, or be able to be depended by others,
+you should add the following metadata in GacGenConfig like this:
+
+<Resource>
+  <Folder name="GacGenConfig">
+    <Xml name="Metadata">
+      <ResourceMetadata Name="NAME" Version="1.0">
+        <Dependencies>
+          <Resource Name="NAME-OF-RESOURCE-YOU-WANT-TO-DEPEND"/>
+          ....
+        </Dependencies>
+      </ResourceMetadata>
+    </Xml>
+    <Folder name="Cpp">...</Folder>
+    <Folder name="ResX86">...</Folder>
+    <Folder name="ResX64">...</Folder>
+    </Folder>
+  </Folder>
+  ...
+</Resource>
+#>
 [CmdLetBinding()]
 param (
     [Parameter(Mandatory=$true)][String]$FileName,

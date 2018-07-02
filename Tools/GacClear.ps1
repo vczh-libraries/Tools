@@ -1,3 +1,8 @@
+<#
+See comments in GacBuild.ps1 for $FileName.
+GacClear.ps1 deletes all cached compile result of all GacUI Xml Resource files, to cause GacBuild.ps1 do a full build.
+If your resource files named Resource.xml, then the Resource.xml.log folder cached all files, which will be deleted.
+#>
 param (
     [String]$FileName
 )
