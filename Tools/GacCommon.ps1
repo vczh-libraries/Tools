@@ -4,7 +4,7 @@ function ForceArray($nodes) {
     } elseif ($nodes -is [System.Array]) {
         return $nodes
     } else {
-        return @($nodes)
+        return ,@($nodes)
     }
 }
 
@@ -89,16 +89,52 @@ function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputNam
     Write-Host "Finding named resource files ..."
 
     $name_to_file_map = @{}
+    $name_to_dep_map = @{}
     $ResourceDumps.Keys | ForEach-Object {
         $xml = $ResourceDumps[$_]
         $name = (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/@Name").Node.Value
         if ($name -ne "") {
-            $deps = (ForceArray (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/Dependencies/Resource/@Name")).Node.Value
+            $attrs = ForceArray (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/Dependencies/Resource/@Name")
+            $deps = ForceArray $attrs.Node.Value
             $name_to_file_map[$name] = $_
+            $name_to_dep_map[$name] = [System.Collections.ArrayList]::new($deps)
         }
     }
 
-    $file_names = ForceArray ($name_to_file_map.Values | Sort-Object)
+    $hasError = $false
+    $name_to_dep_map.Keys | ForEach-Object {
+        $key = $_
+        $name_to_dep_map[$key] | ForEach-Object {
+            if (-not $name_to_dep_map.ContainsKey($key)) {
+                $hasError = $true
+                Write-Host "Resource $($key) depends on $($_) but $($_) does not exist."
+            }
+        }
+    }
+    if ($hasError) { throw "Please check your metadata." }
+
+    $compile_order = [System.Collections.ArrayList]::new()
+    while ($name_to_dep_map.Count -gt 0) {
+        $selection = ForceArray ($name_to_dep_map.Keys | Where-Object { $name_to_dep_map[$_].Count -eq 0 })
+        if ($selection.Count -eq 0) {
+            Write-Host "Found circle dependency in the following resources:"
+            $name_to_dep_map.Keys | ForEach-Object { Write-Host "    $($_)" }
+            $hasError = $true;
+            break
+        } else {
+            $compile_order.AddRange((ForceArray ($selection | Select-Object)))
+            $selection | ForEach-Object {
+                $ready = $_
+                $name_to_dep_map.Remove($ready)
+                $name_to_dep_map.Values | ForEach-Object { $_.Remove($ready) }
+            }
+        }
+    }
+    if ($hasError) { throw "Please check your metadata." }
+
+    $file_names = ForceArray ($compile_order | ForEach-Object {
+        return $name_to_file_map[$_]
+    })
     $file_mapping = ForceArray ($name_to_file_map.Keys | ForEach-Object {
         return "$($_)=>$($name_to_file_map[$_])"
     } | Sort-Object)
