@@ -87,13 +87,19 @@ function ExtractDeps([HashTable] $ResourceDumps, [HashTable] $name_to_file_map, 
 
 function EnumerateBuildCandidates([HashTable] $ResourceDumps, [String] $OutputFileName) {
     Write-Host "Finding resource files that need rebuild ..."
+    $direct_candidates = ForceArray ($ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] })
+
     $name_to_file_map = @{}
     $name_to_dep_map = @{}
     ExtractDeps $ResourceDumps $name_to_file_map $name_to_dep_map
 
-    $direct_candidates = ForceArray ($ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] })
+    $file_to_name_map = @{}
+    $name_to_file_map.Keys | ForEach-Object { $file_to_name_map[$name_to_file_map[$_]] = $_ }
+    $names = ForceArray ($direct_candidates | Where-Object { $file_to_name_map.ContainsKey($_) } | ForEach-Object { $file_to_name_map[$_] })
+    $names = [System.Collections.ArrayList]::new($names)
+    
     $anonymous_candidates = ForceArray ($direct_candidates | Where-Object { -not $name_to_file_map.ContainsValue($_) })
-    $named_candidates = ForceArray ($direct_candidates | Where-Object { $name_to_file_map.ContainsValue($_) })
+    $named_candidates = ForceArray ($names | ForEach-Object { $name_to_file_map[$_] })
 
     [System.IO.File]::WriteAllLines($OutputFileName, $anonymous_candidates + $named_candidates)
 }
