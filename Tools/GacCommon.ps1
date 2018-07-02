@@ -95,8 +95,23 @@ function EnumerateBuildCandidates([HashTable] $ResourceDumps, [String] $OutputFi
 
     $file_to_name_map = @{}
     $name_to_file_map.Keys | ForEach-Object { $file_to_name_map[$name_to_file_map[$_]] = $_ }
+
     $names = ForceArray ($direct_candidates | Where-Object { $file_to_name_map.ContainsKey($_) } | ForEach-Object { $file_to_name_map[$_] })
     $names = [System.Collections.ArrayList]::new($names)
+    $pool = ForceArray ($name_to_file_map.Keys | Where-Object { -not $names.Contains($_) })
+    $pool = [System.Collections.ArrayList]::new($pool)
+
+    while ($true)
+    {
+        $selection = ForceArray ($pool | Where-Object {
+            $deps = $name_to_dep_map[$_]
+            return (ForceArray ($deps | Where-Object { $names.Contains($_) })).Count -ne 0
+        })
+        if ($selection.Count -eq 0) { break }
+
+        $names.AddRange($selection)
+        $selection | ForEach-Object { $pool.Remove($_) }
+    }
     
     $anonymous_candidates = ForceArray ($direct_candidates | Where-Object { -not $name_to_file_map.ContainsValue($_) })
     $named_candidates = ForceArray ($names | ForEach-Object { $name_to_file_map[$_] })
