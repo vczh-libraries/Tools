@@ -1,7 +1,7 @@
 function ForceArray($nodes) {
     if ($nodes -eq $null) {
         return ,@()
-    } elseif ($nodes -is [System.Array]) {
+    } elseif (($nodes -is [System.Array]) -or ($nodes -is [System.Collections.ArrayList])) {
         return $nodes
     } else {
         return ,@($nodes)
@@ -71,6 +71,20 @@ function NeedBuild([Xml] $Dump) {
     return $outdated -ne $null
 }
 
+function ExtractDeps([HashTable] $ResourceDumps, [HashTable] $name_to_file_map, [HashTable] $name_to_dep_map)
+{
+    $ResourceDumps.Keys | ForEach-Object {
+        $xml = $ResourceDumps[$_]
+        $name = (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/@Name").Node.Value
+        if ($name -ne "") {
+            $attrs = ForceArray (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/Dependencies/Resource/@Name")
+            $deps = ForceArray $attrs.Node.Value
+            $name_to_file_map[$name] = $_
+            $name_to_dep_map[$name] = [System.Collections.ArrayList]::new($deps)
+        }
+    }
+}
+
 function EnumerateBuildCandidates([HashTable] $ResourceDumps, [String] $OutputFileName) {
     Write-Host "Finding resource files that need rebuild ..."
     $build_candidates = $ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] } | Sort-Object
@@ -85,22 +99,8 @@ function EnumerateAnonymousResources([HashTable] $ResourceDumps, [String] $Outpu
     [System.IO.File]::WriteAllLines($OutputFileName, (ForceArray $file_names))
 }
 
-function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputNames, [String] $OutputMapping) {
-    Write-Host "Finding named resource files ..."
-
-    $name_to_file_map = @{}
-    $name_to_dep_map = @{}
-    $ResourceDumps.Keys | ForEach-Object {
-        $xml = $ResourceDumps[$_]
-        $name = (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/@Name").Node.Value
-        if ($name -ne "") {
-            $attrs = ForceArray (Select-Xml -Xml $xml -XPath "//ResourceMetadata/ResourceMetadata/Dependencies/Resource/@Name")
-            $deps = ForceArray $attrs.Node.Value
-            $name_to_file_map[$name] = $_
-            $name_to_dep_map[$name] = [System.Collections.ArrayList]::new($deps)
-        }
-    }
-
+function ValidateDeps([HashTable] $name_to_dep_map)
+{
     $hasError = $false
     $name_to_dep_map.Keys | ForEach-Object {
         $key = $_
@@ -112,7 +112,10 @@ function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputNam
         }
     }
     if ($hasError) { throw "Please check your metadata." }
+}
 
+function SortDeps([HashTable] $name_to_dep_map)
+{
     $compile_order = [System.Collections.ArrayList]::new()
     while ($name_to_dep_map.Count -gt 0) {
         $selection = ForceArray ($name_to_dep_map.Keys | Where-Object { $name_to_dep_map[$_].Count -eq 0 })
@@ -131,6 +134,17 @@ function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputNam
         }
     }
     if ($hasError) { throw "Please check your metadata." }
+    return $compile_order
+}
+
+function EnumerateNamedResources([HashTable] $ResourceDumps, [String] $OutputNames, [String] $OutputMapping) {
+    Write-Host "Finding named resource files ..."
+
+    $name_to_file_map = @{}
+    $name_to_dep_map = @{}
+    ExtractDeps $ResourceDumps $name_to_file_map $name_to_dep_map
+    ValidateDeps $name_to_dep_map
+    $compile_order = ForceArray (SortDeps $name_to_dep_map)
 
     $file_names = ForceArray ($compile_order | ForEach-Object {
         return $name_to_file_map[$_]
