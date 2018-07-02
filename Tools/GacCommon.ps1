@@ -87,8 +87,15 @@ function ExtractDeps([HashTable] $ResourceDumps, [HashTable] $name_to_file_map, 
 
 function EnumerateBuildCandidates([HashTable] $ResourceDumps, [String] $OutputFileName) {
     Write-Host "Finding resource files that need rebuild ..."
-    $build_candidates = $ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] } | Sort-Object
-    [System.IO.File]::WriteAllLines($OutputFileName, (ForceArray $build_candidates))
+    $name_to_file_map = @{}
+    $name_to_dep_map = @{}
+    ExtractDeps $ResourceDumps $name_to_file_map $name_to_dep_map
+
+    $direct_candidates = ForceArray ($ResourceDumps.Keys | Where-Object { NeedBuild $ResourceDumps[$_] })
+    $anonymous_candidates = ForceArray ($direct_candidates | Where-Object { -not $name_to_file_map.ContainsValue($_) })
+    $named_candidates = ForceArray ($direct_candidates | Where-Object { $name_to_file_map.ContainsValue($_) })
+
+    [System.IO.File]::WriteAllLines($OutputFileName, $anonymous_candidates + $named_candidates)
 }
 
 function EnumerateAnonymousResources([HashTable] $ResourceDumps, [String] $OutputFileName) {
