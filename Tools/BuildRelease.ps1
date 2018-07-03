@@ -33,8 +33,8 @@ function Build-Release([Bool] $PopupFolders) {
 
         # GacGen
         Write-Host "Compiling Resources ..."
-        $ $PSScriptRoot\GacClear.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
-        $ $PSScriptRoot\GacBuild.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
+        & $PSScriptRoot\GacClear.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
+        & $PSScriptRoot\GacBuild.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
 
         # Debug Build
         Write-Host "Create Debug Builds ..."
