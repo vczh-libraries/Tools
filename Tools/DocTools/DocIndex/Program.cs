@@ -442,9 +442,19 @@ namespace DocIndex
             {
                 if (decl.Document != null)
                 {
-                    var xml = XElement.Parse(decl.Document);
-                    Fix(xml);
-                    decl.Document = xml.ToString();
+                    try
+                    {
+                        var xml = XElement.Parse(decl.Document);
+                        Fix(xml);
+                        decl.Document = xml.ToString();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Error: Unable to parse XML: " + e.Message + "\r\n" + decl.Document);
+                        Console.ResetColor();
+                        decl.Document = null;
+                    }
                 }
                 if (!skipChildren && decl.Children != null)
                 {
