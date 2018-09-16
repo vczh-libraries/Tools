@@ -48,6 +48,7 @@ function Update {
         Update Release
         Update XGac
         Update iGac
+        Update Document
         Update vczh-libraries.github.io
     else
         pushd . > /dev/null
