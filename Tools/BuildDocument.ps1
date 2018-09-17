@@ -68,3 +68,41 @@ function Build-Document {
         Pop-Location | Out-Null
     }
 }
+
+function Build-Document-2 {
+    Push-Location "$PSScriptRoot\..\..\Document\.Output" | Out-Null
+
+    try {
+        # Cleaning
+        Write-Host "Cleaning ..."
+        Remove-Item .\Import -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
+        
+        # Preprocessing
+        Write-Host "Preprocessing ..."
+        New-Item .\Import -ItemType directory -ErrorAction SilentlyContinue | Out-Null
+
+        Copy-Item ..\..\Vlpp\Release\*.h        .\Import
+        Copy-Item ..\..\Vlpp\Release\*.cpp      .\Import
+        Copy-Item ..\..\Workflow\Release\*.h    .\Import
+        Copy-Item ..\..\Workflow\Release\*.cpp  .\Import
+        Copy-Item ..\..\GacUI\Release\*.h       .\Import
+        Copy-Item ..\..\GacUI\Release\*.cpp     .\Import
+
+        $vsdevcmd = $env:VLPP_VSDEVCMD_PATH
+        if ($vsdevcmd -eq $null) {
+            throw "You have to add an environment variable named VLPP_VSDEVCMD_PATH and set its value to the path of VsDevCmd.bat (e.g. C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat)"
+        }
+
+        $cdcmd = "cd `"$PSScriptRoot\..\..\Document\.Output`""
+        $msbuild_arguments = "cl.exe `"Includes.cpp /I .\Import /D WIN32 /D _DEBUG /D WINDOWS /D _UNICODE /D UNICODE /P /C"
+        $cmd_arguments = "`"`"$vsdevcmd`" & $cdcmd & $msbuild_arguments"
+        Start-Process-And-Wait (,($env:ComSpec, "/c $cmd_arguments")) -Inline $true -WorkingDirectory "."
+        Move-Item -Path .\Includes.i -Destination .\Import\Preprocessed.txt
+    }
+    catch {
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
+    finally {
+        Pop-Location | Out-Null
+    }
+}
