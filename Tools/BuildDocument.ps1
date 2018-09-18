@@ -76,6 +76,9 @@ function Build-Document-2 {
         # Cleaning
         Write-Host "Cleaning ..."
         Remove-Item .\Import -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
+
+        # Importing
+        Import-Project Document ("Vlpp")
         
         # Preprocessing
         Write-Host "Preprocessing ..."
