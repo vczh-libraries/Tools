@@ -1,0 +1,4 @@
+Open VSCode
+Find `<WindowsTargetPlatformVersion>(\d|\.)+</WindowsTargetPlatformVersion>`
+Replace by `<WindowsTargetPlatformVersion>NEW_VERSION</WindowsTargetPlatformVersion>`
+Save all
