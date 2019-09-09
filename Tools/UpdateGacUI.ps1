@@ -14,14 +14,16 @@ function Test-GacUI {
 }
 
 function Update-GacUI {
+    # Import
+    Import-Project GacUI ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","Workflow")
+
     # Update Parsers
     Update-Parser $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\GuiInstanceQuery_Parser.parser.txt
 
     # Run test cases
     Test-GacUI
 
-    # Release GacUI
-    Import-Project GacUI ("Vlpp","Workflow")
+    # Release
     Release-Project GacUI
     Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32 OutDir "GacGen(x32)\"
     Test-Single-Binary-Rename "GacGen(x32)\GacGen.exe" GacGen32.exe
@@ -40,6 +42,6 @@ function Update-GacUI {
         Pop-Location
     }
 
-    # Release GacUI
+    # Release
     Release-Project GacUI
 }
