@@ -10,6 +10,14 @@ function Build-Release([Bool] $PopupFolders) {
         New-Item .\Import\Skins\DarkSkin -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         Copy-Item ..\Vlpp\Release\*.h .\Import
         Copy-Item ..\Vlpp\Release\*.cpp .\Import
+        Copy-Item ..\VlppOS\Release\*.h .\Import
+        Copy-Item ..\VlppOS\Release\*.cpp .\Import
+        Copy-Item ..\VlppRegex\Release\*.h .\Import
+        Copy-Item ..\VlppRegex\Release\*.cpp .\Import
+        Copy-Item ..\VlppReflection\Release\*.h .\Import
+        Copy-Item ..\VlppReflection\Release\*.cpp .\Import
+        Copy-Item ..\VlppParser\Release\*.h .\Import
+        Copy-Item ..\VlppParser\Release\*.cpp .\Import
         Copy-Item ..\Workflow\Release\*.h .\Import
         Copy-Item ..\Workflow\Release\*.cpp .\Import
         Copy-Item ..\GacUI\Release\Gac*.h .\Import

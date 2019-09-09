@@ -16,6 +16,14 @@ function Build-Document {
         New-Item .\.Output\Doc -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         Copy-Item ..\..\Vlpp\Release\*.h .\.Output\Doc
         Copy-Item ..\..\Vlpp\Release\*.cpp .\.Output\Doc
+        Copy-Item ..\..\VlppOS\Release\*.h .\.Output\Doc
+        Copy-Item ..\..\VlppOS\Release\*.cpp .\.Output\Doc
+        Copy-Item ..\..\VlppRegex\Release\*.h .\.Output\Doc
+        Copy-Item ..\..\VlppRegex\Release\*.cpp .\.Output\Doc
+        Copy-Item ..\..\VlppReflection\Release\*.h .\.Output\Doc
+        Copy-Item ..\..\VlppReflection\Release\*.cpp .\.Output\Doc
+        Copy-Item ..\..\VlppParser\Release\*.h .\.Output\Doc
+        Copy-Item ..\..\VlppParser\Release\*.cpp .\.Output\Doc
         Copy-Item ..\..\Workflow\Release\*.h .\.Output\Doc
         Copy-Item ..\..\Workflow\Release\*.cpp .\.Output\Doc
         Copy-Item ..\..\GacUI\Release\GacUI*.h .\.Output\Doc
