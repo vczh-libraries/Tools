@@ -4,6 +4,10 @@ param (
 
 . $PSScriptRoot\Common.ps1
 . $PSScriptRoot\UpdateVlpp.ps1
+. $PSScriptRoot\UpdateVlppOS.ps1
+. $PSScriptRoot\UpdateVlppRegex.ps1
+. $PSScriptRoot\UpdateVlppReflection.ps1
+. $PSScriptRoot\UpdateVlppParser.ps1
 . $PSScriptRoot\UpdateWorkflow.ps1
 . $PSScriptRoot\UpdateGacUI.ps1
 . $PSScriptRoot\BuildRelease.ps1
@@ -34,6 +38,22 @@ try {
             Write-Host Update-Vlpp -ForegroundColor Blue -BackgroundColor White
             Update-Vlpp; [Console]::ResetColor()
 
+            $time_vlpp_os = [DateTime]::Now
+            Write-Host Update-VlppOS -ForegroundColor Blue -BackgroundColor White
+            Update-Vlpp; [Console]::ResetColor()
+
+            $time_vlpp_regex = [DateTime]::Now
+            Write-Host Update-VlppRegex -ForegroundColor Blue -BackgroundColor White
+            Update-Vlpp; [Console]::ResetColor()
+
+            $time_vlpp_reflection = [DateTime]::Now
+            Write-Host Update-VlppReflection -ForegroundColor Blue -BackgroundColor White
+            Update-Vlpp; [Console]::ResetColor()
+
+            $time_vlpp_parser = [DateTime]::Now
+            Write-Host Update-VlppParser -ForegroundColor Blue -BackgroundColor White
+            Update-Vlpp; [Console]::ResetColor()
+
             $time_workflow = [DateTime]::Now
             Write-Host Update-Workflow -ForegroundColor Blue -BackgroundColor White
             Update-Workflow; [Console]::ResetColor()
@@ -52,13 +72,17 @@ try {
 
             $time_finished = [DateTime]::Now
             Write-Host Finished! -ForegroundColor Blue -BackgroundColor White
-            Write-Host "Clean    : $time_clean, Elapsed: $((New-TimeSpan $time_clean $time_vlpp).ToString())"
-            Write-Host "Vlpp     : $time_vlpp, Elapsed: $((New-TimeSpan $time_vlpp $time_workflow).ToString())"
-            Write-Host "Workflow : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
-            Write-Host "GacUI    : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_release).ToString())"
-            Write-Host "Release  : $time_release, Elapsed: $((New-TimeSpan $time_release $time_document).ToString())"
-            Write-Host "Document : $time_document, Elapsed: $((New-TimeSpan $time_document $time_finished).ToString())"
-            Write-Host "Total    : $((New-TimeSpan $time_clean $time_finished).ToString())"
+            Write-Host "Clean       : $time_clean, Elapsed: $((New-TimeSpan $time_clean $time_vlpp).ToString())"
+            Write-Host "Vlpp        : $time_vlpp, Elapsed: $((New-TimeSpan $time_vlpp $time_vlpp_os).ToString())"
+            Write-Host "OS          : $time_vlpp_os, Elapsed: $((New-TimeSpan $time_vlpp_os $time_vlpp_regex).ToString())"
+            Write-Host "Regex       : $time_vlpp_regex, Elapsed: $((New-TimeSpan $time_vlpp_regex $time_vlpp_reflection).ToString())"
+            Write-Host "Reflection  : $time_vlpp_reflection, Elapsed: $((New-TimeSpan $time_vlpp_reflection $time_vlpp_parser).ToString())"
+            Write-Host "Parser      : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser $time_workflow).ToString())"
+            Write-Host "Workflow    : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
+            Write-Host "GacUI       : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_release).ToString())"
+            Write-Host "Release     : $time_release, Elapsed: $((New-TimeSpan $time_release $time_document).ToString())"
+            Write-Host "Document    : $time_document, Elapsed: $((New-TimeSpan $time_document $time_finished).ToString())"
+            Write-Host "Total       : $((New-TimeSpan $time_clean $time_finished).ToString())"
 
         }
         "Clean" {
@@ -68,6 +92,22 @@ try {
         "Vlpp" {
             Write-Host Update-Vlpp -ForegroundColor Blue -BackgroundColor White
             Update-Vlpp
+        }
+        "VlppOS" {
+            Write-Host Update-VlppOS -ForegroundColor Blue -BackgroundColor White
+            Update-VlppOS
+        }
+        "VlppRegex" {
+            Write-Host Update-VlppRegex -ForegroundColor Blue -BackgroundColor White
+            Update-VlppRegex
+        }
+        "VlppReflection" {
+            Write-Host Update-VlppReflection -ForegroundColor Blue -BackgroundColor White
+            Update-VlppReflection
+        }
+        "VlppParser" {
+            Write-Host Update-VlppParser -ForegroundColor Blue -BackgroundColor White
+            Update-VlppParser
         }
         "Workflow" {
             Write-Host Update-Workflow -ForegroundColor Blue -BackgroundColor White
@@ -90,7 +130,7 @@ try {
             Build-Document-2;
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Clean, Vlpp, Workflow, GacUI, Release, Document."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Clean, Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, Workflow, GacUI, Release, Document."
         }
     }
 }

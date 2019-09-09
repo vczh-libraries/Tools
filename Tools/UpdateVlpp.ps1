@@ -1,5 +1,5 @@
-function Test-Vlpp-Platform($platform, $outDir) {
-    Build-Sln $PSScriptRoot\..\..\Vlpp\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
+function Test-Vlpp-Platform($project, $platform, $outDir) {
+    Build-Sln $PSScriptRoot\..\..\$project\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
     if (!(Test-Path "$outDir\UnitTest.exe")) {
         throw "Failed"
     }
@@ -8,33 +8,15 @@ function Test-Vlpp-Platform($platform, $outDir) {
     Start-Process-And-Wait (,("$outDir\UnitTest.exe", ""))
 }
 
-function Test-Vlpp {
-    Test-Vlpp-Platform x86 "$PSScriptRoot\..\..\Vlpp\Test\UnitTest\Release"
-    Test-Vlpp-Platform x64 "$PSScriptRoot\..\..\Vlpp\Test\UnitTest\x64\Release"
+function Test-Vlpp($project) {
+    Test-Vlpp-Platform $project x86 "$PSScriptRoot\..\..\$project\Test\UnitTest\Release"
+    Test-Vlpp-Platform $project x64 "$PSScriptRoot\..\..\$project\Test\UnitTest\x64\Release"
 }
 
 function Update-Vlpp {
     # Run test cases
-    Test-Vlpp
+    Test-Vlpp "Vlpp"
 
-    # Build CodePack.exe
-    Build-Sln $PSScriptRoot\..\..\Vlpp\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
-    Test-Single-Binary CodePack.exe
-
-    # Release Vlpp
+    # Release
     Release-Project Vlpp
-
-    # Build ParserGen.exe
-    Build-Sln $PSScriptRoot\..\..\Vlpp\Tools\ParserGen\ParserGen\ParserGen.vcxproj Release x86
-    Test-Single-Binary ParserGen.exe
-
-    # Update Parsers
-    Update-Parser $PSScriptRoot\..\..\Vlpp\Source\Parsing\Xml\ParsingXml.parser.txt
-    Update-Parser $PSScriptRoot\..\..\Vlpp\Source\Parsing\Json\ParsingJson.parser.txt
-
-    # Release Vlpp
-    Release-Project Vlpp
-
-    # Run test cases again
-    Test-Vlpp
 }
