@@ -1,5 +1,5 @@
-function Test-Vlpp-Platform($project, $platform, $outDir) {
-    Build-Sln $PSScriptRoot\..\..\$project\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
+function Test-Vlpp-Platform($projectName, $platform, $outDir) {
+    Build-Sln $PSScriptRoot\..\..\$projectName\Test\UnitTest\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
     if (!(Test-Path "$outDir\UnitTest.exe")) {
         throw "Failed"
     }
@@ -8,9 +8,9 @@ function Test-Vlpp-Platform($project, $platform, $outDir) {
     Start-Process-And-Wait (,("$outDir\UnitTest.exe", ""))
 }
 
-function Test-Vlpp($project) {
-    Test-Vlpp-Platform $project x86 "$PSScriptRoot\..\..\$project\Test\UnitTest\Release"
-    Test-Vlpp-Platform $project x64 "$PSScriptRoot\..\..\$project\Test\UnitTest\x64\Release"
+function Test-Vlpp($projectName) {
+    Test-Vlpp-Platform "$projectName" x86 "$PSScriptRoot\..\..\$projectName\Test\UnitTest\Release"
+    Test-Vlpp-Platform "$projectName" x64 "$PSScriptRoot\..\..\$projectName\Test\UnitTest\x64\Release"
 }
 
 function Update-Vlpp {
