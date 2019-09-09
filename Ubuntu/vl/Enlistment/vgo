@@ -42,6 +42,10 @@ function Update {
     if [ "$1" == "" ]; then
         Update Tools
         Update Vlpp
+        Update VlppOS
+        Update VlppRegex
+        Update VlppReflection
+        Update VlppParser
         Update Workflow
         Update GacUI
         Update GacJS
