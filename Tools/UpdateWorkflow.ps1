@@ -17,14 +17,16 @@ function Test-Workflow {
 }
 
 function Update-Workflow {
+    # Import
+    Import-Project Workflow ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser")
+
     # Update Parsers
     Update-Parser $PSScriptRoot\..\..\Workflow\Source\Expression\WfExpression.parser.txt
 
     # Run test cases
     Test-Workflow
 
-    # Release Workflow
-    Import-Project Workflow ("Vlpp")
+    # Release
     Release-Project Workflow
     Build-Sln $PSScriptRoot\..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj Release x86
     Test-Single-Binary CppMerge.exe
