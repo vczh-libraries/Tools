@@ -38,6 +38,7 @@ try {
             RepoCheckDirty GacUI
             RepoCheckDirty Release
             RepoCheckDirty vczh-libraries.github.io
+            RepoCheckDirty Tools
         }
         "Sync" {
             RepoSync Vlpp
@@ -49,6 +50,7 @@ try {
             RepoSync GacUI
             RepoSync Release
             RepoSync vczh-libraries.github.io
+            RepoCheckDirty Tools
         }
         default {
             throw "Unknown action `"$Action`". Action should be one of the following value: Check, Sync."
