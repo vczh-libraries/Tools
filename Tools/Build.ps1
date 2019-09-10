@@ -103,7 +103,6 @@ try {
             Write-Host "Release      : $time_release, Elapsed: $((New-TimeSpan $time_release $time_document).ToString())"
             Write-Host "Document     : $time_document, Elapsed: $((New-TimeSpan $time_document $time_finished).ToString())"
             Write-Host "Total        : $((New-TimeSpan $time_vlpp $time_finished).ToString())"
-
         }
         "Vlpp" {
             Write-Title Build-Vlpp

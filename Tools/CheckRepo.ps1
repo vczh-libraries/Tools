@@ -1,3 +1,6 @@
+param (
+    [String]$Action = ""
+)
 function RepoCheckDirty([String]$name) {
     Write-Host "Checking repo: $name ..."
 
@@ -15,15 +18,45 @@ function RepoCheckDirty([String]$name) {
     }
 }
 
+function RepoSync([String]$name) {
+    Write-Host "Pulling repo: $name ..."
+
+    Set-Location $PSScriptRoot\..\..\$name | Out-Null
+    git pull origin master
+}
+
 Push-Location $PSScriptRoot | Out-Null
-RepoCheckDirty Vlpp
-RepoCheckDirty VlppOS
-RepoCheckDirty VlppRegex
-RepoCheckDirty VlppReflection
-RepoCheckDirty VlppParser
-RepoCheckDirty Workflow
-RepoCheckDirty GacUI
-RepoCheckDirty Release
-RepoCheckDirty vczh-libraries.github.io
+try {
+    switch ($Action) {
+        "Check" {
+            RepoCheckDirty Vlpp
+            RepoCheckDirty VlppOS
+            RepoCheckDirty VlppRegex
+            RepoCheckDirty VlppReflection
+            RepoCheckDirty VlppParser
+            RepoCheckDirty Workflow
+            RepoCheckDirty GacUI
+            RepoCheckDirty Release
+            RepoCheckDirty vczh-libraries.github.io
+        }
+        "Sync" {
+            RepoSync Vlpp
+            RepoSync VlppOS
+            RepoSync VlppRegex
+            RepoSync VlppReflection
+            RepoSync VlppParser
+            RepoSync Workflow
+            RepoSync GacUI
+            RepoSync Release
+            RepoSync vczh-libraries.github.io
+        }
+        default {
+            throw "Unknown action `"$Action`". Action should be one of the following value: Check, Sync."
+        }
+    }
+}
+catch {
+    Write-Host $_.Exception.Message -ForegroundColor Red
+}
 Pop-Location | Out-Null
 [Console]::ResetColor()
