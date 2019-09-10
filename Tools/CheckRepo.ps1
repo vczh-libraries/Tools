@@ -1,7 +1,7 @@
 function RepoCheckDirty([String]$name) {
     Write-Host "Checking repo: $name ..."
 
-    Set-Location ..\$name | Out-Null
+    Set-Location $PSScriptRoot\..\..\$name | Out-Null
     $length = $(git status --porcelain).Length
     if ($length -ne 0) {
         throw "$name has uncommitted files."
