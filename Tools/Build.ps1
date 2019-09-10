@@ -18,26 +18,26 @@ function Write-Title($text) {
 }
 
 function Update-Binaries-And-Bundle {
-    Write-Title "Cleaning ..."
+    Write-Title "    Cleaning ..."
     Remove-Item .\*.exe -Force | Out-Null
     Remove-Item .\*.dll -Force | Out-Null
     Remove-Item .\.Output -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
     New-Item .\.Output -ItemType directory -ErrorAction SilentlyContinue | Out-Null
     
-    Write-Title "Building CodePack ..."
+    Write-Title "    Building CodePack ..."
     Build-Tool-CodePack
     
-    Write-Title "Updating Vlpp ..."
+    Write-Title "    Updating Vlpp ..."
     Update-Vlpp
     Update-VlppOS
     Update-VlppRegex
     Update-VlppReflection
     Update-VlppParser
     
-    Write-Title "Updating Workflow ..."
+    Write-Title "    Updating Workflow ..."
     Update-Workflow
     
-    Write-Title "Updating GacUI ..."
+    Write-Title "    Updating GacUI ..."
     Update-GacUI
 }
 
@@ -92,17 +92,17 @@ try {
 
             $time_finished = [DateTime]::Now
             Write-Title Finished!
-            Write-Host "Vlpp        : $time_vlpp, Elapsed: $((New-TimeSpan $time_vlpp $time_vlpp_os).ToString())"
-            Write-Host "OS          : $time_vlpp_os, Elapsed: $((New-TimeSpan $time_vlpp_os $time_vlpp_regex).ToString())"
-            Write-Host "Regex       : $time_vlpp_regex, Elapsed: $((New-TimeSpan $time_vlpp_regex $time_vlpp_reflection).ToString())"
-            Write-Host "Reflection  : $time_vlpp_reflection, Elapsed: $((New-TimeSpan $time_vlpp_reflection $time_vlpp_parser).ToString())"
-            Write-Host "Parser      : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser $time_workflow).ToString())"
-            Write-Host "Workflow    : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
-            Write-Host "GacUI       : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_update).ToString())"
-            Write-Host "Update      : $time_update, Elapsed: $((New-TimeSpan $time_update $time_release).ToString())"
-            Write-Host "Release     : $time_release, Elapsed: $((New-TimeSpan $time_release $time_document).ToString())"
-            Write-Host "Document    : $time_document, Elapsed: $((New-TimeSpan $time_document $time_finished).ToString())"
-            Write-Host "Total       : $((New-TimeSpan $time_clean $time_finished).ToString())"
+            Write-Host "Vlpp         : $time_vlpp, Elapsed: $((New-TimeSpan $time_vlpp $time_vlpp_os).ToString())"
+            Write-Host "  OS         : $time_vlpp_os, Elapsed: $((New-TimeSpan $time_vlpp_os $time_vlpp_regex).ToString())"
+            Write-Host "  Regex      : $time_vlpp_regex, Elapsed: $((New-TimeSpan $time_vlpp_regex $time_vlpp_reflection).ToString())"
+            Write-Host "  Reflection : $time_vlpp_reflection, Elapsed: $((New-TimeSpan $time_vlpp_reflection $time_vlpp_parser).ToString())"
+            Write-Host "  Parser     : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser $time_workflow).ToString())"
+            Write-Host "Workflow     : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
+            Write-Host "GacUI        : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_update).ToString())"
+            Write-Host "Update       : $time_update, Elapsed: $((New-TimeSpan $time_update $time_release).ToString())"
+            Write-Host "Release      : $time_release, Elapsed: $((New-TimeSpan $time_release $time_document).ToString())"
+            Write-Host "Document     : $time_document, Elapsed: $((New-TimeSpan $time_document $time_finished).ToString())"
+            Write-Host "Total        : $((New-TimeSpan $time_vlpp $time_finished).ToString())"
 
         }
         "Vlpp" {
@@ -133,7 +133,7 @@ try {
             Write-Title Build-GacUI
             Build-GacUI
         }
-        "Clean" {
+        "Update" {
             Write-Title Update-Binaries-And-Bundle
             Update-Binaries-And-Bundle
         }
