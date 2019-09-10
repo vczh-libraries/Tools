@@ -51,32 +51,32 @@ try {
     switch ($Project) {
         "" {
             $time_vlpp = [DateTime]::Now
-            Write-Title Update-Vlpp
-            Update-Vlpp; [Console]::ResetColor()
+            Write-Title Build-Vlpp
+            Build-Vlpp; [Console]::ResetColor()
 
             $time_vlpp_os = [DateTime]::Now
-            Write-Title Update-VlppOS
-            Update-Vlpp; [Console]::ResetColor()
+            Write-Title Build-VlppOS
+            Build-Vlpp; [Console]::ResetColor()
 
             $time_vlpp_regex = [DateTime]::Now
-            Write-Title Update-VlppRegex
-            Update-Vlpp; [Console]::ResetColor()
+            Write-Title Build-VlppRegex
+            Build-Vlpp; [Console]::ResetColor()
 
             $time_vlpp_reflection = [DateTime]::Now
-            Write-Title Update-VlppReflection
-            Update-Vlpp; [Console]::ResetColor()
+            Write-Title Build-VlppReflection
+            Build-Vlpp; [Console]::ResetColor()
 
             $time_vlpp_parser = [DateTime]::Now
-            Write-Title Update-VlppParser
-            Update-Vlpp; [Console]::ResetColor()
+            Write-Title Build-VlppParser
+            Build-Vlpp; [Console]::ResetColor()
 
             $time_workflow = [DateTime]::Now
-            Write-Title Update-Workflow
-            Update-Workflow; [Console]::ResetColor()
+            Write-Title Build-Workflow
+            Build-Workflow; [Console]::ResetColor()
 
             $time_gacui = [DateTime]::Now
-            Write-Title Update-GacUI
-            Update-GacUI; [Console]::ResetColor()
+            Write-Title Build-GacUI
+            Build-GacUI; [Console]::ResetColor()
 
             $time_update = [DateTime]::Now
             Write-Title Update-Binaries-And-Bundle
