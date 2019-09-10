@@ -13,15 +13,17 @@ function Test-GacUI {
     # Test-GacUI-Platform x64 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\x64\Release"
 }
 
+function Build-GacUI {
+    # Run test cases
+    Test-GacUI
+}
+
 function Update-GacUI {
     # Import
     Import-Project GacUI ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","Workflow")
 
     # Update Parsers
     Update-Parser $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\GuiInstanceQuery_Parser.parser.txt
-
-    # Run test cases
-    Test-GacUI
 
     # Release
     Release-Project GacUI

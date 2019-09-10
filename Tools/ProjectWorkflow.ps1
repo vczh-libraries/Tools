@@ -16,15 +16,17 @@ function Test-Workflow {
     Test-Workflow-Platform x64   $PSScriptRoot\..\..\Workflow\Test\UnitTest\UnitTest_CppCodegen\UnitTest_CppCodegen.vcxproj "$PSScriptRoot\..\..\Workflow\Test\UnitTest\x64\Release" "UnitTest_CppCodegen.exe"
 }
 
+function Build-Workflow {
+    # Run test cases
+    Test-Workflow
+}
+
 function Update-Workflow {
     # Import
     Import-Project Workflow ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser")
 
     # Update Parsers
     Update-Parser $PSScriptRoot\..\..\Workflow\Source\Expression\WfExpression.parser.txt
-
-    # Run test cases
-    Test-Workflow
 
     # Release
     Release-Project Workflow

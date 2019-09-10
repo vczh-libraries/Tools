@@ -13,10 +13,12 @@ function Test-Vlpp($projectName) {
     Test-Vlpp-Platform "$projectName" x64 "$PSScriptRoot\..\..\$projectName\Test\UnitTest\x64\Release"
 }
 
-function Update-Vlpp {
+function Build-Vlpp {
     # Run test cases
     Test-Vlpp "Vlpp"
+}
 
+function Update-Vlpp {
     # Release
     Release-Project Vlpp
 }
