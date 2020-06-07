@@ -52,7 +52,7 @@ try {
             RepoSync Release
             RepoSync Document
             RepoSync vczh-libraries.github.io
-            RepoCheckDirty Tools
+            RepoSync Tools
         }
         default {
             throw "Unknown action `"$Action`". Action should be one of the following value: Check, Sync."
