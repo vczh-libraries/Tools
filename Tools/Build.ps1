@@ -11,7 +11,6 @@ param (
 . $PSScriptRoot\ProjectWorkflow.ps1
 . $PSScriptRoot\ProjectGacUI.ps1
 . $PSScriptRoot\BuildRelease.ps1
-. $PSScriptRoot\BuildDocument.ps1
 
 function Write-Title($text) {
     Write-Host $text -ForegroundColor Blue -BackgroundColor White
@@ -86,10 +85,6 @@ try {
             Write-Title Build-Release
             Build-Release $False; [Console]::ResetColor()
 
-            $time_document = [DateTime]::Now
-            Write-Title Build-Document
-            Build-Document; [Console]::ResetColor()
-
             $time_finished = [DateTime]::Now
             Write-Title Finished!
             Write-Host "Vlpp         : $time_vlpp, Elapsed: $((New-TimeSpan $time_vlpp $time_vlpp_os).ToString())"
@@ -100,8 +95,7 @@ try {
             Write-Host "Workflow     : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
             Write-Host "GacUI        : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_update).ToString())"
             Write-Host "Update       : $time_update, Elapsed: $((New-TimeSpan $time_update $time_release).ToString())"
-            Write-Host "Release      : $time_release, Elapsed: $((New-TimeSpan $time_release $time_document).ToString())"
-            Write-Host "Document     : $time_document, Elapsed: $((New-TimeSpan $time_document $time_finished).ToString())"
+            Write-Host "Release      : $time_release, Elapsed: $((New-TimeSpan $time_release $time_finished).ToString())"
             Write-Host "Total        : $((New-TimeSpan $time_vlpp $time_finished).ToString())"
         }
         "Vlpp" {
@@ -140,16 +134,8 @@ try {
             Write-Title Build-Release
             Build-Release $True;
         }
-        "Document" {
-            Write-Title Build-Document
-            Build-Document;
-        }
-        "Document2" {
-            Write-Title Build-Document-2
-            Build-Document-2;
-        }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, Workflow, GacUI, Update, Release, Document."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, Workflow, GacUI, Update, Release."
         }
     }
 }
