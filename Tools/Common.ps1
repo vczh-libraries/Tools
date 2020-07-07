@@ -1,6 +1,6 @@
 . $PSScriptRoot\StartProcess.ps1
 
-function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir", [String]$OutputFolder="") {
+function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir", [String]$OutputFolder="", [Boolean]$ThrowOnCrash = $true) {
     Write-Host "Building $SolutionFile ..."
 
     $vsdevcmd = $env:VLPP_VSDEVCMD_PATH
@@ -14,7 +14,7 @@ function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir"
     }
     $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 /t:Rebuild /p:Configuration=`"$Configuration`";Platform=`"$Platform`";$($output_dir)"
     $cmd_arguments = "`"`"$vsdevcmd`" & $msbuild_arguments"
-    Start-Process-And-Wait (,($env:ComSpec, "/c $cmd_arguments"))
+    Start-Process-And-Wait (,($env:ComSpec, "/c $cmd_arguments")) $false "" $ThrowOnCrash
 }
 
 function Test-Single-Binary($FileName) {
