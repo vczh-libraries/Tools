@@ -34,21 +34,20 @@ function DocGen-Verify {
     foreach ($projectPair in $projects) {
         $projectId = $projectPair[0];
         $projectName = $projectPair[1];
-        Write-Host "Processing examples in $projectName ..."
         
         $exampleFolder = "$PSScriptRoot\..\..\Document\Tools\Demos\Gaclib\References\$projectId"
         $exampleFiles = Get-ChildItem -Path "$exampleFolder\*.ein.*.xml"
         foreach ($exampleFile in $exampleFiles) {
             $exampleFileName = $exampleFile.Name
             $resultFileName = $exampleFileName -replace ".ein.", ".eout." -replace ".xml", ".txt"
-            Write-Host "  > $exampleFileName"
-            Write-Host "     => $resultFileName"
+            Write-Host " $projectId\$exampleFileName" -ForegroundColor Blue -BackgroundColor White
 
             [Xml]$exampleXml = [System.IO.File]::ReadAllText("$exampleFolder\$exampleFileName")
             $exampleCode = (Select-Xml -Xml $exampleXml -XPath "//example").Node.InnerText
             Set-Content -Path "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\Example.h" -Value $exampleCode
-            Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
 
+            Remove-Item -Path "$ExampleOutput\$projectName.exe" | Out-Null
+            Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
             if (!(Test-Path "$ExampleOutput\$projectName.exe")) {
                 Write-Host "    FAILED TO COMPILE" -ForegroundColor Red
             }
