@@ -27,7 +27,21 @@ function DocGen-Index {
 }
 
 function DocGen-Verify {
-    throw "Not implemented."
+    $projects = (, ("VLPP", "Vlpp"));
+    foreach ($projectPair in $projects) {
+        $projectId = $projectPair[0];
+        $projectName = $projectPair[1];
+        Write-Host "Processing examples in $projectName ..."
+        
+        $exampleFolder = "$PSScriptRoot\..\..\Document\Tools\Demos\Gaclib\References\$projectId"
+        $exampleFiles = Get-ChildItem -Path "$exampleFolder\*.ein.*.xml"
+        foreach ($exampleFile in $exampleFiles) {
+            $exampleFileName = $exampleFile.Name
+            $resultFileName = $exampleFileName -replace ".ein.", ".eout." -replace ".xml", ".txt"
+            Write-Host "  > $exampleFileName"
+            Write-Host "     => $resultFileName"
+        }
+    }
 }
 
 function DocGen-BuildWebsite {
