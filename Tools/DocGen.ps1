@@ -27,6 +27,9 @@ function DocGen-Index {
 }
 
 function DocGen-Verify {
+    $ExampleOutput = "$PSScriptRoot\..\..\Document\Tools\Examples\Debug"
+    Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Lib\Lib.vcxproj" Debug Win32 OutDir $ExampleOutput
+
     $projects = (, ("VLPP", "Vlpp"));
     foreach ($projectPair in $projects) {
         $projectId = $projectPair[0];
@@ -40,6 +43,15 @@ function DocGen-Verify {
             $resultFileName = $exampleFileName -replace ".ein.", ".eout." -replace ".xml", ".txt"
             Write-Host "  > $exampleFileName"
             Write-Host "     => $resultFileName"
+
+            [Xml]$exampleXml = [System.IO.File]::ReadAllText("$exampleFolder\$exampleFileName")
+            $exampleCode = (Select-Xml -Xml $exampleXml -XPath "//example").Node.InnerText
+            Set-Content -Path "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\Example.h" -Value $exampleCode
+            Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
+
+            if (!(Test-Path "$ExampleOutput\$projectName.exe")) {
+                Write-Host "    FAILED TO COMPILE" -ForegroundColor Red
+            }
         }
     }
 }
