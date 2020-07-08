@@ -49,8 +49,18 @@ function DocGen-Verify {
             Remove-Item -Path "$ExampleOutput\$projectName.exe" | Out-Null
             Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
             if ((Test-Path "$ExampleOutput\$projectName.exe")) {
-                Write-Host "    Running the demo and save the output to $exampleFolder\$resultFileName ..."
-                Start-Process -FilePath "$ExampleOutput\$projectName.exe" -RedirectStandardOutput "$exampleFolder\$resultFileName" -NoNewWindow -Wait
+                $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+                $startInfo.FileName = "$ExampleOutput\$projectName.exe"
+                $startInfo.RedirectStandardError = $true
+                $startInfo.RedirectStandardOutput = $true
+                $startInfo.UseShellExecute = $false
+
+                $processObject = New-Object System.Diagnostics.Process
+                $processObject.StartInfo = $startInfo
+                $processObject.Start() | Out-Null
+                $processObject.WaitForExit()
+                
+                [System.IO.File]::WriteAllText("$exampleFolder\$resultFileName", $processObject.StandardOutput.ReadToEnd())
             } else {
                 Write-Host "    FAILED TO COMPILE" -ForegroundColor Red
             }
