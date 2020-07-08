@@ -28,7 +28,7 @@ function DocGen-Index {
 
 function DocGen-Verify {
     $ExampleOutput = "$PSScriptRoot\..\..\Document\Tools\Examples\Debug"
-    Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Lib\Lib.vcxproj" Debug Win32 OutDir $ExampleOutput
+    Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Lib\Lib.vcxproj" Debug Win32 OutDir $ExampleOutput $true $false
 
     $projects = (, ("VLPP", "Vlpp"));
     foreach ($projectPair in $projects) {
@@ -48,7 +48,10 @@ function DocGen-Verify {
 
             Remove-Item -Path "$ExampleOutput\$projectName.exe" | Out-Null
             Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
-            if (!(Test-Path "$ExampleOutput\$projectName.exe")) {
+            if ((Test-Path "$ExampleOutput\$projectName.exe")) {
+                Write-Host "    Running the demo and save the output to $exampleFolder\$resultFileName ..."
+                Start-Process -FilePath "$ExampleOutput\$projectName.exe" -RedirectStandardOutput "$exampleFolder\$resultFileName" -NoNewWindow -Wait
+            } else {
                 Write-Host "    FAILED TO COMPILE" -ForegroundColor Red
             }
         }
@@ -65,6 +68,11 @@ function DocGen-Copy {
 
 try {
     switch ($Project) {
+        "" {
+            DocGen-Build-Index
+            DocGen-Index
+            DocGen-Verify
+        }
         "build-index" {
             DocGen-Build-Index
         }
