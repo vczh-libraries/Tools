@@ -38,6 +38,7 @@ try {
             RepoCheckDirty GacUI
             RepoCheckDirty Release
             RepoCheckDirty Document
+            RepoCheckDirty WebsiteSource
             RepoCheckDirty vczh-libraries.github.io
             RepoCheckDirty Tools
         }
@@ -51,6 +52,7 @@ try {
             RepoSync GacUI
             RepoSync Release
             RepoSync Document
+            RepoSync WebsiteSource
             RepoSync vczh-libraries.github.io
             RepoSync Tools
         }
