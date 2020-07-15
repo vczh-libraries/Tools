@@ -30,7 +30,7 @@ function DocGen-Verify {
     $ExampleOutput = "$PSScriptRoot\..\..\Document\Tools\Examples\Debug"
     Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Lib\Lib.vcxproj" Debug Win32 OutDir $ExampleOutput $true $false
 
-    $projects = (, ("VLPP", "Vlpp"));
+    $projects = @(@("VLPP", "Vlpp"), @("VLPPOS", "VlppOS"));
     foreach ($projectPair in $projects) {
         $projectId = $projectPair[0];
         $projectName = $projectPair[1];
@@ -43,26 +43,32 @@ function DocGen-Verify {
             Write-Host " $projectId\$exampleFileName" -ForegroundColor Blue -BackgroundColor White
 
             [Xml]$exampleXml = [System.IO.File]::ReadAllText("$exampleFolder\$exampleFileName")
-            $exampleCode = (Select-Xml -Xml $exampleXml -XPath "//example").Node.InnerText
-            Set-Content -Path "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\Example.h" -Value $exampleCode
+            $exampleAllowOutput = (Select-Xml -Xml $exampleXml -XPath "//example/@output").Node.Value
+            if ($exampleAllowOutput -ne "false") {
+                $exampleCode = (Select-Xml -Xml $exampleXml -XPath "//example").Node.InnerText
+                Set-Content -Path "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\Example.h" -Value $exampleCode
 
-            Remove-Item -Path "$ExampleOutput\$projectName.exe" | Out-Null
-            Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
-            if ((Test-Path "$ExampleOutput\$projectName.exe")) {
-                $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-                $startInfo.FileName = "$ExampleOutput\$projectName.exe"
-                $startInfo.RedirectStandardError = $true
-                $startInfo.RedirectStandardOutput = $true
-                $startInfo.UseShellExecute = $false
-
-                $processObject = New-Object System.Diagnostics.Process
-                $processObject.StartInfo = $startInfo
-                $processObject.Start() | Out-Null
-                $processObject.WaitForExit()
+                if ((Test-Path "$ExampleOutput\$projectName.exe")) {
+                    Remove-Item -Path "$ExampleOutput\$projectName.exe" | Out-Null
+                }
                 
-                [System.IO.File]::WriteAllText("$exampleFolder\$resultFileName", $processObject.StandardOutput.ReadToEnd())
-            } else {
-                Write-Host "    FAILED TO COMPILE" -ForegroundColor Red
+                Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
+                if ((Test-Path "$ExampleOutput\$projectName.exe")) {
+                    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+                    $startInfo.FileName = "$ExampleOutput\$projectName.exe"
+                    $startInfo.RedirectStandardError = $true
+                    $startInfo.RedirectStandardOutput = $true
+                    $startInfo.UseShellExecute = $false
+
+                    $processObject = New-Object System.Diagnostics.Process
+                    $processObject.StartInfo = $startInfo
+                    $processObject.Start() | Out-Null
+                    $processObject.WaitForExit()
+                    
+                    [System.IO.File]::WriteAllText("$exampleFolder\$resultFileName", $processObject.StandardOutput.ReadToEnd())
+                } else {
+                    Write-Host "    FAILED TO COMPILE" -ForegroundColor Red
+                }
             }
         }
     }
