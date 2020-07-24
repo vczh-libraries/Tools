@@ -14,6 +14,30 @@ $DocIndexOutputFolder = "$PSScriptRoot\..\..\Document\Tools\CppDoc\x64\Release"
 $DocIndexExe = "$DocIndexOutputFolder\DocIndex.exe"
 $DocIndexWD = "$PSScriptRoot\..\..\Document\Tools\CppDoc\DocIndex"
 
+function DocGen-Update {
+    Push-Location $PSScriptRoot\..\..\Document | Out-Null
+    
+    # Import
+    Write-Host "Copying Source Code ..."
+    Copy-Item ..\Vlpp\Release\*.h .\Import
+    Copy-Item ..\Vlpp\Release\*.cpp .\Import
+    Copy-Item ..\VlppOS\Release\*.h .\Import
+    Copy-Item ..\VlppOS\Release\*.cpp .\Import
+    Copy-Item ..\VlppRegex\Release\*.h .\Import
+    Copy-Item ..\VlppRegex\Release\*.cpp .\Import
+    Copy-Item ..\VlppReflection\Release\*.h .\Import
+    Copy-Item ..\VlppReflection\Release\*.cpp .\Import
+    Copy-Item ..\VlppParser\Release\*.h .\Import
+    Copy-Item ..\VlppParser\Release\*.cpp .\Import
+    Copy-Item ..\Workflow\Release\*.h .\Import
+    Copy-Item ..\Workflow\Release\*.cpp .\Import
+    Copy-Item ..\GacUI\Release\Gac*.h .\Import
+    Copy-Item ..\GacUI\Release\Gac*.cpp .\Import
+    Copy-Item ..\GacUI\Release\DarkSkin* .\Import
+
+    Pop-Location | Out-Null
+}
+
 function DocGen-Build-Index {
     Build-Sln "$PSScriptRoot\..\..\Document\Tools\CppDoc\UnitTest_Cases\UnitTest_Cases.vcxproj" Debug Win32 OutDir "$PSScriptRoot\..\..\Document\Tools\CppDoc\Debug" $false
     Build-Sln "$PSScriptRoot\..\..\Document\Tools\CppDoc\DocIndex\DocIndex.vcxproj" Release x64 OutDir "$DocIndexOutputFolder"
@@ -89,6 +113,9 @@ try {
             DocGen-Index
             DocGen-Verify
         }
+        "update" {
+            DocGen-Update
+        }
         "build-index" {
             DocGen-Build-Index
         }
@@ -105,7 +132,7 @@ try {
             DocGen-Copy
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: build-index, index, verify, build-website, copy."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: update, build-index, index, verify, build-website, copy."
         }
     }
 }
