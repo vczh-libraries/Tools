@@ -48,7 +48,7 @@ function Build-Release([Bool] $PopupFolders) {
         # Debug Build
         Write-Host "Create Debug Builds ..."
         Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
-            if ($_.FullName.IndexOf("\Lib\") -eq -1) {
+            if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\Console_Workflow\") -eq -1)) {
                 Build-Sln $_.FullName "Debug" "Win32" "OutDir" "$($_.DirectoryName)\Debug\"
             }
         }
@@ -57,7 +57,7 @@ function Build-Release([Bool] $PopupFolders) {
         Write-Host "Checking Debug Builds ..."
         $failed = $false
         Get-ChildItem -Path .\Tutorial -Filter *.vcxproj -Recurse | %{
-            if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\DocumentEditor\") -eq -1)) {
+            if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\Console_Workflow\") -eq -1) -and ($_.FullName.IndexOf("\DocumentEditor\") -eq -1)) {
                 $exe_file = "$($_.DirectoryName)\..\Debug\$($_.BaseName).exe"
                 if (!(Test-Path $exe_file)) {
                     Write-Host "Binary not found: $exe_file" -ForegroundColor Red
@@ -72,7 +72,7 @@ function Build-Release([Bool] $PopupFolders) {
         # Release Build
         Write-Host "Create Release Builds ..."
         Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
-            if ($_.FullName.IndexOf("\Lib\") -eq -1) {
+            if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\Console_Workflow\") -eq -1)) {
                 Build-Sln $_.FullName "Release" "Win32" "OutDir" "$($_.DirectoryName)\Release\"
             }
         }
