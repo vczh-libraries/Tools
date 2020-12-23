@@ -45,7 +45,7 @@ function Entry {
     chmod u+x "${VPATH}/load.sh"
 }
 
-GITHUB_REPOS=(Tools Vlpp VlppOS VlppRegex VlppReflection VlppParser Workflow GacUI GacJS Release XGac iGac Document vczh-libraries.github.io)
+GITHUB_REPOS=(Tools Vlpp VlppOS VlppRegex VlppReflection VlppParser Workflow GacUI GacJS Release XGac iGac Document vczh-libraries.github.io WebsiteSource)
 
 function Enlist {
     if [ ${PWD}/Tools/Ubuntu/vl/.. == ${VCPROOT} ]; then
