@@ -4,7 +4,7 @@
 
 Build tools for this organization
 
-## Build Release
+## Build Release in Windows
 
 Open PowerShell in folder `Tools` and run:
 
@@ -12,7 +12,7 @@ Open PowerShell in folder `Tools` and run:
 - `.\DocGen.ps1`
 - `.\DocGen.ps1 copy`
 
-## Generate Release for Each Project
+## Generate Repo Release in Windows
 
 Open PowerShell in folder `repo\Release` and run:
 
