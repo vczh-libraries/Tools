@@ -13,6 +13,8 @@ Push-Location $PSScriptRoot | Out-Null
 $DocIndexOutputFolder = "$PSScriptRoot\..\..\Document\Tools\CppDoc\x64\Release"
 $DocIndexExe = "$DocIndexOutputFolder\DocIndex.exe"
 $DocIndexWD = "$PSScriptRoot\..\..\Document\Tools\CppDoc\DocIndex"
+$HtmlSource = "$PSScriptRoot\..\..\Document\Tools\Demos\Gaclib"
+$HtmlTarget = "$PSScriptRoot\..\..\vczh-libraries.github.io\CodeIndexDemo\Gaclib"
 
 function DocGen-Update {
     Push-Location $PSScriptRoot\..\..\Document | Out-Null
@@ -98,12 +100,19 @@ function DocGen-Verify {
     }
 }
 
-function DocGen-BuildWebsite {
-    throw "Not implemented."
-}
-
 function DocGen-Copy {
-    throw "Not implemented."
+    Write-Host "Cleaning $HtmlTarget ..."
+    Remove-Item -Recurse -Force $HtmlTarget | Out-Null
+    Write-Host "Recreating $HtmlTarget ..."
+    New-Item -ItemType Directory -Path $HtmlTarget | Out-Null
+    New-Item -ItemType Directory -Path "$HtmlTarget\SourceFiles" | Out-Null
+    New-Item -ItemType Directory -Path "$HtmlTarget\SymbolIndexFragments" | Out-Null
+    Write-Host "Copying $HtmlSource to $HtmlTarget ..."
+
+    Copy-Item -Path "$HtmlSource\FileIndex.html" -Destination $HtmlTarget | Out-Null
+    Copy-Item -Path "$HtmlSource\SymbolIndex.html" -Destination $HtmlTarget | Out-Null
+    Copy-Item -Path "$HtmlSource\SourceFiles\*" -Destination "$HtmlTarget\SourceFiles" -Recurse | Out-Null
+    Copy-Item -Path "$HtmlSource\SymbolIndexFragments\*" -Destination "$HtmlTarget\SymbolIndexFragments" -Recurse | Out-Null
 }
 
 try {
@@ -125,14 +134,11 @@ try {
         "verify" {
             DocGen-Verify
         }
-        "build-website" {
-            DocGen-BuildWebsite
-        }
         "copy" {
             DocGen-Copy
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: update, build-index, index, verify, build-website, copy."
+            throw "Unknown project `"$Project`". Project can be either unspecified (running build-index, index, verify) or one of the following value: update, build-index, index, verify, copy."
         }
     }
 }
