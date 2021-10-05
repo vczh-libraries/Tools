@@ -1,6 +1,9 @@
 function Build-VlppParser {
     # Run test cases
-    Test-Vlpp "VlppParser"
+    Test-Vlpp-SubProject "VlppParser" "UnitTest"
+    Test-Vlpp-SubProject "VlppParser" "UnitTest_Generated"
+    Test-Vlpp-SubProject "VlppParser" "UnitTest_Generated_Metaonly"
+    Test-Vlpp-SubProject "VlppParser" "UnitTest_Generated_Reflection"
 }
 
 function Update-VlppParser {
