@@ -1,6 +1,8 @@
 function Build-VlppReflection {
     # Run test cases
-    Test-Vlpp "VlppReflection"
+    Test-Vlpp-SubProject "VlppReflection" "Metadata_Generate"
+    Test-Vlpp-SubProject "VlppReflection" "Metadata_Test"
+    Test-Vlpp-SubProject "VlppReflection" "UnitTest"
 }
 
 function Update-VlppReflection {
