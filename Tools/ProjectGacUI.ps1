@@ -52,7 +52,7 @@ function Update-GacUI {
     Push-Location $PSScriptRoot\..\..\GacUI\Source\Skins\DarkSkin | Out-Null
     try {
         Remove-Item *.xml
-        Copy-Item ..\..\..\Test\GacUISrc\Host\Resources\DarkSkin\*.xml .
+        Copy-Item ..\..\..\Test\Resources\App\DarkSkin\*.xml .
         & $PSScriptRoot\GacGen.ps1 -FileName Resource.xml
     }
     finally {
