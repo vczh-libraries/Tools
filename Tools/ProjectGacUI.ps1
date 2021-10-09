@@ -1,21 +1,33 @@
-function Test-GacUI-Platform($platform, $outDir) {
-    Build-Sln $PSScriptRoot\..\..\GacUI\Test\GacUISrc\UnitTest\UnitTest.vcxproj Release $platform OutDir "`"$outDir\`""
-    if (!(Test-Path "$outDir\UnitTest.exe")) {
+function Test-GacUI-Platform($subProjectName, $platform, $outDir) {
+    Build-Sln $PSScriptRoot\..\..\GacUI\Test\GacUISrc\$subProjectName\$subProjectName.vcxproj Release $platform OutDir "`"$outDir\`""
+    if (!(Test-Path "$outDir\$subProjectName.exe")) {
         throw "Failed"
     }
 
     Write-Host "Executing Unit Test ($platform) ..."
-    Start-Process-And-Wait (,("$outDir\UnitTest.exe", ""))
+    Start-Process-And-Wait (,("$outDir\$subProjectName.exe", ""))
 }
 
-function Test-GacUI {
-    Test-GacUI-Platform Win32 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Release"
-    # Test-GacUI-Platform x64 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\x64\Release"
+function Test-GacUI-SubProject-Win32($subProjectName) {
+    Test-GacUI-Platform $subProjectName Win32 "$PSScriptRoot\..\..\GacUI\Test\UnitTest\Release"
+}
+
+function Test-GacUI-SubProject-X64($subProjectName) {
+    Test-GacUI-Platform $subProjectName x64 "$PSScriptRoot\..\..\GacUI\Test\UnitTest\x64\Release"
+}
+
+function Test-GacUI-SubProject($subProjectName) {
+    Test-GacUI-SubProject-Win32 $subProjectName
+    Test-GacUI-SubProject-X64 $subProjectName
 }
 
 function Build-GacUI {
+    # Update metadata
+    Test-GacUI-SubProject "Metadata_Generate"
+    Test-GacUI-SubProject "Metadata_Test"
+
     # Run test cases
-    Test-GacUI
+    Test-GacUI-SubProject-Win32 "UnitTest"
 }
 
 function Update-GacUI {
@@ -27,10 +39,13 @@ function Update-GacUI {
 
     # Release
     Release-Project GacUI
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32 OutDir "GacGen(x32)\"
-    Test-Single-Binary-Rename "GacGen(x32)\GacGen.exe" GacGen32.exe
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64   OutDir "GacGen(x64)\"
-    Test-Single-Binary-Rename "GacGen(x64)\GacGen.exe" GacGen64.exe
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32
+    Test-Single-Binary GacGen32.exe
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64
+    Test-Single-Binary GacGen64.exe
+
+    Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection32.bin $PSScriptRoot
+    Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection64.bin $PSScriptRoot
 
     # Update DarkSkin
     Write-Host "Update GacUI::DarkSkin ..."

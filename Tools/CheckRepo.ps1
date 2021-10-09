@@ -1,6 +1,7 @@
 param (
     [String]$Action = ""
 )
+
 function RepoCheckDirty([String]$name) {
     Write-Host "Checking repo: $name ..."
 
@@ -18,6 +19,15 @@ function RepoCheckDirty([String]$name) {
     }
 }
 
+function RepoCheckAllDirty([String]$name) {
+    try {
+        RepoCheckDirty $name
+    }
+    catch {
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
+}
+
 function RepoSync([String]$name) {
     Write-Host "Pulling repo: $name ..."
 
@@ -27,37 +37,25 @@ function RepoSync([String]$name) {
 
 Push-Location $PSScriptRoot | Out-Null
 try {
+    $projects = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","Workflow","GacUI","Release","Document","WebsiteSource","vczh-libraries.github.io","Tools")
     switch ($Action) {
         "Check" {
-            RepoCheckDirty Vlpp
-            RepoCheckDirty VlppOS
-            RepoCheckDirty VlppRegex
-            RepoCheckDirty VlppReflection
-            RepoCheckDirty VlppParser
-            RepoCheckDirty Workflow
-            RepoCheckDirty GacUI
-            RepoCheckDirty Release
-            RepoCheckDirty Document
-            RepoCheckDirty WebsiteSource
-            RepoCheckDirty vczh-libraries.github.io
-            RepoCheckDirty Tools
+            foreach ($project in $projects) {
+                RepoCheckDirty $project
+            }
+        }
+        "CheckAll" {
+            foreach ($project in $projects) {
+                RepoCheckAllDirty $project
+            }
         }
         "Sync" {
-            RepoSync Vlpp
-            RepoSync VlppOS
-            RepoSync VlppRegex
-            RepoSync VlppReflection
-            RepoSync VlppParser
-            RepoSync Workflow
-            RepoSync GacUI
-            RepoSync Release
-            RepoSync Document
-            RepoSync WebsiteSource
-            RepoSync vczh-libraries.github.io
-            RepoSync Tools
+            foreach ($project in $projects) {
+                RepoSync $project
+            }
         }
         default {
-            throw "Unknown action `"$Action`". Action should be one of the following value: Check, Sync."
+            throw "Unknown action `"$Action`". Action should be one of the following value: Check, CheckAll, Sync."
         }
     }
 }
