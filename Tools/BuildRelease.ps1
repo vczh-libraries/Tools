@@ -39,7 +39,7 @@ function Build-Release([Bool] $PopupFolders) {
         Write-Host "Deploying Tutorial\GacUI_ControlTemplate\BlackSkin ..."
         Push-Location $PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\BlackSkin\UI | Out-Null
         Remove-Item .\FullControlTest -Force -Recurse | Out-Null
-        Copy-Item $PSScriptRoot\..\..\GacUI\Test\GacUISrc\Host\Resources\FullControlTest . -Recurse | Out-Null
+        Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\App\FullControlTest . -Recurse | Out-Null
         Pop-Location
 
         # GacGen
