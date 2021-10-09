@@ -129,10 +129,14 @@ try {
         "Update" {
             Write-Title Update-Binaries-And-Bundle
             Update-Binaries-And-Bundle
+            Write-Title "    Check Repo ..."
+            & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         "Release" {
             Write-Title Build-Release
             Build-Release $True;
+            Write-Title "    Check Repo ..."
+            & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         default {
             throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, Workflow, GacUI, Update, Release."
