@@ -35,9 +35,21 @@ function RepoSync([String]$name) {
     git pull origin master
 }
 
+function RepoCheckout([String]$name, [String]$branch) {
+    Write-Host "Checkout out $branch branch: $name ..."
+
+    Set-Location $PSScriptRoot\..\..\$name | Out-Null
+    git checkout $branch 2>&1 | Out-Null
+    $current_branch = $(git branch --show-current)
+    if ($current_branch -ne $branch) {
+        throw "Branch $branch does not exist in $name."
+    }
+}
+
 Push-Location $PSScriptRoot | Out-Null
 try {
-    $projects = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","Workflow","GacUI","Release","Document","WebsiteSource","vczh-libraries.github.io","Tools")
+    $projects_versioned = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","Workflow","GacUI","Release","Tools")
+    $projects = $projects_versioned + @("Document","WebsiteSource","vczh-libraries.github.io")
     switch ($Action) {
         "Check" {
             foreach ($project in $projects) {
@@ -54,8 +66,18 @@ try {
                 RepoSync $project
             }
         }
+        "Master" {
+            foreach ($project in $projects_versioned) {
+                RepoCheckout $project master
+            }
+        }
+        "1.0" {
+            foreach ($project in $projects_versioned) {
+                RepoCheckout $project release-1.0
+            }
+        }
         default {
-            throw "Unknown action `"$Action`". Action should be one of the following value: Check, CheckAll, Sync."
+            throw "Unknown action `"$Action`". Action should be one of the following value: Check, CheckAll, Sync, Master, 1.0."
         }
     }
 }
