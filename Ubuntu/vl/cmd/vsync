@@ -45,9 +45,10 @@ function Master {
     fi
     for i in "${GITHUB_REPOS[@]}"; do
         if [ -d "$i" ]; then
+            echo "Switch repo $i to master ..."
             pushd $i > /dev/null
             git checkout master
-            popd
+            popd > /dev/null
         fi
     done
     popd > /dev/null
@@ -61,9 +62,10 @@ function ReleaseOne {
     fi
     for i in "${GITHUB_REPOS[@]}"; do
         if [ -d "$i" ]; then
+            echo "Switch repo $i to release-1.0 ..."
             pushd $i > /dev/null
             git checkout release-1.0
-            popd
+            popd > /dev/null
         fi
     done
     popd > /dev/null
