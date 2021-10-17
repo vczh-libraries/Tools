@@ -43,7 +43,7 @@ function Master {
         echo "If you want to create a new enlistment, use --enlist."
         exit 1
     fi
-    for i in "${GITHUB_REPOS[@]}"; do
+    for i in "${GITHUB_REPOS_VERSIONED[@]}"; do
         if [ -d "$i" ]; then
             echo "Switch repo $i to master ..."
             pushd $i > /dev/null
@@ -60,7 +60,7 @@ function ReleaseOne {
         echo "If you want to create a new enlistment, use --enlist."
         exit 1
     fi
-    for i in "${GITHUB_REPOS[@]}"; do
+    for i in "${GITHUB_REPOS_VERSIONED[@]}"; do
         if [ -d "$i" ]; then
             echo "Switch repo $i to release-1.0 ..."
             pushd $i > /dev/null
