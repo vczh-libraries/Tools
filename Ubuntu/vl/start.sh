@@ -4,7 +4,7 @@ export VROOT=${PWD}
 export PATH=${VCPROOT}/vl/cmd:${PATH}
 
 for i in "ls ${VCPROOT}/vl/cmd/v*"; do
-    GitClone $i
+    chmod u+x $i
 done
 
 function vreset {
