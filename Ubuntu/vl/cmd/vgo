@@ -50,8 +50,6 @@ function Update {
         Update GacUI
         Update GacJS
         Update Release
-        Update XGac
-        Update iGac
         Update Document
         Update vczh-libraries.github.io
         Update WebsiteSource
