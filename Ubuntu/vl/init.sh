@@ -18,13 +18,13 @@ function Init {
 
     echo "Enter the launcher display name (${VLAUNCHER_DEFAULT_NAME}):"
     read VLAUNCHER_NAME
-    if ! [ "${VLAUNCHER_NAME}" == ""]; then
+    if ! [ "${VLAUNCHER_NAME}" == "" ]; then
         VLAUNCHER_NAME=${VLAUNCHER_DEFAULT_NAME}
     fi
 
     echo "Enter the launcher file name without extension (${VLAUNCHER_DEFAULT_FILE}):"
     read VLAUNCHER_FILE
-    if ! [ "${VLAUNCHER_FILE}" == ""]; then
+    if ! [ "${VLAUNCHER_FILE}" == "" ]; then
         VLAUNCHER_FILE=${VLAUNCHER_DEFAULT_FILE}
     fi
 
