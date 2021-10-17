@@ -31,7 +31,7 @@ function Init {
     local VLAUNCHER_FILENAME=${PWD}/${VLAUNCHER_FILE}.desktop
     if [ -a ${VLAUNCHER_FILENAME} ]; then
         echo "${VLAUNCHER_FILE}.desktop already exists in the current location: ${PWD}"
-        exit 1
+        return 1
     fi
 
     local VPATTERN_NAME="s?<NAME>?${VLAUNCHER_NAME}?g;"
@@ -39,9 +39,11 @@ function Init {
     local VPATTERN_VCPROOT="s?<VCPROOT>?${VCPROOT}?g;"
     local VPATTERNS="${VPATTERN_NAME}"$'\n'"${VPATTERN_PATH}"$'\n'"${VPATTERN_VCPROOT}"
 
+    echo "Creating ${VLAUNCHER_FILENAME} ..."
     sed -e "${VPATTERNS}" "${VCPROOT}/vl/launcher-template.desktop" > "${VLAUNCHER_FILENAME}"
     chmod u+x "${VLAUNCHER_FILENAME}"
 
+    echo "${VROOT}/load.sh ..."
     sed -e "${VPATTERNS}" "${VCPROOT}/vl/load-template.sh" > "${VROOT}/load.sh"
     chmod u+x "${VROOT}/load.sh"
 
