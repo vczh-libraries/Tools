@@ -17,7 +17,7 @@ function GitClone {
 }
 
 GITHUB_REPOS_VERSIONED=(Tools Vlpp VlppOS VlppRegex VlppReflection VlppParser Workflow GacUI Release)
-GITHUB_REPOS=("${GITHUB_REPOS_VERSIONED}" Document vczh-libraries.github.io WebsiteSource)
+GITHUB_REPOS=("${GITHUB_REPOS_VERSIONED[@]}" Document vczh-libraries.github.io WebsiteSource)
 
 function Fix {
     pushd ${VROOT} > /dev/null
