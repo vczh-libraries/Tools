@@ -8,7 +8,7 @@ function Init {
     if [ -a ${VROOT}/load.sh ]; then
         echo "load.sh already exists in the current location: ${VROOT}"
         echo "To create a launcher icon, please remove load.sh and run this script again."
-        exit 1
+        return 1
     fi
 
     local VLAUNCHER_NAME=""
