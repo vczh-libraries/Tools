@@ -3,7 +3,7 @@
 export VROOT=${PWD}
 export PATH=${VCPROOT}/vl/cmd:${PATH}
 
-for i in "ls ${VCPROOT}/vl/cmd/v*"; do
+for i in "$( ls ${VCPROOT}/vl/cmd/v* )"; do
     chmod u+x $i
 done
 

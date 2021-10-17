@@ -46,6 +46,7 @@ function Init {
     echo "${VROOT}/load.sh ..."
     sed -e "${VPATTERNS}" "${VCPROOT}/vl/load-template.sh" > "${VROOT}/load.sh"
     chmod u+x "${VROOT}/load.sh"
+    chmod u+x "${VCPROOT}/vl/load.sh"
 
     echo "Please close this window and launch the development environment via the created desktop launcher."
 }
