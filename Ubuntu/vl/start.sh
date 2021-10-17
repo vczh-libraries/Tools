@@ -3,9 +3,13 @@
 export VROOT=${PWD}
 export PATH=${VCPROOT}/vl/cmd:${PATH}
 
+for i in "ls ${VCPROOT}/vl/cmd/v*"; do
+    GitClone $i
+done
+
 function vreset {
     pushd $VROOT > /dev/null
-    source ${VCPROOT}/vl/vl-start-enlistment.sh
+    source ${VCPROOT}/vl/start.sh
     popd > /dev/null
 }
 export -f vreset
