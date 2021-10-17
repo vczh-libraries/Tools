@@ -9,10 +9,13 @@ open a command line and run:
 ```PlainText
 mkdir vczh-libraries
 pushd vczh-libraries
-git clone https://github.com/vczh-libraries/Tools.git
+git clone git@github.com:vczh-libraries/Tools.git
 popd
 source ./vczh-libraries/Tools/Ubuntu/vl/init.sh
 ```
+
+If ssh has not been properly setup with github,
+you could also use `git clone https://github.com/vczh-libraries/Tools.git` instead.
 
 You will be asked two questions:
 - Enter the launcher display name (VL++ DevEnv):
