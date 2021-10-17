@@ -42,5 +42,7 @@ case $1 in
     echo "    Quick way to setup ssh key for your github account."
     echo "vapt --help"
     echo "    Download necessary softwares."
+    echo "vsync --help"
+    echo "    Enlist all repos from github."
     ;;
 esac
