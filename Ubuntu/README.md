@@ -35,10 +35,13 @@ and the name changed from `vl.desktop` to `VL++ DevEnv`.
 ## Prepare
 
 - Double click the desktop launcher.
-- Use vapt to install necessary softwares.
-- Use vssh to setup a connection to github.
-- Use vsync to clone all missing repos.
+- Use `vapt` to install necessary softwares.
+- Use `vssh` to setup a connection to github.
+- Use `vsync --fix` to clone all missing repos.
+- Use `vgo u` to sync all remote branches.
 
 ## Start to work
 
 - Double click the desktop launcher. Type `vhelp` to see all available commands.
+- Use `vsync --master` to switch all branches to `master`.
+- Use `vsync --1.0` to switch all branches to `release-1.0`.

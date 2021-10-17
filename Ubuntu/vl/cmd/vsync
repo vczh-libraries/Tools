@@ -44,8 +44,10 @@ function Master {
         exit 1
     fi
     for i in "${GITHUB_REPOS[@]}"; do
-        if ! [ -d "$i" ]; then
-            GitClone $i
+        if [ -d "$i" ]; then
+            pushd $i > /dev/null
+            git checkout master
+            popd
         fi
     done
     popd > /dev/null
@@ -58,8 +60,10 @@ function ReleaseOne {
         exit 1
     fi
     for i in "${GITHUB_REPOS[@]}"; do
-        if ! [ -d "$i" ]; then
-            GitClone $i
+        if [ -d "$i" ]; then
+            pushd $i > /dev/null
+            git checkout release-1.0
+            popd
         fi
     done
     popd > /dev/null
