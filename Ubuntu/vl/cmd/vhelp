@@ -1,0 +1,46 @@
+#!/bin/bash
+
+case $1 in
+    --git)
+    echo "List uncommitted files:"
+    echo "    git status"
+    echo "Track uncommitted files:"
+    echo "    git add ."
+    echo "Commit:"
+    echo "    git commit -a -m \"message\""
+    echo "Create branch:"
+    echo "    LOCAL:  git checkout -b NAME [origin/NAME]"
+    echo "    REMOTE: git push origin NAME"
+    echo "Delete branch:"
+    echo "    LOCAL:  git branch -d NAME"
+    echo "    REMOTE: git push origin --delete NAME"
+    echo "List all branches:"
+    echo "    LOCAL:  git branch -a"
+    echo "    REMOTE: git branch -r"
+    echo "Switch branch:"
+    echo "    git checkout NAME"
+    echo "Merge branch to current branch:"
+    echo "    git merge NAME"
+    echo "Pull all remote branches:"
+    echo "    git pull --all"
+    ;;
+
+    *)
+    echo "vhelp"
+    echo "    Help information for Vczh Libraries Control Panel."
+    echo "    --git"
+    echo "        Quick help for git"
+    echo "vgo --help"
+    echo "    Quick way to jump to a predefined folder."
+    echo "vt4 --help"
+    echo "    T4 template processor."
+    echo "vmake --help"
+    echo "    Generate makefile."
+    echo "vbuild --help"
+    echo "    Build the program."
+    echo "vssh --help"
+    echo "    Quick way to setup ssh key for your github account."
+    echo "vapt --help"
+    echo "    Download necessary softwares."
+    ;;
+esac
