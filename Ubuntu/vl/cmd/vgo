@@ -48,11 +48,11 @@ function Update {
         Update VlppParser
         Update Workflow
         Update GacUI
-        Update GacJS
         Update Release
         Update Document
         Update vczh-libraries.github.io
         Update WebsiteSource
+        Update gGac
     else
         pushd . > /dev/null
         printf "${VC_LIGHTGREEN}Pulling from ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
