@@ -28,7 +28,17 @@ function RepoCheckAllDirty([String]$name) {
     }
 }
 
-function RepoSync([String]$name) {
+function RepoSyncVersioned([String]$name) {
+    Write-Host "Pulling repo: $name ..."
+
+    Set-Location $PSScriptRoot\..\..\$name | Out-Null
+    git checkout release-1.0
+    git pull origin release-1.0
+    git checkout master
+    git pull origin master
+}
+
+function RepoSyncUnversioned([String]$name) {
     Write-Host "Pulling repo: $name ..."
 
     Set-Location $PSScriptRoot\..\..\$name | Out-Null
@@ -49,7 +59,8 @@ function RepoCheckout([String]$name, [String]$branch) {
 Push-Location $PSScriptRoot | Out-Null
 try {
     $projects_versioned = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","Workflow","GacUI","Release","Tools")
-    $projects = $projects_versioned + @("Document","WebsiteSource","vczh-libraries.github.io")
+    $projects_unversionsed = @("Document","WebsiteSource","vczh-libraries.github.io")
+    $projects = $projects_versioned + $projects_unversionsed
     switch ($Action) {
         "Check" {
             foreach ($project in $projects) {
@@ -62,8 +73,11 @@ try {
             }
         }
         "Sync" {
-            foreach ($project in $projects) {
-                RepoSync $project
+            foreach ($project in $projects_versioned) {
+                RepoSyncVersioned $project
+            }
+            foreach ($project in $projects_unversionsed) {
+                RepoSyncUnversioned $project
             }
         }
         "Master" {
