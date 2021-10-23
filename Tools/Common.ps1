@@ -5,7 +5,7 @@ function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir"
 
     $vsdevcmd = $env:VLPP_VSDEVCMD_PATH
     if ($vsdevcmd -eq $null) {
-        throw "You have to add an environment variable named VLPP_VSDEVCMD_PATH and set its value to the path of VsDevCmd.bat (e.g. C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat)"
+        throw "You have to add an environment variable named VLPP_VSDEVCMD_PATH and set its value to the path of VsDevCmd.bat (e.g. C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat)"
     }
     if ($OutputFolder.IndexOf(":\") -eq -1) {
         $output_dir = "$OutputVar=`"$PSScriptRoot\.Output\$OutputFolder"
