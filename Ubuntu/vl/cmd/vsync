@@ -16,8 +16,8 @@ function GitClone {
     git clone git@github.com:vczh-libraries/${1}.git
 }
 
-GITHUB_REPOS_VERSIONED=(Tools Vlpp VlppOS VlppRegex VlppReflection VlppParser Workflow GacUI Release)
-GITHUB_REPOS=("${GITHUB_REPOS_VERSIONED[@]}" Document vczh-libraries.github.io WebsiteSource gGac)
+GITHUB_REPOS_VERSIONED=(Tools Vlpp VlppOS VlppRegex VlppReflection VlppParser Workflow GacUI Release Document)
+GITHUB_REPOS=("${GITHUB_REPOS_VERSIONED[@]}" vczh-libraries.github.io WebsiteSource gGac)
 
 function Fix {
     pushd ${VROOT} > /dev/null
