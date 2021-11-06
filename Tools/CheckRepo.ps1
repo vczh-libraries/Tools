@@ -58,7 +58,7 @@ function RepoCheckout([String]$name, [String]$branch) {
 
 Push-Location $PSScriptRoot | Out-Null
 try {
-    $projects_versioned = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","Workflow","GacUI","Release","Tools","Document")
+    $projects_versioned = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","VlppParser2","Workflow","GacUI","Release","Tools","Document")
     $projects_unversionsed = @("WebsiteSource","vczh-libraries.github.io")
     $projects = $projects_versioned + $projects_unversionsed
     switch ($Action) {

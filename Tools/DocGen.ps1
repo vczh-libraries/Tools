@@ -56,7 +56,7 @@ function DocGen-Verify {
     $ExampleOutput = "$PSScriptRoot\..\..\Document\Tools\Examples\Debug"
     Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Lib\Lib.vcxproj" Debug Win32 OutDir $ExampleOutput $true $false
 
-    $projects = @(@("VLPP", "Vlpp"), @("VLPPOS", "VlppOS"), @("VLPPREGEX", "VlppRegex"), @("VLPPREFLECTION", "VlppReflection"), @("VLPPPARSER", "VlppParser"), @("WORKFLOW", "Workflow"), @("GACUI", "GacUI"));
+    $projects = @(@("VLPP", "Vlpp"), @("VLPPOS", "VlppOS"), @("VLPPREGEX", "VlppRegex"), @("VLPPREFLECTION", "VlppReflection"), @("VLPPPARSER", "VlppParser"), @("VLPPPARSER2", "VlppParser2"), @("WORKFLOW", "Workflow"), @("GACUI", "GacUI"));
     foreach ($projectPair in $projects) {
         $projectId = $projectPair[0];
         $projectName = $projectPair[1];
