@@ -24,9 +24,3 @@ function Update-VlppParser {
     # Release again
     Release-Project VlppParser
 }
-
-function Build-Tool-CodePack {
-    # Build CodePack.exe
-    Build-Sln $PSScriptRoot\..\..\VlppParser\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
-    Test-Single-Binary CodePack.exe
-}

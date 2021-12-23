@@ -8,6 +8,7 @@ param (
 . $PSScriptRoot\ProjectVlppRegex.ps1
 . $PSScriptRoot\ProjectVlppReflection.ps1
 . $PSScriptRoot\ProjectVlppParser.ps1
+. $PSScriptRoot\ProjectVlppParser2.ps1
 . $PSScriptRoot\ProjectWorkflow.ps1
 . $PSScriptRoot\ProjectGacUI.ps1
 . $PSScriptRoot\BuildRelease.ps1
@@ -32,6 +33,7 @@ function Update-Binaries-And-Bundle {
     Update-VlppRegex
     Update-VlppReflection
     Update-VlppParser
+    Update-VlppParser2
     
     Write-Title "    Updating Workflow ..."
     Update-Workflow
@@ -69,6 +71,10 @@ try {
             Write-Title Build-VlppParser
             Build-Vlpp; [Console]::ResetColor()
 
+            $time_vlpp_parser2 = [DateTime]::Now
+            Write-Title Build-VlppParser2
+            Build-Vlpp; [Console]::ResetColor()
+
             $time_workflow = [DateTime]::Now
             Write-Title Build-Workflow
             Build-Workflow; [Console]::ResetColor()
@@ -91,7 +97,8 @@ try {
             Write-Host "  OS         : $time_vlpp_os, Elapsed: $((New-TimeSpan $time_vlpp_os $time_vlpp_regex).ToString())"
             Write-Host "  Regex      : $time_vlpp_regex, Elapsed: $((New-TimeSpan $time_vlpp_regex $time_vlpp_reflection).ToString())"
             Write-Host "  Reflection : $time_vlpp_reflection, Elapsed: $((New-TimeSpan $time_vlpp_reflection $time_vlpp_parser).ToString())"
-            Write-Host "  Parser     : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser $time_workflow).ToString())"
+            Write-Host "  Parser     : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser $time_vlpp_parser2).ToString())"
+            Write-Host "  Parser2    : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser2 $time_workflow).ToString())"
             Write-Host "Workflow     : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
             Write-Host "GacUI        : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_update).ToString())"
             Write-Host "Update       : $time_update, Elapsed: $((New-TimeSpan $time_update $time_release).ToString())"
@@ -118,6 +125,10 @@ try {
             Write-Title Build-VlppParser
             Build-VlppParser
         }
+        "VlppParser2" {
+            Write-Title Build-VlppParser2
+            Build-VlppParser2
+        }
         "Workflow" {
             Write-Title Build-Workflow
             Build-Workflow
@@ -139,7 +150,7 @@ try {
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, Workflow, GacUI, Update, Release."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, Release."
         }
     }
 }
