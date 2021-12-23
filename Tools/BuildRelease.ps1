@@ -18,6 +18,8 @@ function Build-Release([Bool] $PopupFolders) {
         Copy-Item ..\VlppReflection\Release\*.cpp .\Import
         Copy-Item ..\VlppParser\Release\*.h .\Import
         Copy-Item ..\VlppParser\Release\*.cpp .\Import
+        Copy-Item ..\VlppParser2\Release\*.h .\Import
+        Copy-Item ..\VlppParser2\Release\*.cpp .\Import
         Copy-Item ..\Workflow\Release\*.h .\Import
         Copy-Item ..\Workflow\Release\*.cpp .\Import
         Copy-Item ..\GacUI\Release\Gac*.h .\Import
