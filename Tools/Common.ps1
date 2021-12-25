@@ -59,3 +59,8 @@ function Update-Parser($FileName) {
     Write-Host "Updating Parser: $FileName ..."
     Start-Process-And-Wait (,("$PSScriptRoot\ParserGen.exe", "$FileName"))
 }
+
+function Update-Parser2($FileName) {
+    Write-Host "Updating Parser: $FileName ..."
+    Start-Process-And-Wait (,("$PSScriptRoot\GlrParserGen.exe", "$FileName"))
+}

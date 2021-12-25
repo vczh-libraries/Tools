@@ -18,8 +18,8 @@ function Update-VlppParser2 {
     Release-Project VlppParser
 
     # Build GlrParserGen.exe
-    # Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\GlrParserGen\GlrParserGen.vcxproj Release x86
-    # Test-Single-Binary GlrParserGen.exe
+    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\GlrParserGen\GlrParserGen.vcxproj Release x86
+    Test-Single-Binary GlrParserGen.exe
 }
 
 function Build-Tool-CodePack {

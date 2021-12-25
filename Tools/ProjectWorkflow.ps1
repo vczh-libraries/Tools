@@ -16,10 +16,10 @@ function Build-Workflow {
 
 function Update-Workflow {
     # Import
-    Import-Project Workflow ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser")
+    Import-Project Workflow ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser2")
 
     # Update Parsers
-    Update-Parser $PSScriptRoot\..\..\Workflow\Source\Expression\WfExpression.parser.txt
+    Update-Parser2 $PSScriptRoot\..\..\Workflow\Source\Parser\Syntax\Parser.xml
 
     # Release
     Release-Project Workflow
