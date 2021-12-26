@@ -15,7 +15,7 @@ function Update-VlppParser2 {
     Import-Project VlppParser ("Vlpp","VlppOS","VlppRegex","VlppReflection")
 
     # Release
-    Release-Project VlppParser
+    Release-Project VlppParser2
 
     # Build GlrParserGen.exe
     Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\GlrParserGen\GlrParserGen.vcxproj Release x86
