@@ -35,7 +35,7 @@ function Update-GacUI {
     Import-Project GacUI ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","VlppParser2","Workflow")
 
     # Update Parsers
-    Update-Parser $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\GuiInstanceQuery_Parser.parser.txt
+    Update-Parser2 $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\Syntax\Parser.xml
 
     # Release
     Release-Project GacUI
