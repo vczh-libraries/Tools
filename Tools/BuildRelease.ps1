@@ -29,6 +29,7 @@ function Build-Release([Bool] $PopupFolders) {
         # Deploy
         Write-Host "Deploying Binaries ..."
         Copy-Item $PSScriptRoot\ParserGen.exe .\Tools
+        Copy-Item $PSScriptRoot\GlrParserGen.exe .\Tools
         Copy-Item $PSScriptRoot\CppMerge.exe .\Tools
         Copy-Item $PSScriptRoot\GacGen32.exe .\Tools
         Copy-Item $PSScriptRoot\GacGen64.exe .\Tools
