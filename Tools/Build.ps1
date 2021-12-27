@@ -57,23 +57,23 @@ try {
 
             $time_vlpp_os = [DateTime]::Now
             Write-Title Build-VlppOS
-            Build-Vlpp; [Console]::ResetColor()
+            Build-VlppOS; [Console]::ResetColor()
 
             $time_vlpp_regex = [DateTime]::Now
             Write-Title Build-VlppRegex
-            Build-Vlpp; [Console]::ResetColor()
+            Build-VlppRegex; [Console]::ResetColor()
 
             $time_vlpp_reflection = [DateTime]::Now
             Write-Title Build-VlppReflection
-            Build-Vlpp; [Console]::ResetColor()
+            Build-VlppReflection; [Console]::ResetColor()
 
             $time_vlpp_parser = [DateTime]::Now
             Write-Title Build-VlppParser
-            Build-Vlpp; [Console]::ResetColor()
+            Build-VlppParser; [Console]::ResetColor()
 
             $time_vlpp_parser2 = [DateTime]::Now
             Write-Title Build-VlppParser2
-            Build-Vlpp; [Console]::ResetColor()
+            Build-VlppParser2; [Console]::ResetColor()
 
             $time_workflow = [DateTime]::Now
             Write-Title Build-Workflow

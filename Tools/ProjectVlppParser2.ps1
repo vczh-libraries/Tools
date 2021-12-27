@@ -12,7 +12,7 @@ function Build-VlppParser2 {
 
 function Update-VlppParser2 {
     # Import
-    Import-Project VlppParser ("Vlpp","VlppOS","VlppRegex","VlppReflection")
+    Import-Project VlppParser2 ("Vlpp","VlppOS","VlppRegex","VlppReflection")
 
     # Release
     Release-Project VlppParser2
