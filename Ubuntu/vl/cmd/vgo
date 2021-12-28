@@ -46,6 +46,7 @@ function Update {
         Update VlppRegex
         Update VlppReflection
         Update VlppParser
+        Update VlppParser2
         Update Workflow
         Update GacUI
         Update Release
