@@ -145,12 +145,19 @@ try {
         }
         "Release" {
             Write-Title Build-Release
-            Build-Release $True;
+            Build-Release-Update $True;
+            Build-Release-Verify $True;
+            Write-Title "    Check Repo ..."
+            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+        }
+        "VerifyRelease" {
+            Write-Title Build-Release
+            Build-Release-Verify $True;
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, Release."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, Release, VerifyRelease."
         }
     }
 }
