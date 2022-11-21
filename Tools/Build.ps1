@@ -42,6 +42,23 @@ function Update-Binaries-And-Bundle {
     Update-GacUI
 }
 
+function Update-Repo-Commit-Records {
+    $projects = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","VlppParser2","Workflow","GacUI")
+    $content = "# Vczh Library++`n`n";
+    $content += "Please [read the document](http://vczh-libraries.github.io/doc/current/home/download.html) before using source files under this folder.`n`n"
+    $content += "## Commits associated with this release`n`n";
+
+    Write-Title "    Updating Commit Records ..."
+    foreach ($project in $projects) {
+        Set-Location $PSScriptRoot\..\..\$project
+        $commit = $(git rev-parse HEAD)
+        $record = "- **$project**: [$commit](https://github.com/vczh-libraries/$project/tree/$commit)"
+        $content += "$record`n"
+    }
+
+    Set-Content -Path "$PSScriptRoot\..\..\Release\Import\README.md" -Value $content
+}
+
 # Prevent from displaying "Debug or Close Application" dialog on crash
 $dontshowui_key = "HKCU:\Software\Microsoft\Windows\Windows Error Reporting"
 $dontshowui_value = (Get-ItemProperty $dontshowui_key).DontShowUI
@@ -140,24 +157,31 @@ try {
         "Update" {
             Write-Title Update-Binaries-And-Bundle
             Update-Binaries-And-Bundle
+            Update-Repo-Commit-Records
+            Write-Title "    Check Repo ..."
+            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+        }
+        "UpdateCommits" {
+            Write-Title Update-Repo-Commit-Records
+            Update-Repo-Commit-Records
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         "Release" {
             Write-Title Build-Release
-            Build-Release-Update $True;
+            Build-Release-Update;
             Build-Release-Verify $True;
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         "VerifyRelease" {
-            Write-Title Build-Release
+            Write-Title Build-Release-Verify
             Build-Release-Verify $True;
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, Release, VerifyRelease."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, UpdateCommits, Release, VerifyRelease."
         }
     }
 }
