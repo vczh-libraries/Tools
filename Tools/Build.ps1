@@ -157,7 +157,6 @@ try {
         "Update" {
             Write-Title Update-Binaries-And-Bundle
             Update-Binaries-And-Bundle
-            Update-Repo-Commit-Records
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
