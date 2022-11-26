@@ -106,7 +106,8 @@ try {
 
             $time_release = [DateTime]::Now
             Write-Title Build-Release
-            Build-Release $False; [Console]::ResetColor()
+            Build-Release-Update; [Console]::ResetColor()
+            Build-Release-Verify $False; [Console]::ResetColor()
 
             $time_finished = [DateTime]::Now
             Write-Title Finished!
