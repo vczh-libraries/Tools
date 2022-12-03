@@ -10,6 +10,7 @@ function Build-Release-Update() {
         New-Item .\Import\Skins\DarkSkin -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         Copy-Item ..\Vlpp\Release\*.h .\Import
         Copy-Item ..\Vlpp\Release\*.cpp .\Import
+        Copy-Item ..\Vlpp\Release\*.natvis .\Import
         Copy-Item ..\VlppOS\Release\*.h .\Import
         Copy-Item ..\VlppOS\Release\*.cpp .\Import
         Copy-Item ..\VlppRegex\Release\*.h .\Import
