@@ -3,6 +3,7 @@ function Build-VlppParser2 {
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_AstGen"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_AstParserGen"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_LexerAndParser"
+    Test-Vlpp-SubProject "VlppParser2" "ParserTest_ParserGen"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_ParserGen_Compiler"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_ParserGen_Generated"
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Json"
