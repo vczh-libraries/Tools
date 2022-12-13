@@ -10,6 +10,7 @@ Tools/*.dll
 Tools/*.bin
 
 # User-specific files
+*/**/.vs/
 *.suo
 *.user
 *.sln.docstates

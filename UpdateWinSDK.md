@@ -1,4 +1,6 @@
 - Open VSCode
 - Find `<WindowsTargetPlatformVersion>(\d|\.)+</WindowsTargetPlatformVersion>`
 - Replace by `<WindowsTargetPlatformVersion>NEW_VERSION</WindowsTargetPlatformVersion>`
+- Find `<PlatformToolset>v(\d|\.)+</PlatformToolset>`
+- Replace by `<PlatformToolset>NEW_VERSION</PlatformToolset>`
 - Save all
