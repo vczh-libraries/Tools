@@ -78,8 +78,8 @@ function Build-Release-Verify([Bool] $PopupFolders) {
     try {
         # GacGen
         Write-Host "Compiling Resources ..."
-        & $PSScriptRoot\GacClear.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
-        & $PSScriptRoot\GacBuild.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
+        & $PSScriptRoot\..\..\Release\Tools\GacClear.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
+        & $PSScriptRoot\..\..\Release\Tools\GacBuild.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
 
         # Debug Build
         Write-Host "Create Debug Builds ..."
