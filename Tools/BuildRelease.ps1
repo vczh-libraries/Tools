@@ -40,6 +40,10 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.cpp .\Tools\Executables\GacGen
 
         # Build Tools
+        Build-Sln .\Tools\Executables\CodePack\CodePack.vcxproj         Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
+        Build-Sln .\Tools\Executables\GlrParserGen\GlrParserGen.vcxproj Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
+        Build-Sln .\Tools\Executables\CppMerge\CppMerge.vcxproj         Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
+        Build-Sln .\Tools\Executables\GacGen\GacGen.vcxproj             Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
 
         # Deploy
         Write-Host "Deploying Binaries ..."
