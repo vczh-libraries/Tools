@@ -27,8 +27,27 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Release\Gac*.cpp .\Import
         Copy-Item ..\GacUI\Release\DarkSkin* .\Import\Skins\DarkSkin
 
+        # Copy Tools Sources
+        Copy-Item ..\VlppParser2\Tools\CodePack\CodePack\*.h .\Tools\Executables\CodePack
+        Copy-Item ..\VlppParser2\Tools\CodePack\CodePack\*.cpp .\Tools\Executables\CodePack
+        Copy-Item ..\VlppParser2\Tools\GlrParserGen\GlrParserGen\*.h .\Tools\Executables\GlrParserGen
+        Copy-Item ..\VlppParser2\Tools\GlrParserGen\GlrParserGen\*.cpp .\Tools\Executables\GlrParserGen
+        Copy-Item ..\Workflow\Tools\CppMerge\CppMerge\*.h .\Tools\Executables\CppMerge
+        Copy-Item ..\Workflow\Tools\CppMerge\CppMerge\*.cpp .\Tools\Executables\CppMerge
+        Copy-Item ..\Workflow\Source\Cpp\WfMergeCpp.h .\Tools\Executables\CppMerge
+        Copy-Item ..\Workflow\Source\Cpp\WfMergeCpp.cpp .\Tools\Executables\CppMerge
+        Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.h .\Tools\Executables\GacGen
+        Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.cpp .\Tools\Executables\GacGen
+
+        # Build Tools
+
         # Deploy
         Write-Host "Deploying Binaries ..."
+        Remove-Item .\Tools\*.exe
+        Remove-Item .\Tools\*.bin
+        Remove-Item .\Tools\Gac*.ps1
+        Remove-Item .\Tools\StartProcess.ps1
+        .\Tools\CopyExecutables.ps1
         Copy-Item $PSScriptRoot\Reflection32.bin .\Tools
         Copy-Item $PSScriptRoot\Reflection64.bin .\Tools
         Copy-Item $PSScriptRoot\Gac*.ps1 .\Tools
