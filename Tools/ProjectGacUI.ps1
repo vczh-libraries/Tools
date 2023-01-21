@@ -40,9 +40,7 @@ function Update-GacUI {
     # Release
     Release-Project GacUI
     Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32
-    Test-Single-Binary GacGen32.exe
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release x64
-    Test-Single-Binary GacGen64.exe
+    Test-Single-Binary GacGen.exe
 
     Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection32.bin $PSScriptRoot
     Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection64.bin $PSScriptRoot

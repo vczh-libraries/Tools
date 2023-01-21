@@ -32,8 +32,7 @@ function Build-Release-Update() {
         Copy-Item $PSScriptRoot\ParserGen.exe .\Tools
         Copy-Item $PSScriptRoot\GlrParserGen.exe .\Tools
         Copy-Item $PSScriptRoot\CppMerge.exe .\Tools
-        Copy-Item $PSScriptRoot\GacGen32.exe .\Tools
-        Copy-Item $PSScriptRoot\GacGen64.exe .\Tools
+        Copy-Item $PSScriptRoot\GacGen.exe .\Tools
         Copy-Item $PSScriptRoot\Reflection32.bin .\Tools
         Copy-Item $PSScriptRoot\Reflection64.bin .\Tools
         Copy-Item $PSScriptRoot\Gac*.ps1 .\Tools
