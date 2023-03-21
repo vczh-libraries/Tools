@@ -2,7 +2,6 @@ function Test-Workflow {
     Test-Vlpp-SubProject "Workflow" "LibraryTest"
     Test-Vlpp-SubProject "Workflow" "CompilerTest_GenerateMetadata"
     Test-Vlpp-SubProject "Workflow" "CompilerTest_LoadAndCompile"
-    Test-Vlpp-Platform   "Workflow" "UnitTest_MergeCpp" Win32 "$PSScriptRoot\..\..\Workflow\Test\UnitTest\Release"
     Test-Vlpp-SubProject "Workflow" "CppTest"
     Test-Vlpp-SubProject "Workflow" "CppTest_Metaonly"
     Test-Vlpp-SubProject "Workflow" "CppTest_Reflection"
