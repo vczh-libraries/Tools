@@ -40,18 +40,8 @@ function Coverage {
 
 function Generate {
     Check
-    PATTERN='^(.+)?\.o:\s*((.+)?.cpp).*$'
-    CPP_FILES=`cat makefile \
-        | grep -E ${PATTERN} \
-        | sed -r -e 's%'${PATTERN}'%../\2%g'
-        `
-    rm -rf ./Coverage/*
-    gcov -o ./Obj/ ${CPP_FILES} > /dev/null
-    mv -f *.gcov ./Coverage/
-    pushd ./Coverage > /dev/null
-    lcov --directory ../Obj/ --capture --output-file lcov.info
-    genhtml -o HTML lcov.info > /dev/null
-    popd > /dev/null
+    lcov --directory ./Obj/ --base-directory . --gcov-tool ${VCPROOT}/vl/llvm-gcov.sh --capture -o ./Coverage/cov.info
+    genhtml ./Coverage/cov.info -o ./Coverage/HTML/
 }
 
 function Read {
@@ -88,3 +78,35 @@ case $1 in
     echo "Use --help for more information."
     ;;
 esac
+
+COVERAGE?=NO
+
+# makefile-cpp
+
+#ifeq ($(COVERAGE),NO)
+#CPP_LINK=clang++ -std=c++20 -pthread -g $(CPP_COMPILE_OPTIONS) -o $@ $^
+#else
+#CPP_LINK=g++ -std=c++20 -g -fprofile-arcs -pthread $(CPP_LINK_OPTIONS) -o $@ $^
+#endif
+#
+#ifeq ($(COVERAGE),NO)
+#CPP_COMPILE=clang++ -std=c++20 -g $(CPP_COMPILE_OPTIONS) -o $@ -c $<
+#else
+#CPP_COMPILE=g++ -std=c++20 -g -fprofile-arcs -ftest-coverage $(CPP_COMPILE_OPTIONS) -o $@ -c $<
+#endif
+
+#function Generate {
+#    Check
+#    PATTERN='^(.+)?\.o:\s*((.+)?.cpp).*$'
+#    CPP_FILES=`cat makefile \
+#        | grep -E ${PATTERN} \
+#        | sed -r -e 's%'${PATTERN}'%../\2%g'
+#        `
+#    rm -rf ./Coverage/*
+#    gcov -o ./Obj/ ${CPP_FILES} > /dev/null
+#    mv -f *.gcov ./Coverage/
+#    pushd ./Coverage > /dev/null
+#    lcov --directory ../Obj/ --capture --output-file lcov.info
+#    genhtml -o HTML lcov.info > /dev/null
+#    popd > /dev/null
+#}
