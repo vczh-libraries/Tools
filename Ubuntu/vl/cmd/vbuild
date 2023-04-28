@@ -2,15 +2,19 @@
 
 function Help {
     echo "Usage:"
-    echo "<--build>"
+    echo "--clean"
+    echo "    Clean generated files."
+    echo "-b, --build"
     echo "    Incrementally build the current folder."
-    echo "--full"
+    echo "-f, --full-build, -f"
     echo "    Rebuild the current folder."
-    echo "--coverage"
+    echo "-c, --build-coverage"
     echo "    Rebuild the current folder with coverage."
-    echo "--generate"
+    echo "-fc, --full-build-coverage"
+    echo "    Rebuild the current folder with coverage."
+    echo "-g, --generate"
     echo "    Generate coverage data."
-    echo "--read"
+    echo "-r, --read"
     echo "    Read coverage data."
 }
 
@@ -21,18 +25,28 @@ function Check {
     fi
 }
 
+function Clean {
+    Check
+    make clean
+}
+
 function Build {
     Check
     make
 }
 
-function Full {
+function FullBuild {
     Check
     make clean
     make
 }
 
-function Coverage {
+function BuildCoverage {
+    Check
+    make COVERAGE=YES
+}
+
+function FullBuildCoverage {
     Check
     make clean
     make COVERAGE=YES
@@ -55,23 +69,31 @@ case $1 in
     Help
     ;;
 
-    --build)
+    --clean)
+    Clean
+    ;;
+
+    -b|--build)
     Build
     ;;
 
-    --full)
-    Full
+    -f|--full-build)
+    FullBuild
     ;;
 
-    --coverage)
-    Coverage
+    -c|--build-coverage)
+    BuildCoverage
     ;;
 
-    --generate)
+    -fc|--full-build-coverage)
+    FullBuildCoverage
+    ;;
+
+    -g|--generate)
     Generate
     ;;
 
-    --read)
+    -r|--read)
     Read
     ;;
 
