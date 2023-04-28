@@ -46,7 +46,8 @@ function Generate {
 
 function Read {
     Check
-    sensible-browser ./Coverage/HTML/index.html 
+    firefox ./Coverage/HTML/index.html
+    #sensible-browser ./Coverage/HTML/index.html 
 }
 
 case $1 in
@@ -79,10 +80,10 @@ case $1 in
     ;;
 esac
 
-COVERAGE?=NO
+# original makefile-cpp with gcc code coverage
 
-# makefile-cpp
-
+#COVERAGE?=NO
+#
 #ifeq ($(COVERAGE),NO)
 #CPP_LINK=clang++ -std=c++20 -pthread -g $(CPP_COMPILE_OPTIONS) -o $@ $^
 #else

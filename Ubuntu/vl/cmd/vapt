@@ -10,6 +10,7 @@ function Help {
     echo "        git"
     echo "        apt-file"
     echo "        clang"
+    echo "        llvm"
     echo "        libc++-dev"
     echo "        openssh-server"
     echo "        lcov"
@@ -17,6 +18,7 @@ function Help {
     echo "        curl"
     echo "        build-essential"
     echo "        compizconfig-settings-manager"
+    echo "        dbus-x11"
     echo "--remove"
     echo "    Remove all required softwares"
 }
@@ -43,6 +45,7 @@ APTGET_TARGETS=(
     git
     apt-file
     clang
+    llvm
     libc++-dev
     openssh-server
     lcov
@@ -50,6 +53,7 @@ APTGET_TARGETS=(
     curl
     build-essential
     compizconfig-settings-manager
+    dbus-x11
     )
 # xfce4
 # xrdp
