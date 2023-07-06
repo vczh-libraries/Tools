@@ -119,6 +119,7 @@ function Build-Release-Verify([Bool] $PopupFolders) {
             start .\Tutorial\GacUI_Controls\Release
             start .\Tutorial\GacUI_ControlTemplate\Release
             start .\Tutorial\GacUI_Xml\Release
+            start .\Tutorial\GacUI_Windows\Release
         }
     }
     catch {
