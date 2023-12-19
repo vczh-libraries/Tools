@@ -61,6 +61,7 @@ function Update {
         if [ "$PWD" == "${VROOT}/$1" ]; then
             git pull --all
         fi
+        git remote prune origin
 
         local GITHEAD="$(git symbolic-ref HEAD 2>/dev/null)"
         local CURRENT_BRANCH="${GITHEAD##refs/heads/}"
