@@ -12,6 +12,10 @@ function Help {
     echo "    Rebuild the current folder with coverage."
     echo "-fc, --full-build-coverage"
     echo "    Rebuild the current folder with coverage."
+    echo "--build-gcc"
+    echo "    Incrementally build the current folder using G++."
+    echo "--full-build-gcc"
+    echo "    Rebuild the current folder using G++."
     echo "-g, --generate"
     echo "    Generate coverage data."
     echo "-r, --read"
@@ -52,6 +56,17 @@ function FullBuildCoverage {
     make COVERAGE=YES
 }
 
+function BuildGCC {
+    Check
+    make USE_GCC=YES
+}
+
+function FullBuildGCC {
+    Check
+    make clean
+    make USE_GCC=YES
+}
+
 function Generate {
     Check
     lcov --directory ./Obj/ --base-directory . --gcov-tool ${VCPROOT}/vl/llvm-gcov.sh --capture -o ./Coverage/cov.info
@@ -87,6 +102,14 @@ case $1 in
 
     -fc|--full-build-coverage)
     FullBuildCoverage
+    ;;
+
+    --build-gcc)
+    BuildGCC
+    ;;
+
+    --full-build-gcc)
+    FullBuildGCC
     ;;
 
     -g|--generate)
