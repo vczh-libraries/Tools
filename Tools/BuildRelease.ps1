@@ -72,15 +72,55 @@ function Build-Release-Update() {
     }
 }
 
-function Build-Release-Verify([Bool] $PopupFolders) {
+function Build-Release-Verify-Workflow {
     Push-Location $PSScriptRoot\..\..\Release | Out-Null
 
     try {
-        # GacGen
-        Write-Host "Compiling Resources ..."
+        # Debug Build
+        Write-Host "Create Debug Builds ..."
+        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\\Tutorial\Console_Workflow\Debug\
+
+        # Codegen
+        .\Tutorial\Console_Workflow\Debug\W05_Compile.exe
+        
+        # Debug Build After Codegen
+        Write-Host "Create Debug Builds After Codegen..."
+        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\\Tutorial\Console_Workflow\Debug\
+    }
+    catch {
+        throw
+    }
+    finally {
+        Pop-Location | Out-Null
+    }
+}
+
+function Build-Release-Verify-GacUI-Xml {
+    Push-Location $PSScriptRoot\..\..\Release | Out-Null
+
+    try {
+        # Document Tutorial
+        Write-Host "Compiling Resources (GacUI Document Tutorials)..."
+        & $PSScriptRoot\..\..\Release\Tools\GacClear.ps1 -FileName $PSScriptRoot\..\..\Release\SampleForDoc\GacUI\XmlRes\GacUI.xml
+        & $PSScriptRoot\..\..\Release\Tools\GacBuild.ps1 -FileName $PSScriptRoot\..\..\Release\SampleForDoc\GacUI\XmlRes\GacUI.xml
+
+        # Tutorial
+        Write-Host "Compiling Resources (GacUI Tutorials)..."
         & $PSScriptRoot\..\..\Release\Tools\GacClear.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
         & $PSScriptRoot\..\..\Release\Tools\GacBuild.ps1 -FileName $PSScriptRoot\..\..\Release\Tutorial\GacUI.xml
+    }
+    catch {
+        throw
+    }
+    finally {
+        Pop-Location | Out-Null
+    }
+}
 
+function Build-Release-Verify-GacUI-Cpp([Bool] $PopupFolders) {
+    Push-Location $PSScriptRoot\..\..\Release | Out-Null
+
+    try {
         # Debug Build
         Write-Host "Create Debug Builds ..."
         Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{

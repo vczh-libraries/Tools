@@ -180,14 +180,34 @@ try {
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
+        "VerifyReleaseWorkflow" {
+            Write-Title Build-Release-Verify-Workflow
+            Build-Release-Verify-Workflow;
+            Write-Title "    Check Repo ..."
+            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+        }
+        "VerifyReleaseXml" {
+            Write-Title Build-Release-Verify-GacUI-Xml
+            Build-Release-Verify-GacUI-Xml;
+            Write-Title "    Check Repo ..."
+            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+        }
+        "VerifyReleaseCpp" {
+            Write-Title Build-Release-Verify-GacUI-Cpp
+            Build-Release-Verify $True;
+        }
         "VerifyRelease" {
-            Write-Title Build-Release-Verify
+            Write-Title Build-Release-Verify-Workflow
+            Build-Release-Verify-Workflow;
+            Write-Title Build-Release-Verify-GacUI-Xml
+            Build-Release-Verify-GacUI-Xml;
+            Write-Title Build-Release-Verify-GacUI-Cpp
             Build-Release-Verify $True;
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, UpdateCommits, Release(UpdateRelease + VerifyRelease)."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, UpdateCommits, Release(UpdateRelease + VerifyRelease(VerifyReleaseWorkflow + VerifyReleaseXml + VerifyReleaseCpp))."
         }
     }
 }
