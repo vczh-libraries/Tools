@@ -51,11 +51,13 @@ function Build-Release-Update() {
         Remove-Item .\Tools\*.bin
         Remove-Item .\Tools\Gac*.ps1
         Remove-Item .\Tools\StartProcess.ps1
+        Remove-Item .\Tools\Executables\vl\makefile-cpp
         .\Tools\CopyExecutables.ps1
         Copy-Item $PSScriptRoot\Reflection32.bin .\Tools
         Copy-Item $PSScriptRoot\Reflection64.bin .\Tools
         Copy-Item $PSScriptRoot\Gac*.ps1 .\Tools
         Copy-Item $PSScriptRoot\StartProcess.ps1 .\Tools
+        Copy-Item $PSScriptRoot\..\Ubuntu\vl\makefile-cpp .\Tools\Executables\vl
 
         # ControlTemplate\BlackSkin
         Write-Host "Deploying Tutorial\GacUI_ControlTemplate\BlackSkin ..."
