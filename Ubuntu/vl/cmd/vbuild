@@ -75,7 +75,7 @@ function Generate {
 
 function Read {
     Check
-    firefox `pwd`./Coverage/HTML/index.html
+    firefox `pwd`/Coverage/HTML/index.html
     #sensible-browser ./Coverage/HTML/index.html 
 }
 
