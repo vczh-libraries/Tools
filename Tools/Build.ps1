@@ -175,7 +175,7 @@ try {
             Write-Title Build-Release-Verify-GacUI-Xml
             Build-Release-Verify-GacUI-Xml;
             Write-Title Build-Release-Verify-GacUI-Cpp
-            Build-Release-Verify $True;
+            Build-Release-Verify-GacUI-Cpp $True;
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
@@ -199,7 +199,7 @@ try {
         }
         "VerifyReleaseCpp" {
             Write-Title Build-Release-Verify-GacUI-Cpp
-            Build-Release-Verify $True;
+            Build-Release-Verify-GacUI-Cpp $True;
         }
         "VerifyRelease" {
             Write-Title Build-Release-Verify-Workflow
@@ -207,7 +207,7 @@ try {
             Write-Title Build-Release-Verify-GacUI-Xml
             Build-Release-Verify-GacUI-Xml;
             Write-Title Build-Release-Verify-GacUI-Cpp
-            Build-Release-Verify $True;
+            Build-Release-Verify-GacUI-Cpp $True;
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
         }
