@@ -170,6 +170,11 @@ try {
         "Release" {
             Write-Title Build-Release
             Build-Release-Update;
+            Write-Title Build-Release-Verify-Workflow
+            Build-Release-Verify-Workflow;
+            Write-Title Build-Release-Verify-GacUI-Xml
+            Build-Release-Verify-GacUI-Xml;
+            Write-Title Build-Release-Verify-GacUI-Cpp
             Build-Release-Verify $True;
             Write-Title "    Check Repo ..."
             & $PSScriptRoot\CheckRepo.ps1 CheckAll
