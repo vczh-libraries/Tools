@@ -107,7 +107,12 @@ try {
             $time_release = [DateTime]::Now
             Write-Title Build-Release
             Build-Release-Update; [Console]::ResetColor()
-            Build-Release-Verify $False; [Console]::ResetColor()
+            Write-Title Build-Release-Verify-Workflow
+            Build-Release-Verify-Workflow; [Console]::ResetColor()
+            Write-Title Build-Release-Verify-GacUI-Xml
+            Build-Release-Verify-GacUI-Xml; [Console]::ResetColor()
+            Write-Title Build-Release-Verify-GacUI-Cpp
+            Build-Release-Verify-GacUI-Cpp $False; [Console]::ResetColor()
 
             $time_finished = [DateTime]::Now
             Write-Title Finished!
