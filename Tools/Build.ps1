@@ -59,6 +59,81 @@ function Update-Repo-Commit-Records {
     Set-Content -Path "$PSScriptRoot\..\..\Release\Import\README.md" -Value $content
 }
 
+function Task-Vlpp {
+    Write-Title Build-Vlpp
+    Build-Vlpp
+}
+
+function Task-VlppOS {
+    Write-Title Build-VlppOS
+    Build-VlppOS
+}
+
+function Task-VlppRegex {
+    Write-Title Build-VlppRegex
+    Build-VlppRegex
+}
+
+function Task-VlppReflection {
+    Write-Title Build-VlppReflection
+    Build-VlppReflection
+}
+
+function Task-VlppParser {
+    Write-Title Build-VlppParser
+    Build-VlppParser
+}
+
+function Task-VlppParser2 {
+    Write-Title Build-VlppParser2
+    Build-VlppParser2
+}
+
+function Task-Workflow {
+    Write-Title Build-Workflow
+    Build-Workflow
+}
+
+function Task-GacUI {
+    Write-Title Build-GacUI
+    Build-GacUI
+}
+
+function Task-Update-Repos {
+    Write-Title Update-Binaries-And-Bundle
+    Update-Binaries-And-Bundle
+}
+
+function Task-Update-ReleaseRepo {
+    Write-Title Build-Release
+    Build-Release-Update
+}
+
+function Task-Verify-Workflow {
+    Write-Title Build-Release-Verify-Workflow
+    Build-Release-Verify-Workflow
+}
+
+function Task-Verify-Xml {
+    Write-Title Build-Release-Verify-GacUI-Xml
+    Build-Release-Verify-GacUI-Xml
+}
+
+function Task-Verify-Cpp {
+    Write-Title Build-Release-Verify-GacUI-Cpp
+    Build-Release-Verify-GacUI-Cpp $False
+}
+
+function Task-Verify-Cpp-OpenFolders {
+    Write-Title Build-Release-Verify-GacUI-Cpp
+    Build-Release-Verify-GacUI-Cpp $True
+}
+
+function Task-Check-Unsubmitted-Repos {
+    Write-Title "    Check Repo ..."
+    & $PSScriptRoot\CheckRepo.ps1 CheckAll
+}
+
 # Prevent from displaying "Debug or Close Application" dialog on crash
 $dontshowui_key = "HKCU:\Software\Microsoft\Windows\Windows Error Reporting"
 $dontshowui_value = (Get-ItemProperty $dontshowui_key).DontShowUI
@@ -69,50 +144,37 @@ try {
     switch ($Project) {
         "" {
             $time_vlpp = [DateTime]::Now
-            Write-Title Build-Vlpp
-            Build-Vlpp; [Console]::ResetColor()
+            Task-Vlpp; [Console]::ResetColor()
 
             $time_vlpp_os = [DateTime]::Now
-            Write-Title Build-VlppOS
-            Build-VlppOS; [Console]::ResetColor()
+            Task-VlppOS; [Console]::ResetColor()
 
             $time_vlpp_regex = [DateTime]::Now
-            Write-Title Build-VlppRegex
-            Build-VlppRegex; [Console]::ResetColor()
+            Task-VlppRegex; [Console]::ResetColor()
 
             $time_vlpp_reflection = [DateTime]::Now
-            Write-Title Build-VlppReflection
-            Build-VlppReflection; [Console]::ResetColor()
+            Task-VlppReflection; [Console]::ResetColor()
 
             $time_vlpp_parser = [DateTime]::Now
-            Write-Title Build-VlppParser
-            Build-VlppParser; [Console]::ResetColor()
+            Task-VlppParser; [Console]::ResetColor()
 
             $time_vlpp_parser2 = [DateTime]::Now
-            Write-Title Build-VlppParser2
-            Build-VlppParser2; [Console]::ResetColor()
+            Task-VlppParser2; [Console]::ResetColor()
 
             $time_workflow = [DateTime]::Now
-            Write-Title Build-Workflow
-            Build-Workflow; [Console]::ResetColor()
+            Task-Workflow; [Console]::ResetColor()
 
             $time_gacui = [DateTime]::Now
-            Write-Title Build-GacUI
-            Build-GacUI; [Console]::ResetColor()
+            Task-GacUI; [Console]::ResetColor()
 
             $time_update = [DateTime]::Now
-            Write-Title Update-Binaries-And-Bundle
-            Update-Binaries-And-Bundle; [Console]::ResetColor()
+            Task-Update-Repos; [Console]::ResetColor()
 
             $time_release = [DateTime]::Now
-            Write-Title Build-Release
-            Build-Release-Update; [Console]::ResetColor()
-            Write-Title Build-Release-Verify-Workflow
-            Build-Release-Verify-Workflow; [Console]::ResetColor()
-            Write-Title Build-Release-Verify-GacUI-Xml
-            Build-Release-Verify-GacUI-Xml; [Console]::ResetColor()
-            Write-Title Build-Release-Verify-GacUI-Cpp
-            Build-Release-Verify-GacUI-Cpp $False; [Console]::ResetColor()
+            Task-Update-ReleaseRepo; [Console]::ResetColor()
+            Task-Verify-Workflow; [Console]::ResetColor()
+            Task-Verify-Xml; [Console]::ResetColor()
+            Task-Verify-Cpp; [Console]::ResetColor()
 
             $time_finished = [DateTime]::Now
             Write-Title Finished!
@@ -129,95 +191,79 @@ try {
             Write-Host "Total        : $((New-TimeSpan $time_vlpp $time_finished).ToString())"
         }
         "Vlpp" {
-            Write-Title Build-Vlpp
-            Build-Vlpp
+            Task-Vlpp
         }
         "VlppOS" {
-            Write-Title Build-VlppOS
-            Build-VlppOS
+            Task-VlppOS
         }
         "VlppRegex" {
-            Write-Title Build-VlppRegex
-            Build-VlppRegex
+            Task-VlppRegex
         }
         "VlppReflection" {
-            Write-Title Build-VlppReflection
-            Build-VlppReflection
+            Task-VlppReflection
         }
         "VlppParser" {
-            Write-Title Build-VlppParser
-            Build-VlppParser
+            Task-VlppParser
         }
         "VlppParser2" {
-            Write-Title Build-VlppParser2
-            Build-VlppParser2
+            Task-VlppParser2
         }
         "Workflow" {
-            Write-Title Build-Workflow
-            Build-Workflow
+            Task-Workflow
         }
         "GacUI" {
-            Write-Title Build-GacUI
-            Build-GacUI
+            Task-GacUI
+        }
+        "UnitTest" {
+            Task-Vlpp
+            Task-VlppOS
+            Task-VlppRegex
+            Task-VlppReflection
+            Task-VlppParser
+            Task-VlppParser2
+            Task-Workflow
+            Task-GacUI
         }
         "Update" {
-            Write-Title Update-Binaries-And-Bundle
-            Update-Binaries-And-Bundle
-            Write-Title "    Check Repo ..."
-            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+            Task-Update-Repos
+            Task-Check-Unsubmitted-Repos
         }
         "UpdateCommits" {
             Write-Title Update-Repo-Commit-Records
             Update-Repo-Commit-Records
-            Write-Title "    Check Repo ..."
-            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+            Task-Check-Unsubmitted-Repos
         }
         "Release" {
-            Write-Title Build-Release
-            Build-Release-Update;
-            Write-Title Build-Release-Verify-Workflow
-            Build-Release-Verify-Workflow;
-            Write-Title Build-Release-Verify-GacUI-Xml
-            Build-Release-Verify-GacUI-Xml;
-            Write-Title Build-Release-Verify-GacUI-Cpp
-            Build-Release-Verify-GacUI-Cpp $True;
-            Write-Title "    Check Repo ..."
-            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+            Task-Update-ReleaseRepo
+            Task-Verify-Workflow
+            Task-Verify-Xml
+            Task-Verify-Cpp-OpenFolders
+            Task-Check-Unsubmitted-Repos
         }
         "UpdateRelease" {
-            Write-Title Build-Release-Update
-            Build-Release-Update $True;
-            Write-Title "    Check Repo ..."
-            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+            Task-Update-ReleaseRepo
+            Task-Check-Unsubmitted-Repos
         }
         "VerifyReleaseWorkflow" {
-            Write-Title Build-Release-Verify-Workflow
-            Build-Release-Verify-Workflow;
-            Write-Title "    Check Repo ..."
-            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+            Task-Verify-Workflow
+            Task-Check-Unsubmitted-Repos
         }
         "VerifyReleaseXml" {
-            Write-Title Build-Release-Verify-GacUI-Xml
-            Build-Release-Verify-GacUI-Xml;
-            Write-Title "    Check Repo ..."
-            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+            Task-Verify-Xml
+            Task-Check-Unsubmitted-Repos
         }
         "VerifyReleaseCpp" {
-            Write-Title Build-Release-Verify-GacUI-Cpp
-            Build-Release-Verify-GacUI-Cpp $True;
+            Task-Verify-Cpp-OpenFolders
+            Task-Check-Unsubmitted-Repos
         }
         "VerifyRelease" {
-            Write-Title Build-Release-Verify-Workflow
-            Build-Release-Verify-Workflow;
-            Write-Title Build-Release-Verify-GacUI-Xml
-            Build-Release-Verify-GacUI-Xml;
-            Write-Title Build-Release-Verify-GacUI-Cpp
-            Build-Release-Verify-GacUI-Cpp $True;
-            Write-Title "    Check Repo ..."
-            & $PSScriptRoot\CheckRepo.ps1 CheckAll
+            Task-Verify-Workflow
+            Task-Verify-Xml
+            Task-Verify-Cpp-OpenFolders
+            Task-Check-Unsubmitted-Repos
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update, UpdateCommits, Release(UpdateRelease + VerifyRelease(VerifyReleaseWorkflow + VerifyReleaseXml + VerifyReleaseCpp))."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: UnitTest(Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI), Update, UpdateCommits, Release(UpdateRelease + VerifyRelease(VerifyReleaseWorkflow + VerifyReleaseXml + VerifyReleaseCpp))."
         }
     }
 }
