@@ -19,9 +19,9 @@ function Write-Title($text) {
 
 function Update-Binaries-Prepare-CodePack {
     Write-Title "    Preparing CodePack ..."
-    if (-not [System.IO.File]::Exists($PSScriptRoot\CodePack.backup.exe)) {
-        if (-not [System.IO.File]::Exists($PSScriptRoot\CodePack.exe)) {
-            if (-not [System.IO.File]::Exists($PSScriptRoot\.Output\CodePack.exe)) {
+    if (-not [System.IO.File]::Exists("$PSScriptRoot\CodePack.backup.exe")) {
+        if (-not [System.IO.File]::Exists("$PSScriptRoot\CodePack.exe")) {
+            if (-not [System.IO.File]::Exists("$PSScriptRoot\.Output\CodePack.exe")) {
                 Build-Tool-CodePack
             } else {
                 Test-Single-Binary CodePack.exe
@@ -54,6 +54,8 @@ function Update-Binaries-And-Bundle {
     Update-VlppReflection
     Update-VlppParser
     Update-VlppParser2
+    
+    Update-Binaries-Prepare-CodePack
     
     Write-Title "    Updating Workflow ..."
     Update-Workflow
