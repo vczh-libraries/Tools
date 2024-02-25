@@ -11,6 +11,16 @@ function Build-VlppParser2 {
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Xml"
 }
 
+function Build-Tool-GlrParserGen {
+    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\GlrParserGen\GlrParserGen.vcxproj Release x86
+    Test-Single-Binary GlrParserGen.exe
+}
+
+function Build-Tool-CodePack {
+    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
+    Test-Single-Binary CodePack.exe
+}
+
 function Update-VlppParser2 {
     # Import
     Import-Project VlppParser2 ("Vlpp","VlppOS","VlppRegex","VlppReflection")
@@ -19,12 +29,8 @@ function Update-VlppParser2 {
     Release-Project VlppParser2
 
     # Build GlrParserGen.exe
-    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\GlrParserGen\GlrParserGen.vcxproj Release x86
-    Test-Single-Binary GlrParserGen.exe
-}
-
-function Build-Tool-CodePack {
+    Build-Tool-GlrParserGen
+    
     # Build CodePack.exe
-    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
-    Test-Single-Binary CodePack.exe
+    Build-Tool-CodePack
 }

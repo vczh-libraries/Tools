@@ -14,8 +14,7 @@ function Test-Vlpp-SubProject($projectName, $subProjectName) {
 }
 
 function Test-Vlpp($projectName) {
-    Test-Vlpp-Platform "$projectName" "UnitTest" Win32 "$PSScriptRoot\..\..\$projectName\Test\UnitTest\Release"
-    Test-Vlpp-Platform "$projectName" "UnitTest" x64 "$PSScriptRoot\..\..\$projectName\Test\UnitTest\x64\Release"
+    Test-Vlpp-SubProject $projectName "UnitTest"
 }
 
 function Build-Vlpp {

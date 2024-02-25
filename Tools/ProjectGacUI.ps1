@@ -30,6 +30,11 @@ function Build-GacUI {
     Test-GacUI-SubProject-Win32 "UnitTest"
 }
 
+function Build-Tool-GacGen {
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32
+    Test-Single-Binary GacGen.exe
+}
+
 function Update-GacUI {
     # Import
     Import-Project GacUI ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","VlppParser2","Workflow")
@@ -39,8 +44,7 @@ function Update-GacUI {
 
     # Release
     Release-Project GacUI
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32
-    Test-Single-Binary GacGen.exe
+    Build-Tool-GacGen
 
     Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore32.bin $PSScriptRoot
     Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore64.bin $PSScriptRoot

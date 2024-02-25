@@ -31,13 +31,6 @@ function Test-Single-Binary($FileName) {
     Copy $PSScriptRoot\.Output\$FileName $PSScriptRoot\$FileName
 }
 
-function Test-Single-Binary-Rename($Source, $Target) {
-    if (!(Test-Path -Path $PSScriptRoot\.Output\$Source)) {
-        throw "Failed"
-    }
-    Copy $PSScriptRoot\.Output\$Source $PSScriptRoot\$Target
-}
-
 function Import-Project($ProjectName, [String[]]$Dependencies) {
     Write-Host "Importing $ProjectName ..."
     Push-Location $PSScriptRoot\..\..\$ProjectName\Import | Out-Null
