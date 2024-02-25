@@ -17,15 +17,35 @@ function Write-Title($text) {
     Write-Host $text -ForegroundColor Blue -BackgroundColor White
 }
 
+function Update-Binaries-Prepare-CodePack {
+    Write-Title "    Preparing CodePack ..."
+    if (-not [System.IO.File]::Exists($PSScriptRoot\CodePack.backup.exe)) {
+        if (-not [System.IO.File]::Exists($PSScriptRoot\CodePack.exe)) {
+            if (-not [System.IO.File]::Exists($PSScriptRoot\.Output\CodePack.exe)) {
+                Build-Tool-CodePack
+            } else {
+                Test-Single-Binary CodePack.exe
+            }
+        }
+        Copy $PSScriptRoot\CodePack.exe $PSScriptRoot\CodePack.backup.exe
+    }
+}
+
 function Update-Binaries-And-Bundle {
     Write-Title "    Cleaning ..."
-    Remove-Item .\*.exe -Force | Out-Null
-    Remove-Item .\*.dll -Force | Out-Null
+    Remove-Item .\CodePack.exe -Force | Out-Null
+    Remove-Item .\CppMerge.exe -Force | Out-Null
+    Remove-Item .\ParserGen.exe -Force | Out-Null
+    Remove-Item .\GlrParserGen.exe -Force | Out-Null
+    Remove-Item .\GacGen.exe -Force | Out-Null
+    Remove-Item .\Reflection32.bin -Force | Out-Null
+    Remove-Item .\Reflection64.bin -Force | Out-Null
+    Remove-Item .\ReflectionCore32.bin -Force | Out-Null
+    Remove-Item .\ReflectionCore64.bin -Force | Out-Null
     Remove-Item .\.Output -Force -Recurse -ErrorAction SilentlyContinue | Out-Null
     New-Item .\.Output -ItemType directory -ErrorAction SilentlyContinue | Out-Null
     
-    Write-Title "    Building CodePack ..."
-    Build-Tool-CodePack
+    Update-Binaries-Prepare-CodePack
     
     Write-Title "    Updating Vlpp ..."
     Update-Vlpp
@@ -226,6 +246,9 @@ try {
             Task-Workflow
             Task-GacUI
             Task-Check-Unsubmitted-Repos
+        }
+        "Update-Prepare-CodePack" {
+            Update-Binaries-Prepare-CodePack
         }
         "Update" {
             Task-Update-Repos
