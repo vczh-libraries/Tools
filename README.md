@@ -9,13 +9,17 @@ Build tools for this organization
 Open PowerShell in folder `Tools` and run:
 
 - `.\Build.ps1`
-- `.\DocGen.ps1`
-- `.\DocGen.ps1 copy`
 
 ## Generate Repo Release in Windows
 
-Open PowerShell in folder `repo\Release` and run:
+To update all repos at the same time, open PowerShell in folder `Tools` and run:
+
+- `.\Build.ps1 -Project Update`
+
+To update only one repo, open PowerShell in folder `repo\Release` and run:
 
 - `..\..\Tools\Tools\CodePack.exe .\CodegenConfig.xml`
 
-`CodePack.exe` is created during **Build Release**
+`CodePack.exe` and `CodePack.backup.exe` could be created by `.\Build.ps1 -Project Update-Prepare-CodePack`.
+
+`CodePack.backup.exe` keeps the last successful `CodePack.exe` build, it will be updated when a new `CodePack.exe` is available.
