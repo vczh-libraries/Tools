@@ -189,6 +189,8 @@ try {
             Write-Host "Update       : $time_update, Elapsed: $((New-TimeSpan $time_update $time_release).ToString())"
             Write-Host "Release      : $time_release, Elapsed: $((New-TimeSpan $time_release $time_finished).ToString())"
             Write-Host "Total        : $((New-TimeSpan $time_vlpp $time_finished).ToString())"
+            
+            Task-Check-Unsubmitted-Repos
         }
         "Vlpp" {
             Task-Vlpp
@@ -223,6 +225,7 @@ try {
             Task-VlppParser2
             Task-Workflow
             Task-GacUI
+            Task-Check-Unsubmitted-Repos
         }
         "Update" {
             Task-Update-Repos
