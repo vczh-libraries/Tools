@@ -8,17 +8,9 @@ function Test-GacUI-Platform($subProjectName, $platform, $outDir) {
     Start-Process-And-Wait (,("$outDir\$subProjectName.exe", ""))
 }
 
-function Test-GacUI-SubProject-Win32($subProjectName) {
-    Test-GacUI-Platform $subProjectName Win32 "$PSScriptRoot\..\..\GacUI\Test\UnitTest\Release"
-}
-
-function Test-GacUI-SubProject-X64($subProjectName) {
-    Test-GacUI-Platform $subProjectName x64 "$PSScriptRoot\..\..\GacUI\Test\UnitTest\x64\Release"
-}
-
 function Test-GacUI-SubProject($subProjectName) {
-    Test-GacUI-SubProject-Win32 $subProjectName
-    Test-GacUI-SubProject-X64 $subProjectName
+    Test-GacUI-Platform $subProjectName Win32 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Release"
+    Test-GacUI-Platform $subProjectName x64 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\x64\Release"
 }
 
 function Build-GacUI {
@@ -27,7 +19,7 @@ function Build-GacUI {
     Test-GacUI-SubProject "Metadata_Test"
 
     # Run test cases
-    Test-GacUI-SubProject-Win32 "UnitTest"
+    Test-GacUI-SubProject "UnitTest"
 }
 
 function Build-Tool-GacGen {

@@ -1,4 +1,5 @@
-function Test-Workflow {
+function Build-Workflow {
+    # Run test cases
     Test-Vlpp-SubProject "Workflow" "LibraryTest"
     Test-Vlpp-SubProject "Workflow" "CompilerTest_GenerateMetadata"
     Test-Vlpp-SubProject "Workflow" "CompilerTest_LoadAndCompile"
@@ -6,11 +7,6 @@ function Test-Workflow {
     Test-Vlpp-SubProject "Workflow" "CppTest_Metaonly"
     Test-Vlpp-SubProject "Workflow" "CppTest_Reflection"
     Test-Vlpp-SubProject "Workflow" "RuntimeTest"
-}
-
-function Build-Workflow {
-    # Run test cases
-    Test-Workflow
 }
 
 function Build-Tool-CppMerge {
