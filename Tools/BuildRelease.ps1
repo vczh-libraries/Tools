@@ -8,6 +8,8 @@ function Build-Release-Update() {
         Write-Host "Copying Source Code ..."
         New-Item .\Import\Skins -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         New-Item .\Import\Skins\DarkSkin -ItemType directory -ErrorAction SilentlyContinue | Out-Null
+        New-Item .\Import\Metadata -ItemType directory -ErrorAction SilentlyContinue | Out-Null
+        New-Item .\Import\Metadata\RemoteProtocol -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         Copy-Item ..\Vlpp\Release\*.h .\Import
         Copy-Item ..\Vlpp\Release\*.cpp .\Import
         Copy-Item ..\Vlpp\Release\*.natvis .\Import
@@ -26,6 +28,8 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Release\Gac*.h .\Import
         Copy-Item ..\GacUI\Release\Gac*.cpp .\Import
         Copy-Item ..\GacUI\Release\DarkSkin* .\Import\Skins\DarkSkin
+        Copy-Item ..\GacUI\Source\PlatformProviders\Remote\Protocol\Protocol*.txt .\Import\Metadata\RemoteProtocol
+        Copy-Item ..\GacUI\Source\PlatformProviders\Remote\Protocol\Metadata\*.json .\Import\Metadata\RemoteProtocol.json
 
         # Copy Tools Sources
         Copy-Item ..\VlppParser2\Tools\CodePack\CodePack\*.h .\Tools\Executables\CodePack
