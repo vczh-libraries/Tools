@@ -50,6 +50,20 @@ $files_gacui = @(
 )
 
 function GeneratePrompt([string]$name, [string[]]$files) {
+    $output_path = "$PSScriptRoot\..\..\$name\.github\copilot-instructions.md"
+    $output_content = "";
+    foreach ($file in $files) {
+        $fragment_path = "$PSScriptRoot\$file"
+        $fragment_content = Get-Content $fragment_path -Raw
+        if ($output_content -eq "") {
+            $output_content = $fragment_content
+        } else {
+            $output_content += "`r`n" + $fragment_content
+        }
+    }
+    Set-Content -Path $output_path -Value $output_content
+    
+    Write-Host Updated: $output_path
 }
 
 GeneratePrompt "Vlpp"           $files_vlpp
