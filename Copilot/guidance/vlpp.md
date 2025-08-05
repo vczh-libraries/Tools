@@ -61,7 +61,7 @@ Some code also use `Exception` as control flows. For example, you could define y
 
 ## Object Modal
 
-Always use `struct` for value types and `class` for reference types, unless for defining new `Error` or `Exception` sub classes, they are `class` but also value types.
+Always use `struct` for value types and `class` for reference types.
 All reference types must inherits from `Object` or other reference types.
 All interface types must virtual inherits from `Interface` or other interface types.
 A reference type must virtual inherits an interface type to implement it.
@@ -71,6 +71,13 @@ Prefer `Ptr<T>` to hold an initialized reference type instead of using C++ point
 There is no `std::weak_ptr<T>` equivalent constructions, use raw C++ pointers in such cases, but you should try your best to avoid it.
 
 `ComPtr<T>` is similar to `Ptr<T>` but it is for COM objects with Windows API only.
+
+### Special Case
+
+Use `class` for defining new `Error` or `Exception` sub classes, although they are value types.
+
+Collection types are also value types, although they implements `IEnumerable<T>` and `IEnumerator<T>`.
+This is also a reason we always use references instead of pointers on `IEnumerable<T>` and `IEnumerator<T>`.
 
 ## Lambda Expressions and Callable Types
 
@@ -88,6 +95,8 @@ There is no `std::weak_ptr<T>` equivalent constructions, use raw C++ pointers in
 
 ## Collection Types
 
+### IEnumerable<T> and IEnumerator<T>
+
 ### Array<T>
 
 ### List<T>
@@ -101,6 +110,8 @@ There is no `std::weak_ptr<T>` equivalent constructions, use raw C++ pointers in
 ### Sorting and Partial Ordering
 
 ## Linq for C++
+
+## Iterating with Collections, Linq, and also C++ Arrays/Pointers/STL Iterators
 
 ## Command Line Interactions for Console Application
 
