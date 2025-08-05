@@ -1,5 +1,6 @@
 # General Instruction
 
+- This project uses C++ 20, you don't need to worry about compatibility with prior version of C++.
 - DO NOT MODIFY any source code in the `Import` folder, they are dependencies.
 - DO NOT MODIFY any source code in the `Release` folder, they are generated release files.
 - You can modify source code in the `Source` and `Test` folder.
