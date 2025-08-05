@@ -4,7 +4,7 @@ $files_vlpp = @(
     "makefile\vlpp.md",
     "general-instructions-2.md",
     "unittest.md",
-    "guidance\vlpp.md",
+    "guidance\vlpp.md"
 )
 
 $files_vlppos = @(
