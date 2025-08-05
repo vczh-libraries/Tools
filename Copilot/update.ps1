@@ -1,49 +1,80 @@
 $files_vlpp = @(
+    "introduction\vlpp.md",
     "general-instructions-1.md",
     "makefile\vlpp.md",
     "general-instructions-2.md",
-    "unittest.md"
+    "unittest.md",
+    "guidance\vlpp.md",
 )
 
 $files_vlppos = @(
+    "introduction\vlppos.md",
     "general-instructions-1.md",
     "makefile\vlppos.md",
     "general-instructions-2.md",
-    "unittest.md"
+    "unittest.md",
+    "guidance\vlpp.md",
+    "guidance\vlppos.md"
 )
 
 $files_vlppregex = @(
+    "introduction\vlppregex.md",
     "general-instructions-1.md",
     "makefile\vlppregex.md",
     "general-instructions-2.md",
-    "unittest.md"
+    "unittest.md",
+    "guidance\vlpp.md",
+    "guidance\vlppregex.md"
 )
 
 $files_vlppreflection = @(
+    "introduction\vlppreflection.md",
     "general-instructions-1.md",
     "makefile\vlppreflection.md",
     "general-instructions-2.md",
-    "unittest.md"
+    "unittest.md",
+    "guidance\vlpp.md",
+    "guidance\vlppos.md",
+    "guidance\vlppregex.md",
+    "guidance\vlppreflection.md"
 )
 
 $files_vlppparser2 = @(
+    "introduction\vlppparser2.md",
     "general-instructions-1.md",
     "makefile\vlppparser2.md",
     "general-instructions-2.md",
-    "unittest.md"
+    "unittest.md",
+    "guidance\vlpp.md",
+    "guidance\vlppos.md",
+    "guidance\vlppregex.md",
+    "guidance\vlppreflection.md",
+    "guidance\vlppparser2.md"
 )
 
 $files_workflow = @(
+    "introduction\workflow.md",
     "general-instructions-1.md",
     "makefile\workflow.md",
     "general-instructions-2.md",
-    "unittest.md"
+    "unittest.md",
+    "guidance\vlpp.md",
+    "guidance\vlppos.md",
+    "guidance\vlppregex.md",
+    "guidance\vlppreflection.md",
+    "guidance\vlppparser2.md"
 )
 
 $files_gacui = @(
+    "introduction\gacui.md",
     "general-instructions-1.md",
     "makefile\gacui.md",
-    "general-instructions-2.md",
+    "general-instructions-2.md",,
+    "guidance\vlpp.md",
+    "guidance\vlppos.md",
+    "guidance\vlppregex.md",
+    "guidance\vlppreflection.md",
+    "guidance\vlppparser2.md",
     "gacui\unittest.md",
     "gacui\xml.md",
     "gacui\workflow.md"

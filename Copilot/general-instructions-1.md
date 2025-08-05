@@ -1,5 +1,3 @@
-In this repo, we are developing a crossed-platform C++ library.
-
 # General Instruction
 
 - DO NOT MODIFY any source code in the `Import` folder, they are dependencies.
