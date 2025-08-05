@@ -1,4 +1,5 @@
 $files_vlpp = @(
+    "general-instructions-role.md",
     "introduction\vlpp.md",
     "general-instructions-1.md",
     "makefile\vlpp.md",
@@ -8,6 +9,7 @@ $files_vlpp = @(
 )
 
 $files_vlppos = @(
+    "general-instructions-role.md",
     "introduction\vlppos.md",
     "general-instructions-1.md",
     "makefile\vlppos.md",
@@ -18,6 +20,7 @@ $files_vlppos = @(
 )
 
 $files_vlppregex = @(
+    "general-instructions-role.md",
     "introduction\vlppregex.md",
     "general-instructions-1.md",
     "makefile\vlppregex.md",
@@ -28,6 +31,7 @@ $files_vlppregex = @(
 )
 
 $files_vlppreflection = @(
+    "general-instructions-role.md",
     "introduction\vlppreflection.md",
     "general-instructions-1.md",
     "makefile\vlppreflection.md",
@@ -40,6 +44,7 @@ $files_vlppreflection = @(
 )
 
 $files_vlppparser2 = @(
+    "general-instructions-role.md",
     "introduction\vlppparser2.md",
     "general-instructions-1.md",
     "makefile\vlppparser2.md",
@@ -53,6 +58,7 @@ $files_vlppparser2 = @(
 )
 
 $files_workflow = @(
+    "general-instructions-role.md",
     "introduction\workflow.md",
     "general-instructions-1.md",
     "makefile\workflow.md",
@@ -66,6 +72,7 @@ $files_workflow = @(
 )
 
 $files_gacui = @(
+    "general-instructions-role.md",
     "introduction\gacui.md",
     "general-instructions-1.md",
     "makefile\gacui.md",

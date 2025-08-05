@@ -23,8 +23,6 @@
 
 - You are on Linux
 
-### Verifying via Unit Test
-
 There are unit test projects that available in Linux, they are authored as makefile.
 To use compile and run a unit test project, you need to `cd` to each folder that stores the makefile, and:
 
