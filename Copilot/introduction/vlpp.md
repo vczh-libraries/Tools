@@ -1,3 +1,4 @@
 # About this repo
 
-This repo contains source code of the `vlpp` project. The goal of this project is to reduce the dependency to STL.
+This repo contains C++ source code of the `Vlpp` project.
+The goal of this project is to reduce the dependency to STL.

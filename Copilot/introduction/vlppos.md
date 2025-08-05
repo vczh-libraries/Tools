@@ -1,1 +1,4 @@
 # About this repo
+
+This repo contains C++ source code of the `VlppOS` project.
+The goal of this project is to make a thin layer of cross-platform OS abstraction.
