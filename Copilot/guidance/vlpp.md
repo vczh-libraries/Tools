@@ -87,6 +87,8 @@ This is also a reason we always use references instead of pointers on `IEnumerab
 
 ## Other Primitive Types
 
+### Nullable<T>
+
 ### Pair<Key, Value>
 
 ### Tuple<T...>
