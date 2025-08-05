@@ -10,15 +10,7 @@
   - Always use `vint` instead of `int`.
   - Always use `L'x'`, `L"x"`, `wchar_t`, `const wchar_t` and `vl::WString`, instead of `std::string` or `std::wstring`.
   - Use my own collection types vl::collections::* instead of std::*
-    - `Array<T>` for array, but if a local C++ ordinary array works, use the ordinary one.
-    - `List<T>` for vector, `SortedList<T>` if elements need to keep ordered.
-    - `Dictionary<K, V>` for 1:1 mapping and `Group<K, V>` for 1:n mapping.
-  - Do not use regular expression unless directed by me.
-- This is the document of dependencies:
-  - `Vlpp`, basic C++ constructions: https://gaclib.net/doc/current/vlpp/home.html
-  - `VlppOS`, a simple OS abstraction: https://gaclib.net/doc/current/vlppos/home.html
-  - `VlppRegex`, regular expression: https://gaclib.net/doc/current/vlppregex/home.html
-  - `VlppReflection`, reflection: https://gaclib.net/doc/current/vlppreflection/home.html
+  - See `Using Vlpp` for more information of how to choose correct C++ data types.
 
 ## for Copilot Chat/Agent in Visual Studio
 
