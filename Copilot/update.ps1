@@ -76,7 +76,7 @@ $files_gacui = @(
     "introduction\gacui.md",
     "general-instructions-1.md",
     "makefile\gacui.md",
-    "general-instructions-2.md",,
+    "general-instructions-2.md",
     "guidance\vlpp.md",
     "guidance\vlppos.md",
     "guidance\vlppregex.md",
