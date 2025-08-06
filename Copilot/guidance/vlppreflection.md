@@ -16,9 +16,18 @@ A reflectable class or interface must inherits from `public vl::reflection::Desc
 Use `AggregatableDescription` to allow a class being inherited in a Workflow script class.
 Sub types of reflectable classes or interfaces do not automatically reflectable, it must uses `Description<T>` or `AggregatableDescription<T>`.
 
+
+When accessing reflectable members or functions, `vl::reflection::description::Value` would be helpful.
+It should be used as a value type.
+When reflection is not enabled, `Value` could still box any value,
+just like `object` in C# or Java, or `std::any` in C++.
+
 A type is reflectable only when it is registered.
 
 ## Type Registration
+
+There are tons of examples in the source code.
+It is strongly recommended to follow those examples to register new types.
 
 - Any registration must happen in `vl::reflection::description`.
 - Type list and interface proxy must happen in `.h` files.
@@ -107,8 +116,150 @@ namespace vl::reflection::description
 
 ### Enum
 
+For any `enum` that works like a list of names:
+```C++
+BEGIN_ENUM_ITEM(MyEnum)
+    ENUM_CLASS_ITEM(FirstItem)
+    ENUM_CLASS_ITEM(SecondItem)
+END_ENUM_ITEM(MyEnum)
+```
+
+For any `enum` that works like a mixable flags, which usually combined using the `|` operator:
+```C++
+BEGIN_ENUM_ITEM_MERGABLE(MyEnum)
+    ENUM_CLASS_ITEM(FirstItem)
+    ENUM_CLASS_ITEM(SecondItem)
+END_ENUM_ITEM(MyEnum)
+```
+
+For items in an `enum class`, use `ENUM_CLASS_ITEM` to list each member.
+
+For items in an `enum`, use `ENUM_ITEM` to list each member.
+
+If the `enum` (not `enum class`) is defined inside other type, use `ENUM_ITEM_NAMESPACE` to declare the type name, followed with `ENUM_NAMESPACE_ITEM` to list each member.
+
 ### Struct
 
-### Interface Proxy
+Register a struct like this:
+```C++
+BEGIN_STRUCT_MEMBER(MyStruct)
+    STRUCT_MEMBER(FirstField)
+    STRUCT_MEMBER(SecondField)
+END_STRUCT_MEMBER(MyStruct)
+```
 
 ### Interface and Class
+
+Register a class like this:
+```C++
+BEGIN_CLASS_MEMBER(MyStruct)
+    CLASS_MEMBER_FIELD(FirstField)
+    CLASS_MEMBER_FIELD(SecondField)
+END_CLASS_MEMBER(MyStruct)
+```
+
+Register an interface like this:
+```C++
+BEGIN_INTERFACE_MEMBER(MyStruct)
+    CLASS_MEMBER_FIELD(FirstField)
+    CLASS_MEMBER_FIELD(SecondField)
+END_INTERFACE_MEMBER(MyStruct)
+```
+
+Class and interface registration shares all macros mentioned below.
+
+There is no constructor for interfaces,
+but in order to allow an interface to be implemented in a class in Workflow script,
+an interface proxy will be required in the header file for that interface.
+
+#### Base Class
+
+Use `CLASS_MEMBER_BASE(name)` to declare all reflectable base classes.
+
+#### Field
+
+Use `CLASS_MEMBER_FIELD(name)` to declare all reflectable member fields.
+
+#### Function Arguments
+
+For constructors and methods, argument names are also required in the declaration.
+
+When there is no argument, use `NO_PARAMETER` for the argument list.
+
+When there are any argument, use `{ L"arg1" _ L"arg2" ... }` for the argument list.
+Here `_` is a must have and should be defined as in the `.cpp` example.
+
+#### Constructor and Overloading
+
+Use `CLASS_MEMBER_CONSTRUCTOR(type, parameters)` to declare a constructor.
+`type` is a function type with two choices, deciding whether the created instance by calling such constructor will be boxed in `Ptr<T>` or not:
+  - `Ptr<Class>(types...)`
+  - `Class*(types...)`
+
+If we want to declare a constructor, but it is an ordinary function C++, we should use `CLASS_MEMBER_EXTERNALCTOR(type, parameters, source)`.
+`source` is the name of the ordinary function.
+
+#### Method and Overloading
+
+Use `CLASS_MEMBER_METHOD(name, parameters)` to declare a method.
+
+Use `CLASS_MEMBER_METHOD(new-name, name, parameters)` to declare a method and change its name in the metadata.
+
+Use `CLASS_MEMBER_METHOD_OVERLOAD(name, parameter, function-type)` and `CLASS_MEMBER_METHOD_OVERLOAD_RENAME(new-name, name, parameter, function-type)` to declare an overloaded method.
+`function-type` must be a pointer type to a member function.
+
+Use `CLASS_MEMBER_EXTERNALMETHOD(name, parameters, function-type, source)` to declare a method but it is an ordinary function C++.
+`function-type` must be a pointer type to a member function.
+`source` is the name of the ordinary function.
+By bringing an ordinary inside a class, the first parameter actually acts as the `this` pointer, so it should not appear in `parameters` or `function-type`.
+
+#### Static Method and Overloading
+
+Use `CLASS_METHOD_STATIC(name, parameters)` to declare a static method.
+
+Use `CLASS_MEMBER_STATIC_METHOD_OVERLOAD(name, parameter, function-type)` and `CLASS_MEMBER_METHOD_OVERLOAD_RENAME(new-name, name, parameter, function-type)` to declare an overloaded method.
+`function-type` must be a pointer type to an ordinary function.
+
+Use `CLASS_MEMBER_STATIC_EXTERNALMETHOD(name, parameters, function-type, source)` to declare a method but it is an ordinary function C++.
+`function-type` must be a pointer type to a member function.
+`source` is the name of the ordinary function.
+
+#### Event
+
+There is no event in C++. But we could still register events for Workflow script.
+An event is a member field of type `Event<T>`, offered in the `Vlpp` project.
+Such field works as an event and we should not register it with `CLASS_MEMBER_FIELD`.
+
+An event could be used to notify a property value changing,
+in this case we can declare such fact in the property registration.
+
+Use `CLASS_MEMBER_EVENT(name)` to register an event.
+
+#### Property
+
+There is no property in C++. But we could still register properties for Workflow script, and redirect its reading and writing to other members.
+
+Use `CLASS_MEMBER_PROPERTY_READONLY(name, getter)` to register a readonly property.
+`getter` should be the name of a registered method without parameter, to return the value of the property.
+
+Use `CLASS_MEMBER_PROPERTY(name, getter, setter)` to register a readonly property.
+`getter` should be the name of a registered method without parameter, to return the value of the property.
+`getter` should be the name of a registered method one parameter, to change the value of the property.
+
+If the getter is `GetX` and the property name is `X`,
+we could replace one `CLASS_MEMBER_METHOD` and one `CLASS_MEMBER_PROPERTY_READONLY` with one single call: `CLASS_MEMBER_PROPERTY_READONLY_FAST(X)`.
+
+If the getter is `GetX`, the setter is `SetX` and the property name is `X`,
+we could replace two `CLASS_MEMBER_METHOD` and one `CLASS_MEMBER_PROPERTY_READONLY` with one single call: `CLASS_MEMBER_PROPERTY_FAST(X)`.
+
+#### Property with Event
+
+If the getter is `GetX`, the triggering event is `XChanged`, and the property name is `X`,
+we could replace one `CLASS_MEMBER_METHOD` and one `CLASS_MEMBER_PROPERTY_READONLY` with one single call: `CLASS_MEMBER_PROPERTY_EVENT_READONLY_FAST(X)`.
+
+If the getter is `GetX`, the setter is `SetX`, the triggering event is `XChanged` and the property name is `X`,
+we could replace two `CLASS_MEMBER_METHOD` and one `CLASS_MEMBER_PROPERTY_READONLY` with one single call: `CLASS_MEMBER_PROPERTY_EVENT_FAST(X)`.
+
+We should still call `CLASS_MEMBER_EVENT` before using `CLASS_MEMBER_PROPERTY_EVENT_READONLY_FAST` or `CLASS_MEMBER_PROPERTY_EVENT_FAST`.
+
+### Interface Proxy
