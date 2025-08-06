@@ -130,9 +130,9 @@ The buffer will be deleted when `MemoryStream` is destroyed.
 
 ### EncoderStream and DecoderStream
 
-An `EncoderStream` transform the data using the given `IEncoder` and then write to a given writable stream.
+An `EncoderStream` transform the data using the given `IEncoder` and then write to a given writable stream. It is write only stream.
 
-A `DecoderStream` read data from a given readable stream and then transform the data using the given `IDecoder`.
+A `DecoderStream` read data from a given readable stream and then transform the data using the given `IDecoder`. It is a read only stream.
 
 By stacking multiple encoders, decoders and stream together, we can create a pipeline of data processing.
 
@@ -158,9 +158,64 @@ Or just use `File` to do the work which is much simpler.
 
 #### UTF Encoding
 
+- `BomEncoder` and `BomDecoder` convert data between `wchar_t` and a specified UTF encoding with BOM added to the very beginning.
+- `UtfGeneralEncoder<Native, Expect>` encode from `Expext` to `Native`, `UtfGeneralDecoder<Native, Expect>` decode from `Native` to `Expect`. They should be one of `wchar_t`, `char8_t`, `char16_t`, `char32_t` and `char16be_t`.
+  - Unlike `BomEncoder` and `BomDecoder`, `UtfGeneralEncoder` and `UtfGeneralDecodes` is without BOM.
+  - `char16be_t` means UTF-16 Big Endian, which is not a C++ native type, it can't be used with any string literal.
+  - There are aliases for them to convert between `wchar_t` and any other UTF encoding:
+    - `Utf8Encoder` and `Utf8Decoder`
+    - `Utf16Encoder` and `Utf16Decoder`
+    - `Utf16BEEncoder` and `Utf16BEDecoder`
+    - `Utf32Encoder` and `Utf32Decoder`
+- `MbcsEncoder` and `MbcsDecoder` convert data between `wchar_t` and `char`, which is ASCII.
+  - `BomEncoder::Mbcs` also handles ASCII meanwhile there is no BOM for ASCII. A `BomEncoder(BomEncoder::Mbcs)` works like a `MbcsEncoder`.
+  - The actual encoding of `char` depends on the user setting in the running OS.
+
+There is a function `TestEncoding` to scan a binary data and guess the most possible UTF encoding.
+
 #### Base64 Encoding
 
+`Utf8Base64Encoder` and `Utf6Base64Decoder` convert between binary data to Base64 in UTF8 encoding.
+They can work with `UtfGeneralEncoder` and `UtfGeneralDecoder` to convert binary data to Base64 in a `WString`.
+Here is some examples:
+
+```C++
+MemoryStream memoryStream;
+{
+  UtfGeneralEncoder<wchar_t, char8_t> u8towEncoder;
+  EncoderStream u8towStream(memoryStream, u8towEncoder);
+  Utf8Base64Encoder base64Encoder;
+  EncoderStream base64Stream(u8t0wStream, base64Encoder);
+  base64Stream.Write(binary ...);
+}
+memoryStream.SeekFromBegin(0);
+{
+  StreamReader reader(memoryStream);
+  auto base64 = reader.ReadToEnd(reader);
+}
+```
+
+```C++
+MemoryStream memoryStreamn;
+{
+  StreamWriter writer(memoryStream);
+  writer.WriteString(base64);
+}
+memoryStream.SeekFromBegin(0);
+{
+  UtfGeneralEncoder<wchar_t, char8_t> wtou8Decoder;
+  DecoderStream wtou8Stream(memoryStream, wtou8Decoder);
+  Utf8Base64Decoder base64Decoder;
+  DecoderStream base64Stream(wtou8Stream, base64Decoder);
+  base64Stream.Read(binary ...);
+}
+```
+
 #### Lzw Encoding
+
+- `LzwEncoder` compress binary data.
+- `LzwDecoder` decompress binary data.
+- There are help functions `CopyStream`, `CompressStream` and `DecompressStream` to make the code simpler.
 
 ### Other Streams
 
