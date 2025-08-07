@@ -12,10 +12,12 @@ Always prefer code that compatible with `VCZH_DEBUG_NO_REFLECTION`.
 
 When reflection is enabled (aka `VCZH_DEBUG_NO_REFLECTION` is not defined), use `vl::reflection::description::GetTypeDescriptor<T>` to get the metadata of a type.
 
-A reflectable class or interface must inherits from `public vl::reflection::Description<the class itself>`.
+A reflectable class must inherits from `public vl::reflection::Description<the class itself>`.
 Use `AggregatableDescription` to allow a class being inherited in a Workflow script class.
 Sub types of reflectable classes or interfaces do not automatically reflectable, it must uses `Description<T>` or `AggregatableDescription<T>`.
 
+A reflectable interface must inherits from `public vl::reflection::Description<the class itself>`.
+If such interface does not implement any other interface, it must inherits from `public vl::reflection::IDescriptable`.
 
 When accessing reflectable members or functions, `vl::reflection::description::Value` would be helpful.
 It should be used as a value type.
@@ -49,11 +51,14 @@ namespace vl::reflection::description
     MY_TYPES(DECL_TYPE_INFO)
 
 #ifdef VCZH_DESCRIPTABLEOBJECT_WITH_METADATA
+#pragma warning(push)
+#pragma warning(disable:4250)
 
     BEGIN_INTERFACE_PROXY...(::my::namespaces::ISecond)
       ...
     END_INTERFACE_PROXY(::my::namespaces::ISecond)
 
+#pragma warning(pop)
 #endif
 #endif
 
@@ -80,6 +85,10 @@ namespace vl::reflection::description
     END_CLASS_MEMBER(::my::namespaces::ISecond)
 
     BEGIN_INTERFACE_MEMBER(::my::namespaces::ISecond)
+        vint Func(vint a, vint b) override
+        {
+            INVOKEGET_INTERFACE_PROXY_NOPARAMS(Func, a, b);
+        }
         ...
     END_INTERFACE_MEMBER(::my::namespaces::ISecond)
 
@@ -152,25 +161,27 @@ END_STRUCT_MEMBER(MyStruct)
 
 Register a class like this:
 ```C++
-BEGIN_CLASS_MEMBER(MyStruct)
+BEGIN_CLASS_MEMBER(MyClass)
     CLASS_MEMBER_FIELD(FirstField)
     CLASS_MEMBER_FIELD(SecondField)
-END_CLASS_MEMBER(MyStruct)
+END_CLASS_MEMBER(MyClass)
 ```
 
 Register an interface like this:
 ```C++
-BEGIN_INTERFACE_MEMBER(MyStruct)
+BEGIN_INTERFACE_MEMBER(IMyInterface)
     CLASS_MEMBER_FIELD(FirstField)
     CLASS_MEMBER_FIELD(SecondField)
-END_INTERFACE_MEMBER(MyStruct)
+END_INTERFACE_MEMBER(IMyInterface)
 ```
 
 Class and interface registration shares all macros mentioned below.
 
-There is no constructor for interfaces,
-but in order to allow an interface to be implemented in a class in Workflow script,
-an interface proxy will be required in the header file for that interface.
+Using `BEGIN_INTERFACE_MEMBER` requires a proxy to EXIST in the header file, which means the interface could be inherited in Workflow script.
+
+Using `BEGIN_INTERFACE_MEMBER_NOPROXY` requires a proxy to NOT EXIAST in the header file, which means the interface could not be inherited in Workflow script.
+
+There is no constructor in an interface.
 
 #### Base Class
 
@@ -263,3 +274,17 @@ we could replace two `CLASS_MEMBER_METHOD` and one `CLASS_MEMBER_PROPERTY_READON
 We should still call `CLASS_MEMBER_EVENT` before using `CLASS_MEMBER_PROPERTY_EVENT_READONLY_FAST` or `CLASS_MEMBER_PROPERTY_EVENT_FAST`.
 
 ### Interface Proxy
+
+An interface proxy begins with the following macros and ends with `END_INTERFACE_PROXY(name)`:
+  - `BEGIN_INTERFACE_PROXY_NOPARENT_RAWPTR(name)`: The interface does not implement other interface (`IDescriptable` doesn't count). When implementing such interface, it will be a raw C++ pointer.
+  - `BEGIN_INTERFACE_PROXY_NOPARENT_SHAREDPTR(name)`: The interface does not implement other interface (`IDescriptable` doesn't count). When implementing such interface, it will be created and boxed in a `Ptr<T>`.
+  - `BEGIN_INTERFACE_PROXY_RAWPTR(name, base-interfaces...)`: All reflectable base interfaces must be listed (`IDescriptable` doesn't count). When implementing such interface, it will be a raw C++ pointer.
+  - `BEGIN_INTERFACE_PROXY_SHAREDPTR(name, base-interfaces...)`: All reflectable base interfaces must be listed (`IDescriptable` doesn't count). When implementing such interface, it will be created and boxed in a `Ptr<T>`.
+
+Inside the proxy, there are functions that implements this interface. In each function implementation there will be only one line of code, from one of the following:
+  - `INVOKE_INTERFACE_PROXY_NOPARAMS(function);`: The function returns void without argument.
+  - `INVOKEGET_INTERFACE_PROXY_NOPARAMS(function);`: The function returns a value without argument.
+  - `INVOKE_INTERFACE_PROXY(function, arguments...);`: The function returns void without argument.
+  - `INVOKEGET_INTERFACE_PROXY(function, arguments...);`: The function returns a value without argument.
+
+The `return` keyword is not necessary as `INVOKEGET_INTERFACE_PROXY_NOPARAMS` or `INVOKEGET_INTERFACE_PROXY` already take care of it.
