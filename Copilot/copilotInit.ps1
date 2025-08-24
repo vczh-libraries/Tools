@@ -10,36 +10,28 @@ if ($slnFiles.Count -eq 0) {
 
 Write-Host "Found solution file: $($slnFiles[0].Name)"
 
-# Create or override the markdown files with the specified content
-$filesToCreate = @{
-    "Copilot_Planning.md" = "# !!!PLANNING!!!"
-    "Copilot_Execution.md" = "# !!!EXECUTION!!!"
-    "Copilot_Task.md" = "# !!!TASK!!!"
-}
+# Copy PowerShell scripts to current working directory
+$scriptsToCopy = @(
+    "copilotExecute.ps1"
+    "copilotPrepare.ps1"
+)
 
 # Files to track in the @Copilot solution folder
-$filesToTrack = @(
+$filesToTrack = $scriptsToCopy + @(
     "Copilot_Execution.md"
     "Copilot_Planning.md"
     "Copilot_Task.md"
-    "copilotExecute.ps1"
 )
 
-# Create each markdown file with the specified content
-foreach ($file in $filesToCreate.GetEnumerator()) {
-    $filePath = ".\$($file.Key)"
-    Write-Host "Creating/overriding $($file.Key)..."
-    $file.Value | Out-File -FilePath $filePath -Encoding UTF8
-}
-
-# Copy copilotExecute.ps1 to current working directory
-$sourceExecuteScript = "$PSScriptRoot\copilotExecute.ps1"
-$targetExecuteScript = ".\copilotExecute.ps1"
-if (Test-Path $sourceExecuteScript) {
-    Write-Host "Copying copilotExecute.ps1 to current directory..."
-    Copy-Item -Path $sourceExecuteScript -Destination $targetExecuteScript -Force
-} else {
-    Write-Host "Warning: copilotExecute.ps1 not found at $sourceExecuteScript"
+foreach ($script in $scriptsToCopy) {
+    $sourceScript = "$PSScriptRoot\$script"
+    $targetScript = ".\$script"
+    if (Test-Path $sourceScript) {
+        Write-Host "Copying $script to current directory..."
+        Copy-Item -Path $sourceScript -Destination $targetScript -Force
+    } else {
+        Write-Host "Warning: $script not found at $sourceScript"
+    }
 }
 
 # Create or update .gitignore to include the markdown files
@@ -107,6 +99,14 @@ if (Test-Path $solutionPath) {
     }
 } else {
     Write-Host "Warning: $($slnFiles[0].Name) not found."
+}
+
+# Execute copilotPrepare.ps1 if it exists
+if (Test-Path ".\copilotPrepare.ps1") {
+    Write-Host "Executing copilotPrepare.ps1..."
+    & ".\copilotPrepare.ps1"
+} else {
+    Write-Host "Warning: copilotPrepare.ps1 not found in current directory."
 }
 
 Write-Host "Copilot initialization completed."
