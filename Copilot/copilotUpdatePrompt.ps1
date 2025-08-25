@@ -137,6 +137,24 @@ function GeneratePrompt([string]$name, [string[]]$files) {
     Set-Content -Path $output_path -Value $output_content
     
     Write-Host Updated: $output_path
+    
+    # Handle prompts folder
+    $prompts_folder = "$PSScriptRoot\..\..\$name\.github\prompts"
+    
+    # Delete the prompts folder if it exists (including all files)
+    if (Test-Path $prompts_folder) {
+        Remove-Item $prompts_folder -Recurse -Force
+    }
+    
+    # Create the prompts folder
+    New-Item -ItemType Directory -Path $prompts_folder -Force | Out-Null
+    
+    # Copy all .md files from the source prompts folder
+    $source_prompts = "$PSScriptRoot\prompts\*.md"
+    if (Test-Path "$PSScriptRoot\prompts") {
+        Copy-Item $source_prompts -Destination $prompts_folder -Force
+        Write-Host "Copied prompts to: $prompts_folder"
+    }
 }
 
 # Define all available projects
