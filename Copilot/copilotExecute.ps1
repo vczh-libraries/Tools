@@ -36,7 +36,7 @@ if ($existingFiles.Count -gt 0) {
     Write-Host "Selected $executableName`: $($latestFile.Path) (Modified: $($latestFile.LastWriteTime))"
 
     # Execute the selected executable and capture the exit code
-    & $latestFile.Path
+    & $latestFile.Path /D
     exit $LASTEXITCODE
 } else {
     throw "No $executableName files found in any of the expected locations."
