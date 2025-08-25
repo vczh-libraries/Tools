@@ -66,8 +66,10 @@ $solutionPath = ".\$($slnFiles[0].Name)"
 # Build the solution items section
 $solutionItems = ($filesToTrack | ForEach-Object { "`t`t$_ = $_" }) -join "`r`n"
 
+$copilotSectionBegin = 'Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Copilot", "@Copilot", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"'
+
 $copilotSection = @"
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Copilot", "@Copilot", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+$copilotSectionBegin
 	ProjectSection(SolutionItems) = preProject
 $solutionItems
 	EndProjectSection
@@ -78,9 +80,33 @@ if (Test-Path $solutionPath) {
     Write-Host "Updating $($slnFiles[0].Name)..."
     $solutionContent = Get-Content $solutionPath -Raw
     
-    # Check if @Copilot section already exists
-    if ($solutionContent -match 'Project\("[^"]+"\) = "@Copilot"') {
-        Write-Host "@Copilot section already exists in solution file."
+    # Check if @Copilot section already exists using exact match
+    $copilotSectionIndex = $solutionContent.IndexOf($copilotSectionBegin)
+    if ($copilotSectionIndex -ge 0) {
+        Write-Host "@Copilot section already exists. Replacing it..."
+        
+        # Find the first EndProject after the copilot section begin
+        $searchStartIndex = $copilotSectionIndex + $copilotSectionBegin.Length
+        $endProjectIndex = $solutionContent.IndexOf("EndProject", $searchStartIndex)
+        
+        if ($endProjectIndex -ge 0) {
+            # Include the EndProject line
+            $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
+            if ($endOfSectionIndex -eq 0) {
+                $endOfSectionIndex = $endProjectIndex + "EndProject".Length
+            }
+            
+            # Remove the existing copilot section
+            $beforeCopilot = $solutionContent.Substring(0, $copilotSectionIndex)
+            $afterCopilot = $solutionContent.Substring($endOfSectionIndex)
+            
+            # Insert the new copilot section
+            $newContent = $beforeCopilot.TrimEnd() + "`r`n" + $copilotSection + "`r`n" + $afterCopilot.TrimStart()
+            $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
+            Write-Host "@Copilot section replaced in solution file."
+        } else {
+            Write-Host "Warning: Could not find EndProject after @Copilot section. Skipping replacement."
+        }
     } else {
         # Find the position to insert (before Global section)
         $globalSectionIndex = $solutionContent.IndexOf("Global")
