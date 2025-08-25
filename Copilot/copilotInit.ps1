@@ -80,49 +80,46 @@ if (Test-Path $solutionPath) {
     Write-Host "Updating $($slnFiles[0].Name)..."
     $solutionContent = Get-Content $solutionPath -Raw
     
-    # Check if @Copilot section already exists using exact match
+    # Find content before and after copilot section
     $copilotSectionIndex = $solutionContent.IndexOf($copilotSectionBegin)
+    
     if ($copilotSectionIndex -ge 0) {
+        # Copilot section exists - find where it ends
         Write-Host "@Copilot section already exists. Replacing it..."
-        
-        # Find the first EndProject after the copilot section begin
         $searchStartIndex = $copilotSectionIndex + $copilotSectionBegin.Length
         $endProjectIndex = $solutionContent.IndexOf("EndProject", $searchStartIndex)
         
         if ($endProjectIndex -ge 0) {
-            # Include the EndProject line
             $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
             if ($endOfSectionIndex -eq 0) {
                 $endOfSectionIndex = $endProjectIndex + "EndProject".Length
             }
             
-            # Remove the existing copilot section
             $beforeCopilot = $solutionContent.Substring(0, $copilotSectionIndex)
             $afterCopilot = $solutionContent.Substring($endOfSectionIndex)
-            
-            # Insert the new copilot section
-            $newContent = $beforeCopilot.TrimEnd() + "`r`n" + $copilotSection + "`r`n" + $afterCopilot.TrimStart()
-            $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
-            Write-Host "@Copilot section replaced in solution file."
         } else {
             Write-Host "Warning: Could not find EndProject after @Copilot section. Skipping replacement."
+            return
         }
     } else {
-        # Find the position to insert (before Global section)
+        # Copilot section doesn't exist - insert before Global section
+        Write-Host "@Copilot section not found. Adding it..."
         $globalSectionIndex = $solutionContent.IndexOf("Global")
+        
         if ($globalSectionIndex -gt 0) {
-            $beforeGlobal = $solutionContent.Substring(0, $globalSectionIndex).TrimEnd()
-            $afterGlobal = $solutionContent.Substring($globalSectionIndex)
-            $newContent = $beforeGlobal + "`r`n" + $copilotSection + "`r`n" + $afterGlobal
-            $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
-            Write-Host "@Copilot section added to solution file."
+            $beforeCopilot = $solutionContent.Substring(0, $globalSectionIndex)
+            $afterCopilot = $solutionContent.Substring($globalSectionIndex)
         } else {
-            # If no Global section found, append at the end
-            $newContent = $solutionContent.TrimEnd() + "`r`n" + $copilotSection + "`r`n"
-            $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
-            Write-Host "@Copilot section appended to solution file."
+            # No Global section - append at end
+            $beforeCopilot = $solutionContent
+            $afterCopilot = ""
         }
     }
+    
+    # Combine the three parts and write to file
+    $newContent = $beforeCopilot.TrimEnd() + "`r`n" + $copilotSection + "`r`n" + $afterCopilot.TrimStart()
+    $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
+    Write-Host "@Copilot section updated in solution file."
 } else {
     Write-Host "Warning: $($slnFiles[0].Name) not found."
 }
