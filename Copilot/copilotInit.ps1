@@ -109,4 +109,27 @@ if (Test-Path ".\copilotPrepare.ps1") {
     Write-Host "Warning: copilotPrepare.ps1 not found in current directory."
 }
 
+# Extract project name from current working directory
+$currentPath = Get-Location
+$pathParts = $currentPath.Path.Split('\')
+$vczhLibrariesIndex = -1
+
+# Find the VczhLibraries part in the path
+for ($i = 0; $i -lt $pathParts.Length; $i++) {
+    if ($pathParts[$i] -eq "VczhLibraries") {
+        $vczhLibrariesIndex = $i
+        break
+    }
+}
+
+if ($vczhLibrariesIndex -ne -1 -and ($vczhLibrariesIndex + 1) -lt $pathParts.Length) {
+    $projectName = $pathParts[$vczhLibrariesIndex + 1]
+    Write-Host "Detected project name: $projectName"
+    
+    # Call copilotUpdatePrompt with the detected project name
+    & "$PSScriptRoot\copilotUpdatePrompt.ps1" -Project $projectName
+} else {
+    Write-Host "Warning: Could not detect project name from current path."
+}
+
 Write-Host "Copilot initialization completed."
