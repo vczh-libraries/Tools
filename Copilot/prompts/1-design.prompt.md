@@ -1,5 +1,4 @@
 # Design
-# Design
 
 - The problem I would like to solve is in the chat messages sending with this request, under the `#Problem` section. If there are other sections, they are extra instructions for you in higher priority.
 - Before solving my problem, read `Copilot_Task.md` and find if there is any `# !!!FINISHED!!!` mark.
