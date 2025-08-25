@@ -1,3 +1,7 @@
+param(
+    [string]$Project = ""
+)
+
 $files_vlpp = @(
     "general-instructions-role.md",
     "introduction\vlpp.md",
@@ -104,10 +108,33 @@ function GeneratePrompt([string]$name, [string[]]$files) {
     Write-Host Updated: $output_path
 }
 
-GeneratePrompt "Vlpp"           $files_vlpp
-GeneratePrompt "VlppOS"         $files_vlppos
-GeneratePrompt "VlppRegex"      $files_vlppregex
-GeneratePrompt "VlppReflection" $files_vlppreflection
-GeneratePrompt "VlppParser2"    $files_vlppparser2
-GeneratePrompt "Workflow"       $files_workflow
-GeneratePrompt "GacUI"          $files_gacui
+# Define all available projects
+$projects = @{
+    "Vlpp"           = $files_vlpp
+    "VlppOS"         = $files_vlppos
+    "VlppRegex"      = $files_vlppregex
+    "VlppReflection" = $files_vlppreflection
+    "VlppParser2"    = $files_vlppparser2
+    "Workflow"       = $files_workflow
+    "GacUI"          = $files_gacui
+}
+
+# Check if a project was specified
+if ($Project -eq "") {
+    Write-Host "Please specify a project name. Available projects:"
+    foreach ($projectName in $projects.Keys | Sort-Object) {
+        Write-Host "  $projectName"
+    }
+    exit 1
+}
+
+# Check if the specified project exists and execute
+if ($projects.ContainsKey($Project)) {
+    GeneratePrompt $Project $projects[$Project]
+} else {
+    Write-Host "Project '$Project' not found. Available projects:"
+    foreach ($projectName in $projects.Keys | Sort-Object) {
+        Write-Host "  $projectName"
+    }
+    exit 1
+}
