@@ -87,9 +87,16 @@ if (Test-Path $solutionPath) {
         # Copilot section exists - find where it ends
         Write-Host "@Copilot section already exists. Replacing it..."
         $searchStartIndex = $copilotSectionIndex + $copilotSectionBegin.Length
-        $endProjectIndex = $solutionContent.IndexOf("EndProject", $searchStartIndex)
         
-        if ($endProjectIndex -ge 0) {
+        # Use regex to find EndProject at the beginning of a line (with possible whitespace)
+        # This prevents matching EndProjectSection which is indented
+        $endProjectPattern = '(?m)^(\s*)EndProject(?!\w)'
+        $searchContent = $solutionContent.Substring($searchStartIndex)
+        $endProjectMatch = [regex]::Match($searchContent, $endProjectPattern)
+        
+        if ($endProjectMatch.Success) {
+            # Adjust the index to account for the substring offset
+            $endProjectIndex = $searchStartIndex + $endProjectMatch.Index
             $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
             if ($endOfSectionIndex -eq 0) {
                 $endOfSectionIndex = $endProjectIndex + "EndProject".Length
