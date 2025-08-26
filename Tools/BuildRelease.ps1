@@ -84,14 +84,14 @@ function Build-Release-Verify-Workflow {
     try {
         # Debug Build
         Write-Host "Create Debug Builds ..."
-        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\\Tutorial\Console_Workflow\Debug\
+        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\Tutorial\Console_Workflow\Debug\
 
         # Codegen
         .\Tutorial\Console_Workflow\Debug\W05_Compile.exe
         
         # Debug Build After Codegen
         Write-Host "Create Debug Builds After Codegen..."
-        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\\Tutorial\Console_Workflow\Debug\
+        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\Tutorial\Console_Workflow\Debug\
     }
     catch {
         throw
