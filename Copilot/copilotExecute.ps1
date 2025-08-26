@@ -10,29 +10,23 @@ if (-not $Executable.EndsWith(".exe")) {
     $executableName = $Executable
 }
 
-# Define the possible paths for the executable relative to the script location
-$possiblePaths = @(
-    "$PSScriptRoot\Debug\$executableName",
-    "$PSScriptRoot\Release\$executableName",
-    "$PSScriptRoot\x64\Debug\$executableName",
-    "$PSScriptRoot\x64\Release\$executableName"
-)
-
-# Define corresponding configuration/platform mappings for .vcxproj.user
-$configPlatformMap = @{
-    "$PSScriptRoot\Debug\$executableName" = "Debug|Win32"
-    "$PSScriptRoot\Release\$executableName" = "Release|Win32"
-    "$PSScriptRoot\x64\Debug\$executableName" = "Debug|x64"
-    "$PSScriptRoot\x64\Release\$executableName" = "Release|x64"
+# Define configuration to path mappings
+$configToPathMap = @{
+    "Debug|Win32" = "$PSScriptRoot\Debug\$executableName"
+    "Release|Win32" = "$PSScriptRoot\Release\$executableName"
+    "Debug|x64" = "$PSScriptRoot\x64\Debug\$executableName"
+    "Release|x64" = "$PSScriptRoot\x64\Release\$executableName"
 }
 
-# Find existing files and get their modification times
+# Find existing files and get their modification times with configuration info
 $existingFiles = @()
-foreach ($path in $possiblePaths) {
+foreach ($config in $configToPathMap.Keys) {
+    $path = $configToPathMap[$config]
     if (Test-Path $path) {
         $fileInfo = Get-Item $path
         $existingFiles += [PSCustomObject]@{
             Path = $path
+            Configuration = $config
             LastWriteTime = $fileInfo.LastWriteTime
         }
     }
@@ -50,7 +44,7 @@ if ($existingFiles.Count -gt 0) {
     if (Test-Path $userProjectFile) {
         try {
             [xml]$userProjectXml = Get-Content $userProjectFile
-            $configPlatform = $configPlatformMap[$latestFile.Path]
+            $configPlatform = $latestFile.Configuration
             
             if ($configPlatform) {
                 # Find the PropertyGroup with the matching Condition
