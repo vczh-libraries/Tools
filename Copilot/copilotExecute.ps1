@@ -18,6 +18,14 @@ $possiblePaths = @(
     "$PSScriptRoot\x64\Release\$executableName"
 )
 
+# Define corresponding configuration/platform mappings for .vcxproj.user
+$configPlatformMap = @{
+    "$PSScriptRoot\Debug\$executableName" = "Debug|Win32"
+    "$PSScriptRoot\Release\$executableName" = "Release|Win32"
+    "$PSScriptRoot\x64\Debug\$executableName" = "Debug|x64"
+    "$PSScriptRoot\x64\Release\$executableName" = "Release|x64"
+}
+
 # Find existing files and get their modification times
 $existingFiles = @()
 foreach ($path in $possiblePaths) {
@@ -35,8 +43,36 @@ if ($existingFiles.Count -gt 0) {
     $latestFile = $existingFiles | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     Write-Host "Selected $executableName`: $($latestFile.Path) (Modified: $($latestFile.LastWriteTime))"
 
-    # Execute the selected executable and capture the exit code
-    & $latestFile.Path /D
+    # Try to read debug arguments from the corresponding .vcxproj.user file
+    $userProjectFile = "$PSScriptRoot\$Executable\$Executable.vcxproj.user"
+    $debugArgs = ""
+
+    if (Test-Path $userProjectFile) {
+        try {
+            [xml]$userProjectXml = Get-Content $userProjectFile
+            $configPlatform = $configPlatformMap[$latestFile.Path]
+            
+            if ($configPlatform) {
+                # Find the PropertyGroup with the matching Condition
+                $propertyGroup = $userProjectXml.Project.PropertyGroup | Where-Object { 
+                    $_.Condition -eq "'`$(Configuration)|`$(Platform)'=='$configPlatform'" 
+                }
+                
+                if ($propertyGroup -and $propertyGroup.LocalDebuggerCommandArguments) {
+                    $debugArgs = $propertyGroup.LocalDebuggerCommandArguments
+                    Write-Host "Found debug arguments: $debugArgs"
+                }
+            }
+        }
+        catch {
+            Write-Host "Warning: Could not read debug arguments from $userProjectFile"
+        }
+    } else {
+		Write-Host "Failed to find $userProjectFile"
+	}
+
+    # Execute the selected executable with debug arguments if found
+    & $latestFile.Path /D $debugArgs
     exit $LASTEXITCODE
 } else {
     throw "No $executableName files found in any of the expected locations."
