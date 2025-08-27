@@ -140,9 +140,9 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Using Global Storage for Memory Leak Detection](KB_Vlpp_Memory_UsingGlobalStorageForMemoryLeakDetection.md)
 
 #### Function Types
-- * [Using Func for Callable Objects](KB_Vlpp_Lambda_UsingFunc.md)
-- * [Using Event for Multiple Callbacks](KB_Vlpp_Lambda_UsingEvent.md)
-- * [Working with Lambda Expressions](KB_Vlpp_Lambda_WorkingWithLambdaExpressions.md)
+- [Using Func for Callable Objects](KB_Vlpp_Lambda_UsingFunc.md)
+- [Using Event for Multiple Callbacks](KB_Vlpp_Lambda_UsingEvent.md)
+- [Working with Lambda Expressions](KB_Vlpp_Lambda_WorkingWithLambdaExpressions.md)
 
 #### Tuple Types
 - * [Using Pair for Two Values](KB_Vlpp_Primitives_UsingPair.md)

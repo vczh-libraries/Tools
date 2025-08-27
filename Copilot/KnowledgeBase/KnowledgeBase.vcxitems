@@ -26,6 +26,9 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingSortedList.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingSortFunction.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_WorkingWithIEnumerable.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Lambda_UsingEvent.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Lambda_UsingFunc.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Lambda_WorkingWithLambdaExpressions.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Memory_DefiningGlobalStorageClasses.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Memory_UsingComPtr.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Memory_UsingGlobalStorageForMemoryLeakDetection.md" />
