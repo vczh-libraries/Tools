@@ -38,6 +38,10 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Memory_UsingNullable.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Memory_UsingPtr.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Memory_WorkingWithRawPointers.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Object_DefiningClassForReferenceTypes.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Object_DefiningStructForValueTypes.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Object_WorkingWithInterfaceBaseClass.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Object_WorkingWithObjectBaseClass.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Primitives_UsingPair.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Primitives_UsingTuple.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Primitives_UsingVariant.md" />

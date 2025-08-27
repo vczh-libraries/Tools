@@ -159,10 +159,10 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Using CHECK_FAIL Macro](KB_Vlpp_Exception_UsingCHECK_FAIL.md)
 
 #### Object Model
-- * [Defining Struct for Value Types](KB_Vlpp_Object_DefiningStructForValueTypes.md)
-- * [Defining Class for Reference Types](KB_Vlpp_Object_DefiningClassForReferenceTypes.md)
-- * [Working with Object Base Class](KB_Vlpp_Object_WorkingWithObjectBaseClass.md)
-- * [Working with Interface Base Class](KB_Vlpp_Object_WorkingWithInterfaceBaseClass.md)
+- [Defining Struct for Value Types](KB_Vlpp_Object_DefiningStructForValueTypes.md)
+- [Defining Class for Reference Types](KB_Vlpp_Object_DefiningClassForReferenceTypes.md)
+- [Working with Object Base Class](KB_Vlpp_Object_WorkingWithObjectBaseClass.md)
+- [Working with Interface Base Class](KB_Vlpp_Object_WorkingWithInterfaceBaseClass.md)
 
 #### Console Operations
 - * [Using Console Write and WriteLine](KB_Vlpp_Console_UsingConsoleWriteAndWriteLine.md)
