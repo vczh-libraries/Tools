@@ -16,6 +16,7 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Index.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenUTFEncodings.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingNumbersToStrings.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingStringsToNumbers.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_WorkingWithUtfAndAnsiStringTypes.md" />
   </ItemGroup>
