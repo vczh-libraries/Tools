@@ -57,12 +57,6 @@ if (stringPtr)
     Console::WriteLine(L"String value: " + *stringPtr);
 }
 
-auto intPtr = value.TryGet<vint>();
-if (intPtr == nullptr)
-{
-    Console::WriteLine(L"Not an integer");
-}
-
 // Direct access - only use when certain of type
 if (value.Index() == 0)  // WString is at index 0
 {
@@ -73,7 +67,7 @@ if (value.Index() == 0)  // WString is at index 0
 
 ## Working with Nullable Variants
 
-If you need a variant that can be empty, add `nullptr_t` to the type list instead of using `Nullable<Variant<...>>`:
+If you need a variant that can be empty, add `nullptr_t` to the type list:
 
 ```cpp
 // Variant that can be empty
@@ -95,7 +89,7 @@ optionalValue = 123;
 
 ## Variant with Apply
 
-Use `Apply` with a callback to handle the value generically. The callback must handle all possible types:
+Use `Apply` with a callback to handle the value generically:
 
 ```cpp
 Variant<WString, vint, bool> value = 42;
@@ -138,8 +132,6 @@ value.Apply(Overloading(
 ));
 ```
 
-This approach is cleaner and more readable than template lambdas when you need different handling for each type.
-
 ## Partial Handling with TryApply
 
 Use `TryApply` when you don't need to handle every possible type:
@@ -167,64 +159,6 @@ if (!handled)
 
 ## Common Patterns
 
-### State Machine Implementation
-
-```cpp
-enum class State { Idle, Processing, Error };
-
-struct IdleState { WString message; };
-struct ProcessingState { vint progress; };
-struct ErrorState { WString error; };
-
-using MachineState = Variant<IdleState, ProcessingState, ErrorState>;
-
-class StateMachine
-{
-private:
-    MachineState currentState = IdleState{ L"Ready" };
-
-public:
-    void ProcessEvent()
-    {
-        currentState.Apply(Overloading(
-            [&](const IdleState& idle) {
-                Console::WriteLine(L"Starting from: " + idle.message);
-                currentState = ProcessingState{ 0 };
-            },
-            [&](const ProcessingState& processing) {
-                if (processing.progress < 100)
-                {
-                    currentState = ProcessingState{ processing.progress + 10 };
-                }
-                else
-                {
-                    currentState = IdleState{ L"Completed" };
-                }
-            },
-            [&](const ErrorState& error) {
-                Console::WriteLine(L"Error: " + error.error);
-                currentState = IdleState{ L"Reset after error" };
-            }
-        ));
-    }
-
-    WString GetStatusString()
-    {
-        return currentState.Apply(Overloading(
-            [](const IdleState& idle) -> WString {
-                return L"Idle: " + idle.message;
-            },
-            [](const ProcessingState& processing) -> WString {
-                return L"Processing: " + itow(processing.progress) + L"%";
-            },
-            [](const ErrorState& error) -> WString {
-                return L"Error: " + error.error;
-            }
-        ));
-    }
-};
-```
-
 ### Configuration Value Storage
 
 ```cpp
@@ -237,7 +171,6 @@ public:
     ConfigValue(const WString& str) : value(str) {}
     ConfigValue(vint num) : value(num) {}
     ConfigValue(bool flag) : value(flag) {}
-    ConfigValue(double num) : value(num) {}
 
     WString ToString()
     {
@@ -261,33 +194,15 @@ public:
         return false;
     }
 };
-
-// Usage
-Dictionary<WString, ConfigValue> config;
-config.Add(L"timeout", ConfigValue(30));
-config.Add(L"enabled", ConfigValue(true));
-config.Add(L"server", ConfigValue(L"localhost"));
-
-// Retrieve values safely
-vint timeout;
-if (config[L"timeout"].TryGetValue(timeout))
-{
-    Console::WriteLine(L"Timeout: " + itow(timeout));
-}
 ```
 
 ## Best Practices
 
 1. **Use Overloading for Type-Specific Handling**: When each type needs different processing, `Overloading` is more readable than template lambdas.
-
 2. **Prefer TryGet for Safe Access**: Use `TryGet<T>()` instead of `Get<T>()` unless you're certain about the type.
-
 3. **Consider nullptr_t for Optional Values**: Add `nullptr_t` to the type list for variants that can be empty.
-
 4. **Use TryApply for Partial Handling**: When you only care about some types, `TryApply` is more appropriate than `Apply`.
-
 5. **Keep Type Lists Small**: Too many types in a variant can make it unwieldy. Consider redesigning if you have more than 5-6 types.
-
 6. **Document Type Indices**: Since `Index()` returns numeric values, document what each index represents for clarity.
 
 The `Variant<T...>` type provides a powerful and type-safe way to implement union types in C++, enabling elegant solutions for state machines, configuration systems, and any scenario where a value can be one of several different types.

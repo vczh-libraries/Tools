@@ -23,65 +23,36 @@ Vlpp provides dedicated functions to convert integers and unsigned integers to `
 #include "Vlpp.h"
 using namespace vl;
 
-void ConvertBasicIntegers()
-{
-    // Convert signed integers
-    vint signedNumber = 42;
-    WString signedStr = itow(signedNumber);
-    // signedStr contains L"42"
-    
-    // Convert unsigned integers
-    vuint unsignedNumber = 100U;
-    WString unsignedStr = utow(unsignedNumber);
-    // unsignedStr contains L"100"
-}
+// Convert signed integers
+vint signedNumber = 42;
+WString signedStr = itow(signedNumber);      // L"42"
+
+// Convert unsigned integers
+vuint unsignedNumber = 100U;
+WString unsignedStr = utow(unsignedNumber);  // L"100"
+
+// Convert negative numbers
+vint negativeNumber = -123;
+WString negativeStr = itow(negativeNumber);  // L"-123"
 ```
 
 ### Converting 64-bit Integer Types
 
 ```cpp
-#include "Vlpp.h"
-using namespace vl;
+// Convert 64-bit signed integers
+vint64_t largeSignedNumber = 9223372036854775807LL;
+WString largeSignedStr = i64tow(largeSignedNumber);
+// L"9223372036854775807"
 
-void Convert64BitIntegers()
-{
-    // Convert 64-bit signed integers
-    vint64_t largeSignedNumber = 9223372036854775807LL;
-    WString largeSignedStr = i64tow(largeSignedNumber);
-    // largeSignedStr contains L"9223372036854775807"
-    
-    // Convert 64-bit unsigned integers
-    vuint64_t largeUnsignedNumber = 18446744073709551615ULL;
-    WString largeUnsignedStr = u64tow(largeUnsignedNumber);
-    // largeUnsignedStr contains L"18446744073709551615"
-}
-```
-
-### Converting Negative Numbers
-
-```cpp
-#include "Vlpp.h"
-using namespace vl;
-
-void ConvertNegativeNumbers()
-{
-    // Negative numbers work naturally with signed conversion functions
-    vint negativeNumber = -123;
-    WString negativeStr = itow(negativeNumber);
-    // negativeStr contains L"-123"
-    
-    vint64_t largeNegativeNumber = -9223372036854775808LL;
-    WString largeNegativeStr = i64tow(largeNegativeNumber);
-    // largeNegativeStr contains L"-9223372036854775808"
-}
+// Convert 64-bit unsigned integers
+vuint64_t largeUnsignedNumber = 18446744073709551615ULL;
+WString largeUnsignedStr = u64tow(largeUnsignedNumber);
+// L"18446744073709551615"
 ```
 
 ### Practical Usage in Applications
 
 ```cpp
-#include "Vlpp.h"
-using namespace vl;
-
 void BuildUserMessage()
 {
     vint totalItems = 1250;
@@ -92,9 +63,15 @@ void BuildUserMessage()
                     + L" items processed, "
                     + u64tow(bytesProcessed) 
                     + L" bytes transferred.";
-    
-    // message contains: L"Processing completed: 1250 items processed, 524288000 bytes transferred."
 }
+
+// Building error messages with line numbers
+vint lineNumber = 42;
+WString error = L"Syntax error on line " + itow(lineNumber);
+
+// Formatting IDs and counts
+vuint userId = 12345;
+WString userInfo = L"User ID: " + utow(userId);
 ```
 
 ## Type Recommendations
@@ -111,6 +88,10 @@ For the reverse operation (string to number conversion), see:
 - `wtoi64()` - Convert `WString` to `vint64_t`
 - `wtou()` - Convert `WString` to `vuint`
 - `wtou64()` - Convert `WString` to `vuint64_t`
+
+For floating-point conversions:
+- `ftow()` - Convert `double` to `WString`
+- `wtof()` - Convert `WString` to `double`
 
 ## Implementation Details
 

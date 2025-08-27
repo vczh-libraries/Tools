@@ -7,7 +7,6 @@
 ## Basic Usage
 
 ### Creating a Tuple
-
 ```cpp
 #include "Vlpp.h"
 using namespace vl;
@@ -20,18 +19,15 @@ auto coordinates = Tuple(10, 20, 30);  // Creates Tuple<int, int, int>
 
 // Mixed types
 auto record = Tuple(L"Document.txt", DateTime::LocalTime(), 1024);
-// Creates Tuple<const wchar_t*, DateTime, int>
 
 // From variables
 WString name = L"Bob";
 vint age = 25;
-bool isActive = true;
-auto person = Tuple(name, age, isActive);  // Creates Tuple<WString, vint, bool>
+auto person = Tuple(name, age, true);
 ```
 
 ### Accessing Values
-
-Values in a tuple can be accessed using the `get<Index>()` method where the index must be a compile-time constant. The returned reference is mutable if the tuple itself is non-const:
+Values in a tuple can be accessed using the `get<Index>()` method where the index must be a compile-time constant:
 
 ```cpp
 Tuple<WString, vint, bool> student(L"Charlie", 88, false);
@@ -45,33 +41,11 @@ bool isHonor = student.get<2>();    // false
 student.get<1>() = 95;  // OK: Modify the score
 student.get<2>() = true; // OK: Modify the honor status
 
-// For const tuples, get<> returns immutable references
-const Tuple<WString, vint, bool> constStudent(L"David", 92, true);
-// constStudent.get<1>() = 85;  // ERROR: Cannot modify const tuple elements
-
 // Index must be compile-time constant
 // student.get<i>();  // ERROR: i must be constexpr
 ```
 
-### Assignment and Immutability
-
-```cpp
-Tuple<WString, vint> original(L"Test", 100);
-
-// Individual elements can be modified for non-const tuples
-original.get<0>() = L"Modified";  // OK: Change the first element
-original.get<1>() = 200;          // OK: Change the second element
-
-// You can also assign entire tuples
-original = Tuple(L"New Value", 300);
-
-// Or assign from another compatible tuple
-Tuple<WString, vint> another(L"Another", 150);
-original = another;
-```
-
-## Working with Structured Binding
-
+## Structured Binding
 `Tuple<T...>` supports structured binding, which provides a more convenient way to access all values:
 
 ```cpp
@@ -81,13 +55,9 @@ Tuple<WString, vint, bool> student(L"David", 92, true);
 auto [name, score, isHonor] = student;
 Console::WriteLine(name + L" scored " + itow(score));
 
-// You can also use specific types
-const auto& [studentName, studentScore, honorStatus] = student;
-
-// In range-based for loops (when iterating over containers of tuples)
+// In range-based for loops
 List<Tuple<WString, vint>> grades;
 grades.Add(Tuple(L"Alice", 95));
-grades.Add(Tuple(L"Bob", 88));
 
 for (auto [name, grade] : grades)
 {
@@ -96,31 +66,22 @@ for (auto [name, grade] : grades)
 ```
 
 ## Comparison Operations
-
 `Tuple<T...>` supports comparison operations when all contained types are comparable:
 
 ```cpp
 Tuple<vint, WString> a(1, L"first");
 Tuple<vint, WString> b(1, L"second");
-Tuple<vint, WString> c(2, L"first");
 
 // Equality comparison
 bool equal = (a == b);  // false (different second values)
 
 // Ordering comparison (lexicographic - compares elements in order)
-auto ordering = a <=> b;  // std::strong_ordering::less ("first" < "second")
-bool isLess = a < c;      // true (1 < 2)
-
-// Same first element, compare second element
-Tuple<vint, vint> x(5, 10);
-Tuple<vint, vint> y(5, 20);
-bool xLessY = x < y;  // true (same first, 10 < 20)
+bool isLess = a < b;  // true ("first" < "second")
 ```
 
 ## Common Use Cases
 
-### Returning Multiple Values from Functions
-
+### Returning Multiple Values
 ```cpp
 // Function returning multiple related values
 Tuple<vint, vint, double> AnalyzeNumbers(const Array<vint>& numbers)
@@ -144,23 +105,32 @@ Tuple<vint, vint, double> AnalyzeNumbers(const Array<vint>& numbers)
 }
 
 // Usage
-Array<vint> data(5);
-data[0] = 3; data[1] = 7; data[2] = 1; data[3] = 9; data[4] = 5;
-
 auto [minimum, maximum, avg] = AnalyzeNumbers(data);
-Console::WriteLine(L"Min: " + itow(minimum) + L", Max: " + itow(maximum) + 
-                   L", Avg: " + ftow(avg));
 ```
 
-### Intermediate Data Processing
-
+### Configuration and Settings
 ```cpp
-// Processing data with multiple attributes
+// Application configuration tuple
+using AppConfig = Tuple<WString, vint, bool, double>;
+
+AppConfig LoadConfiguration()
+{
+    return Tuple(L"MyApp", 8080, true, 1.5);  // name, port, debug, scale
+}
+
+void ApplyConfiguration(const AppConfig& config)
+{
+    auto [appName, port, debugMode, uiScale] = config;
+    Console::WriteLine(L"Application: " + appName);
+    Console::WriteLine(L"Port: " + itow(port));
+}
+```
+
+### LINQ Operations
+```cpp
 List<WString> words;
 words.Add(L"apple");
 words.Add(L"banana");
-words.Add(L"cherry");
-words.Add(L"date");
 
 // Create tuples for complex processing
 auto wordAnalysis = From(words)
@@ -169,162 +139,26 @@ auto wordAnalysis = From(words)
     })
     .Where([](auto tuple) { 
         auto [word, length, firstChar] = tuple;
-        return length >= 5 && firstChar >= L'a' && firstChar <= L'm';
-    })
-    .OrderByKey([](auto tuple) { 
-        return tuple.get<1>();  // Sort by length
+        return length >= 5;
     });
 
 for (auto [word, length, firstChar] : wordAnalysis)
 {
-    Console::WriteLine(word + L" (length: " + itow(length) + 
-                       L", starts with: " + WString::FromChar(firstChar) + L")");
-}
-```
-
-### Configuration and Settings
-
-```cpp
-// Application configuration tuple
-using AppConfig = Tuple<WString, vint, bool, double>;
-
-AppConfig LoadConfiguration()
-{
-    // Load from file or database
-    return Tuple(L"MyApp", 8080, true, 1.5);  // name, port, debug, scale
-}
-
-void ApplyConfiguration(const AppConfig& config)
-{
-    auto [appName, port, debugMode, uiScale] = config;
-    
-    Console::WriteLine(L"Application: " + appName);
-    Console::WriteLine(L"Port: " + itow(port));
-    Console::WriteLine(L"Debug Mode: " + (debugMode ? L"On" : L"Off"));
-    Console::WriteLine(L"UI Scale: " + ftow(uiScale));
-}
-
-// Usage
-auto config = LoadConfiguration();
-ApplyConfiguration(config);
-```
-
-### Coordinate Systems
-
-```cpp
-// 3D point representation
-using Point3D = Tuple<double, double, double>;
-
-Point3D CreatePoint(double x, double y, double z)
-{
-    return Tuple(x, y, z);
-}
-
-double CalculateDistance(const Point3D& p1, const Point3D& p2)
-{
-    auto [x1, y1, z1] = p1;
-    auto [x2, y2, z2] = p2;
-    
-    double dx = x2 - x1;
-    double dy = y2 - y1;
-    double dz = z2 - z1;
-    
-    return sqrt(dx*dx + dy*dy + dz*dz);
-}
-
-// Usage
-auto origin = CreatePoint(0, 0, 0);
-auto point = CreatePoint(3, 4, 5);
-double distance = CalculateDistance(origin, point);
-```
-
-## Working with Collections
-
-### Lists of Tuples
-
-```cpp
-List<Tuple<WString, vint, WString>> employees;
-employees.Add(Tuple(L"Alice Johnson", 28, L"Engineer"));
-employees.Add(Tuple(L"Bob Smith", 32, L"Manager"));
-employees.Add(Tuple(L"Charlie Brown", 25, L"Designer"));
-
-// Filter and display
-auto seniors = From(employees)
-    .Where([](auto employee) {
-        auto [name, age, position] = employee;
-        return age >= 30;
-    });
-
-Console::WriteLine(L"Senior Employees:");
-for (auto [name, age, position] : seniors)
-{
-    Console::WriteLine(L"- " + name + L" (" + itow(age) + L", " + position + L")");
-}
-```
-
-### Complex Data Transformations
-
-```cpp
-// Transform data through multiple steps using simple string operations
-List<WString> rawData;
-rawData.Add(L"Item1,100,Active");
-rawData.Add(L"Item2,250,Inactive");
-rawData.Add(L"Item3,175,Active");
-
-auto processedData = From(rawData)
-    .Select([](const WString& line) {
-        // Parse the string manually and create tuple (VlppRegex could be used to simplify this)
-        vint firstComma = -1;
-        vint secondComma = -1;
-        for (vint i = 0; i < line.Length(); i++)
-        {
-            if (line[i] == L',' && firstComma == -1)
-                firstComma = i;
-            else if (line[i] == L',' && secondComma == -1)
-                secondComma = i;
-        }
-        
-        WString name = line.Sub(0, firstComma);
-        WString valueStr = line.Sub(firstComma + 1, secondComma - firstComma - 1);
-        WString statusStr = line.Sub(secondComma + 1, line.Length() - secondComma - 1);
-        
-        return Tuple(name, wtoi(valueStr), statusStr == L"Active");
-    })
-    .Where([](auto item) {
-        auto [name, value, isActive] = item;
-        return isActive && value > 150;
-    })
-    .Select([](auto item) {
-        auto [name, value, isActive] = item;
-        return Tuple(name, L"Value: " + itow(value), L"Status: Active");
-    });
-
-for (auto [name, valueStr, statusStr] : processedData)
-{
-    Console::WriteLine(name + L" - " + valueStr + L", " + statusStr);
+    Console::WriteLine(word + L" (length: " + itow(length) + L")");
 }
 ```
 
 ## Best Practices
 
 1. **Use structured binding** when accessing multiple elements to make code more readable.
-
 2. **Leverage automatic type deduction** with `Tuple(...)` constructor to avoid verbose type specifications.
-
 3. **Consider using Tuple for function return values** when returning multiple related values instead of defining a custom struct.
-
 4. **Use type aliases** for complex tuples to improve readability:
    ```cpp
    using PersonInfo = Tuple<WString, vint, WString>;  // name, age, email
    using Coordinates = Tuple<double, double, double>; // x, y, z
    ```
-
 5. **Remember comparison semantics**: Tuples are compared lexicographically (element by element in order).
-
 6. **Use get<Index>() for single element access** when you only need one specific element.
-
-7. **Prefer Tuple over Pair for 3+ values**: While `Pair<K, V>` is specialized for two values, use `Tuple<T...>` for three or more values.
-
-8. **Consider performance**: For frequently used data structures, a custom struct might be more performant than a tuple.
 
 The `Tuple<T...>` type provides a flexible and efficient way to group multiple values together, making it particularly useful for functional programming patterns, data transformation, and scenarios where you need to return or pass multiple values without defining custom types.

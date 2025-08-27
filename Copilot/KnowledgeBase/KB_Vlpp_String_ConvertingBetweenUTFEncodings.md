@@ -27,18 +27,13 @@ auto utf8Text = ConvertUtfString<wchar_t, char8_t>(wideText);
 // Convert from UTF-8 to UTF-16
 U8String utf8Input = U8String::Unmanaged(u8"Hello, ??!");
 auto utf16Text = ConvertUtfString<char8_t, char16_t>(utf8Input);
-
-// Convert from UTF-32 to wchar_t
-U32String utf32Input = U32String::Unmanaged(U"Hello, ??!");
-auto wideFromUtf32 = ConvertUtfString<char32_t, wchar_t>(utf32Input);
 ```
 
 ## Using Convenient Type-Specific Functions
 
-For common conversions involving `WString`, Vlpp provides convenient functions with descriptive names:
+For common conversions involving `WString`, Vlpp provides convenient functions:
 
 ### Converting WString to Other Encodings
-
 ```cpp
 WString wideText = WString::Unmanaged(L"Hello, ??!");
 
@@ -56,7 +51,6 @@ auto asciiResult = wtoa(wideText);
 ```
 
 ### Converting Other Encodings to WString
-
 ```cpp
 // From UTF-8 to WString
 U8String utf8Text = U8String::Unmanaged(u8"Hello, ??!");
@@ -81,8 +75,7 @@ The behavior of `wchar_t` differs between platforms:
 - **Windows**: `wchar_t` is 16-bit (UTF-16)
 - **Linux/Unix**: `wchar_t` is 32-bit (UTF-32)
 
-When writing cross-platform code, be aware of this difference:
-
+When writing cross-platform code:
 ```cpp
 // This will work correctly on both platforms
 WString text = WString::Unmanaged(L"Hello, ??!");
@@ -116,10 +109,3 @@ UTF conversion functions in Vlpp handle invalid sequences gracefully:
 - Invalid UTF sequences are typically replaced with replacement characters
 - The conversion functions do not throw exceptions
 - Always check the result if data integrity is critical
-
-```cpp
-// Example with potentially invalid input
-U8String potentiallyInvalidUtf8 = /* some UTF-8 data */;
-WString converted = u8tow(potentiallyInvalidUtf8);
-// The conversion will succeed, but invalid sequences may be replaced
-```
