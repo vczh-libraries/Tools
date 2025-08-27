@@ -1,6 +1,6 @@
 # Using Dictionary for Key-Value Mapping
 
-`Dictionary<Key, Value>` is a one-to-one map that maintains all values in the order of keys. It implements `IEnumerable<Pair<K, V>`.
+`Dictionary<Key, Value>` is a one-to-one map that maintains all values in the order of keys. It implements `IEnumerable<Pair<K, V>>`.
 
 ## Basic Operations
 

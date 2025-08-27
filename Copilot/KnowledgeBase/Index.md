@@ -116,8 +116,8 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 
 #### LINQ Operations
 - [Using LazyList for LINQ Operations](KB_Vlpp_Collections_UsingLazyListForLINQ.md)
-- * [Using From Function with Collections](KB_Vlpp_Collections_UsingFromFunction.md)
-- * [Working with IEnumerable and IEnumerator](KB_Vlpp_Collections_WorkingWithIEnumerable.md)
+- [Using From Function with Collections](KB_Vlpp_Collections_UsingFromFunction.md)
+- [Working with IEnumerable and IEnumerator](KB_Vlpp_Collections_WorkingWithIEnumerable.md)
 
 #### Sorting and Ordering
 - * [Using Sort Function for Quick Sort](KB_Vlpp_Collections_UsingSortFunction.md)
