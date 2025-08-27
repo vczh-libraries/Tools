@@ -226,38 +226,3 @@ else
     Console::WriteLine(L"File does not exist");
 }
 ```
-
-### Working with Configuration Files
-```cpp
-FilePath configDir = FilePath(L"~/.config/myapp");
-File configFile = configDir / L"settings.conf";
-
-// Read configuration
-WString config = configFile.ReadAllTextByBom();
-if (config.Length() == 0)
-{
-    // Create default configuration
-    WString defaultConfig = L"# Default configuration\nkey=value\n";
-    configFile.WriteAllText(defaultConfig, true, BomEncoder::Utf8);
-}
-```
-
-### Backup Before Modify
-```cpp
-File originalFile(L"/path/to/important.txt");
-File backupFile(L"/path/to/important.txt.backup");
-
-if (originalFile.Exists())
-{
-    // Create backup
-    WString content = originalFile.ReadAllTextByBom();
-    backupFile.WriteAllText(content, true, BomEncoder::Utf8);
-    
-    // Modify original
-    WString newContent = L"Modified content";
-    if (!originalFile.WriteAllText(newContent, true, BomEncoder::Utf8))
-    {
-        Console::WriteLine(L"Failed to write file, backup preserved");
-    }
-}
-```

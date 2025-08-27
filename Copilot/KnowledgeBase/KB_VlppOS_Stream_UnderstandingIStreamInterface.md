@@ -1,4 +1,4 @@
-# Understanding IStream Interface
+﻿# Understanding IStream Interface
 
 The `IStream` interface is the foundation of all stream operations in VlppOS. It provides a unified interface for reading, writing, and seeking across different types of streams including files, memory, and encoded data.
 
@@ -31,90 +31,7 @@ void DemonstrateStreamInterface(IStream& stream)
 
 ## Stream Capabilities
 
-### Feature Testing Methods
-
-Always test stream capabilities before using specific features:
-
-```cpp
-void TestStreamCapabilities(IStream& stream)
-{
-    // Required: Check availability first
-    if (!stream.IsAvailable())
-    {
-        Console::WriteLine(L"Stream is unavailable - cannot perform operations");
-        return;
-    }
-    
-    // Test each capability
-    if (stream.CanRead())
-    {
-        Console::WriteLine(L"? Stream supports reading");
-    }
-    
-    if (stream.CanWrite())
-    {
-        Console::WriteLine(L"? Stream supports writing");
-    }
-    
-    if (stream.CanSeek())
-    {
-        Console::WriteLine(L"? Stream supports seeking");
-        Console::WriteLine(L"  Current position: " + i64tow(stream.Position()));
-        
-        if (stream.IsLimited())
-        {
-            Console::WriteLine(L"  Stream size: " + i64tow(stream.Size()));
-        }
-        else
-        {
-            Console::WriteLine(L"  Stream is unlimited");
-        }
-    }
-    
-    if (stream.CanPeek())
-    {
-        Console::WriteLine(L"? Stream supports peeking");
-    }
-}
-```
-
-### Stream States
-
-```cpp
-enum class StreamState
-{
-    Available,
-    Unavailable,
-    Closed
-};
-
-StreamState GetStreamState(IStream& stream)
-{
-    if (stream.IsAvailable())
-    {
-        return StreamState::Available;
-    }
-    return StreamState::Unavailable;
-}
-
-void HandleStreamByState(IStream& stream)
-{
-    StreamState state = GetStreamState(stream);
-    
-    switch (state)
-    {
-    case StreamState::Available:
-        Console::WriteLine(L"Stream is ready for operations");
-        break;
-    case StreamState::Unavailable:
-        Console::WriteLine(L"Stream is unavailable - check initialization");
-        break;
-    case StreamState::Closed:
-        Console::WriteLine(L"Stream has been closed");
-        break;
-    }
-}
-```
+You can test capabilities of a stream if you are not sure, but in most of the cases you should know by the structure of stream combining.
 
 ## Basic Stream Operations
 
@@ -155,7 +72,7 @@ void SafeReadFromStream(IStream& stream)
 ### Writing to Streams
 
 ```cpp
-void SafeWriteToStream(IStream& stream, const void* data, vint size)
+void SafeWriteToStream(IStream& stream, char* data, vint size)
 {
     if (!stream.IsAvailable() || !stream.CanWrite())
     {
@@ -164,12 +81,11 @@ void SafeWriteToStream(IStream& stream, const void* data, vint size)
     }
     
     vint totalBytesWritten = 0;
-    const char* dataPtr = static_cast<const char*>(data);
     
     while (totalBytesWritten < size)
     {
         vint bytesWritten = stream.Write(
-            const_cast<char*>(dataPtr + totalBytesWritten), 
+            data + totalBytesWritten, 
             size - totalBytesWritten
         );
         
@@ -256,186 +172,6 @@ void DemonstrateStreamSeeking(IStream& stream)
     // Restore initial position
     stream.SeekFromBegin(initialPos);
     Console::WriteLine(L"Restored to: " + i64tow(stream.Position()));
-}
-```
-
-### Position Tracking
-
-```cpp
-class StreamPositionTracker : public Object
-{
-private:
-    IStream& stream;
-    pos_t savedPosition;
-    bool hasSeekSupport;
-    
-public:
-    StreamPositionTracker(IStream& _stream) 
-        : stream(_stream)
-        , savedPosition(0)
-        , hasSeekSupport(false)
-    {
-        if (stream.IsAvailable() && stream.CanSeek())
-        {
-            hasSeekSupport = true;
-            savedPosition = stream.Position();
-        }
-    }
-    
-    ~StreamPositionTracker()
-    {
-        // Restore position when going out of scope
-        RestorePosition();
-    }
-    
-    void SavePosition()
-    {
-        if (hasSeekSupport)
-        {
-            savedPosition = stream.Position();
-        }
-    }
-    
-    void RestorePosition()
-    {
-        if (hasSeekSupport)
-        {
-            stream.SeekFromBegin(savedPosition);
-        }
-    }
-    
-    pos_t GetSavedPosition() const
-    {
-        return savedPosition;
-    }
-};
-
-// Usage
-void TemporaryStreamOperation(IStream& stream)
-{
-    StreamPositionTracker tracker(stream);
-    
-    // Do some operations that change position
-    if (stream.CanSeek())
-    {
-        stream.SeekFromBegin(100);
-        // ... do work ...
-    }
-    
-    // Position automatically restored when tracker goes out of scope
-}
-```
-
-## Stream Utility Functions
-
-### Stream Copying
-
-```cpp
-vint CopyStreamData(IStream& source, IStream& destination)
-{
-    if (!source.IsAvailable() || !source.CanRead())
-    {
-        Console::WriteLine(L"Source stream cannot be read");
-        return 0;
-    }
-    
-    if (!destination.IsAvailable() || !destination.CanWrite())
-    {
-        Console::WriteLine(L"Destination stream cannot be written");
-        return 0;
-    }
-    
-    const vint bufferSize = 4096;
-    char buffer[bufferSize];
-    vint totalCopied = 0;
-    
-    while (true)
-    {
-        vint bytesRead = source.Read(buffer, bufferSize);
-        if (bytesRead == 0) break;
-        
-        vint bytesWritten = destination.Write(buffer, bytesRead);
-        totalCopied += bytesWritten;
-        
-        if (bytesWritten < bytesRead)
-        {
-            Console::WriteLine(L"Destination stream is full");
-            break;
-        }
-    }
-    
-    return totalCopied;
-}
-```
-
-### Stream Information
-
-```cpp
-struct StreamInfo
-{
-    bool isAvailable;
-    bool canRead;
-    bool canWrite;
-    bool canSeek;
-    bool canPeek;
-    bool isLimited;
-    pos_t currentPosition;
-    pos_t size;
-};
-
-StreamInfo GetStreamInfo(IStream& stream)
-{
-    StreamInfo info = {};
-    
-    info.isAvailable = stream.IsAvailable();
-    
-    if (info.isAvailable)
-    {
-        info.canRead = stream.CanRead();
-        info.canWrite = stream.CanWrite();
-        info.canSeek = stream.CanSeek();
-        info.canPeek = stream.CanPeek();
-        info.isLimited = stream.IsLimited();
-        
-        if (info.canSeek)
-        {
-            info.currentPosition = stream.Position();
-        }
-        
-        if (info.isLimited)
-        {
-            info.size = stream.Size();
-        }
-    }
-    
-    return info;
-}
-
-void PrintStreamInfo(IStream& stream, const WString& streamName)
-{
-    StreamInfo info = GetStreamInfo(stream);
-    
-    Console::WriteLine(L"Stream Info: " + streamName);
-    Console::WriteLine(L"  Available: " + (info.isAvailable ? L"true" : L"false"));
-    
-    if (info.isAvailable)
-    {
-        Console::WriteLine(L"  Readable: " + (info.canRead ? L"true" : L"false"));
-        Console::WriteLine(L"  Writable: " + (info.canWrite ? L"true" : L"false"));
-        Console::WriteLine(L"  Seekable: " + (info.canSeek ? L"true" : L"false"));
-        Console::WriteLine(L"  Peekable: " + (info.canPeek ? L"true" : L"false"));
-        Console::WriteLine(L"  Limited: " + (info.isLimited ? L"true" : L"false"));
-        
-        if (info.canSeek)
-        {
-            Console::WriteLine(L"  Position: " + i64tow(info.currentPosition));
-        }
-        
-        if (info.isLimited)
-        {
-            Console::WriteLine(L"  Size: " + i64tow(info.size));
-        }
-    }
 }
 ```
 

@@ -1,6 +1,64 @@
-# Working with Stream Availability and Capabilities
+﻿# Working with Stream Availability and Capabilities
 
 Stream availability and capability checking are essential for safe stream operations in VlppOS. Understanding when and how to test stream features prevents runtime errors and ensures robust code.
+
+A stream is available when `IsAvailable` returns true. All other methods can only be used in this case.
+Calling `Close` will release the resource behind the stream and make it unavailable.
+Usually we don't need to call `Close` explicitly, it will be called internally when the stream is destroyed.
+
+A stream is readable when `CanRead` returns true. `Read` and `Peek` can only be used in this case.
+
+Here are all streams that guaranteed to be readable so no further checking is needed:
+  - `FileStream` with `FileStream::ReadOnly` or `FileStream::ReadWrite` in the constructor.
+  - `MemoryStream`
+  - `MemoryWrapperStream`
+  - `DecoderStream`
+  - `RecorderStream`
+  - The following streams are readable when their underlying streams are readable
+    - `CacheStream`
+
+A stream is writable when `CanWrite` returns true. `Write` can only be used in this case.
+
+Here are all streams that guaranteed to be writable so no further checking is needed:
+  - `FileStream` with `FileStream::WriteOnly` or `FileStream::ReadWrite` in the constructor.
+  - `MemoryStream`
+  - `MemoryWrapperStream`
+  - `EncoderStream`
+  - `BroadcastStream`
+  - The following streams are readable when their underlying streams are writable 
+    - `CacheStream`
+
+A stream is random accessible when `CanSeek` returns true. `Seek`, `SeekFromBegin` can only be used in this case. `SeekFromEnd` can only be used when both `CanSeek` and `IsLimited` returns true.
+Use `Position` to know the current seeking position.
+`Read` and `Peek` will read the data at the seeking position.
+
+Here are all streams that guaranteed to be seekable so no further checking is needed:
+  - `FileStream`
+  - `MemoryStream`
+  - `MemoryWrapperStream`
+  - The following streams are readable when their underlying streams are seekable
+    - `CacheStream`
+
+A stream is finite when `IsLimited` returns true. A finite stream means there is limited data in the stream. An infinite stream means you can `Read` from the stream forever before it is broken or closed.
+The `Size` and `SeekFromEnd` method only make sense for a finite stream.
+
+Here are all streams that guaranteed to be limited/finite so no further checking is needed:
+  - `FileStream` with `FileStream::ReadOnly` in the constructor.
+  - `MemoryWrapperStream`
+  - The following streams are readable when their underlying streams are limited/finite
+    - `DecoderStream`
+    - `EncoderStream`
+    - `CacheStream`
+    - `RecorderStream`
+
+Here are all streams that guaranteed to be infinite so no further checking is needed:
+  - `FileStream` with `FileStream::WriteOnly` or `FileStream::ReadWrite` in the constructor.
+  - `MemoryStream`
+  - The following streams are readable when their underlying streams are limited/finite
+    - `DecoderStream`
+    - `EncoderStream`
+    - `CacheStream`
+    - `RecorderStream`
 
 ## Stream Availability
 
@@ -99,15 +157,15 @@ void PrintCapabilities(IStream& stream, const WString& streamName)
     StreamCapabilities caps = AnalyzeStream(stream);
     
     Console::WriteLine(L"=== " + streamName + L" Capabilities ===");
-    Console::WriteLine(L"Available: " + (caps.isAvailable ? L"?" : L"?"));
+    Console::WriteLine(L"Available: " + (caps.isAvailable ? L"✓" : L"✗"));
     
     if (caps.isAvailable)
     {
-        Console::WriteLine(L"Readable: " + (caps.canRead ? L"?" : L"?"));
-        Console::WriteLine(L"Writable: " + (caps.canWrite ? L"?" : L"?"));
-        Console::WriteLine(L"Seekable: " + (caps.canSeek ? L"?" : L"?"));
-        Console::WriteLine(L"Peekable: " + (caps.canPeek ? L"?" : L"?"));
-        Console::WriteLine(L"Limited: " + (caps.isLimited ? L"?" : L"?"));
+        Console::WriteLine(L"Readable: " + (caps.canRead ? L"✓" : L"✗"));
+        Console::WriteLine(L"Writable: " + (caps.canWrite ? L"✓" : L"✗"));
+        Console::WriteLine(L"Seekable: " + (caps.canSeek ? L"✓" : L"✗"));
+        Console::WriteLine(L"Peekable: " + (caps.canPeek ? L"✓" : L"✗"));
+        Console::WriteLine(L"Limited: " + (caps.isLimited ? L"✓" : L"✗"));
         
         if (caps.canSeek)
         {
@@ -120,323 +178,6 @@ void PrintCapabilities(IStream& stream, const WString& streamName)
         }
     }
     Console::WriteLine(L"========================");
-}
-```
-
-### Stream Type Recognition
-
-Different stream types have predictable capability patterns:
-
-```cpp
-enum class StreamType
-{
-    Unknown,
-    FileReadOnly,
-    FileWriteOnly,
-    FileReadWrite,
-    Memory,
-    MemoryWrapper,
-    Encoder,
-    Decoder,
-    Broadcast,
-    Cache
-};
-
-StreamType IdentifyStreamType(IStream& stream)
-{
-    if (!stream.IsAvailable())
-    {
-        return StreamType::Unknown;
-    }
-    
-    bool canRead = stream.CanRead();
-    bool canWrite = stream.CanWrite();
-    bool canSeek = stream.CanSeek();
-    bool canPeek = stream.CanPeek();
-    bool isLimited = stream.IsLimited();
-    
-    // Memory streams: readable, writable, seekable, peekable, unlimited
-    if (canRead && canWrite && canSeek && canPeek && !isLimited)
-    {
-        return StreamType::Memory;
-    }
-    
-    // Memory wrapper: readable, writable, seekable, peekable, limited
-    if (canRead && canWrite && canSeek && canPeek && isLimited)
-    {
-        return StreamType::MemoryWrapper;
-    }
-    
-    // File read-only: readable, seekable, limited, not writable
-    if (canRead && !canWrite && canSeek && isLimited)
-    {
-        return StreamType::FileReadOnly;
-    }
-    
-    // File write-only: writable, not readable, not limited
-    if (!canRead && canWrite && !isLimited)
-    {
-        return StreamType::FileWriteOnly;
-    }
-    
-    // File read-write: readable, writable, seekable
-    if (canRead && canWrite && canSeek)
-    {
-        return StreamType::FileReadWrite;
-    }
-    
-    // Encoder stream: writable only
-    if (!canRead && canWrite)
-    {
-        return StreamType::Encoder;
-    }
-    
-    // Decoder stream: readable only
-    if (canRead && !canWrite)
-    {
-        return StreamType::Decoder;
-    }
-    
-    return StreamType::Unknown;
-}
-
-WString StreamTypeToString(StreamType type)
-{
-    switch (type)
-    {
-    case StreamType::FileReadOnly: return L"File (Read-Only)";
-    case StreamType::FileWriteOnly: return L"File (Write-Only)";
-    case StreamType::FileReadWrite: return L"File (Read-Write)";
-    case StreamType::Memory: return L"Memory Stream";
-    case StreamType::MemoryWrapper: return L"Memory Wrapper";
-    case StreamType::Encoder: return L"Encoder Stream";
-    case StreamType::Decoder: return L"Decoder Stream";
-    case StreamType::Broadcast: return L"Broadcast Stream";
-    case StreamType::Cache: return L"Cache Stream";
-    default: return L"Unknown Stream";
-    }
-}
-```
-
-## Capability-Based Stream Usage
-
-### Safe Reading Operations
-
-```cpp
-class SafeStreamReader : public Object
-{
-private:
-    IStream& stream;
-    bool canRead;
-    bool canSeek;
-    bool canPeek;
-    
-public:
-    SafeStreamReader(IStream& _stream) : stream(_stream)
-    {
-        canRead = stream.IsAvailable() && stream.CanRead();
-        canSeek = stream.IsAvailable() && stream.CanSeek();
-        canPeek = stream.IsAvailable() && stream.CanPeek();
-    }
-    
-    bool CanRead() const { return canRead; }
-    
-    vint ReadData(void* buffer, vint size)
-    {
-        if (!canRead)
-        {
-            Console::WriteLine(L"Stream is not readable");
-            return 0;
-        }
-        
-        return stream.Read(buffer, size);
-    }
-    
-    bool PeekData(void* buffer, vint size, vint& bytesRead)
-    {
-        if (!canPeek)
-        {
-            Console::WriteLine(L"Stream does not support peeking");
-            return false;
-        }
-        
-        bytesRead = stream.Peek(buffer, size);
-        return true;
-    }
-    
-    bool SeekToPosition(pos_t position)
-    {
-        if (!canSeek)
-        {
-            Console::WriteLine(L"Stream does not support seeking");
-            return false;
-        }
-        
-        stream.SeekFromBegin(position);
-        return true;
-    }
-    
-    pos_t GetCurrentPosition()
-    {
-        if (!canSeek)
-        {
-            return -1; // Position unknown
-        }
-        
-        return stream.Position();
-    }
-};
-```
-
-### Safe Writing Operations
-
-```cpp
-class SafeStreamWriter : public Object
-{
-private:
-    IStream& stream;
-    bool canWrite;
-    bool canSeek;
-    
-public:
-    SafeStreamWriter(IStream& _stream) : stream(_stream)
-    {
-        canWrite = stream.IsAvailable() && stream.CanWrite();
-        canSeek = stream.IsAvailable() && stream.CanSeek();
-    }
-    
-    bool CanWrite() const { return canWrite; }
-    
-    vint WriteData(const void* buffer, vint size)
-    {
-        if (!canWrite)
-        {
-            Console::WriteLine(L"Stream is not writable");
-            return 0;
-        }
-        
-        return stream.Write(const_cast<void*>(buffer), size);
-    }
-    
-    bool WriteAll(const void* buffer, vint size)
-    {
-        if (!canWrite) return false;
-        
-        vint totalWritten = 0;
-        const char* data = static_cast<const char*>(buffer);
-        
-        while (totalWritten < size)
-        {
-            vint written = stream.Write(
-                const_cast<char*>(data + totalWritten), 
-                size - totalWritten
-            );
-            
-            if (written == 0)
-            {
-                Console::WriteLine(L"Stream cannot accept more data");
-                break;
-            }
-            
-            totalWritten += written;
-        }
-        
-        return totalWritten == size;
-    }
-    
-    pos_t GetCurrentPosition()
-    {
-        if (!canSeek)
-        {
-            return -1; // Position unknown
-        }
-        
-        return stream.Position();
-    }
-};
-```
-
-## Advanced Capability Patterns
-
-### Capability-Based Stream Adapter
-
-```cpp
-template<typename TOperation>
-class StreamCapabilityAdapter : public Object
-{
-private:
-    IStream& stream;
-    
-public:
-    StreamCapabilityAdapter(IStream& _stream) : stream(_stream) {}
-    
-    bool ExecuteIfCapable(
-        const WString& operationName,
-        const Func<bool(IStream&)>& capabilityCheck,
-        const TOperation& operation
-    )
-    {
-        if (!stream.IsAvailable())
-        {
-            Console::WriteLine(L"Cannot " + operationName + L": stream unavailable");
-            return false;
-        }
-        
-        if (!capabilityCheck(stream))
-        {
-            Console::WriteLine(L"Cannot " + operationName + L": capability not supported");
-            return false;
-        }
-        
-        try
-        {
-            operation(stream);
-            return true;
-        }
-        catch (...)
-        {
-            Console::WriteLine(L"Error during " + operationName);
-            return false;
-        }
-    }
-};
-
-// Usage example
-void DemonstrateCapabilityAdapter(IStream& stream)
-{
-    StreamCapabilityAdapter<Func<void(IStream&)>> adapter(stream);
-    
-    // Safe reading
-    adapter.ExecuteIfCapable(
-        L"reading",
-        [](IStream& s) { return s.CanRead(); },
-        [](IStream& s) {
-            char buffer[100];
-            vint bytes = s.Read(buffer, sizeof(buffer));
-            Console::WriteLine(L"Read " + itow(bytes) + L" bytes");
-        }
-    );
-    
-    // Safe seeking
-    adapter.ExecuteIfCapable(
-        L"seeking",
-        [](IStream& s) { return s.CanSeek(); },
-        [](IStream& s) {
-            s.SeekFromBegin(0);
-            Console::WriteLine(L"Seeked to beginning");
-        }
-    );
-    
-    // Safe peeking
-    adapter.ExecuteIfCapable(
-        L"peeking",
-        [](IStream& s) { return s.CanPeek(); },
-        [](IStream& s) {
-            char buffer[10];
-            vint bytes = s.Peek(buffer, sizeof(buffer));
-            Console::WriteLine(L"Peeked " + itow(bytes) + L" bytes");
-        }
-    );
 }
 ```
 

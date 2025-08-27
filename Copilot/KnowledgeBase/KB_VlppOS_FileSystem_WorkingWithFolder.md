@@ -309,45 +309,6 @@ Folder rootDir(L"/path/to/traverse");
 TraverseDirectory(rootDir);
 ```
 
-### Backup Directory Structure
-```cpp
-void BackupFolder(const Folder& source, const Folder& destination)
-{
-    // Create destination if it doesn't exist
-    if (!destination.Exists())
-    {
-        destination.Create(true);
-    }
-    
-    // Copy all files
-    List<File> files;
-    if (source.GetFiles(files))
-    {
-        for (vint i = 0; i < files.Count(); i++)
-        {
-            auto sourceFile = files[i];
-            auto destFile = destination.GetFilePath() / sourceFile.GetFilePath().GetName();
-            
-            // Read and write file content
-            WString content = sourceFile.ReadAllTextByBom();
-            File(destFile).WriteAllText(content, true, BomEncoder::Utf8);
-        }
-    }
-    
-    // Recursively copy subdirectories
-    List<Folder> subfolders;
-    if (source.GetFolders(subfolders))
-    {
-        for (vint i = 0; i < subfolders.Count(); i++)
-        {
-            auto subSource = subfolders[i];
-            auto subDest = destination.GetFilePath() / subSource.GetFilePath().GetName();
-            BackupFolder(subSource, Folder(subDest));
-        }
-    }
-}
-```
-
 ### Cleaning Up Temporary Directories
 ```cpp
 void CleanTempDirectory(const Folder& tempDir)
