@@ -31,7 +31,7 @@ auto person = Tuple(name, age, isActive);  // Creates Tuple<WString, vint, bool>
 
 ### Accessing Values
 
-Values in a tuple are immutable, but you can access them using the `get<Index>()` method where the index must be a compile-time constant:
+Values in a tuple can be accessed using the `get<Index>()` method where the index must be a compile-time constant. The returned reference is mutable if the tuple itself is non-const:
 
 ```cpp
 Tuple<WString, vint, bool> student(L"Charlie", 88, false);
@@ -40,6 +40,14 @@ Tuple<WString, vint, bool> student(L"Charlie", 88, false);
 WString name = student.get<0>();    // "Charlie"
 vint score = student.get<1>();      // 88
 bool isHonor = student.get<2>();    // false
+
+// For non-const tuples, get<> returns mutable references
+student.get<1>() = 95;  // OK: Modify the score
+student.get<2>() = true; // OK: Modify the honor status
+
+// For const tuples, get<> returns immutable references
+const Tuple<WString, vint, bool> constStudent(L"David", 92, true);
+// constStudent.get<1>() = 85;  // ERROR: Cannot modify const tuple elements
 
 // Index must be compile-time constant
 // student.get<i>();  // ERROR: i must be constexpr
@@ -50,11 +58,12 @@ bool isHonor = student.get<2>();    // false
 ```cpp
 Tuple<WString, vint> original(L"Test", 100);
 
-// Cannot modify individual elements
-// original.get<0>() = L"Modified";  // ERROR: values are immutable
+// Individual elements can be modified for non-const tuples
+original.get<0>() = L"Modified";  // OK: Change the first element
+original.get<1>() = 200;          // OK: Change the second element
 
-// But you can assign entire tuples
-original = Tuple(L"New Value", 200);
+// You can also assign entire tuples
+original = Tuple(L"New Value", 300);
 
 // Or assign from another compatible tuple
 Tuple<WString, vint> another(L"Another", 150);
@@ -256,17 +265,30 @@ for (auto [name, age, position] : seniors)
 ### Complex Data Transformations
 
 ```cpp
-// Transform data through multiple steps
+// Transform data through multiple steps using simple string operations
 List<WString> rawData;
-rawData.Add(L"Item1:100:Active");
-rawData.Add(L"Item2:250:Inactive");
-rawData.Add(L"Item3:175:Active");
+rawData.Add(L"Item1,100,Active");
+rawData.Add(L"Item2,250,Inactive");
+rawData.Add(L"Item3,175,Active");
 
 auto processedData = From(rawData)
     .Select([](const WString& line) {
-        // Parse the string and create tuple
-        auto parts = line.Split(L':');
-        return Tuple(parts[0], wtoi(parts[1]), parts[2] == L"Active");
+        // Parse the string manually and create tuple (VlppRegex could be used to simplify this)
+        vint firstComma = -1;
+        vint secondComma = -1;
+        for (vint i = 0; i < line.Length(); i++)
+        {
+            if (line[i] == L',' && firstComma == -1)
+                firstComma = i;
+            else if (line[i] == L',' && secondComma == -1)
+                secondComma = i;
+        }
+        
+        WString name = line.Sub(0, firstComma);
+        WString valueStr = line.Sub(firstComma + 1, secondComma - firstComma - 1);
+        WString statusStr = line.Sub(secondComma + 1, line.Length() - secondComma - 1);
+        
+        return Tuple(name, wtoi(valueStr), statusStr == L"Active");
     })
     .Where([](auto item) {
         auto [name, value, isActive] = item;
