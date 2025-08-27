@@ -39,6 +39,7 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Primitives_UsingTuple.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Primitives_UsingVariant.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Primitives_WorkingWithStructuredBinding.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Primitives_WorkingWithVariantApply.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenDoubleAndString.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenUTFEncodings.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingNumbersToStrings.md" />

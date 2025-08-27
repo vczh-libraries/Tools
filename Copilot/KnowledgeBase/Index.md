@@ -151,7 +151,7 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 
 #### Variant Types
 - [Using Variant for Union Types](KB_Vlpp_Primitives_UsingVariant.md)
-- * *[Working with Variant Apply and Overloading](KB_Vlpp_Primitives_WorkingWithVariantApply.md)
+- [Working with Variant Apply and Overloading](KB_Vlpp_Primitives_WorkingWithVariantApply.md)
 
 #### Error Handling
 - * [Understanding Error vs Exception](KB_Vlpp_Exception_UnderstandingErrorVsException.md)
