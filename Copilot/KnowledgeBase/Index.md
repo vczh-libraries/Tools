@@ -167,7 +167,7 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Working with Interface Base Class](KB_Vlpp_Object_WorkingWithInterfaceBaseClass.md)
 
 #### Console Operations
-- * [Using Console Write and WriteLine](KB_Vlpp_Console_UsingConsoleWriteAndWriteLine.md)
+- [Using Console Write and WriteLine](KB_Vlpp_Console_UsingConsoleWriteAndWriteLine.md)
 
 ### VlppOS
 
