@@ -16,6 +16,9 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Index.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingArray.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingDictionary.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingGroup.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingLazyListForLINQ.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingList.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingSortedList.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenDoubleAndString.md" />
