@@ -15,10 +15,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Index.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingArray.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenDoubleAndString.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenUTFEncodings.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingNumbersToStrings.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingStringsToNumbers.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_StringCaseConversion.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_WorkingWithUtfAndAnsiStringTypes.md" />
   </ItemGroup>
 </Project>

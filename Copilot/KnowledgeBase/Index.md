@@ -101,10 +101,10 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Converting Strings to Numbers](KB_Vlpp_String_ConvertingStringsToNumbers.md)
 - [Converting Numbers to Strings](KB_Vlpp_String_ConvertingNumbersToStrings.md)
 - [Converting Between Double and String](KB_Vlpp_String_ConvertingBetweenDoubleAndString.md)
-- * [String Case Conversion](KB_Vlpp_String_StringCaseConversion.md)
+- [String Case Conversion](KB_Vlpp_String_StringCaseConversion.md)
 
 #### Array Collection
-- * [Using Array for Fixed Size Collections](KB_Vlpp_Collections_UsingArray.md)
+- [Using Array for Fixed Size Collections](KB_Vlpp_Collections_UsingArray.md)
 
 #### List Collections
 - * [Using List for Dynamic Collections](KB_Vlpp_Collections_UsingList.md)
