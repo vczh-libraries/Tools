@@ -264,12 +264,12 @@ else
 
 ```cpp
 // Process multiple data streams
-List<Pair<WString, List<vint>>> dataStreams;
+List<Pair<WString, Ptr<List<vint>>>> dataStreams;
 
-List<vint> stream1;
-stream1.Add(10); stream1.Add(20); stream1.Add(30);
-List<vint> stream2;
-stream2.Add(15); stream2.Add(25); stream2.Add(35);
+auto stream1 = Ptr(new List<vint>());
+stream1->Add(10); stream1->Add(20); stream1->Add(30);
+auto stream2 = Ptr(new List<vint>());
+stream2->Add(15); stream2->Add(25); stream2->Add(35);
 
 dataStreams.Add(Pair(L"StreamA", stream1));
 dataStreams.Add(Pair(L"StreamB", stream2));
@@ -277,9 +277,9 @@ dataStreams.Add(Pair(L"StreamB", stream2));
 // Process each stream with structured binding
 for (auto [streamName, values] : dataStreams)
 {
-    auto stats = From(values)
+    auto stats = From(*values.Obj())
         .Aggregate(
-            Tuple(values[0], values[0], 0),  // min, max, sum
+            Tuple(values->Get(0), values->Get(0), 0),  // min, max, sum
             [](auto acc, vint value) {
                 auto [currentMin, currentMax, currentSum] = acc;
                 return Tuple(
@@ -291,7 +291,7 @@ for (auto [streamName, values] : dataStreams)
         );
     
     auto [min, max, sum] = stats;
-    double average = static_cast<double>(sum) / values.Count();
+    double average = static_cast<double>(sum) / values->Count();
     
     Console::WriteLine(streamName + L" statistics:");
     Console::WriteLine(L"  Min: " + itow(min) + L", Max: " + itow(max) + L", Avg: " + ftow(average));

@@ -8,6 +8,7 @@
 
 All interface types must inherit from `Interface` because it:
 
+- **Virtual destructor**: Enables `Ptr<T>` to work correctly
 - **Establishes contracts**: Defines abstract behavior without implementation
 - **Enables multiple inheritance**: Interfaces can be combined safely
 - **Supports reflection**: Enables runtime type information for scripting

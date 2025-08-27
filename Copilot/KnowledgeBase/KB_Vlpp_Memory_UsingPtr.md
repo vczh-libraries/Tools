@@ -2,6 +2,8 @@
 
 `Ptr<T>` is the Vlpp equivalent of `std::shared_ptr<T>` and is the primary way to manage reference types in the Vlpp framework. It provides automatic memory management through reference counting for objects that inherit from `Object`.
 
+You can use `p->member` to access members of the object pointed to by `Ptr<T>`. You could also use `p.Obj()` and `*p.Obj()` to get the raw pointer or the raw reference from it.
+
 ## Basic Usage
 
 ### Creating a Ptr<T>

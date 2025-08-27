@@ -107,6 +107,8 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Using Array for Fixed Size Collections](KB_Vlpp_Collections_UsingArray.md)
 
 #### List Collections
+**Important**: All collection types (`Array<T>`, `List<T>`, `SortedList<T>`, `Dictionary<K,V>`, `Group<K,V>`) are not copy constructible or assignable. When you need to share collections between variables or pass them around, use `Ptr<CollectionType>` for shared ownership.
+
 - [Using List for Dynamic Collections](KB_Vlpp_Collections_UsingList.md)
 - [Using SortedList for Ordered Collections](KB_Vlpp_Collections_UsingSortedList.md)
 

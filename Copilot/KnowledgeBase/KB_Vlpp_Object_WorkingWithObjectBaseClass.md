@@ -8,7 +8,7 @@
 
 All reference types must inherit from `Object` because it provides:
 
-- **Reference counting support**: Enables `Ptr<T>` to work correctly
+- **Virtual destructor**: Enables `Ptr<T>` to work correctly
 - **Type safety**: Ensures proper memory management
 - **Debugging information**: Provides object lifetime tracking
 - **Consistent interface**: Standard methods available on all objects
