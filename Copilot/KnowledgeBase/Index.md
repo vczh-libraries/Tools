@@ -145,9 +145,9 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Working with Lambda Expressions](KB_Vlpp_Lambda_WorkingWithLambdaExpressions.md)
 
 #### Tuple Types
-- * [Using Pair for Two Values](KB_Vlpp_Primitives_UsingPair.md)
-- * [Using Tuple for Multiple Values](KB_Vlpp_Primitives_UsingTuple.md)
-- * [Working with Structured Binding](KB_Vlpp_Primitives_WorkingWithStructuredBinding.md)
+- [Using Pair for Two Values](KB_Vlpp_Primitives_UsingPair.md)
+- [Using Tuple for Multiple Values](KB_Vlpp_Primitives_UsingTuple.md)
+- [Working with Structured Binding](KB_Vlpp_Primitives_WorkingWithStructuredBinding.md)
 
 #### Variant Types
 - * [Using Variant for Union Types](KB_Vlpp_Primitives_UsingVariant.md)
