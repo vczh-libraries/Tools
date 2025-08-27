@@ -181,7 +181,7 @@ VlppOS provides cross-platform OS abstraction for file system operations, stream
 #### File I/O Operations
 - [Reading Text Files with Encoding Detection](KB_VlppOS_FileSystem_ReadingTextFilesWithEncodingDetection.md)
 - [Reading Text Files with BOM](KB_VlppOS_FileSystem_ReadingTextFilesWithBOM.md)
-- * [Writing Text Files](KB_VlppOS_FileSystem_WritingTextFiles.md)
+- [Writing Text Files](KB_VlppOS_FileSystem_WritingTextFiles.md)
 - * [File Operations Delete and Rename](KB_VlppOS_FileSystem_FileOperationsDeleteAndRename.md)
 
 #### Directory Operations
