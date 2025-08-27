@@ -188,13 +188,13 @@ for (auto pair : grades)
 }
 
 // Enumerate keys only
-for (auto subject : grades.Keys())  // Keys() returns IEnumerable<K>
+for (auto subject : grades.Keys())  // Keys() returns const collection implementing IEnumerable<K>
 {
     Console::WriteLine(L"Subject: " + subject);
 }
 
 // Enumerate values only
-for (auto grade : grades.Values())  // Values() returns IEnumerable<V>
+for (auto grade : grades.Values())  // Values() returns const collection implementing IEnumerable<V>
 {
     Console::WriteLine(L"Grade: " + itow(grade));
 }
@@ -245,31 +245,6 @@ while (enumerator->Next())
 }
 
 delete enumerator;
-```
-
-## Collection Reference Management
-
-IEnumerable supports collection reference management for memory and lifetime control:
-
-```cpp
-// Create an enumerable
-List<vint> numbers;
-for (vint i = 1; i <= 3; i++)
-    numbers.Add(i);
-
-// Check if there's an associated reference
-auto collectionRef = numbers.GetCollectionReference();
-if (!collectionRef)
-{
-    Console::WriteLine(L"No collection reference associated");
-}
-
-// The collection object
-auto collectionObj = numbers.GetCollectionObject();
-if (collectionObj)
-{
-    Console::WriteLine(L"Collection object available");
-}
 ```
 
 ## Error Handling and Safety

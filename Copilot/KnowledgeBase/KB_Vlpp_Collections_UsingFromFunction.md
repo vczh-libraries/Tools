@@ -39,10 +39,10 @@ for (vint i = 1; i <= 10; i++)
     numbers.Add(i);
 }
 
-auto result = From(numbers)
+List<vint> result;
+CopyFrom(result, From(numbers)
     .Where([](vint x) { return x % 2 == 0; })  // Filter even numbers
-    .Select([](vint x) { return x * x; })      // Square them
-    .ToList();                                 // Convert back to List
+    .Select([](vint x) { return x * x; }));    // Square them
 
 // result contains [4, 16, 36, 64, 100]
 ```
@@ -58,9 +58,9 @@ words.Add(L"banana");
 words.Add(L"cherry");
 words.Add(L"date");
 
-auto longWords = From(words)
-    .Where([](const WString& word) { return word.Length() > 5; })
-    .ToList();
+List<WString> longWords;
+CopyFrom(longWords, From(words)
+    .Where([](const WString& word) { return word.Length() > 5; }));
 // Contains ["banana", "cherry"]
 ```
 
@@ -73,9 +73,9 @@ for (vint i = 1; i <= 5; i++)
     numbers.Add(i);
 }
 
-auto doubled = From(numbers)
-    .Select([](vint x) { return x * 2; })
-    .ToList();
+List<vint> doubled;
+CopyFrom(doubled, From(numbers)
+    .Select([](vint x) { return x * 2; }));
 // Contains [2, 4, 6, 8, 10]
 ```
 
@@ -108,10 +108,10 @@ for (vint i = 1; i <= 10; i++)
     numbers.Add(i);
 }
 
-auto middle = From(numbers)
+List<vint> middle;
+CopyFrom(middle, From(numbers)
     .Skip(3)        // Skip first 3 elements
-    .Take(4)        // Take next 4 elements
-    .ToList();
+    .Take(4));      // Take next 4 elements
 // Contains [4, 5, 6, 7]
 ```
 
@@ -127,10 +127,10 @@ studentGrades.Add(L"Charlie", 92);
 studentGrades.Add(L"David", 78);
 
 // Find students with high grades
-auto topStudents = From(studentGrades)
+List<WString> topStudents;
+CopyFrom(topStudents, From(studentGrades)
     .Where([](const Pair<WString, vint>& entry) { return entry.value >= 90; })
-    .Select([](const Pair<WString, vint>& entry) { return entry.key; })
-    .ToList();
+    .Select([](const Pair<WString, vint>& entry) { return entry.key; }));
 // Contains ["Alice", "Charlie"]
 ```
 
@@ -146,8 +146,7 @@ words.Add(L"blueberry");
 
 // Group by first letter
 auto grouped = From(words)
-    .GroupBy([](const WString& word) { return word[0]; })
-    .ToList();
+    .GroupBy([](const WString& word) { return word[0]; });
 
 // Process each group
 for (auto group : grouped)
@@ -167,17 +166,17 @@ for (auto group : grouped)
 For better readability, place line breaks before the `.` operator:
 
 ```cpp
-auto result = From(collection)
+List<ResultType> result;
+CopyFrom(result, From(collection)
     .Where(condition1)
     .Select(transformation)
     .Where(condition2)
-    .OrderBy(keySelector)
-    .ToList();
+    .OrderBy(keySelector));
 ```
 
 ### Lazy Evaluation
 
-Remember that `LazyList<T>` uses lazy evaluation. Operations are not executed until you call a materializing operation like `ToList()`, `ToArray()`, or iterate through the results:
+Remember that `LazyList<T>` uses lazy evaluation. Operations are not executed until you call a materializing operation like `CopyFrom`, `ToArray()`, or iterate through the results:
 
 ```cpp
 auto lazy = From(numbers)
@@ -188,7 +187,8 @@ auto lazy = From(numbers)
 
 // No output yet - operations are deferred
 
-auto result = lazy.ToList();  // Now the operations execute
+List<vint> result;
+CopyFrom(result, lazy);  // Now the operations execute
 ```
 
 ### Avoid Multiple Enumeration
@@ -196,9 +196,9 @@ auto result = lazy.ToList();  // Now the operations execute
 If you need to use the same LazyList multiple times, convert it to a concrete collection first:
 
 ```cpp
-auto filtered = From(collection)
-    .Where(someCondition)
-    .ToList();  // Materialize once
+List<SomeType> filtered;
+CopyFrom(filtered, From(collection)
+    .Where(someCondition));  // Materialize once
 
 // Now safe to use multiple times
 vint count = filtered.Count();
@@ -209,18 +209,34 @@ auto first = filtered[0];
 
 ### To List
 ```cpp
-auto list = From(collection).ToList();
+List<T> list;
+CopyFrom(list, From(collection));
 ```
 
 ### To Array
 ```cpp
-auto array = From(collection).ToArray();
+Array<T> array;
+CopyFrom(array, From(collection));
 ```
 
 ### To Dictionary
 ```cpp
 // Assuming collection contains Pair<K, V>
-auto dict = From(pairCollection).ToDictionary();
+Dictionary<K, V> dict;
+CopyFrom(dict, From(pairCollection));
+```
+
+## Alternative: Direct Iteration
+
+You can also iterate directly over the `LazyList<T>` without materializing it to a collection:
+
+```cpp
+// Process each element without creating an intermediate collection
+for (auto item : From(collection).Where(condition).Select(transformation))
+{
+    // Process item
+    Console::WriteLine(itow(item));
+}
 ```
 
 The `From` function is essential for functional programming in Vlpp, providing a clean and expressive way to work with collections while maintaining performance through lazy evaluation.
