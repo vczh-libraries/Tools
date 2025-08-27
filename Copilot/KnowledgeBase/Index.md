@@ -107,8 +107,8 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Using Array for Fixed Size Collections](KB_Vlpp_Collections_UsingArray.md)
 
 #### List Collections
-- * [Using List for Dynamic Collections](KB_Vlpp_Collections_UsingList.md)
-- * [Using SortedList for Ordered Collections](KB_Vlpp_Collections_UsingSortedList.md)
+- [Using List for Dynamic Collections](KB_Vlpp_Collections_UsingList.md)
+- [Using SortedList for Ordered Collections](KB_Vlpp_Collections_UsingSortedList.md)
 
 #### Dictionary Collections
 - * [Using Dictionary for Key-Value Mapping](KB_Vlpp_Collections_UsingDictionary.md)

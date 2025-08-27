@@ -16,6 +16,8 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Index.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingArray.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingList.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingSortedList.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenDoubleAndString.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingBetweenUTFEncodings.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_String_ConvertingNumbersToStrings.md" />
