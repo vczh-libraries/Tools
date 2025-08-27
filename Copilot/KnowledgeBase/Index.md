@@ -182,16 +182,16 @@ VlppOS provides cross-platform OS abstraction for file system operations, stream
 - [Reading Text Files with Encoding Detection](KB_VlppOS_FileSystem_ReadingTextFilesWithEncodingDetection.md)
 - [Reading Text Files with BOM](KB_VlppOS_FileSystem_ReadingTextFilesWithBOM.md)
 - [Writing Text Files](KB_VlppOS_FileSystem_WritingTextFiles.md)
-- * [File Operations Delete and Rename](KB_VlppOS_FileSystem_FileOperationsDeleteAndRename.md)
+- [File Operations Delete and Rename](KB_VlppOS_FileSystem_FileOperationsDeleteAndRename.md)
 
 #### Directory Operations
-- * [Enumerating Folder Contents](KB_VlppOS_FileSystem_EnumeratingFolderContents.md)
-- * [Creating and Managing Directories](KB_VlppOS_FileSystem_CreatingAndManagingDirectories.md)
-- * [Working with Root Directories](KB_VlppOS_FileSystem_WorkingWithRootDirectories.md)
+- [Enumerating Folder Contents](KB_VlppOS_FileSystem_EnumeratingFolderContents.md)
+- [Creating and Managing Directories](KB_VlppOS_FileSystem_CreatingAndManagingDirectories.md)
+- [Working with Root Directories](KB_VlppOS_FileSystem_WorkingWithRootDirectories.md)
 
 #### Stream Interface
-- * [Understanding IStream Interface](KB_VlppOS_Stream_UnderstandingIStreamInterface.md)
-- * [Working with Stream Availability and Capabilities](KB_VlppOS_Stream_WorkingWithStreamAvailabilityAndCapabilities.md)
+- [Understanding IStream Interface](KB_VlppOS_Stream_UnderstandingIStreamInterface.md)
+- [Working with Stream Availability and Capabilities](KB_VlppOS_Stream_WorkingWithStreamAvailabilityAndCapabilities.md)
 
 #### File Streams
 - * [Using FileStream for File I/O](KB_VlppOS_Stream_UsingFileStream.md)

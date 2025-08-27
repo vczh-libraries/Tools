@@ -14,12 +14,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Index.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_CreatingAndManagingDirectories.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_EnumeratingFolderContents.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_FileOperationsDeleteAndRename.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_ReadingTextFilesWithBOM.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_ReadingTextFilesWithEncodingDetection.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_UsingFilePath.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WorkingWithFile.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WorkingWithFolder.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WorkingWithRootDirectories.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WritingTextFiles.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UnderstandingIStreamInterface.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_WorkingWithStreamAvailabilityAndCapabilities.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingArray.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingDictionary.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingFromFunction.md" />
