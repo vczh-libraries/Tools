@@ -128,16 +128,16 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Using Indexed Function for Index Access](KB_Vlpp_Collections_UsingIndexedFunction.md)
 
 #### Smart Pointers
-- * [Using Ptr for Shared Ownership](KB_Vlpp_Memory_UsingPtr.md)
-- * [Using ComPtr for COM Objects](KB_Vlpp_Memory_UsingComPtr.md)
-- * [Working with Raw Pointers as Weak References](KB_Vlpp_Memory_WorkingWithRawPointers.md)
+- [Using Ptr for Shared Ownership](KB_Vlpp_Memory_UsingPtr.md)
+- [Using ComPtr for COM Objects](KB_Vlpp_Memory_UsingComPtr.md)
+- [Working with Raw Pointers as Weak References](KB_Vlpp_Memory_WorkingWithRawPointers.md)
 
 #### Nullable Types
-- * [Using Nullable for Optional Values](KB_Vlpp_Memory_UsingNullable.md)
+- [Using Nullable for Optional Values](KB_Vlpp_Memory_UsingNullable.md)
 
 #### Global Storage Management
-- * [Defining Global Storage Classes](KB_Vlpp_Memory_DefiningGlobalStorageClasses.md)
-- * [Using Global Storage for Memory Leak Detection](KB_Vlpp_Memory_UsingGlobalStorageForMemoryLeakDetection.md)
+- [Defining Global Storage Classes](KB_Vlpp_Memory_DefiningGlobalStorageClasses.md)
+- [Using Global Storage for Memory Leak Detection](KB_Vlpp_Memory_UsingGlobalStorageForMemoryLeakDetection.md)
 
 #### Function Types
 - * [Using Func for Callable Objects](KB_Vlpp_Lambda_UsingFunc.md)
