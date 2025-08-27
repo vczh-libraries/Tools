@@ -120,7 +120,7 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Working with IEnumerable and IEnumerator](KB_Vlpp_Collections_WorkingWithIEnumerable.md)
 
 #### Sorting and Ordering
-- * [Using Sort Function for Quick Sort](KB_Vlpp_Collections_UsingSortFunction.md)
+- [Using Sort Function for Quick Sort](KB_Vlpp_Collections_UsingSortFunction.md)
 - * [Using PartialOrderingProcessor](KB_Vlpp_Collections_UsingPartialOrderingProcessor.md)
 
 #### Collection Iteration
