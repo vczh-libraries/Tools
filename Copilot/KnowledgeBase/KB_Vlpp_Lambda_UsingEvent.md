@@ -22,27 +22,65 @@ Event<void(vint, WString)> onProgress;
 
 ## Adding Callbacks with Add Method
 
-Use the `Add` method to register callable objects. It returns a handle that can be used to remove the callback later:
+`Event<F>` provides three overloads of the `Add` method to register different types of callable objects. All overloads return a handle (`Ptr<EventHandler>`) that can be used to remove the callback later:
+
+### Add Overload 1: Lambda Expressions and Function Objects
+For lambda expressions and function objects that match the event signature:
 
 ```cpp
 Event<void(WString)> onMessage;
 
-// Add lambda expressions
+// Add lambda expression
 auto handle1 = onMessage.Add([](const WString& msg) {
     Console::WriteLine(L"Handler 1: " + msg);
 });
 
-auto handle2 = onMessage.Add([](const WString& msg) {
-    Console::WriteLine(L"Handler 2: " + msg);
-});
+// Add function object
+struct MessageHandler {
+    void operator()(const WString& msg) {
+        Console::WriteLine(L"Function object: " + msg);
+    }
+};
+MessageHandler handler;
+auto handle2 = onMessage.Add(handler);
+```
 
-// Add function pointer
+### Add Overload 2: Function Pointers
+For raw function pointers that match the event signature:
+
+```cpp
+// Function pointer
 void LogMessage(const WString& msg)
 {
     Console::WriteLine(L"Log: " + msg);
 }
+
+Event<void(WString)> onMessage;
 auto handle3 = onMessage.Add(LogMessage);
 ```
+
+### Add Overload 3: Method Pointers
+For method pointers with an object instance:
+
+```cpp
+class MessageProcessor {
+public:
+    void ProcessMessage(const WString& msg) {
+        Console::WriteLine(L"Processing: " + msg);
+    }
+};
+
+Event<void(WString)> onMessage;
+MessageProcessor processor;
+
+// Add method pointer with object instance
+auto handle4 = onMessage.Add(&processor, &MessageProcessor::ProcessMessage);
+```
+
+All three overloads demonstrate different ways to attach callable objects to the event:
+1. **Func-compatible objects** (lambdas, function objects)
+2. **Function pointers**
+3. **Method pointers** with object instances
 
 ## Triggering Events
 

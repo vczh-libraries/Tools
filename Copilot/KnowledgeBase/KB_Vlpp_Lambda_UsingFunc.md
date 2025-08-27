@@ -37,7 +37,7 @@ auto result = incrementer(5); // result is 6
 ```
 
 ### Method Pointers
-When using method pointers, the first argument becomes the object instance:
+When using method pointers, you must provide the object instance (this pointer) yourself as the first argument to the Func:
 
 ```cpp
 class Calculator
@@ -47,8 +47,8 @@ public:
 };
 
 Calculator calc;
-Func<vint(Calculator*, vint, vint)> multiplier = &Calculator::Multiply;
-auto result = multiplier(&calc, 3, 4); // result is 12
+Func<vint(Calculator*, vint, vint)> multiplier(&calc, &Calculator::Multiply);
+auto result = multiplier(3, 4); // result is 12
 ```
 
 ### Another Func with Compatible Types
@@ -208,7 +208,7 @@ bool ValidateAndProcess(const WString& input)
     if (!validator)
     {
         // Default validation: non-empty string
-        return !input.IsEmpty();
+        return input != WString::Empty;
     }
     
     return validator(input);
