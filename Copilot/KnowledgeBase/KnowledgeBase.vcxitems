@@ -1,4 +1,3 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -19,6 +18,7 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingDictionary.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingFromFunction.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingGroup.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingIndexedFunction.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingLazyListForLINQ.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingList.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingPartialOrderingProcessor.md" />

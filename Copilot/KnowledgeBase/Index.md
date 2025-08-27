@@ -124,8 +124,8 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Using PartialOrderingProcessor](KB_Vlpp_Collections_UsingPartialOrderingProcessor.md)
 
 #### Collection Iteration
-- * [Using Range-Based For Loop with Collections](KB_Vlpp_Collections_UsingRangeBasedForLoop.md)
-- * [Using Indexed Function for Index Access](KB_Vlpp_Collections_UsingIndexedFunction.md)
+- [Using Range-Based For Loop with Collections](KB_Vlpp_Collections_UsingRangeBasedForLoop.md)
+- [Using Indexed Function for Index Access](KB_Vlpp_Collections_UsingIndexedFunction.md)
 
 #### Smart Pointers
 - * [Using Ptr for Shared Ownership](KB_Vlpp_Memory_UsingPtr.md)
