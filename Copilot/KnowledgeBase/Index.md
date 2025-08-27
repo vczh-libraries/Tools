@@ -154,9 +154,9 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Working with Variant Apply and Overloading](KB_Vlpp_Primitives_WorkingWithVariantApply.md)
 
 #### Error Handling
-- * [Understanding Error vs Exception](KB_Vlpp_Exception_UnderstandingErrorVsException.md)
-- * [Using CHECK_ERROR Macro](KB_Vlpp_Exception_UsingCHECK_ERROR.md)
-- * [Using CHECK_FAIL Macro](KB_Vlpp_Exception_UsingCHECK_FAIL.md)
+- [Understanding Error vs Exception](KB_Vlpp_Exception_UnderstandingErrorVsException.md)
+- [Using CHECK_ERROR Macro](KB_Vlpp_Exception_UsingCHECK_ERROR.md)
+- [Using CHECK_FAIL Macro](KB_Vlpp_Exception_UsingCHECK_FAIL.md)
 
 #### Object Model
 - * [Defining Struct for Value Types](KB_Vlpp_Object_DefiningStructForValueTypes.md)
