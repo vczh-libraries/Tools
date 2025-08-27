@@ -18,19 +18,27 @@
 | Base Type | Must inherit from `Object` or `Interface` | Must implement `IUnknown` |
 | Memory Management | Reference counting | COM reference counting |
 
+## Important Usage Notes
+
+**Unlike ATL's `CComPtr`, `ComPtr<T>` cannot be used directly as `T**` or `void**`.** You must retrieve the raw pointer from COM APIs first, then construct a `ComPtr<T>` from it.
+
 ## Basic Usage
 
 ### Creating a ComPtr<T>
 
 ```cpp
-// Assuming you have a COM interface
-ComPtr<IMyComInterface> comObject;
-
-// Get COM object from factory or API
-if (SUCCEEDED(SomeComApi(&comObject)))
+// Correct way: Get raw pointer first, then construct ComPtr
+IMyComInterface* pInterface = nullptr;
+HRESULT hr = SomeComApi(&pInterface);
+if (SUCCEEDED(hr))
 {
+    ComPtr<IMyComInterface> comObject = pInterface;
     // Use the COM object
+    // pInterface is now managed by comObject, don't call Release() manually
 }
+
+// Alternative: Direct construction from function that returns raw pointer
+ComPtr<IMyComInterface> comObject = GetSomeComInterface();
 ```
 
 ### Checking if ComPtr<T> is Empty
@@ -89,8 +97,9 @@ HRESULT hr = unknown->QueryInterface(IID_IMySpecificInterface,
                                    reinterpret_cast<void**>(&pSpecific));
 if (SUCCEEDED(hr))
 {
-	ComPtr<IMySpecificInterface> specificInterface = pSpecific;
+    ComPtr<IMySpecificInterface> specificInterface = pSpecific;
     // Use the specific interface
+    // pSpecific is now managed by specificInterface, don't call Release() manually
 }
 ```
 
@@ -99,8 +108,9 @@ if (SUCCEEDED(hr))
 ### Working with DirectX
 
 ```cpp
-ComPtr<ID3D11Device> device;
-ComPtr<ID3D11DeviceContext> context;
+// Correct way: Get raw pointers first, then construct ComPtr
+ID3D11Device* pDevice = nullptr;
+ID3D11DeviceContext* pContext = nullptr;
 
 HRESULT hr = D3D11CreateDevice(
     nullptr,
@@ -110,14 +120,17 @@ HRESULT hr = D3D11CreateDevice(
     nullptr,
     0,
     D3D11_SDK_VERSION,
-    &device,
+    &pDevice,
     nullptr,
-    &context
+    &pContext
 );
 
 if (SUCCEEDED(hr))
 {
+    ComPtr<ID3D11Device> device = pDevice;
+    ComPtr<ID3D11DeviceContext> context = pContext;
     // Use DirectX device and context
+    // pDevice and pContext are now managed by ComPtr, don't call Release() manually
 }
 ```
 
@@ -134,11 +147,13 @@ private:
 public:
     MyComWrapper()
     {
-        HRESULT hr = CreateMyComObject(&m_interface);
+        IMyComInterface* pInterface = nullptr;
+        HRESULT hr = CreateMyComObject(&pInterface);
         if (FAILED(hr))
         {
             throw Exception(L"Failed to create COM object");
         }
+        m_interface = pInterface;
     }
     
     // Destructor automatically releases COM object
@@ -159,15 +174,34 @@ public:
 ```cpp
 ComPtr<IMyComInterface> CreateComObject()
 {
-    ComPtr<IMyComInterface> result;
-    HRESULT hr = SomeApiCall(&result);
+    IMyComInterface* pInterface = nullptr;
+    HRESULT hr = SomeApiCall(&pInterface);
     
     if (FAILED(hr))
     {
         throw Exception(L"COM object creation failed: " + itow(hr));
     }
     
-    return result;
+    return ComPtr<IMyComInterface>(pInterface);
+}
+```
+
+### Getting Raw Pointer from ComPtr<T>
+
+When you need to pass a raw pointer to APIs that don't transfer ownership:
+
+```cpp
+ComPtr<IMyComInterface> comPtr = GetComObject();
+
+// Get raw pointer for APIs that don't transfer ownership
+SomeApiThatDoesNotTakeOwnership(comPtr.Obj());
+
+// For APIs that do take ownership, you need to AddRef manually
+IMyComInterface* pForTransfer = comPtr.Obj();
+if (pForTransfer)
+{
+    pForTransfer->AddRef();  // Manual AddRef since ownership is being transferred
+    SomeApiThatTakesOwnership(pForTransfer);
 }
 ```
 

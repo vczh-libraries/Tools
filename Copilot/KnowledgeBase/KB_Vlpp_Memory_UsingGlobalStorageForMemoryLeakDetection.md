@@ -178,12 +178,12 @@ void SafeFinalize()
         Console::WriteLine(L"Finalizing application globals...");
         
         // This will trigger AppGlobals finalization
-        GetAppGlobals().IsInitialized();  // Force finalization check
+        GetAppGlobals().EnsureFinalized();  // Force finalization
         
         Console::WriteLine(L"Finalizing core globals...");
         
         // This will trigger CoreGlobals finalization
-        GetCoreGlobals().IsInitialized();  // Force finalization check
+        GetCoreGlobals().EnsureFinalized();  // Force finalization
         
         Console::WriteLine(L"Finalizing all remaining global storage...");
         vl::FinalizeGlobalStorage();  // Clean up everything
