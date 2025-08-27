@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Index.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_ReadingTextFilesWithEncodingDetection.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_UsingFilePath.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WorkingWithFile.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WorkingWithFolder.md" />

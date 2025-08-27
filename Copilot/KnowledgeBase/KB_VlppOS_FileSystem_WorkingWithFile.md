@@ -1,4 +1,4 @@
-# Working with File Class
+﻿# Working with File Class
 
 The `File` class in VlppOS provides file operations and text reading/writing capabilities. It's built on top of the `FilePath` class and offers convenient methods for common file operations.
 
@@ -166,12 +166,11 @@ BomEncoder::Utf8        // UTF-8 with or without BOM
 BomEncoder::Utf16       // UTF-16 Little Endian with BOM
 BomEncoder::Utf16BE     // UTF-16 Big Endian with BOM  
 BomEncoder::Utf32       // UTF-32 Little Endian with BOM
-BomEncoder::Utf32BE     // UTF-32 Big Endian with BOM
 BomEncoder::Mbcs        // ANSI/MBCS encoding
 
 // Example: Writing with specific encoding
 File file(L"/path/to/file.txt");
-WString content = L"Unicode content: ????";
+WString content = L"Unicode content: 你好世界";
 file.WriteAllText(content, true, BomEncoder::Utf16);
 ```
 
