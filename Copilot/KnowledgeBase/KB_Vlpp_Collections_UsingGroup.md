@@ -45,8 +45,8 @@ categoryItems.Add(L"Fruits", L"Banana");
 categoryItems.Add(L"Vegetables", L"Carrot");
 
 // Get all values for a key - returns a collection
-auto fruits = categoryItems.Get(L"Fruits");     // ["Apple", "Banana"]
-auto vegetables = categoryItems[L"Vegetables"]; // ["Carrot"]
+auto&& fruits = categoryItems.Get(L"Fruits");     // ["Apple", "Banana"]
+auto&& vegetables = categoryItems[L"Vegetables"]; // ["Carrot"]
 
 // Iterate through values for a specific key
 for (auto fruit : fruits)
@@ -66,11 +66,11 @@ categoryItems.Add(L"Fruits", L"Banana");
 categoryItems.Add(L"Vegetables", L"Carrot");
 
 // Get keys (sorted order)
-auto keys = categoryItems.Keys();  // ["Fruits", "Vegetables"]
+auto&& keys = categoryItems.Keys();  // ["Fruits", "Vegetables"]
 
 // GetByIndex equivalents to Get(Keys()[index])
-auto firstGroupItems = categoryItems.GetByIndex(0);   // Same as categoryItems.Get(L"Fruits")
-auto secondGroupItems = categoryItems.GetByIndex(1);  // Same as categoryItems.Get(L"Vegetables")
+auto&& firstGroupItems = categoryItems.GetByIndex(0);   // Same as categoryItems.Get(L"Fruits")
+auto&& secondGroupItems = categoryItems.GetByIndex(1);  // Same as categoryItems.Get(L"Vegetables")
 ```
 
 ### Size and Contents
@@ -85,7 +85,7 @@ categoryItems.Add(L"Vegetables", L"Carrot");
 vint keyCount = categoryItems.Count();  // Returns 2 (Fruits, Vegetables)
 
 // Get all keys (in sorted order)
-auto keys = categoryItems.Keys();       // ["Fruits", "Vegetables"]
+auto&& keys = categoryItems.Keys();       // ["Fruits", "Vegetables"]
 ```
 
 ### Checking Existence
@@ -170,10 +170,10 @@ categoryItems.Add(L"Fruits", L"Banana");
 categoryItems.Add(L"Vegetables", L"Carrot");
 
 // Iterate through each key and its values
-for (auto key : categoryItems.Keys())
+for (auto [key, index] : categoryItems.Keys())
 {
     Console::WriteLine(L"Category: " + key);
-    auto items = categoryItems[key];
+    auto&& items = categoryItems.GetByIndex(index);
     for (auto item : items)
     {
         Console::WriteLine(L"  - " + item);

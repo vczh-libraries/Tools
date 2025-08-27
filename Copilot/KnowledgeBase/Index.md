@@ -121,7 +121,7 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 
 #### Sorting and Ordering
 - [Using Sort Function for Quick Sort](KB_Vlpp_Collections_UsingSortFunction.md)
-- * [Using PartialOrderingProcessor](KB_Vlpp_Collections_UsingPartialOrderingProcessor.md)
+- [Using PartialOrderingProcessor](KB_Vlpp_Collections_UsingPartialOrderingProcessor.md)
 
 #### Collection Iteration
 - * [Using Range-Based For Loop with Collections](KB_Vlpp_Collections_UsingRangeBasedForLoop.md)

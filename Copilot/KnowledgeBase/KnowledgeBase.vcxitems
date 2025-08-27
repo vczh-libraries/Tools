@@ -21,6 +21,7 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingGroup.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingLazyListForLINQ.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingList.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingPartialOrderingProcessor.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingSortedList.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingSortFunction.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_WorkingWithIEnumerable.md" />

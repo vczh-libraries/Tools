@@ -76,10 +76,10 @@ scores.Add(L"Charlie", 92);
 vint count = scores.Count();  // Returns 3
 
 // Get all keys (in sorted order)
-auto keys = scores.Keys();    // Returns immutable collection: ["Alice", "Bob", "Charlie"]
+auto&& keys = scores.Keys();    // Returns immutable collection: ["Alice", "Bob", "Charlie"]
 
 // Get all values (in the order of keys)
-auto values = scores.Values(); // Returns immutable collection: [95, 87, 92]
+auto&& values = scores.Values(); // Returns immutable collection: [95, 87, 92]
 ```
 
 ### Removing Elements
