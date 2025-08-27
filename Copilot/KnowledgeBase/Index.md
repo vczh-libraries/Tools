@@ -100,7 +100,7 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 - [Converting Between UTF Encodings](KB_Vlpp_String_ConvertingBetweenUTFEncodings.md)
 - [Converting Strings to Numbers](KB_Vlpp_String_ConvertingStringsToNumbers.md)
 - [Converting Numbers to Strings](KB_Vlpp_String_ConvertingNumbersToStrings.md)
-- * [Converting Between Double and String](KB_Vlpp_String_ConvertingBetweenDoubleAndString.md)
+- [Converting Between Double and String](KB_Vlpp_String_ConvertingBetweenDoubleAndString.md)
 - * [String Case Conversion](KB_Vlpp_String_StringCaseConversion.md)
 
 #### Array Collection
