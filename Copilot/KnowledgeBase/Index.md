@@ -96,7 +96,7 @@ The following data types are preferred:
 Vlpp is the foundational library that provides STL replacements and basic utilities. It is the cornerstone of the entire framework, offering string handling, collections, lambda expressions, memory management, and primitive data types. Use this when you need basic data structures without depending on STL. This project prefers `wchar_t` over other char types and provides immutable string types, smart pointers, collection classes, and LINQ-like operations.
 
 #### String Types
-- * [Working with Utf and Ansi String Types](KB_Vlpp_String_WorkingWithUtfAndAnsiStringTypes.md)
+- [Working with Utf and Ansi String Types](KB_Vlpp_String_WorkingWithUtfAndAnsiStringTypes.md)
 - * [Converting Between UTF Encodings](KB_Vlpp_String_ConvertingBetweenUTFEncodings.md)
 - * [Converting Strings to Numbers](KB_Vlpp_String_ConvertingStringsToNumbers.md)
 - * [Converting Numbers to Strings](KB_Vlpp_String_ConvertingNumbersToStrings.md)
