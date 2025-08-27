@@ -174,9 +174,9 @@ Vlpp is the foundational library that provides STL replacements and basic utilit
 VlppOS provides cross-platform OS abstraction for file system operations, streams, locale support, and multi-threading. Use this when you need to interact with the operating system in a portable way. It offers locale-aware string manipulation, file system access, various stream types with encoding/decoding capabilities, and comprehensive multi-threading support with synchronization primitives.
 
 #### File System Path Operations
-- * [Using FilePath for Path Manipulation](KB_VlppOS_FileSystem_UsingFilePath.md)
-- * [Working with File Class](KB_VlppOS_FileSystem_WorkingWithFile.md)
-- * [Working with Folder Class](KB_VlppOS_FileSystem_WorkingWithFolder.md)
+- [Using FilePath for Path Manipulation](KB_VlppOS_FileSystem_UsingFilePath.md)
+- [Working with File Class](KB_VlppOS_FileSystem_WorkingWithFile.md)
+- [Working with Folder Class](KB_VlppOS_FileSystem_WorkingWithFolder.md)
 
 #### File I/O Operations
 - * [Reading Text Files with Encoding Detection](KB_VlppOS_FileSystem_ReadingTextFilesWithEncodingDetection.md)
