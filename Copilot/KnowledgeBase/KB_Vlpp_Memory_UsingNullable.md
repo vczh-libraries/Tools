@@ -1,6 +1,6 @@
 # Using Nullable for Optional Values
 
-`Nullable<T>` is Vlpp's equivalent to `std::optional<T>`, providing a way to represent values that may or may not be present. It adds `nullptr` semantics to any value type `T`, making it useful for optional parameters, optional return values, and scenarios where a value might be uninitialized.
+`Nullable<T>` is Vlpp's equivalent to `std::optional<T>`, providing a way to represent values that may or may not be present. It adds `nullptr` semantics to any value type `T`.
 
 ## Basic Usage
 
@@ -12,11 +12,7 @@ Nullable<vint> optionalInt;
 
 // Create nullable with value
 Nullable<vint> withValue = 42;
-
-// Direct assignment
 Nullable<WString> optionalString = L"Hello";
-
-// Using constructor
 Nullable<bool> optionalBool(true);
 ```
 
@@ -25,13 +21,12 @@ Nullable<bool> optionalBool(true);
 ```cpp
 Nullable<vint> value = 42;
 
-// Method 1: Using operator bool
+// Using operator bool
 if (value)
 {
     Console::WriteLine(L"Value is present");
 }
 
-// Method 2: Checking against empty state
 if (!value)
 {
     Console::WriteLine(L"Value is empty");
@@ -51,21 +46,14 @@ if (text)
     Console::WriteLine(L"Text: " + content);
 }
 
-// CAUTION: Calling Value() on empty Nullable is undefined behavior
-// Nullable<WString> empty;
-// empty.Value();  // DANGEROUS - only call if you're sure it has a value
+// CAUTION: Only call Value() if you're sure it has a value
 ```
 
 ### Resetting to Empty State
 
-Use the `Reset()` method to clear a nullable value:
-
 ```cpp
 Nullable<vint> number = 42;
-Console::WriteLine(number ? L"Has value" : L"Empty");  // "Has value"
-
-number.Reset();
-Console::WriteLine(number ? L"Has value" : L"Empty");  // "Empty"
+number.Reset();  // Now empty
 ```
 
 ## Common Use Cases
@@ -88,8 +76,8 @@ void ProcessConfiguration(const WString& name, Nullable<vint> timeout = {})
 }
 
 // Usage
-ProcessConfiguration(L"Config1");              // No timeout
-ProcessConfiguration(L"Config2", 30);          // 30 second timeout
+ProcessConfiguration(L"Config1");      // No timeout
+ProcessConfiguration(L"Config2", 30);  // 30 second timeout
 ```
 
 ### Optional Return Values
@@ -108,11 +96,6 @@ Nullable<vint> FindIndex(const List<WString>& list, const WString& item)
 }
 
 // Usage
-List<WString> names;
-names.Add(L"Alice");
-names.Add(L"Bob");
-names.Add(L"Charlie");
-
 auto index = FindIndex(names, L"Bob");
 if (index)
 {
@@ -138,83 +121,36 @@ struct AppSettings
 
 void ApplySettings(const AppSettings& settings)
 {
-    Console::WriteLine(L"App: " + settings.appName);
-    
     if (settings.windowWidth && settings.windowHeight)
     {
-        Console::WriteLine(L"Window size: " + 
-                          itow(settings.windowWidth.Value()) + L"x" + 
-                          itow(settings.windowHeight.Value()));
+        // Apply window size
     }
     
     if (settings.fullscreen)
     {
-        Console::WriteLine(settings.fullscreen.Value() ? L"Fullscreen mode" : L"Windowed mode");
+        // Apply fullscreen setting
     }
     
     if (settings.theme)
     {
-        Console::WriteLine(L"Theme: " + settings.theme.Value());
+        // Apply theme
     }
-}
-```
-
-### Style Properties (Real-world Example)
-
-From the GacUI codebase, `Nullable<T>` is extensively used for style properties:
-
-```cpp
-class DocumentStyleProperties : public Object
-{
-public:
-    Nullable<WString>       face;           // Optional font face
-    Nullable<Color>         color;          // Optional text color
-    Nullable<bool>          bold;           // Optional bold flag
-    Nullable<bool>          italic;         // Optional italic flag
-    Nullable<bool>          underline;      // Optional underline flag
-};
-
-void ApplyStyle(DocumentStyleProperties& style)
-{
-    if (style.face)
-    {
-        SetFont(style.face.Value());
-    }
-    
-    if (style.color)
-    {
-        SetTextColor(style.color.Value());
-    }
-    
-    if (style.bold)
-    {
-        SetBold(style.bold.Value());
-    }
-    
-    // etc.
 }
 ```
 
 ## Comparisons
 
-`Nullable<T>` supports standard comparison operations:
-
 ```cpp
 Nullable<vint> a = 10;
 Nullable<vint> b = 10;
-Nullable<vint> c = 20;
 Nullable<vint> empty;
 
 // Equality comparison
 Console::WriteLine(a == b ? L"Equal" : L"Not equal");           // "Equal"
-Console::WriteLine(a == c ? L"Equal" : L"Not equal");           // "Not equal"
 Console::WriteLine(a == empty ? L"Equal" : L"Not equal");       // "Not equal"
 
 // Comparison with raw values
 Console::WriteLine(a == 10 ? L"Equal" : L"Not equal");          // "Equal"
-
-// Other comparisons
-Console::WriteLine(a < c ? L"Less" : L"Not less");              // "Less"
 ```
 
 ## Helper Patterns
@@ -232,21 +168,6 @@ Nullable<vint> userTimeout;  // Empty
 vint timeout = GetConfigValue(userTimeout, 30);  // Returns 30
 ```
 
-### Chaining Operations
-
-```cpp
-Nullable<WString> ProcessText(Nullable<WString> input)
-{
-    if (!input)
-    {
-        return {};  // Return empty if input is empty
-    }
-    
-    WString processed = wupper(input.Value());
-    return processed.Length() > 0 ? Nullable<WString>(processed) : Nullable<WString>();
-}
-```
-
 ### Validation Pattern
 
 ```cpp
@@ -262,17 +183,6 @@ Nullable<vint> ParseInteger(const WString& text)
         return {};  // Return empty on parse failure
     }
 }
-
-// Usage
-auto result = ParseInteger(L"123");
-if (result)
-{
-    Console::WriteLine(L"Parsed: " + itow(result.Value()));
-}
-else
-{
-    Console::WriteLine(L"Failed to parse");
-}
 ```
 
 ## Best Practices
@@ -285,43 +195,27 @@ else
    }
    ```
 
-2. **Use Reset() for Clearing**: Don't rely on assignment patterns
+2. **Use Reset() for Clearing**: Clear and explicit
    ```cpp
-   nullable.Reset();  // Clear and explicit
+   nullable.Reset();
    ```
 
-3. **Prefer Return {} for Empty**: More explicit than other empty patterns
+3. **Prefer Return {} for Empty**: Clear intent
    ```cpp
-   return {};  // Clear intent - returning empty
+   return {};  // Returning empty
    ```
 
-4. **Document Nullable Parameters**: Make it clear when parameters are optional
+4. **Document Nullable Parameters**: Make optional parameters clear
    ```cpp
-   // Process data with optional validation
    void ProcessData(const Data& data, Nullable<bool> validate = {});
-   ```
-
-5. **Consider Default Values**: Sometimes defaults are better than nullable
-   ```cpp
-   // Sometimes this is clearer:
-   void SetTimeout(vint timeout = 30);
-   
-   // Instead of:
-   void SetTimeout(Nullable<vint> timeout = {});
    ```
 
 ## Immutability Note
 
-The `Value()` method returns an immutable value. You cannot modify the contained value directly, but you can assign a new value to the `Nullable<T>`:
+The `Value()` method returns an immutable value. You cannot modify the contained value directly:
 
 ```cpp
 Nullable<vint> number = 42;
 
-// This won't work (Value() returns immutable reference):
-// number.Value()++;  // ERROR
-
 // This works (assigns new value):
 number = number.Value() + 1;  // OK
-```
-
-`Nullable<T>` provides a safe, explicit way to handle optional values in Vlpp applications, making code more robust and intentions clearer.

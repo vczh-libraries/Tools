@@ -1,10 +1,10 @@
 # Using Func for Callable Objects
 
-`Func<F>` in Vlpp works like `std::function<F>` in C++ standard library. It provides a type-erased wrapper for callable objects including function pointers, lambda expressions, and method pointers. Use this when you need to store or pass around callable objects in a flexible way.
+`Func<F>` works like `std::function<F>` providing a type-erased wrapper for callable objects including function pointers, lambda expressions, and method pointers.
 
 ## Basic Usage
 
-`Func<F>` uses function signature syntax where `F` represents the function type:
+`Func<F>` uses function signature syntax:
 
 ```cpp
 #include "Vlpp.h"
@@ -20,7 +20,7 @@ Func<void(vint, vint)> calculator;
 Func<WString()> generator;
 ```
 
-## Initializing Func with Different Callable Objects
+## Initializing Func
 
 ### Lambda Expressions
 ```cpp
@@ -37,7 +37,7 @@ auto result = incrementer(5); // result is 6
 ```
 
 ### Method Pointers
-When using method pointers, you must provide the object instance (this pointer) yourself as the first argument to the Func:
+When using method pointers, provide the object instance as the first argument:
 
 ```cpp
 class Calculator
@@ -51,23 +51,14 @@ Func<vint(Calculator*, vint, vint)> multiplier(&calc, &Calculator::Multiply);
 auto result = multiplier(3, 4); // result is 12
 ```
 
-### Another Func with Compatible Types
-```cpp
-Func<vint(vint)> original = [](vint x) { return x * 2; };
-Func<vint(vint)> copy = original; // Copy constructor
-```
-
-## Type Inference
-
-You can use `Func(callable-object)` to automatically infer the function type:
-
+### Type Inference
 ```cpp
 auto processor = Func([](vint x) { return x * 2; }); // Infers Func<vint(vint)>
 ```
 
 ## Checking for Empty State
 
-`Func<F>` can be empty (not assigned with any callable object). Check this using the `operator bool`:
+`Func<F>` can be empty. Check using `operator bool`:
 
 ```cpp
 Func<vint(vint)> processor;
@@ -77,17 +68,15 @@ if (!processor)
     Console::WriteLine(L"Function is empty");
 }
 
-// Assign a lambda
 processor = [](vint x) { return x * 2; };
 
 if (processor)
 {
-    Console::WriteLine(L"Function is ready");
     auto result = processor(5); // Safe to call
 }
 ```
 
-## Practical Examples
+## Basic Usage Examples
 
 ### Event Handler Pattern
 ```cpp
@@ -119,11 +108,30 @@ manager.SetMessageHandler([](const WString& msg) {
 manager.SendMessage(L"Hello World");
 ```
 
-### Callback-Based Async Operations
+### Higher-Order Functions
+```cpp
+void ForEach(const List<vint>& list, Func<void(vint)> action)
+{
+    for (vint item : list)
+    {
+        action(item);
+    }
+}
+
+List<vint> numbers;
+numbers.Add(1);
+numbers.Add(2);
+numbers.Add(3);
+
+ForEach(numbers, [](vint x) {
+    Console::WriteLine(L"Value: " + itow(x));
+});
+```
+
+### Callback-Based Operations
 ```cpp
 void ProcessDataAsync(const WString& data, Func<void(WString)> onComplete)
 {
-    // Simulate async processing
     ThreadPoolLite::QueueLambda([=]()
     {
         WString result = L"Processed: " + data;
@@ -135,48 +143,6 @@ void ProcessDataAsync(const WString& data, Func<void(WString)> onComplete)
 ProcessDataAsync(L"input data", [](const WString& result) {
     Console::WriteLine(result);
 });
-```
-
-### Higher-Order Functions
-```cpp
-List<vint> numbers;
-numbers.Add(1);
-numbers.Add(2);
-numbers.Add(3);
-numbers.Add(4);
-numbers.Add(5);
-
-List<vint> results;
-CopyFrom(results, From(numbers)
-    .Where([](vint x) { return x % 2 == 0; })
-    .Select([](vint x) { return x * x; }));
-
-// Custom higher-order function
-void ForEach(const List<vint>& list, Func<void(vint)> action)
-{
-    for (vint item : list)
-    {
-        action(item);
-    }
-}
-
-ForEach(results, [](vint x) {
-    Console::WriteLine(L"Value: " + itow(x));
-});
-```
-
-## Type Conversion and Compatibility
-
-`Func<F>` supports implicit conversion when argument and return types can be implicitly converted:
-
-```cpp
-// Function that takes and returns derived types
-Func<Ptr<Object>(Ptr<Object>)> processor = [](Ptr<Object> obj) {
-    return obj;
-};
-
-// Can be assigned to function that works with base types if conversion is valid
-// This depends on the specific inheritance relationships in your types
 ```
 
 ## Best Practices
@@ -191,15 +157,7 @@ Func<void(const List<WString>&)> listProcessor = [](const List<WString>& strings
 };
 ```
 
-### Prefer Lambda Capture by Reference When Appropriate
-```cpp
-vint multiplier = 10;
-Func<vint(vint)> scaler = [&multiplier](vint x) {
-    return x * multiplier; // Captures multiplier by reference
-};
-```
-
-### Error Handling with Func
+### Error Handling
 ```cpp
 Func<bool(const WString&)> validator;
 
@@ -207,18 +165,15 @@ bool ValidateAndProcess(const WString& input)
 {
     if (!validator)
     {
-        // Default validation: non-empty string
-        return input != WString::Empty;
+        return input != WString::Empty; // Default validation
     }
     
     return validator(input);
 }
 ```
 
-## Performance Considerations
+## Performance Notes
 
-- `Func<F>` has some overhead compared to direct function calls due to type erasure
-- For performance-critical code with known function types, consider using function pointers or template parameters
-- Lambda expressions captured in `Func<F>` may allocate memory for captured variables
-
-`Func<F>` provides a powerful and flexible way to work with callable objects in Vlpp, enabling functional programming patterns and callback-based designs while maintaining type safety.
+- `Func<F>` has overhead compared to direct function calls due to type erasure
+- For performance-critical code, consider function pointers or template parameters
+- Lambda expressions may allocate memory for captured variables
