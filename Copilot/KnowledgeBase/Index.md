@@ -45,7 +45,7 @@ Immutable string types for text processing across different encodings with UTF c
 - Use `ConvertUtfString<From, To>` for template-based UTF string conversion
 - Use `AtoB` functions (like `wtou8`, `u8tow`) for direct UTF encoding conversion
 
-* [API Explanation](./KB_Vlpp_StringTypes.md)
+[API Explanation](./KB_Vlpp_StringTypes.md)
 
 #### Exception Handling
 
