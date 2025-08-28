@@ -122,7 +122,7 @@ Check out comments before `#ifndef VCZH_COLLECTIONS_OPERATION` for a full list o
 - Use `indexed` function for enumeration with index access
 - Use range-based for loops with any IEnumerable implementation
 
-* [API Explanation](./KB_Vlpp_LinqOperations.md)
+[API Explanation](./KB_Vlpp_LinqOperations.md)
 
 #### Sorting and Ordering
 
