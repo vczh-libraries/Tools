@@ -1,4 +1,4 @@
-# Using Utf8Base64Encoder and Utf8Base64Decoder
+﻿# Using Utf8Base64Encoder and Utf8Base64Decoder
 
 `Utf8Base64Encoder` and `Utf8Base64Decoder` provide Base64 encoding and decoding functionality, converting binary data to and from Base64 text representation using UTF-8 character encoding. These classes are useful for embedding binary data in text formats or transmitting binary data over text-based protocols.
 
@@ -17,7 +17,7 @@ Every 3 bytes of binary data becomes 4 Base64 characters, with padding (`=`) use
 ### Encoding Process
 
 ```cpp
-// 3 binary bytes ? 4 Base64 characters
+// 3 binary bytes → 4 Base64 characters
 // Input:  [0x4D, 0x61, 0x6E]  (bytes for "Man")
 // Output: "TWFu"               (Base64 representation)
 ```
@@ -73,14 +73,7 @@ WString ConvertFileToBase64(const WString& binaryFilename)
     EncoderStream encoderStream(base64Stream, encoder);
     
     // Read and encode file in chunks
-    Array<vuint8_t> buffer(4096);
-    while (true)
-    {
-        vint bytesRead = inputStream.Read(buffer.Buffer(), buffer.Count());
-        if (bytesRead == 0) break;
-        
-        encoderStream.Write(buffer.Buffer(), bytesRead);
-    }
+    CopyStream(inputStream, encoderStream);
     encoderStream.Close();
     
     // Convert UTF-8 Base64 to wchar_t string
@@ -90,43 +83,6 @@ WString ConvertFileToBase64(const WString& binaryFilename)
     StreamReader reader(utf8DecoderStream);
     
     return reader.ReadToEnd();
-}
-```
-
-### Creating Base64 Data URLs
-
-```cpp
-// Create data URL with Base64 encoding (useful for web content)
-WString CreateDataUrl(const Array<vuint8_t>& imageData, const WString& mimeType)
-{
-    // Encode image data to Base64
-    MemoryStream base64Stream;
-    Utf8Base64Encoder encoder;
-    EncoderStream encoderStream(base64Stream, encoder);
-    
-    encoderStream.Write(imageData.Buffer(), imageData.Count());
-    encoderStream.Close();
-    
-    // Convert to string
-    base64Stream.SeekFromBegin(0);
-    Utf8Decoder decoder;
-    DecoderStream decoderStream(base64Stream, decoder);
-    StreamReader reader(decoderStream);
-    
-    WString base64String = reader.ReadToEnd();
-    
-    // Create data URL
-    return L"data:" + mimeType + L";base64," + base64String;
-}
-
-// Usage example
-void CreateImageDataUrl()
-{
-    // Load image file (simplified)
-    Array<vuint8_t> imageBytes(1024); // Would contain actual image data
-    
-    WString dataUrl = CreateDataUrl(imageBytes, L"image/png");
-    Console::WriteLine(L"Data URL: " + dataUrl);
 }
 ```
 

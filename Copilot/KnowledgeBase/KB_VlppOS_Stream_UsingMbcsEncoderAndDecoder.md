@@ -1,4 +1,4 @@
-# Using MbcsEncoder and MbcsDecoder
+ï»¿# Using MbcsEncoder and MbcsDecoder
 
 `MbcsEncoder` and `MbcsDecoder` provide encoding and decoding between `wchar_t` strings and multi-byte character sequences (MBCS) using the local code page. MBCS typically refers to ANSI encoding that varies based on the system's locale settings.
 
@@ -16,10 +16,10 @@ MBCS (Multi-Byte Character Set) encoding uses variable-length byte sequences to 
 ```cpp
 using namespace vl::stream;
 
-// MbcsEncoder: wchar_t ? char (ANSI/local code page)
+// MbcsEncoder: wchar_t â†’ char (ANSI/local code page)
 class MbcsEncoder : public EncoderBase;
 
-// MbcsDecoder: char (ANSI/local code page) ? wchar_t  
+// MbcsDecoder: char (ANSI/local code page) â†’ wchar_t  
 class MbcsDecoder : public DecoderBase;
 ```
 
@@ -40,7 +40,7 @@ writer.WriteString(L"Hello, World!");
 writer.WriteLine(L"ANSI compatible text");
 
 // Note: Non-ASCII characters may not encode properly depending on locale
-writer.WriteString(L"Extended characters: café, naïve");
+writer.WriteString(L"Extended characters: cafÃ©, naÃ¯ve");
 ```
 
 ### Writing Legacy ANSI Files
@@ -70,7 +70,7 @@ MbcsEncoder encoder;
 EncoderStream encoderStream(memoryStream, encoder);
 StreamWriter writer(encoderStream);
 
-WString unicodeText = L"Text with accents: résumé, naïve, café";
+WString unicodeText = L"Text with accents: rÃ©sumÃ©, naÃ¯ve, cafÃ©";
 writer.WriteString(unicodeText);
 
 // Get the encoded bytes
@@ -134,183 +134,6 @@ void ProcessAnsiData(const Array<char>& ansiData)
     
     WString unicodeText = reader.ReadToEnd();
     Console::WriteLine(L"Converted to Unicode: " + unicodeText);
-}
-```
-
-## Practical Usage Scenarios
-
-### Legacy File Format Support
-
-```cpp
-// Support for legacy file formats that use ANSI encoding
-class LegacyConfigReader
-{
-public:
-    static WString ReadLegacyConfig(const WString& configFile)
-    {
-        try
-        {
-            FileStream fileStream(configFile, FileStream::ReadOnly);
-            MbcsDecoder decoder;
-            DecoderStream decoderStream(fileStream, decoder);
-            StreamReader reader(decoderStream);
-            
-            return reader.ReadToEnd();
-        }
-        catch (...)
-        {
-            Console::WriteLine(L"Failed to read legacy config: " + configFile);
-            return L"";
-        }
-    }
-    
-    static bool WriteLegacyConfig(const WString& configFile, const WString& content)
-    {
-        try
-        {
-            FileStream fileStream(configFile, FileStream::WriteOnly);
-            MbcsEncoder encoder;
-            EncoderStream encoderStream(fileStream, encoder);
-            StreamWriter writer(encoderStream);
-            
-            writer.WriteString(content);
-            return true;
-        }
-        catch (...)
-        {
-            Console::WriteLine(L"Failed to write legacy config: " + configFile);
-            return false;
-        }
-    }
-};
-```
-
-### Interoperability with Legacy Applications
-
-```cpp
-// Interface with external programs that expect ANSI input
-void CallLegacyTool(const WString& inputData, const WString& outputFile)
-{
-    // Write Unicode data as ANSI for legacy tool
-    WString tempInputFile = L"temp_input.txt";
-    
-    FileStream inputStream(tempInputFile, FileStream::WriteOnly);
-    MbcsEncoder encoder;
-    EncoderStream encoderStream(inputStream, encoder);
-    StreamWriter writer(encoderStream);
-    
-    writer.WriteString(inputData);
-    encoderStream.Close();
-    
-    // Call legacy tool (pseudocode)
-    // ExecuteCommand(L"legacy_tool.exe " + tempInputFile + L" " + outputFile);
-    
-    // Read ANSI output from legacy tool
-    FileStream outputStream(outputFile, FileStream::ReadOnly);
-    MbcsDecoder decoder;
-    DecoderStream decoderStream(outputStream, decoder);
-    StreamReader reader(decoderStream);
-    
-    WString result = reader.ReadToEnd();
-    Console::WriteLine(L"Legacy tool output: " + result);
-}
-```
-
-### Text File Migration
-
-```cpp
-// Migrate legacy ANSI files to UTF-8
-void MigrateAnsiToUtf8(const WString& sourceDir, const WString& targetDir)
-{
-    // This would typically iterate through files
-    WString sourceFile = sourceDir + L"/legacy.txt";
-    WString targetFile = targetDir + L"/migrated.txt";
-    
-    // Read ANSI file
-    FileStream inputStream(sourceFile, FileStream::ReadOnly);
-    MbcsDecoder decoder;
-    DecoderStream decoderStream(inputStream, decoder);
-    StreamReader reader(decoderStream);
-    
-    WString content = reader.ReadToEnd();
-    
-    // Write as UTF-8
-    FileStream outputStream(targetFile, FileStream::WriteOnly);
-    Utf8Encoder utf8Encoder;
-    EncoderStream utf8EncoderStream(outputStream, utf8Encoder);
-    StreamWriter writer(utf8EncoderStream);
-    
-    writer.WriteString(content);
-    
-    Console::WriteLine(L"Migrated: " + sourceFile + L" ? " + targetFile);
-}
-```
-
-## Important Considerations
-
-### Character Set Limitations
-
-```cpp
-// MBCS encoding may lose information for non-local characters
-void TestMbcsLimitations()
-{
-    WString unicodeText = L"Mixed: Hello, ??, ???????, ???????";
-    
-    MemoryStream memoryStream;
-    MbcsEncoder encoder;
-    EncoderStream encoderStream(memoryStream, encoder);
-    StreamWriter writer(encoderStream);
-    
-    writer.WriteString(unicodeText);
-    encoderStream.Close();
-    
-    memoryStream.SeekFromBegin(0);
-    MbcsDecoder decoder;
-    DecoderStream decoderStream(memoryStream, decoder);
-    StreamReader reader(decoderStream);
-    
-    WString decodedText = reader.ReadToEnd();
-    
-    Console::WriteLine(L"Original: " + unicodeText);
-    Console::WriteLine(L"After MBCS round-trip: " + decodedText);
-    
-    if (unicodeText != decodedText)
-    {
-        Console::WriteLine(L"Warning: Data loss occurred during MBCS encoding");
-    }
-}
-```
-
-### Error Handling
-
-```cpp
-// Safe MBCS processing with error handling
-bool SafeMbcsConversion(const WString& input, WString& output)
-{
-    try
-    {
-        MemoryStream memoryStream;
-        MbcsEncoder encoder;
-        EncoderStream encoderStream(memoryStream, encoder);
-        StreamWriter writer(encoderStream);
-        
-        writer.WriteString(input);
-        encoderStream.Close();
-        
-        memoryStream.SeekFromBegin(0);
-        MbcsDecoder decoder;
-        DecoderStream decoderStream(memoryStream, decoder);
-        StreamReader reader(decoderStream);
-        
-        output = reader.ReadToEnd();
-        return true;
-    }
-    catch (...)
-    {
-        Console::WriteLine(L"MBCS conversion failed");
-        output = L"";
-        return false;
-    }
 }
 ```
 

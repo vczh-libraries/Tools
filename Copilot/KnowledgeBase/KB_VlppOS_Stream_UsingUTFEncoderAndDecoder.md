@@ -1,4 +1,4 @@
-# Using UTF Encoder and Decoder
+﻿# Using UTF Encoder and Decoder
 
 VlppOS provides specialized UTF encoder and decoder classes that are type-aliases for the `UtfGeneralEncoder` and `UtfGeneralDecoder` templates, configured for common UTF conversion scenarios. These classes simplify the conversion between `wchar_t` and specific UTF encodings.
 
@@ -47,9 +47,9 @@ Utf8Encoder encoder;
 EncoderStream encoderStream(fileStream, encoder);
 StreamWriter writer(encoderStream);
 
-writer.WriteString(L"Hello, ??!");
-writer.WriteLine(L"UTF-8 encoded content: ����");
-writer.WriteString(L"Emoji: ??????");
+writer.WriteString(L"Hello, 世界!");
+writer.WriteLine(L"UTF-8 encoded content: ñäöü");
+writer.WriteString(L"Emoji: 🚀🌟💫");
 ```
 
 ### Reading UTF-8 Content
@@ -125,7 +125,7 @@ Utf32Encoder utf32Encoder;
 EncoderStream utf32EncoderStream(outputStream, utf32Encoder);
 StreamWriter utf32Writer(utf32EncoderStream);
 
-utf32Writer.WriteString(L"UTF-32 content with complex characters: ??????????");
+utf32Writer.WriteString(L"UTF-32 content with complex characters: 𝕳𝖊𝖑𝖑𝖔");
 
 // Read from UTF-32 format
 FileStream inputStream(L"input_utf32.txt", FileStream::ReadOnly);
@@ -135,109 +135,6 @@ StreamReader utf32Reader(utf32DecoderStream);
 
 WString utf32Content = utf32Reader.ReadToEnd();
 Console::WriteLine(L"UTF-32 content: " + utf32Content);
-```
-
-## Practical Usage Patterns
-
-### Cross-Platform Text Files
-
-```cpp
-// For maximum compatibility, use UTF-8 for file storage
-void SaveCrossPlatformTextFile(const WString& filename, const WString& content)
-{
-    FileStream fileStream(filename, FileStream::WriteOnly);
-    Utf8Encoder encoder;
-    EncoderStream encoderStream(fileStream, encoder);
-    StreamWriter writer(encoderStream);
-    
-    writer.WriteString(content);
-}
-
-WString LoadCrossPlatformTextFile(const WString& filename)
-{
-    FileStream fileStream(filename, FileStream::ReadOnly);
-    Utf8Decoder decoder;
-    DecoderStream decoderStream(fileStream, decoder);
-    StreamReader reader(decoderStream);
-    
-    return reader.ReadToEnd();
-}
-```
-
-### Protocol Implementation
-
-```cpp
-// Network protocols often require specific UTF encodings
-void SendUtf8OverNetwork(IStream& networkStream, const WString& message)
-{
-    Utf8Encoder encoder;
-    EncoderStream encoderStream(networkStream, encoder);
-    StreamWriter writer(encoderStream);
-    
-    writer.WriteString(message);
-}
-
-WString ReceiveUtf8FromNetwork(IStream& networkStream)
-{
-    Utf8Decoder decoder;
-    DecoderStream decoderStream(networkStream, decoder);
-    StreamReader reader(decoderStream);
-    
-    return reader.ReadToEnd();
-}
-```
-
-### Data Format Conversion
-
-```cpp
-// Convert between different UTF formats
-void ConvertUtf8ToUtf16BE(const WString& inputFile, const WString& outputFile)
-{
-    // Read UTF-8
-    FileStream inputStream(inputFile, FileStream::ReadOnly);
-    Utf8Decoder utf8Decoder;
-    DecoderStream utf8DecoderStream(inputStream, utf8Decoder);
-    StreamReader reader(utf8DecoderStream);
-    
-    WString content = reader.ReadToEnd();
-    
-    // Write UTF-16 BE
-    FileStream outputStream(outputFile, FileStream::WriteOnly);
-    Utf16BEEncoder utf16beEncoder;
-    EncoderStream utf16beEncoderStream(outputStream, utf16beEncoder);
-    StreamWriter writer(utf16beEncoderStream);
-    
-    writer.WriteString(content);
-}
-```
-
-## Error Handling and Best Practices
-
-### Safe UTF Processing
-
-```cpp
-bool SafeProcessUtfFile(const WString& filename)
-{
-    try
-    {
-        FileStream fileStream(filename, FileStream::ReadOnly);
-        Utf8Decoder decoder;
-        DecoderStream decoderStream(fileStream, decoder);
-        StreamReader reader(decoderStream);
-        
-        while (!reader.IsEnd())
-        {
-            WString line = reader.ReadLine();
-            // Process line...
-        }
-        return true;
-    }
-    catch (...)
-    {
-        Console::WriteLine(L"Failed to process UTF file: " + filename);
-        return false;
-    }
-}
 ```
 
 ## When to Use Each Encoder/Decoder

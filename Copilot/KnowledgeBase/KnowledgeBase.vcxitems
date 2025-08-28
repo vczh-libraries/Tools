@@ -26,12 +26,17 @@
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WritingTextFiles.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UnderstandingIStreamInterface.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingBomEncoderAndBomDecoder.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingBroadcastStream.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingCacheStream.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingDecoderStream.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingEncoderStream.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingFileStream.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingLzwEncoderAndDecoder.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingMbcsEncoderAndDecoder.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingMemoryStream.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingMemoryWrapperStream.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingRecorderStream.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingStreamHelperFunctions.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingTestEncodingForDetection.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingUtf8Base64EncoderAndDecoder.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingUTFEncoderAndDecoder.md" />

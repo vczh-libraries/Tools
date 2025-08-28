@@ -216,13 +216,13 @@ VlppOS provides cross-platform OS abstraction for file system operations, stream
 - [Using Utf8Base64Encoder and Utf8Base64Decoder](KB_VlppOS_Stream_UsingUtf8Base64EncoderAndDecoder.md)
 
 #### LZW Compression
-- * [Using LzwEncoder and LzwDecoder](KB_VlppOS_Stream_UsingLzwEncoderAndDecoder.md)
-- * [Using Stream Helper Functions](KB_VlppOS_Stream_UsingStreamHelperFunctions.md)
+- [Using LzwEncoder and LzwDecoder](KB_VlppOS_Stream_UsingLzwEncoderAndDecoder.md)
+- [Using Stream Helper Functions](KB_VlppOS_Stream_UsingStreamHelperFunctions.md)
 
 #### Utility Streams
-- * [Using CacheStream for Performance](KB_VlppOS_Stream_UsingCacheStream.md)
-- * [Using RecorderStream for Data Copying](KB_VlppOS_Stream_UsingRecorderStream.md)
-- * [Using BroadcastStream for Multiple Targets](KB_VlppOS_Stream_UsingBroadcastStream.md)
+- [Using CacheStream for Performance](KB_VlppOS_Stream_UsingCacheStream.md)
+- [Using RecorderStream for Data Copying](KB_VlppOS_Stream_UsingRecorderStream.md)
+- [Using BroadcastStream for Multiple Targets](KB_VlppOS_Stream_UsingBroadcastStream.md)
 
 #### Locale Support
 - * [Working with Locale Class](KB_VlppOS_Locale_WorkingWithLocaleClass.md)
