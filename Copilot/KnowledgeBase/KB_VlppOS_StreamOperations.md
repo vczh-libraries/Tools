@@ -140,7 +140,7 @@ The stream system in VlppOS follows a layered design pattern where basic streams
 
 ### Performance Considerations
 
-When working with large amounts of data, prefer streaming operations over loading entire content into memory. Use `MemoryStream` for temporary buffers and `FileStream` for persistent storage.
+When working with large amounts of data, prefer streaming operations over loading entire content into memory. Use `MemoryStream` for temporary buffers and `FileStream` for persistent storage. Or use `CacheStream` to improve `FileStream` performance when random access is not required.
 
 ### Error Handling
 

@@ -253,7 +253,7 @@ Text encoding conversion between different UTF formats with BOM support and bina
 
 Specialized stream types for caching, recording, and broadcasting data operations.
 
-- Use `CacheStream` for performance optimization with frequently accessed data
+- Use `CacheStream` for performance optimization with non-random accessed data, although it supports random accessing if the underlying stream does
 - Use `RecorderStream` for copying data from one stream to another during reading
 - Use `BroadcastStream` for writing the same data to multiple target streams
 - Use `Targets()` method to manage BroadcastStream destinations
@@ -337,7 +337,7 @@ Text pattern matching and searching operations with support for different UTF en
 - Use `Split<U>` for using pattern as delimiter to split text
 - Use `Cut<U>` for combined search and split operations
 
-* [API Explanation](./KB_VlppRegex_PatternMatching.md)
+[API Explanation](./KB_VlppRegex_PatternMatching.md)
 
 #### Type Aliases
 
@@ -353,7 +353,7 @@ Convenient type aliases for common character encodings to simplify regex usage.
 - Use `RegexLexerColorizer` instead of `RegexLexerColorizer_<wchar_t>`
 - Use `RegexLexer` instead of `RegexLexer_<wchar_t>`
 
-* [API Explanation](./KB_VlppRegex_TypeAliases.md)
+[API Explanation](./KB_VlppRegex_TypeAliases.md)
 
 ### Design Explanation
 

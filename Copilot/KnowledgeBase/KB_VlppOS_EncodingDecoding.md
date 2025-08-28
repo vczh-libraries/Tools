@@ -1,4 +1,4 @@
-# Encoding and Decoding
+﻿# Encoding and Decoding
 
 Text encoding conversion between different UTF formats with BOM support and binary data encoding.
 
@@ -127,7 +127,7 @@ Always handle potential encoding exceptions, especially when processing user-pro
 ### Pipeline Design
 
 The encoder/decoder system is designed for pipeline composition. You can chain multiple encoding operations together to create complex data transformation workflows, such as:
-1. Base64 decode ? UTF-8 decode ? String processing
-2. String processing ? UTF-8 encode ? Compression ? File output
+1. Base64 decode → UTF-8 decode → String processing
+2. String processing → UTF-8 encode → Compression → File output
 
 This design provides flexibility for handling various data transformation scenarios efficiently.
