@@ -382,7 +382,7 @@ The reflection system supports three compilation levels:
 - No reflection (`VCZH_DEBUG_NO_REFLECTION`): Reflection disabled entirely
 Always prefer code compatible with `VCZH_DEBUG_NO_REFLECTION` when possible.
 
-* [API Explanation](./KB_VlppReflection_CompilationLevels.md)
+[API Explanation](./KB_VlppReflection_CompilationLevels.md)
 
 #### Type Metadata Access
 
@@ -394,7 +394,7 @@ Runtime type information retrieval and manipulation through the reflection syste
 - Use `AggregatableDescription<T>` for classes that can be inherited in Workflow scripts
 - Use `IDescriptable` interface for reflectable interfaces without other base interfaces
 
-* [API Explanation](./KB_VlppReflection_TypeMetadata.md)
+[API Explanation](./KB_VlppReflection_TypeMetadata.md)
 
 #### Type Registration Structure
 
@@ -406,7 +406,7 @@ All type registration must occur in `vl::reflection::description` namespace with
 - Registration code in dedicated files
 - Follow established patterns from existing source code examples
 
-* [API Explanation](./KB_VlppReflection_TypeRegistrationStructure.md)
+[API Explanation](./KB_VlppReflection_TypeRegistrationStructure.md)
 
 #### Enum Registration
 
@@ -418,7 +418,7 @@ Registration patterns for enumeration types with support for simple lists and co
 - Use `ENUM_ITEM` for enum members
 - Use `ENUM_ITEM_NAMESPACE` and `ENUM_NAMESPACE_ITEM` for enums defined inside other types
 
-* [API Explanation](./KB_VlppReflection_EnumRegistration.md)
+[API Explanation](./KB_VlppReflection_EnumRegistration.md)
 
 #### Struct Registration
 
@@ -427,7 +427,7 @@ Registration patterns for structure types with field access capabilities.
 - Use `BEGIN_STRUCT_MEMBER` and `END_STRUCT_MEMBER` for struct registration
 - Use `STRUCT_MEMBER` to register each accessible field
 
-* [API Explanation](./KB_VlppReflection_StructRegistration.md)
+[API Explanation](./KB_VlppReflection_StructRegistration.md)
 
 #### Class and Interface Registration
 
@@ -451,7 +451,7 @@ Comprehensive registration system for classes and interfaces with methods, prope
 - Use `NO_PARAMETER` for parameterless functions
 - Use `{ L"arg1" _ L"arg2" ... }` for parameter name lists
 
-* [API Explanation](./KB_VlppReflection_ClassInterfaceRegistration.md)
+[API Explanation](./KB_VlppReflection_ClassInterfaceRegistration.md)
 
 #### Interface Proxy Implementation
 
@@ -467,7 +467,7 @@ Proxy generation for interfaces to enable inheritance in Workflow scripts.
 - Use `INVOKE_INTERFACE_PROXY` for void methods with parameters
 - Use `INVOKEGET_INTERFACE_PROXY` for return value methods with parameters
 
-* [API Explanation](./KB_VlppReflection_InterfaceProxy.md)
+[API Explanation](./KB_VlppReflection_InterfaceProxy.md)
 
 ### Design Explanation
 

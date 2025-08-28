@@ -90,9 +90,9 @@ When using regex operations:
 
 ### Common Usage Patterns
 
-**Simple validation**:
+**Simple validation**: (note that `^` is not required and `$` does not make sense here)
 ```cpp
-Regex regex(L"^[0-9]+$");
+Regex regex(L"[0-9]+");
 bool isNumber = regex.TestHead(input);
 ```
 
