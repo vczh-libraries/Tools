@@ -94,7 +94,7 @@ Container types for organizing and manipulating related data values.
 - Use `Get<T>()`, `TryGet<T>()` for variant value access
 - Use `Apply` with `Overloading` for variant type-specific handling
 
-* [API Explanation](./KB_Vlpp_PrimitiveTypes.md)
+[API Explanation](./KB_Vlpp_PrimitiveTypes.md)
 
 #### Collection Types
 
