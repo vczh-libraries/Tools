@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
@@ -20,6 +20,7 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_LinqOperations.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_ObjectModel.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_PrimitiveTypes.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_SortingOrdering.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_StringTypes.md" />
   </ItemGroup>
 </Project>

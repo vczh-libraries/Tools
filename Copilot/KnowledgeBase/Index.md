@@ -133,7 +133,7 @@ Algorithms for arranging data with support for both total and partial ordering r
 - Use `PartialOrderingProcessor` for partial ordering scenarios where Sort doesn't work
 - Use `<=>` operator to obtain ordering values for comparators
 
-* [API Explanation](./KB_Vlpp_SortingOrdering.md)
+[API Explanation](./KB_Vlpp_SortingOrdering.md)
 
 #### Console Operations
 
