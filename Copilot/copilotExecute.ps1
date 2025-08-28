@@ -66,7 +66,7 @@ if ($existingFiles.Count -gt 0) {
 	}
 
     # Execute the selected executable with debug arguments if found
-    & $latestFile.Path /D $debugArgs
+    & $latestFile.Path /C $debugArgs
     exit $LASTEXITCODE
 } else {
     throw "No $executableName files found in any of the expected locations."
