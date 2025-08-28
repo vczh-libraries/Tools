@@ -141,7 +141,7 @@ Basic input/output operations for console applications.
 
 - Use `Console::Write` and `Console::WriteLine` for console output in CLI applications
 
-* [API Explanation](./KB_Vlpp_ConsoleOperations.md)
+[API Explanation](./KB_Vlpp_ConsoleOperations.md)
 
 #### Memory Leak Detection
 
