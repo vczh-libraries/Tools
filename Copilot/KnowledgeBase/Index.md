@@ -207,13 +207,13 @@ VlppOS provides cross-platform OS abstraction for file system operations, stream
 
 #### UTF Encoding Support
 - [Using BomEncoder and BomDecoder](KB_VlppOS_Stream_UsingBomEncoderAndBomDecoder.md)
-- * [Using UtfGeneralEncoder and UtfGeneralDecoder](KB_VlppOS_Stream_UsingUtfGeneralEncoderAndDecoder.md)
-- * [Using UTF Encoder and Decoder](KB_VlppOS_Stream_UsingUTFEncoderAndDecoder.md)
-- * [Using MbcsEncoder and MbcsDecoder](KB_VlppOS_Stream_UsingMbcsEncoderAndDecoder.md)
-- * [Using TestEncoding for Encoding Detection](KB_VlppOS_Stream_UsingTestEncodingForDetection.md)
+- [Using UtfGeneralEncoder and UtfGeneralDecoder](KB_VlppOS_Stream_UsingUtfGeneralEncoderAndDecoder.md)
+- [Using UTF Encoder and Decoder](KB_VlppOS_Stream_UsingUTFEncoderAndDecoder.md)
+- [Using MbcsEncoder and MbcsDecoder](KB_VlppOS_Stream_UsingMbcsEncoderAndDecoder.md)
+- [Using TestEncoding for Encoding Detection](KB_VlppOS_Stream_UsingTestEncodingForDetection.md)
 
 #### Base64 Encoding
-- * [Using Utf8Base64Encoder and Utf8Base64Decoder](KB_VlppOS_Stream_UsingUtf8Base64EncoderAndDecoder.md)
+- [Using Utf8Base64Encoder and Utf8Base64Decoder](KB_VlppOS_Stream_UsingUtf8Base64EncoderAndDecoder.md)
 
 #### LZW Compression
 - * [Using LzwEncoder and LzwDecoder](KB_VlppOS_Stream_UsingLzwEncoderAndDecoder.md)
