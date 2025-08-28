@@ -114,6 +114,7 @@ Dynamic containers implementing IEnumerable interface with comprehensive manipul
 #### LINQ Operations
 
 Functional programming operations on collections with lazy evaluation and method chaining.
+Check out comments before `#ifndef VCZH_COLLECTIONS_OPERATION` for a full list of operators.
 
 - Use `LazyList<T>` for LINQ-style operations on any IEnumerable collection
 - Use `From(collection)` to create LazyList from collections
@@ -310,13 +311,9 @@ Online documentation: https://gaclib.net/doc/current/vlppregex/home.html
 
 VlppRegex provides regular expression functionality with .NET-like syntax but with important differences.
 Use this when you need pattern matching and text processing capabilities.
-Key differences include using both `/` and `\` for escaping, `.` accepting literal '.' character while `/.` accepts all characters, and performance considerations for DFA incompatible features.
-
-### Choosing APIs
-
-#### Regular Expression Syntax
 
 Pattern definition with .NET-like syntax but specific escaping and character matching rules.
+Check out comments before `class Regex_` for a full syntax description.
 
 The regular expression syntax is mostly compatible with .NET but has important differences:
 - Both `/` and `\` perform escaping (prefer `/` to avoid C++ string literal conflicts)
@@ -324,7 +321,7 @@ The regular expression syntax is mostly compatible with .NET but has important d
 - DFA incompatible features significantly impact performance
 - Detailed syntax description is available in `Regex_<T>` class comments
 
-* [API Explanation](./KB_VlppRegex_Syntax.md)
+### Choosing APIs
 
 #### Pattern Matching Operations
 
