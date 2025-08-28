@@ -69,7 +69,7 @@ Reference counting smart pointers and object lifecycle management following spec
 - Use `Nullable<T>` to add nullptr semantics to value types
 - Use `struct` for value types and `class` for reference types
 
-* [API Explanation](./KB_Vlpp_ObjectModel.md)
+[API Explanation](./KB_Vlpp_ObjectModel.md)
 
 #### Lambda Expressions and Callable Types
 
