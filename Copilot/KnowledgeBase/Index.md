@@ -192,12 +192,13 @@ VlppOS provides cross-platform OS abstraction for file system operations, stream
 #### Stream Interface
 - [Understanding IStream Interface](KB_VlppOS_Stream_UnderstandingIStreamInterface.md)
 - [Working with Stream Availability and Capabilities](KB_VlppOS_Stream_WorkingWithStreamAvailabilityAndCapabilities.md)
+- * [Working with StreamReader and StreamWriter](KB_VlppOS_Stream_WorkingWithStreamReaderAndStreamWriter.md)
 
 #### File Streams
-- * [Using FileStream for File I/O](KB_VlppOS_Stream_UsingFileStream.md)
+- [Using FileStream for File I/O](KB_VlppOS_Stream_UsingFileStream.md)
 
 #### Memory Streams
-- * [Using MemoryStream for Buffer Operations](KB_VlppOS_Stream_UsingMemoryStream.md)
+- [Using MemoryStream for Buffer Operations](KB_VlppOS_Stream_UsingMemoryStream.md)
 - * [Using MemoryWrapperStream for External Buffers](KB_VlppOS_Stream_UsingMemoryWrapperStream.md)
 
 #### Encoding Streams
@@ -207,9 +208,7 @@ VlppOS provides cross-platform OS abstraction for file system operations, stream
 #### UTF Encoding Support
 - * [Using BomEncoder and BomDecoder](KB_VlppOS_Stream_UsingBomEncoderAndBomDecoder.md)
 - * [Using UtfGeneralEncoder and UtfGeneralDecoder](KB_VlppOS_Stream_UsingUtfGeneralEncoderAndDecoder.md)
-- * [Using UTF-8 Encoder and Decoder](KB_VlppOS_Stream_UsingUTF8EncoderAndDecoder.md)
-- * [Using UTF-16 Encoder and Decoder](KB_VlppOS_Stream_UsingUTF16EncoderAndDecoder.md)
-- * [Using UTF-32 Encoder and Decoder](KB_VlppOS_Stream_UsingUTF32EncoderAndDecoder.md)
+- * [Using UTF Encoder and Decoder](KB_VlppOS_Stream_UsingUTFEncoderAndDecoder.md)
 - * [Using MbcsEncoder and MbcsDecoder](KB_VlppOS_Stream_UsingMbcsEncoderAndDecoder.md)
 - * [Using TestEncoding for Encoding Detection](KB_VlppOS_Stream_UsingTestEncodingForDetection.md)
 
