@@ -80,7 +80,7 @@ Function objects and event handling with type-safe callable containers.
 - Use lambda expressions for callbacks instead of native functions when possible
 - Use `Func(callable-object)` for automatic type inference
 
-* [API Explanation](./KB_Vlpp_LambdaExpressions.md)
+[API Explanation](./KB_Vlpp_LambdaExpressions.md)
 
 #### Primitive Value Types
 
