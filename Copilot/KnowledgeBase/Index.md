@@ -200,7 +200,7 @@ Cross-platform localization and globalization with culture-aware string operatio
 - Use `Compare`, `CompareOrdinal`, `CompareOrdinalIgnoreCase` for locale-aware string comparison
 - Use `FindFirst`, `FindLast`, `StartsWith`, `EndsWith` for normalized string searching
 
-* [API Explanation](./KB_VlppOS_LocaleSupport.md)
+[API Explanation](./KB_VlppOS_LocaleSupport.md)
 
 #### File System Operations
 
