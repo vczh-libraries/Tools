@@ -24,5 +24,6 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_PrimitiveTypes.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_SortingOrdering.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_StringTypes.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_UnitTesting.md" />
   </ItemGroup>
 </Project>

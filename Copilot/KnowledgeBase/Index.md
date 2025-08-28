@@ -165,7 +165,7 @@ Testing infrastructure with hierarchical test organization and assertion capabil
 - Use nested `TEST_CATEGORY` for hierarchical organization
 - Use `TEST_PRINT` for logging information to CLI in tests
 
-* [API Explanation](./KB_Vlpp_UnitTesting.md)
+[API Explanation](./KB_Vlpp_UnitTesting.md)
 
 ### Design Explanation
 
