@@ -45,7 +45,7 @@ Immutable string types for text processing across different encodings with UTF c
 - Use `ConvertUtfString<From, To>` for template-based UTF string conversion
 - Use `AtoB` functions (like `wtou8`, `u8tow`) for direct UTF encoding conversion
 
-[API Explanation](./KB_Vlpp_StringTypes.md)
+* [API Explanation](./KB_Vlpp_StringTypes.md)
 
 #### Exception Handling
 
@@ -56,7 +56,7 @@ Error reporting and exception management for fatal errors and recoverable condit
 - Use `CHECK_ERROR(condition, message)` to raise errors on assertion failures
 - Use `CHECK_FAIL(message)` to raise errors without conditions
 
-[API Explanation](./KB_Vlpp_ExceptionHandling.md)
+* [API Explanation](./KB_Vlpp_ExceptionHandling.md)
 
 #### Object Model and Memory Management
 
@@ -69,7 +69,7 @@ Reference counting smart pointers and object lifecycle management following spec
 - Use `Nullable<T>` to add nullptr semantics to value types
 - Use `struct` for value types and `class` for reference types
 
-[API Explanation](./KB_Vlpp_ObjectModel.md)
+* [API Explanation](./KB_Vlpp_ObjectModel.md)
 
 #### Lambda Expressions and Callable Types
 
@@ -80,7 +80,7 @@ Function objects and event handling with type-safe callable containers.
 - Use lambda expressions for callbacks instead of native functions when possible
 - Use `Func(callable-object)` for automatic type inference
 
-[API Explanation](./KB_Vlpp_LambdaExpressions.md)
+* [API Explanation](./KB_Vlpp_LambdaExpressions.md)
 
 #### Primitive Value Types
 
@@ -94,7 +94,7 @@ Container types for organizing and manipulating related data values.
 - Use `Get<T>()`, `TryGet<T>()` for variant value access
 - Use `Apply` with `Overloading` for variant type-specific handling
 
-[API Explanation](./KB_Vlpp_PrimitiveTypes.md)
+* [API Explanation](./KB_Vlpp_PrimitiveTypes.md)
 
 #### Collection Types
 
@@ -109,7 +109,7 @@ Dynamic containers implementing IEnumerable interface with comprehensive manipul
 - Use `Add()`, `Insert()`, `Remove()`, `RemoveAt()`, `Clear()` for modification operations
 - Use `Keys()`, `Values()` for dictionary access patterns
 
-[API Explanation](./KB_Vlpp_CollectionTypes.md)
+* [API Explanation](./KB_Vlpp_CollectionTypes.md)
 
 #### LINQ Operations
 
@@ -121,7 +121,7 @@ Functional programming operations on collections with lazy evaluation and method
 - Use `indexed` function for enumeration with index access
 - Use range-based for loops with any IEnumerable implementation
 
-[API Explanation](./KB_Vlpp_LinqOperations.md)
+* [API Explanation](./KB_Vlpp_LinqOperations.md)
 
 #### Sorting and Ordering
 
@@ -132,7 +132,7 @@ Algorithms for arranging data with support for both total and partial ordering r
 - Use `PartialOrderingProcessor` for partial ordering scenarios where Sort doesn't work
 - Use `<=>` operator to obtain ordering values for comparators
 
-[API Explanation](./KB_Vlpp_SortingOrdering.md)
+* [API Explanation](./KB_Vlpp_SortingOrdering.md)
 
 #### Console Operations
 
@@ -140,7 +140,7 @@ Basic input/output operations for console applications.
 
 - Use `Console::Write` and `Console::WriteLine` for console output in CLI applications
 
-[API Explanation](./KB_Vlpp_ConsoleOperations.md)
+* [API Explanation](./KB_Vlpp_ConsoleOperations.md)
 
 #### Memory Leak Detection
 
@@ -151,7 +151,7 @@ Global storage management and memory leak detection for debugging and testing.
 - Use `GetStorageName().IsInitialized()` to check availability
 - Use `_CrtDumpMemoryLeaks()` on Windows for leak detection
 
-[API Explanation](./KB_Vlpp_MemoryLeakDetection.md)
+* [API Explanation](./KB_Vlpp_MemoryLeakDetection.md)
 
 #### Unit Testing Framework
 
@@ -163,7 +163,7 @@ Testing infrastructure with hierarchical test organization and assertion capabil
 - Use `TEST_ASSERT(expression)` for test assertions
 - Use nested `TEST_CATEGORY` for hierarchical organization
 
-[API Explanation](./KB_Vlpp_UnitTesting.md)
+* [API Explanation](./KB_Vlpp_UnitTesting.md)
 
 ### Design Explanation
 
@@ -198,7 +198,7 @@ Cross-platform localization and globalization with culture-aware string operatio
 - Use `Compare`, `CompareOrdinal`, `CompareOrdinalIgnoreCase` for locale-aware string comparison
 - Use `FindFirst`, `FindLast`, `StartsWith`, `EndsWith` for normalized string searching
 
-[API Explanation](./KB_VlppOS_LocaleSupport.md)
+* [API Explanation](./KB_VlppOS_LocaleSupport.md)
 
 #### File System Operations
 
@@ -215,7 +215,7 @@ Cross-platform file and directory manipulation with path handling and content ac
 - Use `GetFolders`, `GetFiles` for directory content enumeration
 - Use `Create` for creating new folders
 
-[API Explanation](./KB_VlppOS_FileSystemOperations.md)
+* [API Explanation](./KB_VlppOS_FileSystemOperations.md)
 
 #### Stream Operations
 
@@ -230,7 +230,7 @@ Unified stream interface for file, memory, and data transformation operations wi
 - Use `Read`, `Write`, `Peek`, `Seek`, `Position`, `Size` for stream operations
 - Use `Close` for resource cleanup (automatic on destruction)
 
-[API Explanation](./KB_VlppOS_StreamOperations.md)
+* [API Explanation](./KB_VlppOS_StreamOperations.md)
 
 #### Encoding and Decoding
 
@@ -245,7 +245,7 @@ Text encoding conversion between different UTF formats with BOM support and bina
 - Use `LzwEncoder` and `LzwDecoder` for data compression
 - Use `CopyStream`, `CompressStream`, `DecompressStream` helper functions
 
-[API Explanation](./KB_VlppOS_EncodingDecoding.md)
+* [API Explanation](./KB_VlppOS_EncodingDecoding.md)
 
 #### Additional Streams
 
@@ -256,7 +256,7 @@ Specialized stream types for caching, recording, and broadcasting data operation
 - Use `BroadcastStream` for writing the same data to multiple target streams
 - Use `Targets()` method to manage BroadcastStream destinations
 
-[API Explanation](./KB_VlppOS_AdditionalStreams.md)
+* [API Explanation](./KB_VlppOS_AdditionalStreams.md)
 
 #### Multi-threading
 
@@ -267,7 +267,7 @@ Cross-platform threading primitives and synchronization mechanisms for concurren
 - Use `Thread::GetCurrentThreadId` for thread identification
 - Use `Thread::CreateAndStart` only when thread pool is insufficient
 
-[API Explanation](./KB_VlppOS_MultiThreading.md)
+* [API Explanation](./KB_VlppOS_MultiThreading.md)
 
 #### Synchronization Primitives
 
@@ -281,7 +281,7 @@ Non-waitable synchronization objects for protecting shared resources in multi-th
 - Use `ConditionVariable` with `SleepWith`, `SleepWithForTime` for conditional waiting
 - Use `WakeOnePending`, `WaitAllPendings` for condition variable signaling
 
-[API Explanation](./KB_VlppOS_SynchronizationPrimitives.md)
+* [API Explanation](./KB_VlppOS_SynchronizationPrimitives.md)
 
 #### Waitable Objects
 
@@ -296,7 +296,7 @@ Cross-process synchronization objects that support waiting operations with timeo
 - Use `Signal`, `Unsignal` for event object state management
 - Use `Release` for releasing mutex and semaphore ownership
 
-[API Explanation](./KB_VlppOS_WaitableObjects.md)
+* [API Explanation](./KB_VlppOS_WaitableObjects.md)
 
 ### Design Explanation
 
@@ -324,7 +324,7 @@ The regular expression syntax is mostly compatible with .NET but has important d
 - DFA incompatible features significantly impact performance
 - Detailed syntax description is available in `Regex_<T>` class comments
 
-[API Explanation](./KB_VlppRegex_Syntax.md)
+* [API Explanation](./KB_VlppRegex_Syntax.md)
 
 #### Pattern Matching Operations
 
@@ -339,7 +339,7 @@ Text pattern matching and searching operations with support for different UTF en
 - Use `Split<U>` for using pattern as delimiter to split text
 - Use `Cut<U>` for combined search and split operations
 
-[API Explanation](./KB_VlppRegex_PatternMatching.md)
+* [API Explanation](./KB_VlppRegex_PatternMatching.md)
 
 #### Type Aliases
 
@@ -355,7 +355,7 @@ Convenient type aliases for common character encodings to simplify regex usage.
 - Use `RegexLexerColorizer` instead of `RegexLexerColorizer_<wchar_t>`
 - Use `RegexLexer` instead of `RegexLexer_<wchar_t>`
 
-[API Explanation](./KB_VlppRegex_TypeAliases.md)
+* [API Explanation](./KB_VlppRegex_TypeAliases.md)
 
 ### Design Explanation
 
@@ -384,7 +384,7 @@ The reflection system supports three compilation levels:
 - No reflection (`VCZH_DEBUG_NO_REFLECTION`): Reflection disabled entirely
 Always prefer code compatible with `VCZH_DEBUG_NO_REFLECTION` when possible.
 
-[API Explanation](./KB_VlppReflection_CompilationLevels.md)
+* [API Explanation](./KB_VlppReflection_CompilationLevels.md)
 
 #### Type Metadata Access
 
@@ -396,7 +396,7 @@ Runtime type information retrieval and manipulation through the reflection syste
 - Use `AggregatableDescription<T>` for classes that can be inherited in Workflow scripts
 - Use `IDescriptable` interface for reflectable interfaces without other base interfaces
 
-[API Explanation](./KB_VlppReflection_TypeMetadata.md)
+* [API Explanation](./KB_VlppReflection_TypeMetadata.md)
 
 #### Type Registration Structure
 
@@ -408,7 +408,7 @@ All type registration must occur in `vl::reflection::description` namespace with
 - Registration code in dedicated files
 - Follow established patterns from existing source code examples
 
-[API Explanation](./KB_VlppReflection_TypeRegistrationStructure.md)
+* [API Explanation](./KB_VlppReflection_TypeRegistrationStructure.md)
 
 #### Enum Registration
 
@@ -420,7 +420,7 @@ Registration patterns for enumeration types with support for simple lists and co
 - Use `ENUM_ITEM` for enum members
 - Use `ENUM_ITEM_NAMESPACE` and `ENUM_NAMESPACE_ITEM` for enums defined inside other types
 
-[API Explanation](./KB_VlppReflection_EnumRegistration.md)
+* [API Explanation](./KB_VlppReflection_EnumRegistration.md)
 
 #### Struct Registration
 
@@ -429,7 +429,7 @@ Registration patterns for structure types with field access capabilities.
 - Use `BEGIN_STRUCT_MEMBER` and `END_STRUCT_MEMBER` for struct registration
 - Use `STRUCT_MEMBER` to register each accessible field
 
-[API Explanation](./KB_VlppReflection_StructRegistration.md)
+* [API Explanation](./KB_VlppReflection_StructRegistration.md)
 
 #### Class and Interface Registration
 
@@ -453,7 +453,7 @@ Comprehensive registration system for classes and interfaces with methods, prope
 - Use `NO_PARAMETER` for parameterless functions
 - Use `{ L"arg1" _ L"arg2" ... }` for parameter name lists
 
-[API Explanation](./KB_VlppReflection_ClassInterfaceRegistration.md)
+* [API Explanation](./KB_VlppReflection_ClassInterfaceRegistration.md)
 
 #### Interface Proxy Implementation
 
@@ -469,7 +469,7 @@ Proxy generation for interfaces to enable inheritance in Workflow scripts.
 - Use `INVOKE_INTERFACE_PROXY` for void methods with parameters
 - Use `INVOKEGET_INTERFACE_PROXY` for return value methods with parameters
 
-[API Explanation](./KB_VlppReflection_InterfaceProxy.md)
+* [API Explanation](./KB_VlppReflection_InterfaceProxy.md)
 
 ### Design Explanation
 
@@ -526,7 +526,7 @@ Declarative user interface definition using XML syntax with automatic C++ code g
 
 GacUI provides an XML-based system for defining user interfaces declaratively. The XML definitions are compiled into equivalent C++ code, providing both design-time flexibility and runtime performance. The system supports complex layouts, data binding, and event handling through integrated Workflow script.
 
-[API Explanation](./KB_GacUI_XMLUIDefinition.md)
+* [API Explanation](./KB_GacUI_XMLUIDefinition.md)
 
 #### GUI Controls and Elements
 
@@ -537,7 +537,7 @@ Comprehensive set of user interface controls and graphical elements for desktop 
 - Use compositions from `presentation::compositions::Gui*Composition` for layout management
 - Use templates from `presentation::templates::Gui*` for control styling and customization
 
-[API Explanation](./KB_GacUI_ControlsElements.md)
+* [API Explanation](./KB_GacUI_ControlsElements.md)
 
 #### Layout Management
 
@@ -551,7 +551,7 @@ Flexible layout system with various composition types for organizing UI elements
 - Use `MinSizeLimitation` for size constraint management
 - Use `CellPadding`, `BorderVisible` for spacing control
 
-[API Explanation](./KB_GacUI_LayoutManagement.md)
+* [API Explanation](./KB_GacUI_LayoutManagement.md)
 
 #### Event Handling and Data Binding
 
@@ -562,7 +562,7 @@ Integration with Workflow script for dynamic behavior and data connectivity.
 - Use `att.PropertyName` and `att.PropertyName-set` for property configuration
 - Use nested property access with `-set` binding for composition properties
 
-[API Explanation](./KB_GacUI_EventHandlingDataBinding.md)
+* [API Explanation](./KB_GacUI_EventHandlingDataBinding.md)
 
 #### Testing Framework
 
@@ -575,7 +575,7 @@ Comprehensive testing infrastructure for automated GUI testing with remote proto
 - Use `protocol->LocationOf`, `protocol->LClick`, `protocol->KeyPress` for UI interaction
 - Use `GetApplication()->GetMainWindow()` for main window access
 
-[API Explanation](./KB_GacUI_TestingFramework.md)
+* [API Explanation](./KB_GacUI_TestingFramework.md)
 
 #### Cross-platform Support
 
@@ -583,7 +583,7 @@ Platform abstraction for deploying GUI applications across different operating s
 
 GacUI provides cross-platform GUI capabilities with platform-specific implementations for Windows and Linux, maintaining consistent API and behavior across platforms.
 
-[API Explanation](./KB_GacUI_CrossPlatformSupport.md)
+* [API Explanation](./KB_GacUI_CrossPlatformSupport.md)
 
 ### Design Explanation
 
