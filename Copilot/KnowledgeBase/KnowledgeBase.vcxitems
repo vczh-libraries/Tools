@@ -25,9 +25,14 @@
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WorkingWithRootDirectories.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_FileSystem_WritingTextFiles.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UnderstandingIStreamInterface.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingBomEncoderAndBomDecoder.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingDecoderStream.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingEncoderStream.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingFileStream.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingMemoryStream.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_UsingMemoryWrapperStream.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_WorkingWithStreamAvailabilityAndCapabilities.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_VlppOS_Stream_WorkingWithStreamReaderAndStreamWriter.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingArray.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingDictionary.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_Collections_UsingFromFunction.md" />
