@@ -112,22 +112,36 @@ Using aliases vs explicit templates has no performance impact:
 **Basic pattern matching**:
 ```cpp
 Regex pattern(L"\\d+");
-RegexMatch match = pattern.Match(text);
+auto match = pattern.Match(text);
 ```
 
 **Lexical analysis**:
 ```cpp
-RegexLexer lexer;
-lexer.AddToken(L"keyword", L"\\b(if|else|while)\\b");
-lexer.AddToken(L"identifier", L"\\b[a-zA-Z_][a-zA-Z0-9_]*\\b");
-RegexTokens tokens = lexer.Parse(sourceCode);
+List<WString> tokenDefs;
+tokenDefs.Add(L"\\b(if|else|while)\\b");  // keywords
+tokenDefs.Add(L"\\b[a-zA-Z_][a-zA-Z0-9_]*\\b");  // identifiers
+tokenDefs.Add(L"\\d+");  // numbers
+
+RegexLexer lexer(tokenDefs);
+auto tokens = lexer.Parse(sourceCode);
 ```
 
 **Syntax highlighting**:
 ```cpp
-RegexLexerColorizer colorizer;
-colorizer.AddColorizeToken(L"\\bclass\\b", keywordColor);
-colorizer.AddColorizeToken(L"\"[^\"]*\"", stringColor);
+List<WString> tokenDefs;
+tokenDefs.Add(L"\\bclass\\b");  // token 0: keywords
+tokenDefs.Add(L"\"[^\"]*\"");   // token 1: strings
+
+RegexProc proc;
+proc.colorizeProc = [](void* argument, vint start, vint length, vint token)
+{
+    // Apply colors based on token type
+    if (token == 0) ApplyKeywordColor(start, length);
+    if (token == 1) ApplyStringColor(start, length);
+};
+
+RegexLexer lexer(tokenDefs);
+RegexLexerColorizer colorizer = lexer.Colorize(proc);
 ```
 
 ### Migration Considerations

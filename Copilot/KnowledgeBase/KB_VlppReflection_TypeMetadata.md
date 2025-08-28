@@ -36,6 +36,8 @@ If such interface does not implement any other interface, it must inherit from `
 When accessing reflectable members or functions, `vl::reflection::description::Value` is particularly helpful.
 It should be used as a value type and provides similar functionality to `object` in C# or Java, or `std::any` in C++.
 
+When using `Value` to represent "anything", it does not require reflection to be enabled.
+
 A type is reflectable only when it is registered through the reflection system's registration mechanisms.
 
 ## Extra Content

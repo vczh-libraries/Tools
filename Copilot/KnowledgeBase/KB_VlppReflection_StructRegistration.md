@@ -62,7 +62,6 @@ Struct fields can be of various types:
 - String types (WString, etc.)
 - Other registered structs
 - Enum types
-- Collection types
 
 #### Nested Structs
 When registering structs that contain other struct types:
@@ -71,7 +70,7 @@ When registering structs that contain other struct types:
 3. The reflection system will automatically handle the relationships
 
 #### Read-Only Fields
-While `STRUCT_MEMBER` typically allows both reading and writing:
+While `STRUCT_MEMBER` typically requires both reading and writing:
 - Some fields may be conceptually read-only
 - Consider the design implications of exposing mutable access
 - Document field mutability expectations clearly

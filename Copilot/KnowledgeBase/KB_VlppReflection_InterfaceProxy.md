@@ -74,17 +74,8 @@ The `return` keyword is not necessary as `INVOKEGET_INTERFACE_PROXY_NOPARAMS` an
 
 ## Proxy Categories
 
-### Raw Pointer Proxies
-Used when interface implementations will be managed as raw C++ pointers:
-- Suitable for stack-allocated objects
-- Manual lifetime management required
-- Lower overhead for simple scenarios
-
-### Shared Pointer Proxies
-Used when interface implementations will be created and boxed in `Ptr<T>`:
-- Automatic reference counting
-- Safer memory management
-- Integration with the broader object system
+### Raw or Shared Pointer Proxies
+This is decided by the natural usage of the interface. If an instance of the interface is usually stored in `Ptr<T>`, use the shared pointer version.
 
 ## Interface Inheritance Hierarchy
 

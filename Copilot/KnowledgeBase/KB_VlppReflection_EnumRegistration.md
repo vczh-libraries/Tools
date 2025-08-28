@@ -43,7 +43,7 @@ END_ENUM_ITEM(MyEnum)
 - Members are accessible in the surrounding scope
 
 ### Namespace-Scoped Enums
-- Use `ENUM_ITEM_NAMESPACE` and `ENUM_NAMESPACE_ITEM` for enums defined inside other types
+- Use `ENUM_ITEM_NAMESPACE` and `ENUM_NAMESPACE_ITEM` for enums (not enum classes) defined inside other types
 - `ENUM_ITEM_NAMESPACE` declares the type name
 - `ENUM_NAMESPACE_ITEM` lists each member
 - Handles enums that are nested within classes or namespaces
