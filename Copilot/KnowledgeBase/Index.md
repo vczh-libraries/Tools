@@ -109,7 +109,7 @@ Dynamic containers implementing IEnumerable interface with comprehensive manipul
 - Use `Add()`, `Insert()`, `Remove()`, `RemoveAt()`, `Clear()` for modification operations
 - Use `Keys()`, `Values()` for dictionary access patterns
 
-* [API Explanation](./KB_Vlpp_CollectionTypes.md)
+[API Explanation](./KB_Vlpp_CollectionTypes.md)
 
 #### LINQ Operations
 

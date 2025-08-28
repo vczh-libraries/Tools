@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Index.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_CollectionTypes.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_ExceptionHandling.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_LambdaExpressions.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_ObjectModel.md" />
