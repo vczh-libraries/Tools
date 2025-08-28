@@ -56,7 +56,7 @@ Error reporting and exception management for fatal errors and recoverable condit
 - Use `CHECK_ERROR(condition, message)` to raise errors on assertion failures
 - Use `CHECK_FAIL(message)` to raise errors without conditions
 
-* [API Explanation](./KB_Vlpp_ExceptionHandling.md)
+[API Explanation](./KB_Vlpp_ExceptionHandling.md)
 
 #### Object Model and Memory Management
 
