@@ -1,4 +1,4 @@
-# Writing Test Code
+# Writing General Unit Test
 
 Test code uses my own unit test framework. Here are some basic rules.
 
@@ -25,6 +25,4 @@ TEST_FILE
 }
 ```
 
-There can be mulitple `TEST_CATEGORY`, `TEST_CATEGORY` can be nested inside another `TEST_CATEGORY`.
-There can be mulitple `TEST_CASE` in `TEST_FILE` or `TEST_CATEGORY`, `TEST_CASE` cannot be nested inside another `TEST_CASE`.
-`TEST_ASSERT` can only appear in `TEST_CASE`.
+Please refer to the `Accessing Knowledge Base` section for more information about advanced features in unit test.

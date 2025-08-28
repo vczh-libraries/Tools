@@ -1,4 +1,4 @@
-# Writing GacUI Test Code
+# Writing GacUI Unit Test
 
 Here are some basic rules.
 

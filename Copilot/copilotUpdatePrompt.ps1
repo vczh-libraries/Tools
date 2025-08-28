@@ -10,8 +10,8 @@ $files_vlpp = @(
     "general-instructions-2.md",
     "makefile\vlpp.md",
     "general-instructions-3.md",
-    "unittest.md",
-    "guidance\vlpp.md"
+    "kb.md",
+    "unittest.md"
 )
 
 $files_vlppos = @(
@@ -22,9 +22,8 @@ $files_vlppos = @(
     "general-instructions-2.md",
     "makefile\vlppos.md",
     "general-instructions-3.md",
-    "unittest.md",
-    "guidance\vlpp.md",
-    "guidance\vlppos.md"
+    "kb.md",
+    "unittest.md"
 )
 
 $files_vlppregex = @(
@@ -35,9 +34,8 @@ $files_vlppregex = @(
     "general-instructions-2.md",
     "makefile\vlppregex.md",
     "general-instructions-3.md",
-    "unittest.md",
-    "guidance\vlpp.md",
-    "guidance\vlppregex.md"
+    "kb.md",
+    "unittest.md"
 )
 
 $files_vlppreflection = @(
@@ -48,11 +46,8 @@ $files_vlppreflection = @(
     "general-instructions-2.md",
     "makefile\vlppreflection.md",
     "general-instructions-3.md",
-    "unittest.md",
-    "guidance\vlpp.md",
-    "guidance\vlppos.md",
-    "guidance\vlppregex.md",
-    "guidance\vlppreflection.md"
+    "kb.md",
+    "unittest.md"
 )
 
 $files_vlppparser2 = @(
@@ -63,12 +58,8 @@ $files_vlppparser2 = @(
     "general-instructions-2.md",
     "makefile\vlppparser2.md",
     "general-instructions-3.md",
-    "unittest.md",
-    "guidance\vlpp.md",
-    "guidance\vlppos.md",
-    "guidance\vlppregex.md",
-    "guidance\vlppreflection.md",
-    "guidance\vlppparser2.md"
+    "kb.md",
+    "unittest.md"
 )
 
 $files_workflow = @(
@@ -79,12 +70,8 @@ $files_workflow = @(
     "general-instructions-2.md",
     "makefile\workflow.md",
     "general-instructions-3.md",
-    "unittest.md",
-    "guidance\vlpp.md",
-    "guidance\vlppos.md",
-    "guidance\vlppregex.md",
-    "guidance\vlppreflection.md",
-    "guidance\vlppparser2.md"
+    "kb.md",
+    "unittest.md"
 )
 
 $files_gacui = @(
@@ -95,11 +82,8 @@ $files_gacui = @(
     "general-instructions-2.md",
     "makefile\gacui.md",
     "general-instructions-3.md",
-    "guidance\vlpp.md",
-    "guidance\vlppos.md",
-    "guidance\vlppregex.md",
-    "guidance\vlppreflection.md",
-    "guidance\vlppparser2.md",
+    "kb.md",
+    "unittest.md",
     "gacui\unittest.md",
     "gacui\xml.md",
     "gacui\workflow.md"
