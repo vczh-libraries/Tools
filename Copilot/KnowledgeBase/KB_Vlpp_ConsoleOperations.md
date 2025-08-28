@@ -1,4 +1,4 @@
-# Console Operations
+﻿# Console Operations
 
 ## Overview
 
@@ -157,7 +157,7 @@ Always use `WString` with console operations for proper Unicode support:
 
 ```cpp
 // Good: Using WString
-Console::WriteLine(L"Unicode text: ????");
+Console::WriteLine(L"Unicode text: 你好世界");
 
 // Avoid: Don't mix with narrow strings
 // Console::WriteLine("Narrow string");  // Wrong - type mismatch
@@ -228,7 +228,7 @@ For different output needs, consider:
 
 ### Integration with Unit Testing
 
-Console operations can be useful in unit tests for diagnostic output:
+Console operations can be useful in unit tests for diagnostic output, but we favor TEST_PRINT.
 
 ```cpp
 TEST_CASE(L"MyTestCase")
@@ -238,7 +238,7 @@ TEST_CASE(L"MyTestCase")
     // Test logic here
     TEST_ASSERT(condition);
     
-    Console::WriteLine(L"Test completed successfully");
+    TEST_PRINT(L"Test completed successfully");
 }
 ```
 
@@ -263,9 +263,9 @@ Since console operations use `WString`, they support international characters na
 
 ```cpp
 Console::WriteLine(L"English: Hello World");
-Console::WriteLine(L"Chinese: ????");
-Console::WriteLine(L"Japanese: ???????");
-Console::WriteLine(L"Arabic: ????? ???????");
+Console::WriteLine(L"Chinese: 你好世界");
+Console::WriteLine(L"Japanese: こんにちは世界");
+Console::WriteLine(L"Arabic: مرحبا بالعالم");
 ```
 
 The actual display depends on the console's font and locale settings, but the framework properly handles the character encoding.

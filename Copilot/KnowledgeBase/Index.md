@@ -152,7 +152,7 @@ Global storage management and memory leak detection for debugging and testing.
 - Use `GetStorageName().IsInitialized()` to check availability
 - Use `_CrtDumpMemoryLeaks()` on Windows for leak detection
 
-* [API Explanation](./KB_Vlpp_MemoryLeakDetection.md)
+[API Explanation](./KB_Vlpp_MemoryLeakDetection.md)
 
 #### Unit Testing Framework
 
@@ -163,6 +163,7 @@ Testing infrastructure with hierarchical test organization and assertion capabil
 - Use `TEST_CASE(name)` for individual test implementations
 - Use `TEST_ASSERT(expression)` for test assertions
 - Use nested `TEST_CATEGORY` for hierarchical organization
+- Use `TEST_PRINT` for logging information to CLI in tests
 
 * [API Explanation](./KB_Vlpp_UnitTesting.md)
 

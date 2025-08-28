@@ -19,6 +19,7 @@
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_ExceptionHandling.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_LambdaExpressions.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_LinqOperations.md" />
+    <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_MemoryLeakDetection.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_ObjectModel.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_PrimitiveTypes.md" />
     <None Include="$(MSBuildThisFileDirectory)KB_Vlpp_SortingOrdering.md" />
