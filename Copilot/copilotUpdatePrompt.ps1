@@ -112,6 +112,45 @@ function GenerateProcessPrompt([string]$name) {
     if (Test-Path "$PSScriptRoot\prompts") {
         Copy-Item $source_prompts -Destination $prompts_folder -Force
         Write-Host "Copied prompts to: $prompts_folder"
+        
+        # Get all copied .md files and append content to each
+        $copied_files = Get-ChildItem -Path $prompts_folder -Filter "*.md"
+        foreach ($file in $copied_files) {
+            $file_content = Get-Content $file.FullName -Raw
+            
+            # Append common content to all files
+            $common_general_path = "$PSScriptRoot\prompts\common\general-instructions.md"
+            $kb_path = "$PSScriptRoot\prompts\common\kb.md"
+            
+            if (Test-Path $common_general_path) {
+                $common_general_content = Get-Content $common_general_path -Raw
+                $file_content += "`r`n" + $common_general_content
+            }
+            
+            if (Test-Path $kb_path) {
+                $kb_content = Get-Content $kb_path -Raw
+                $file_content += "`r`n" + $kb_content
+            }
+            
+            # Special handling for 4-verifying.prompt.md
+            if ($file.Name -eq "4-verifying.prompt.md") {
+                $verifying_path = "$PSScriptRoot\prompts\common\verifying.md"
+                $specific_windows_path = "$PSScriptRoot\specific-windows\$name.md"
+                
+                if (Test-Path $verifying_path) {
+                    $verifying_content = Get-Content $verifying_path -Raw
+                    $file_content += "`r`n" + $verifying_content
+                }
+                
+                if (Test-Path $specific_windows_path) {
+                    $specific_windows_content = Get-Content $specific_windows_path -Raw
+                    $file_content += "`r`n" + $specific_windows_content
+                }
+            }
+            
+            # Write the updated content back to the file
+            Set-Content -Path $file.FullName -Value $file_content
+        }
     }
 }
 
