@@ -133,7 +133,7 @@ function GenerateProcessPrompt([string]$name) {
             }
             
             # Special handling for 4-verifying.prompt.md
-            if ($file.Name -eq "4-verifying.prompt.md") {
+            if (($file.Name -eq "4-verifying.prompt.md") -or ($file.Name -eq "code.prompt.md")) {
                 $verifying_path = "$PSScriptRoot\prompts\common\verifying.md"
                 $specific_windows_path = "$PSScriptRoot\specific-windows\$name.md"
                 

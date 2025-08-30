@@ -6,3 +6,4 @@
   - Call `.\copilotExecute.ps1 -Executable <PROJECT-NAME>`. `<PROJECT-NAME>` is the project name in the list.
     - You must call `.\copilotExecute.ps1`, must not call `copilotExecute.ps1`, as PowerShell refuses to run a script file if there is only a simple file name.
     - Make sure the current directory is set to the folder containing the solution file, which I believe is the default location.
+- You must keep fixing the code until all errors are eliminated.
