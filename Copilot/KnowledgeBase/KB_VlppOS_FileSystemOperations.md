@@ -65,6 +65,17 @@ Initializing a `Folder` with a file path with `IsRoot` returning true, is just c
 
 ## Extra Content
 
+### Implementation Injection
+
+You can replace the default file system implementation with a custom one for testing and specialized scenarios:
+
+- Use `InjectFileSystemImpl(impl)` to set a custom `IFileSystemImpl` implementation
+- Use `InjectFileSystemImpl(nullptr)` to reset to the default OS-specific implementation
+
+The injected implementation affects all `FilePath`, `File`, and `Folder` class operations that interact with the file system. This enables you to create in-memory file systems for testing, provide sandboxed file access, implement virtual file systems, or add custom file system behaviors like encryption or compression.
+
+Implementation injection should typically be done during application startup before any multi-threaded usage begins, as it affects global state.
+
 ### Path Manipulation Best Practices
 
 When working with file paths, always use `FilePath` for cross-platform compatibility. The class automatically handles path separators and normalization across different operating systems.
@@ -80,3 +91,12 @@ For large files, consider using stream-based operations instead of reading entir
 ### Encoding Detection
 
 The `ReadAllTextWithEncodingTesting` method attempts to automatically detect the encoding of text files, making it suitable for processing files with unknown encodings. However, for better performance and when the encoding is known, use the specific BOM-based reading methods.
+
+### Testing Applications
+
+Implementation injection is particularly valuable for unit testing file system operations:
+
+- Create isolated test environments without affecting the real file system
+- Simulate file system errors and edge cases
+- Test file operations with predictable directory structures
+- Mock file system behaviors for consistent testing across different environments

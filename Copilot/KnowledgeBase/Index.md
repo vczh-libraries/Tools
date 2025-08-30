@@ -96,6 +96,18 @@ Container types for organizing and manipulating related data values.
 
 [API Explanation](./KB_Vlpp_PrimitiveTypes.md)
 
+#### Date and Time Operations
+
+Cross-platform date and time handling with timezone conversions and arithmetic operations.
+
+- Use `DateTime::LocalTime()` and `DateTime::UtcTime()` for current time retrieval
+- Use `DateTime::FromDateTime()` for creating specific date/time instances
+- Use `ToLocalTime()` and `ToUtcTime()` for timezone conversions
+- Use `Forward()` and `Backward()` for time arithmetic operations
+- Use `InjectDateTimeImpl` to replace implementation for testing and customization
+
+[API Explanation](./KB_Vlpp_DateTimeOperations.md)
+
 #### Collection Types
 
 Dynamic containers implementing IEnumerable interface with comprehensive manipulation capabilities.
@@ -199,6 +211,7 @@ Cross-platform localization and globalization with culture-aware string operatio
 - Use `FormatNumber` and `FormatCurrency` for locale-aware number formatting
 - Use `Compare`, `CompareOrdinal`, `CompareOrdinalIgnoreCase` for locale-aware string comparison
 - Use `FindFirst`, `FindLast`, `StartsWith`, `EndsWith` for normalized string searching
+- Use `InjectLocaleImpl` to replace `Locale` implementation for testing and customization
 
 [API Explanation](./KB_VlppOS_LocaleSupport.md)
 
@@ -216,6 +229,7 @@ Cross-platform file and directory manipulation with path handling and content ac
 - Use `Folder` class for directory operations when `FilePath::IsFolder` or `FilePath::IsRoot` returns true
 - Use `GetFolders`, `GetFiles` for directory content enumeration
 - Use `Create` for creating new folders
+- Use `InjectFileSystemImpl` to replace file system implementation for testing and customization
 
 [API Explanation](./KB_VlppOS_FileSystemOperations.md)
 
