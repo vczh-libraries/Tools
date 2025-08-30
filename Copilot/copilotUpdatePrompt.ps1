@@ -61,7 +61,7 @@ $files_gacui = @(
     "gacui\workflow.md"
 )
 
-function GeneratePrompt([string]$name, [string[]]$files) {
+function GenerateGeneralPrompt([string]$name, [string[]]$files) {
     $output_path = "$PSScriptRoot\..\..\$name\.github\copilot-instructions.md"
     
     # First, check that all files exist
@@ -93,7 +93,9 @@ function GeneratePrompt([string]$name, [string[]]$files) {
     Set-Content -Path $output_path -Value $output_content
     
     Write-Host Updated: $output_path
-    
+}
+
+function GenerateProcessPrompt([string]$name) {
     # Handle prompts folder
     $prompts_folder = "$PSScriptRoot\..\..\$name\.github\prompts"
     
@@ -136,7 +138,8 @@ if ($Project -eq "") {
 
 # Check if the specified project exists and execute
 if ($projects.ContainsKey($Project)) {
-    GeneratePrompt $Project $projects[$Project]
+    GenerateGeneralPrompt $Project $projects[$Project]
+    GenerateProcessPrompt $Project
 } else {
     Write-Host "Project '$Project' not found. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {
