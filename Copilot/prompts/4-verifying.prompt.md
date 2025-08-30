@@ -11,7 +11,7 @@
       - In any test case, `TEST_PRINT` would help.
       - In other source code, `vl::console::Console::WriteLine` would help. In `Vlpp` project, you should `#include` `Console.h`. In other projects, the `Console` class should just be available.
       - When added logging are not longer necessary, you should remove all of them.
-  - Find the `Verifying your code edit` section in `copilot-instructions.md`, it has everything you need to know about how to verify your code edit.
+  - Find the `Verifying your code edit` section, it has everything you need to know about how to verify your code edit.
 - For every attempt of fixing the source code:
   - Explain why the original change did not work.
   - Explain what you need to do.
