@@ -5,84 +5,56 @@ param(
 $files_vlpp = @(
     "general-instructions-role.md",
     "introduction\vlpp.md",
-    "general-instructions-1.md",
-    "specific-windows\vlpp.md",
-    "general-instructions-2.md",
+    "general-instructions.md",
     "specific-linux\vlpp.md",
-    "general-instructions-3.md",
-    "kb.md",
     "unittest.md"
 )
 
 $files_vlppos = @(
     "general-instructions-role.md",
     "introduction\vlppos.md",
-    "general-instructions-1.md",
-    "specific-windows\vlppos.md",
-    "general-instructions-2.md",
+    "general-instructions.md",
     "specific-linux\vlppos.md",
-    "general-instructions-3.md",
-    "kb.md",
     "unittest.md"
 )
 
 $files_vlppregex = @(
     "general-instructions-role.md",
     "introduction\vlppregex.md",
-    "general-instructions-1.md",
-    "specific-windows\vlppregex.md",
-    "general-instructions-2.md",
+    "general-instructions.md",
     "specific-linux\vlppregex.md",
-    "general-instructions-3.md",
-    "kb.md",
     "unittest.md"
 )
 
 $files_vlppreflection = @(
     "general-instructions-role.md",
     "introduction\vlppreflection.md",
-    "general-instructions-1.md",
-    "specific-windows\vlppreflection.md",
-    "general-instructions-2.md",
+    "general-instructions.md",
     "specific-linux\vlppreflection.md",
-    "general-instructions-3.md",
-    "kb.md",
     "unittest.md"
 )
 
 $files_vlppparser2 = @(
     "general-instructions-role.md",
     "introduction\vlppparser2.md",
-    "general-instructions-1.md",
-    "specific-windows\vlppparser2.md",
-    "general-instructions-2.md",
+    "general-instructions.md",
     "specific-linux\vlppparser2.md",
-    "general-instructions-3.md",
-    "kb.md",
     "unittest.md"
 )
 
 $files_workflow = @(
     "general-instructions-role.md",
     "introduction\workflow.md",
-    "general-instructions-1.md",
-    "specific-windows\workflow.md",
-    "general-instructions-2.md",
+    "general-instructions.md",
     "specific-linux\workflow.md",
-    "general-instructions-3.md",
-    "kb.md",
     "unittest.md"
 )
 
 $files_gacui = @(
     "general-instructions-role.md",
     "introduction\gacui.md",
-    "general-instructions-1.md",
-    "specific-windows\gacui.md",
-    "general-instructions-2.md",
+    "general-instructions.md",
     "specific-linux\gacui.md",
-    "general-instructions-3.md",
-    "kb.md",
     "unittest.md",
     "gacui\unittest.md",
     "gacui\xml.md",
@@ -141,59 +113,6 @@ function GeneratePrompt([string]$name, [string[]]$files) {
     }
 }
 
-function ReverseCopyPrompts() {
-    $destination_prompts_folder = "$PSScriptRoot\prompts"
-    
-    # Search for .github folder starting from current directory and going up
-    $currentPath = Get-Location
-    $githubFolder = $null
-    
-    while ($currentPath) {
-        $testGithubPath = Join-Path $currentPath ".github"
-        if (Test-Path $testGithubPath) {
-            $githubFolder = $testGithubPath
-            break
-        }
-        
-        # Move up one directory
-        $parentPath = Split-Path $currentPath -Parent
-        if ($parentPath -eq $currentPath) {
-            # We've reached the root, stop searching
-            break
-        }
-        $currentPath = $parentPath
-    }
-    
-    # Throw if .github folder not found
-    if (-not $githubFolder) {
-        throw "Could not find .github folder in current directory or any parent directories"
-    }
-    
-    $source_prompts_folder = Join-Path $githubFolder "prompts"
-    
-    # Check if source prompts folder exists
-    if (-not (Test-Path $source_prompts_folder)) {
-        throw "Source prompts folder not found: $source_prompts_folder"
-    }
-    
-    # Delete all files in the destination prompts folder if it exists
-    if (Test-Path $destination_prompts_folder) {
-        Remove-Item "$destination_prompts_folder\*" -Force
-    }
-    
-    # Ensure destination prompts folder exists
-    New-Item -ItemType Directory -Path $destination_prompts_folder -Force | Out-Null
-    
-    # Copy all .md files from source prompts folder
-    $source_prompts = "$source_prompts_folder\*.md"
-    if (Test-Path $source_prompts) {
-        Copy-Item $source_prompts -Destination $destination_prompts_folder -Force
-        Write-Host "Reverse copy completed from: $source_prompts_folder"
-    } else {
-        Write-Host "No .md files found to copy back from: $source_prompts_folder"
-    }
-}
-
 # Define all available projects
 $projects = @{
     "Vlpp"           = $files_vlpp
@@ -218,8 +137,6 @@ if ($Project -eq "") {
 # Check if the specified project exists and execute
 if ($projects.ContainsKey($Project)) {
     GeneratePrompt $Project $projects[$Project]
-} elseif ($Project -eq "CopyBack") {
-    ReverseCopyPrompts
 } else {
     Write-Host "Project '$Project' not found. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {

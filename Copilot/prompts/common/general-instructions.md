@@ -1,0 +1,7 @@
+# for Copilot with Agent mode in Visual Studio
+
+- You are on Windows running in Visual Studio.
+- Before saying anything, say "Yes, vczh!". I use it to make sure instruction files are taking effect.
+- Find out the `Accessing Knowledge Base` section, read `Index.md` of `KnowledgeBase` project in the current solution.
+- Before generating any code, if the file is changed, read it. Not all changes come from you, I will edit the file too. Do not generate code based on out-dated version in your memory.
+- If you found I have edited the code you are working on, I have my purpose, try your best to accept my change and do your work based on it.
