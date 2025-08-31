@@ -62,10 +62,20 @@ You can replace the default locale implementation with a custom one for testing 
 
 - Use `InjectLocaleImpl(impl)` to set a custom `ILocaleImpl` implementation
 - Use `InjectLocaleImpl(nullptr)` to reset to the default OS-specific implementation
+- Use `GetOSLocaleImpl()` to get the OS-dependent default implementation (function not in header file, declare manually)
 
 The injected implementation affects all `Locale` class operations including formatting, string comparison, and cultural operations. This allows you to provide custom localization behavior, create mock locales for testing, or implement specialized cultural rules not supported by the default OS implementation.
 
 Implementation injection should typically be done during application startup before any multi-threaded usage begins, as it affects global state.
+
+The `GetOSLocaleImpl()` function provides access to the platform-specific default implementation but is not declared in the header files. You need to declare it manually in your cpp files when needed:
+
+```cpp
+namespace vl
+{
+    extern ILocaleImpl* GetOSLocaleImpl();
+}
+```
 
 ### Character Normalization
 The locale system performs character normalization as part of its string operations. This means that characters that appear different but have the same semantic meaning (such as composed vs. decomposed Unicode characters) are treated as equivalent during comparisons and searches.

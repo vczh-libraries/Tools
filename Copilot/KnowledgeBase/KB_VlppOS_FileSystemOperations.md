@@ -71,10 +71,39 @@ You can replace the default file system implementation with a custom one for tes
 
 - Use `InjectFileSystemImpl(impl)` to set a custom `IFileSystemImpl` implementation
 - Use `InjectFileSystemImpl(nullptr)` to reset to the default OS-specific implementation
+- Use `GetOSFileSystemImpl()` to get the OS-dependent default implementation (function not in header file, declare manually)
 
 The injected implementation affects all `FilePath`, `File`, and `Folder` class operations that interact with the file system. This enables you to create in-memory file systems for testing, provide sandboxed file access, implement virtual file systems, or add custom file system behaviors like encryption or compression.
 
 Implementation injection should typically be done during application startup before any multi-threaded usage begins, as it affects global state.
+
+The `GetOSFileSystemImpl()` function provides access to the platform-specific default implementation but is not declared in the header files. You need to declare it manually in your cpp files when needed:
+
+```cpp
+namespace vl
+{
+    namespace filesystem
+    {
+        extern IFileSystemImpl* GetOSFileSystemImpl();
+    }
+}
+```
+
+### File Stream Implementation
+
+The file system implementation also provides file stream creation through `IFileSystemImpl::GetFileStreamImpl`. This method is used internally by `FileStream` constructors but can be useful when implementing custom file systems.
+
+There is also a `CreateOSFileStreamImpl` function available that creates the OS-specific file stream implementation directly. Like `GetOSFileSystemImpl`, this function is not declared in header files and must be declared manually:
+
+```cpp
+namespace vl
+{
+    namespace stream
+    {
+        extern Ptr<IFileStreamImpl> CreateOSFileStreamImpl(const WString& fileName, FileStream::AccessRight accessRight);
+    }
+}
+```
 
 ### Path Manipulation Best Practices
 

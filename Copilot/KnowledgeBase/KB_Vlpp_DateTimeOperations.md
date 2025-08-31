@@ -50,8 +50,18 @@ Override the default DateTime implementation for testing and customization.
 
 - Use `InjectDateTimeImpl(impl)` to set a custom `IDateTimeImpl` implementation
 - Use `InjectDateTimeImpl(nullptr)` to reset to the default OS-specific implementation
+- Use `GetOSDateTimeImpl()` to get the OS-dependent default implementation (function not in header file, declare manually)
 
 This functionality allows you to provide predictable time values for testing or implement custom time behaviors. The injected implementation affects all `DateTime` operations globally.
+
+The `GetOSDateTimeImpl()` function provides access to the platform-specific default implementation but is not declared in the header files. You need to declare it manually in your cpp files when needed:
+
+```cpp
+namespace vl
+{
+    extern IDateTimeImpl* GetOSDateTimeImpl();
+}
+```
 
 ## Extra Content
 
