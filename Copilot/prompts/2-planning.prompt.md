@@ -17,6 +17,7 @@
 - If there is nothing:
   - If `Copilot_Planning.md` only has a title, you are on a fresh start.
   - Otherwise, it means you are accidentally stopped. Please continue your work.
+    - Read `Copilot_Planning.md` througly, it is highly possibly that you were working on the request described in the last section in `# UPDATES`.
 
 ## Step 2. Understand the Goal and Quality Requirement
 
