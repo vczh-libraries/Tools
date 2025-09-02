@@ -35,12 +35,20 @@
 - If there is nothing: it means you are accidentally stopped. Please continue your work.
   - Read `Copilot_KB.md` througly, it is highly possibly that you were working on the request described in the last section in `# DOCUMENT REQUEST`.
 
+- Existing content in `# DOCUMENT REQUEST` should be frozen, you can change it only when you find out the analysis is incorrect during my clarification (try limit the scope to `## TOPIC`).
+
 ## Steps for Topic
 
 - Your goal is to complete a `### Insight` section in the `## TOPIC` of the `# DOCUMENT REQUEST` section.
 - The topic I would like you to research about is in the `# Topic` section in the LATEST chat message.
-
-### TO BE CONTINUED ...
+- The topic is around a feature of the project. It involves multiple places of the source code across many components.
+- You need to find out the details of the code logic abount:
+  - The entry point.
+  - The core part.
+  - Whether there are multiple branches of cases, find all of them.
+  - Whether there are recursive calls, find the structure.
+- Explain the architecture, organization of components, execution flows, design patterns (if applicable) in details about the design and the architecture.
+- You are writing all of this so that, when you need to change it in the future, you know how to do.
 
 ## Steps for Ask
 
