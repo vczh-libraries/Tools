@@ -10,7 +10,7 @@
 
 - The problem I would like to solve is in the chat messages sending with this request.
 - Find `# Problem` or `# Update` in the LATEST chat message. Ignore any `# Problem` or `# Update` in the chat history.
-- If there is a `# Problem` section: it means the content of the file is out-dated.
+- If there is a `# Problem` section: it means you are on a fresh start.
   - Make sure the current working directory is set to the folder containing the solution file, which I believe is the default location.
   - You must execute `.\copilotPrepare.ps1` to clean up everything from the last run.
   - You must execute `.\copilotPrepare.ps1`, must not be `copilotPrepare.ps1`, as PowerShell refuses to run a script file if there is only a simple file name.

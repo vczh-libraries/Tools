@@ -5,6 +5,7 @@ $filesToOverride = @{
     "Copilot_Planning.md" = "# !!!PLANNING!!!"
     "Copilot_Execution.md" = "# !!!EXECUTION!!!"
     "Copilot_Task.md" = "# !!!TASK!!!"
+    "Copilot_KB.md" = "# !!!KNOWLEDGE BASE!!!"
 }
 
 # Create or override the markdown files with the specified content
