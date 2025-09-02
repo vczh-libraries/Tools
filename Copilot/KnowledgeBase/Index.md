@@ -534,4 +534,14 @@ It provides a comprehensive testing framework, XML-to-C++ compilation, and integ
 
 ### Design Explanation
 
+#### Platform Initialization and Multi-Platform Architecture
+
+GacUI implements a sophisticated multi-platform initialization system that provides consistent API across different operating systems and rendering backends while maintaining platform-specific optimizations.
+
+The initialization process follows a layered architecture from platform entry points through renderer setup to application framework. It supports Windows Direct2D/GDI, Linux GTK, macOS Cocoa, remote rendering for testing, and hosted mode for embedded applications. The system uses a consistent naming pattern `Setup[Platform][Renderer][Mode]()` with standard mode providing full application framework, hosted mode running within a single native window, and raw mode bypassing GuiApplication entirely.
+
+Key features include hardware acceleration fallbacks, comprehensive error handling, frame-based unit testing through remote mode, and systematic service registration with proper dependency management.
+
+[Design Explanation](./KB_GacUI_Design_PlatformInitialization.md)
+
 ## Experiences and Learnings
