@@ -49,13 +49,14 @@
   - Whether there are recursive calls, find the structure.
 - Explain the architecture, organization of components, execution flows, design patterns (if applicable) in details about the design and the architecture.
 - You are writing all of this so that, when you need to change it in the future, you know how to do.
+- You should keep the content compact. When you refer to the source code, do not include code snippets. Say the function name, and if the function is big, a little bit more to locate the code in it.
 
 ## Steps for Ask
 
 - Your goal is to complete a `### Insight` section in the `## ASK` of the `# DOCUMENT REQUEST` section.
-- The finding I would like you to clarify is in the `# Topic` section in the LATEST chat message.
-
-### TO BE CONTINUED ...
+- The finding I would like you to clarify is in the `# Ask` section in the LATEST chat message.
+- I will point out that what you are wrong about, what I still do not understand, where you should need to go deeper.
+- You will have to answer my question in `### Insight` of `## ASK`, and fix `## TOPIC` under `# DOCUMENT REQUEST` if there is anything wrong.
 
 ## Steps for Draft
 
