@@ -37,12 +37,34 @@
 
 ## Steps for Topic
 
+- Your goal is to complete a `### Insight` section in the `## TOPIC` of the `# DOCUMENT REQUEST` section.
+- The topic I would like you to research about is in the `# Topic` section in the LATEST chat message.
+
+### TO BE CONTINUED ...
+
 ## Steps for Ask
+
+- Your goal is to complete a `### Insight` section in the `## ASK` of the `# DOCUMENT REQUEST` section.
+- The finding I would like you to clarify is in the `# Topic` section in the LATEST chat message.
+
+### TO BE CONTINUED ...
 
 ## Steps for Draft
 
+- Your goal is to complete a draft document for the knowledge base in `Copilot_KB.md`.
+- Make a `# DRAFT-LOCATION` section, you need to describe which part you would like to update in the knowledge base.
+- Make a `# DRAFT-TITLE` section, you need to make a comprehensive but short title for the draft document.
+- Make a `# DRAFT-CONTENT` section, you need to complete the content of the draft document here.
+- The draft document is completedly based on the source code of the project, and all findings in the `# DOCUMENT REQUEST` section.
+
 ## Steps for Improve
+
+- Your goal is to update `# DRAFT-*` based on my suggestion.
+- The suggestion is in the `# Improve` section in the LATEST chat message.
 
 ## Steps for Execute
 
-## TO BE CONTINUED ...
+- Follow `# DRAFT-LOCATION` to add a new hyperlink to the knowledge base.
+- Create a file according to the hyperlink and add it to the `KnowledgeBase` project.
+- The title of the document is in the `# DRAFT-TITLE` section.
+- The content must be exactly and precisely the content under `# DRAFT-CONTENT`. But do not copy the `# DRAFT-CONTENT` title itself.
