@@ -25,6 +25,7 @@ $filesToIgnore = $scriptsToCopy + @(
 
 $filesToTrack = $filesToIgnore + @(
     "Copilot_Scrum.md"
+    "Copilot_KB.md"
 )
 
 foreach ($script in $scriptsToCopy) {
