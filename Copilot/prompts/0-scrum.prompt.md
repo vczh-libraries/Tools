@@ -5,6 +5,7 @@
 - Your goal is to finish a design document in `Copilot_Scrum.md` to address a problem.
 - You are only allowed to update `Copilot_Scrum.md`.
 - You are not allowed to modify any other files.
+- Make sure only code references are in code blocks. Do not emit code blocks for markdown.
 
 ## Step 1. Identify the Problem
 
@@ -17,6 +18,7 @@
   - You should continue to work out more details.
   - Copy precisely my problem description in `# Update` from the LATEST chat message to the `# DESIGN REQUEST` section, with a new sub-section `## UPDATE`.
   - Follow my update to change the design document.
+- If there is nothing: it means you are accidentally stopped. Please continue your work.
 
 ## Step 2. Understand the Goal and Quality Requirement
 
@@ -24,6 +26,10 @@
 - Each task should be small enough to only represent a single idea or feature upgrade.
 - Each task should be big enough to deliver a complete piece of functionality, do not make a task that only add code that will not be executed.
 - The order of tasks is important. At the end of any task, the project should be able to compile and test.
+- The reason I would like you to solve the problem in this way instead of making an immediate plan of code improvement is that, it is complicated and should work across the whole project. As an experienced C++ developer for large scale systems, you need to:
+  - Take in consideration of the knowledge base, finding anything that would be helpful for the current problem.
+  - Read through the code base carefully. The project is complicated, one small decision may have widely impact to the other part of the project.
+  - Think thoroughly.
 
 ## Step 3. Finish the Document
 
@@ -43,10 +49,7 @@
   - `rationale`:
     - Reasons about why you think it is necessary to have this task, why you think it is the best for the task to be in this order.
     - Any support evidences from source code or knowledge base. If you can't find anything from the knowledge base, what do you think need to be added.
-- The reason I would like you to solve the problem in this way instead of making an immediate plan of code improvement is that, it is complicated and should work across the whole project. As an experienced C++ developer for large scale systems, you need to:
-  - Take in consideration of the knowledge base, finding anything that would be helpful for the current problem.
-  - Read through the code base carefully. The project is complicated, one small decision may have widely impact to the other part of the project.
-  - Think thoroughly.
+- Make sure only code references are in code blocks. Do not emit code blocks for markdown.
 
 ## Step 4. Identify Changes to Knowledge Base
 
@@ -61,4 +64,4 @@
 
 ## Step 5. Mark the Completion
 
-- Append `# !!!FINISHED!!!` to `Copilot_Scrum.md` to indicate the design reaches the end.
+- Ensure there is a `# !!!FINISHED!!!` mark at the end of `Copilot_Scrum.md` to indicate the document reaches the end.
