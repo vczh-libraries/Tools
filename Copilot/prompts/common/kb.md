@@ -25,7 +25,14 @@ At the end of the category, there is a hyperlink: `[API Explanation](./KB_Projec
 
 ## Project/Design Explanation
 
-(To do ...)
+There are multiple topics under `Design Explanation`. Each topic begins with a short and accurate title `#### Topic`.
+A topic means a feature of this project, it will be multiple components combined.
+
+Under the topic, there is overall and comprehensive description about what does this feature do.
+
+Under the description, there are bullet points to provide a little more detail, but do not make it too long. Full details are supposed to be in the document from the hyperlink.
+
+At the end of the topic, there is a hyperlink: `[Design Explanation](./KB_Project_Design_Topic.md)` (no space between file name, all pascal case).
 
 ## Experiences and Learnings
 

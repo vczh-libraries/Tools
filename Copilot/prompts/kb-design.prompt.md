@@ -61,6 +61,7 @@
 
 - Your goal is to complete a draft document for the knowledge base in `Copilot_KB.md`.
 - Make a `# DRAFT-LOCATION` section, you need to describe which part you would like to update in the knowledge base.
+  - It will be a new topic under the `Design Explanation` section of a project in `Index.md` of the knowledge base.
 - Make a `# DRAFT-TITLE` section, you need to make a comprehensive but short title for the draft document.
 - Make a `# DRAFT-CONTENT` section, you need to complete the content of the draft document here.
 - The draft document is completedly based on the source code of the project, and all findings in the `# DOCUMENT REQUEST` section.
@@ -72,7 +73,7 @@
 
 ## Steps for Execute
 
-- Follow `# DRAFT-LOCATION` to add a new hyperlink to the knowledge base.
+- Follow `# DRAFT-LOCATION` to add a new topic under the `Design Explanation` section of a project in `Index.md` of the knowledge base.
 - Create a file according to the hyperlink and add it to the `KnowledgeBase` project.
 - The title of the document is in the `# DRAFT-TITLE` section.
 - The content must be exactly and precisely the content under `# DRAFT-CONTENT`. But do not copy the `# DRAFT-CONTENT` title itself.
