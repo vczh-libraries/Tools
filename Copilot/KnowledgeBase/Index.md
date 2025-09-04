@@ -558,4 +558,15 @@ It provides a comprehensive testing framework, XML-to-C++ compilation, and integ
 
 [Design Explanation](./KB_GacUI_Design_MainWindowModalWindow.md)
 
+#### Implementing IGuiGraphicsElement
+
+- Defines element lifecycle via `IGuiGraphicsElement`, `IGuiGraphicsRenderer`, renderer factories, and render targets.
+- Uses `GuiElementBase<T>` pattern with property change notifications through `InvokeOnElementStateChanged` for invalidation and size recalculation.
+- Renderer abstraction supplies hooks (`InitializeInternal`, `FinalizeInternal`, `RenderTargetChangedInternal`, `Render`, `OnElementStateChanged`, `GetMinSize`) and caches platform resources.
+- Parallel renderer families per backend (Direct2D, GDI, Remote/Hosted) registered in backend initialization via static `Register()`.
+- Composition + host rendering pipeline traverses compositions, applies clippers, calls element renderers; invalidation chain from property setter to `GuiGraphicsHost::Render`.
+- Provides checklist, lifecycle summary, common pitfalls, and distinction from complex `GuiDocumentElement` model-based rendering architecture.
+
+[Design Explanation](./KB_GacUI_Design_ImplementingIGuiGraphicsElement.md)
+
 ## Experiences and Learnings
