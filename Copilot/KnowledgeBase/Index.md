@@ -548,4 +548,14 @@ It provides a comprehensive testing framework, XML-to-C++ compilation, and integ
 
 [Design Explanation](./KB_GacUI_Design_PlatformInitialization.md)
 
+#### Main Window and Modal Window Management
+
+- GacUI provides a sophisticated multi-layered window management architecture that enables consistent main window and modal window behavior across all supported platforms while maintaining platform-specific optimizations.
+- The application loop operates through hierarchical delegation from `GuiApplication` layer down to platform-specific `INativeWindowService` implementations, supporting Windows native, hosted mode, and remote mode environments.
+- Modal windows achieve apparent "blocking" behavior without actually blocking the underlying event processing system through an event-driven callback architecture that maintains full user interaction capabilities.
+- The system supports three modal window variants: `ShowModal` for basic modal behavior, `ShowModalAndDelete` for automatic cleanup, and `ShowModalAsync` for modern async/await integration patterns.
+- Cross-platform consistency is maintained through unified modal APIs, continuous message loop processing, and platform-optimized implementations that abstract differences while providing rich windowing capabilities.
+
+[Design Explanation](./KB_GacUI_Design_MainWindowModalWindow.md)
+
 ## Experiences and Learnings
