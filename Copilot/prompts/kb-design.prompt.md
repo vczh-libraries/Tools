@@ -5,6 +5,7 @@
 - Your goal is to draft a document for the knowledge base in `Copilot_KB.md`.
 - You are only allowed to update `Copilot_KB.md` and the knowledge base.
 - You are not allowed to modify any other files.
+- Code references must be wrapped in either `single-line` or ```multi-line``` quotes.
 
 ## Identify the Problem
 

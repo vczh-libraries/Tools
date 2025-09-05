@@ -21,6 +21,7 @@ $filesToIgnore = $scriptsToCopy + @(
     "Copilot_Execution.md"
     "Copilot_Planning.md"
     "Copilot_Task.md"
+    "enc_temp_folder" # for gpt-5
 )
 
 $filesToTrack = $filesToIgnore + @(
