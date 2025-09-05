@@ -569,4 +569,15 @@ It provides a comprehensive testing framework, XML-to-C++ compilation, and integ
 
 [Design Explanation](./KB_GacUI_Design_ImplementingIGuiGraphicsElement.md)
 
+#### Layout and GuiGraphicsComposition
+
+- Core layout system centered on `GuiGraphicsComposition` with measurement (`Layout_CalculateMinSize`) and arrangement (`Layout_CalculateBounds`) passes driven only by host render loop invalidation.
+- Three subclass archetypes (`_Trivial`, `_Controlled`, `_Specialized`) define ownership of size calculation and parent-child constraint propagation.
+- Eight predefined layout families (Bounds, Table, Stack, Flow, Shared Size, Side Aligned, Partial View, Window Root) plus responsive (`GuiResponsive*`) adaptive level-based system.
+- Bidirectional constraints: parent supplies space; children optionally enlarge parent via `Layout_CalculateMinClientSizeForParent`; controlled items receive bounds from parent setters.
+- Invalidation via `InvokeOnCompositionStateChanged`; `GuiGraphicsHost::Render` iteratively recalculates until stable; `ForceCalculateSizeImmediately` only for interactive latency.
+- Responsive compositions add multi-level adaptive switching with aggregation strategies (View, Stack, Group, Fixed) and automatic container adjustment.
+
+[Design Explanation](./KB_GacUI_Design_LayoutAndGuiGraphicsComposition.md)
+
 ## Experiences and Learnings

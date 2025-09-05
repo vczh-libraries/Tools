@@ -21,12 +21,16 @@ $filesToIgnore = $scriptsToCopy + @(
     "Copilot_Execution.md"
     "Copilot_Planning.md"
     "Copilot_Task.md"
-    "enc_temp_folder" # for gpt-5
 )
 
 $filesToTrack = $filesToIgnore + @(
     "Copilot_Scrum.md"
     "Copilot_KB.md"
+)
+
+# Files to track in the @Copilot solution folder
+$extraFilesToIgnore = $filesToIgnore + @(
+    "enc_temp_folder" # for gpt-5
 )
 
 foreach ($script in $scriptsToCopy) {
@@ -45,7 +49,7 @@ $gitignorePath = ".\.gitignore"
 
 Write-Host "Updating .gitignore..."
 
-$filesToIgnore | Out-File -FilePath $gitignorePath -Encoding UTF8
+$extraFilesToIgnore | Out-File -FilePath $gitignorePath -Encoding UTF8
 
 # Update UnitTest.sln to include the @Copilot section
 $solutionPath = ".\$($slnFiles[0].Name)"
