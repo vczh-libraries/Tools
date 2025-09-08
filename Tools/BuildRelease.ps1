@@ -19,8 +19,6 @@ function Build-Release-Update() {
         Copy-Item ..\VlppRegex\Release\*.cpp .\Import
         Copy-Item ..\VlppReflection\Release\*.h .\Import
         Copy-Item ..\VlppReflection\Release\*.cpp .\Import
-        Copy-Item ..\VlppParser\Release\*.h .\Import
-        Copy-Item ..\VlppParser\Release\*.cpp .\Import
         Copy-Item ..\VlppParser2\Release\*.h .\Import
         Copy-Item ..\VlppParser2\Release\*.cpp .\Import
         Copy-Item ..\Workflow\Release\*.h .\Import

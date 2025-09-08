@@ -29,7 +29,7 @@ function Build-Tool-GacGen {
 
 function Update-GacUI {
     # Import
-    Import-Project GacUI ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","VlppParser2","Workflow")
+    Import-Project GacUI ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser2","Workflow")
 
     # Update Parsers
     Update-Parser2 $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\Syntax\Parser.xml
