@@ -4,4 +4,6 @@
 
 ### Calling copilotBuild.ps1 and copilotExecute.ps1
 
-This solution is in `Test\GacUISrc`, after `ls` to this folder, scripts will be in `..\..\.github`.
+This solution is in `Test\GacUISrc`, after `ls` to this folder, scripts will be accessible with:
+- `& ..\..\.github\TaskLogs\copilotBuild.ps1`
+- `& ..\..\.github\TaskLogs\copilotExecute.ps1`
