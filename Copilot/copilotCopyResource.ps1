@@ -19,7 +19,14 @@ function GenerateResource([string]$name, [string]$vcxitems) {
 }
 
 function InitTaskLogs([string]$name) {
-    $output_folder = "$PSScriptRoot\vcxitems-TaskLogs\"
+    $output_folder = "$PSScriptRoot\..\..\$name\.github\TaskLogs"
+    
+    # Add *.ps1 to .gitignore
+    $gitignore_path = "$output_folder\.gitignore"
+    Add-Content -Path $gitignore_path -Value "*.ps1"
+    
+    # Execute copilotPrepare.ps1
+    & "$output_folder\copilotPrepare.ps1"
 }
 
 # Define all available projects
