@@ -172,25 +172,14 @@ $projects = @{
     "GacUI"          = $files_gacui
 }
 
-# Check if a project was specified
-if ($Project -eq "") {
-    Write-Host "Please specify a project name. Available projects:"
-    foreach ($projectName in $projects.Keys | Sort-Object) {
-        Write-Host "  $projectName"
-    }
-    Write-Host "  CopyBack"
-    exit 1
-}
-
 # Check if the specified project exists and execute
 if ($projects.ContainsKey($Project)) {
     GenerateGeneralPrompt $Project $projects[$Project]
     GenerateProcessPrompt $Project "vs"
 } else {
-    Write-Host "Project '$Project' not found. Available projects:"
+    Write-Host "Project '$Project' not found. Please specify a valid project name. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {
         Write-Host "  $projectName"
     }
-    Write-Host "  CopyBack"
     exit 1
 }
