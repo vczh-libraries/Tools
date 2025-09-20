@@ -119,33 +119,23 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             $file_content = Get-Content $file.FullName -Raw
             
             # Append common content to all files
-            $common_general_path = "$PSScriptRoot\prompts\$ide-common\general-instructions.md"
-            $tasklogs_path = "$PSScriptRoot\prompts\common\tasklogs.md"
+            $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\ide.md" -Raw)
+            $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\common\general-instructions.md" -Raw)
             
-            if (Test-Path $common_general_path) {
-                $common_general_content = Get-Content $common_general_path -Raw
-                $file_content += "`r`n" + $common_general_content
+            # These files do not need to know about log files
+            # ask.prompt.md
+            # code.prompt.md
+            # kb-api.prompt.md
+            if (($file.Name -ne "ask.prompt.md") -and ($file.Name -ne "code.prompt.md") -and ($file.Name -ne "kb-api.prompt.md")) {
+                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\common\tasklogs.md" -Raw)
             }
             
-            if ((Test-Path $tasklogs_path) -and ($file.Name -ne "ask.prompt.md") -and ($file.Name -ne "code.prompt.md") -and ($file.Name -ne "kb-api.prompt.md")) {
-                $kb_content = Get-Content $tasklogs_path -Raw
-                $file_content += "`r`n" + $kb_content
-            }
-            
-            # Special handling for 4-verifying.prompt.md
+            # These files need to know about compiling
+            # 4-verifying.prompt.md
+            # code.prompt.md
             if (($file.Name -eq "4-verifying.prompt.md") -or ($file.Name -eq "code.prompt.md")) {
-                $verifying_path = "$PSScriptRoot\prompts\common\verifying.md"
-                $specific_windows_path = "$PSScriptRoot\specific-windows\$name.md"
-                
-                if (Test-Path $verifying_path) {
-                    $verifying_content = Get-Content $verifying_path -Raw
-                    $file_content += "`r`n" + $verifying_content
-                }
-                
-                if (Test-Path $specific_windows_path) {
-                    $specific_windows_content = Get-Content $specific_windows_path -Raw
-                    $file_content += "`r`n" + $specific_windows_content
-                }
+                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\common\verifying.md" -Raw)
+                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\specific-windows\$name.md" -Raw)
             }
             
             # Write the updated content back to the file
@@ -175,6 +165,7 @@ $projects = @{
 if ($projects.ContainsKey($Project)) {
     GenerateGeneralPrompt $Project $projects[$Project]
     GenerateProcessPrompt $Project "vs"
+    GenerateProcessPrompt $Project "win"
 } else {
     Write-Host "Project '$Project' not found. Please specify a valid project name. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {
