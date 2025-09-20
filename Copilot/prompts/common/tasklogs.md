@@ -2,8 +2,8 @@
 
 This guidance is for accessing following files mentioned in this instruction:
 - `Copilot_Scrum.md`
-- `Copilot_Planning.md`
 - `Copilot_Task.md`
+- `Copilot_Planning.md`
 - `Copilot_Execution.md`
 - `Copilot_KB.md`
 - `copilotExecute.ps1`
