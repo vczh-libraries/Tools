@@ -10,12 +10,30 @@ if (-not $Executable.EndsWith(".exe")) {
     $executableName = $Executable
 }
 
+# Find the solution folder by looking for *.sln files
+$currentDir = Get-Location
+$solutionFolder = $null
+
+while ($currentDir -ne $null -and $currentDir.Parent -ne $null) {
+    $solutionFiles = Get-ChildItem -Path $currentDir.Path -Filter "*.sln" -ErrorAction SilentlyContinue
+    if ($solutionFiles.Count -gt 0) {
+        $solutionFolder = $currentDir.Path
+        Write-Host "Found solution folder: $solutionFolder"
+        break
+    }
+    $currentDir = $currentDir.Parent
+}
+
+if ($solutionFolder -eq $null) {
+    throw "Could not find a solution folder (*.sln file) in current directory or any parent directories."
+}
+
 # Define configuration to path mappings
 $configToPathMap = @{
-    "Debug|Win32" = "$PSScriptRoot\Debug\$executableName"
-    "Release|Win32" = "$PSScriptRoot\Release\$executableName"
-    "Debug|x64" = "$PSScriptRoot\x64\Debug\$executableName"
-    "Release|x64" = "$PSScriptRoot\x64\Release\$executableName"
+    "Debug|Win32" = "$solutionFolder\Debug\$executableName"
+    "Release|Win32" = "$solutionFolder\Release\$executableName"
+    "Debug|x64" = "$solutionFolder\x64\Debug\$executableName"
+    "Release|x64" = "$solutionFolder\x64\Release\$executableName"
 }
 
 # Find existing files and get their modification times with configuration info
@@ -38,7 +56,7 @@ if ($existingFiles.Count -gt 0) {
     Write-Host "Selected $executableName`: $($latestFile.Path) (Modified: $($latestFile.LastWriteTime))"
 
     # Try to read debug arguments from the corresponding .vcxproj.user file
-    $userProjectFile = "$PSScriptRoot\$Executable\$Executable.vcxproj.user"
+    $userProjectFile = "$solutionFolder\$Executable\$Executable.vcxproj.user"
     $debugArgs = ""
 
     if (Test-Path $userProjectFile) {
