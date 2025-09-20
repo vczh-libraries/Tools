@@ -1,6 +1,6 @@
 # Accessing Log Files and PowerShell Scripts
 
-This guidance is for accessing any following file mentioned in this instruction:
+This guidance is for accessing following files mentioned in this instruction:
 - `Copilot_Scrum.md`
 - `Copilot_Planning.md`
 - `Copilot_Task.md`
@@ -14,4 +14,4 @@ Otherwise, locate the `TaskLogs` project in `REPO-ROOT/.github/TaskLogs/TaskLogs
 `REPO-ROOT` is the root folder of the repo.
 
 `TaskLogs.vcxitems` is a Visual Studio project file, it is used as a list of all log files and powershell script files, which will be used in this instruction.
-You need to locate listed files in `KnowledgeBase.vcxitems`.
+You need to locate listed files in `TaskLogs.vcxitems`.
