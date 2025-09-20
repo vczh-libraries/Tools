@@ -21,29 +21,17 @@ function PatchSln_AddSection([String]$solutionContent, [string]$projectSectionBe
         return $solutionContent
     }
 
-    # Project section exists - find where it ends
-    Write-Host "@Project section already exists. Replacing it..."
-    $searchStartIndex = $projectSectionIndex + $projectSectionBegin.Length
+    # section doesn't exist - insert before Global section
+    $globalSectionIndex = $solutionContent.IndexOf("Global")
     
-    # Use regex to find $projectSectionEnd at the beginning of a line (with possible whitespace)
-    $endProjectPattern = "(?m)^(\s*)$projectSectionEnd(?!\w)"
-    $searchContent = $solutionContent.Substring($searchStartIndex)
-    $endProjectMatch = [regex]::Match($searchContent, $endProjectPattern)
-    
-    if ($endProjectMatch.Success) {
-        # Adjust the index to account for the substring offset
-        $endProjectIndex = $searchStartIndex + $endProjectMatch.Index
-        $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
-        if ($endOfSectionIndex -eq 0) {
-            $endOfSectionIndex = $endProjectIndex + $projectSectionEnd.Length
-        }
-        
-        $beforeCopilot = $solutionContent.Substring(0, $projectSectionIndex)
-        $afterCopilot = $solutionContent.Substring($endOfSectionIndex)
+    if ($globalSectionIndex -gt 0) {
+        $beforeCopilot = $solutionContent.Substring(0, $globalSectionIndex)
+        $afterCopilot = $solutionContent.Substring($globalSectionIndex)
     }
     else {
-        Write-Host "Warning: Could not find $projectSectionEnd after the specified section. Skipping replacement."
-        return $solutionContent
+        # No Global section - append at end
+        $beforeCopilot = $solutionContent
+        $afterCopilot = ""
     }
     
     # Combine the three parts and write to file
