@@ -95,7 +95,7 @@ function GenerateGeneralPrompt([string]$name, [string[]]$files) {
     Write-Host Updated: $output_path
 }
 
-function GenerateProcessPrompt([string]$name) {
+function GenerateProcessPrompt([string]$name, [string]$ide) {
     # Handle prompts folder
     $prompts_folder = "$PSScriptRoot\..\..\$name\.github\prompts"
     
@@ -119,7 +119,7 @@ function GenerateProcessPrompt([string]$name) {
             $file_content = Get-Content $file.FullName -Raw
             
             # Append common content to all files
-            $common_general_path = "$PSScriptRoot\prompts\common\general-instructions.md"
+            $common_general_path = "$PSScriptRoot\prompts\$ide-common\general-instructions.md"
             $kb_path = "$PSScriptRoot\prompts\common\kb.md"
             
             if (Test-Path $common_general_path) {
@@ -150,6 +150,13 @@ function GenerateProcessPrompt([string]$name) {
             
             # Write the updated content back to the file
             Set-Content -Path $file.FullName -Value $file_content
+            
+            # Rename the file to add "$ide-" prefix
+            $directory = $file.Directory.FullName
+            $originalName = $file.Name
+            $newName = "$ide-$originalName"
+            $newPath = Join-Path $directory $newName
+            Rename-Item -Path $file.FullName -NewName $newName
         }
     }
 }
@@ -178,7 +185,7 @@ if ($Project -eq "") {
 # Check if the specified project exists and execute
 if ($projects.ContainsKey($Project)) {
     GenerateGeneralPrompt $Project $projects[$Project]
-    GenerateProcessPrompt $Project
+    GenerateProcessPrompt $Project "vs"
 } else {
     Write-Host "Project '$Project' not found. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {
