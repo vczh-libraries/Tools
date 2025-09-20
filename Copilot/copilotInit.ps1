@@ -8,127 +8,71 @@ if ($slnFiles.Count -eq 0) {
     throw "Multiple .sln files found in current directory. Please navigate to a directory containing exactly one solution file."
 }
 
-Write-Host "Found solution file: $($slnFiles[0].Name)"
-
-# Copy PowerShell scripts to current working directory
-$scriptsToCopy = @(
-    "copilotExecute.ps1"
-    "copilotPrepare.ps1"
-)
-
-# Files to track in the @Copilot solution folder
-$filesToIgnore = $scriptsToCopy + @(
-    "Copilot_Execution.md"
-    "Copilot_Planning.md"
-    "Copilot_Task.md"
-)
-
-$filesToTrack = $filesToIgnore + @(
-    "Copilot_Scrum.md"
-    "Copilot_KB.md"
-)
-
-# Files to track in the @Copilot solution folder
-$extraFilesToIgnore = $filesToIgnore + @(
-    "enc_temp_folder" # for gpt-5
-)
-
-foreach ($script in $scriptsToCopy) {
-    $sourceScript = "$PSScriptRoot\$script"
-    $targetScript = ".\$script"
-    if (Test-Path $sourceScript) {
-        Write-Host "Copying $script to current directory..."
-        Copy-Item -Path $sourceScript -Destination $targetScript -Force
-    } else {
-        Write-Host "Warning: $script not found at $sourceScript"
-    }
-}
-
-# Create or update .gitignore to include the markdown files
-$gitignorePath = ".\.gitignore"
-
-Write-Host "Updating .gitignore..."
-
-$extraFilesToIgnore | Out-File -FilePath $gitignorePath -Encoding UTF8
-
 # Update UnitTest.sln to include the @Copilot section
 $solutionPath = ".\$($slnFiles[0].Name)"
+Write-Host "Found solution file: $solutionPath"
 
 # Build the solution items section
-$solutionItems = ($filesToTrack | ForEach-Object { "`t`t$_ = $_" }) -join "`r`n"
 
 $copilotSectionBegin = 'Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Copilot", "@Copilot", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"'
 
 $copilotSection = @"
 $copilotSectionBegin
 	ProjectSection(SolutionItems) = preProject
-$solutionItems
 	EndProjectSection
 EndProject
 "@
 
-if (Test-Path $solutionPath) {
-    Write-Host "Updating $($slnFiles[0].Name)..."
-    $solutionContent = Get-Content $solutionPath -Raw
+Write-Host "Updating $solutionPath..."
+$solutionContent = Get-Content $solutionPath -Raw
+
+# Find content before and after copilot section
+$copilotSectionIndex = $solutionContent.IndexOf($copilotSectionBegin)
+
+if ($copilotSectionIndex -ge 0) {
+    # Copilot section exists - find where it ends
+    Write-Host "@Copilot section already exists. Replacing it..."
+    $searchStartIndex = $copilotSectionIndex + $copilotSectionBegin.Length
     
-    # Find content before and after copilot section
-    $copilotSectionIndex = $solutionContent.IndexOf($copilotSectionBegin)
+    # Use regex to find EndProject at the beginning of a line (with possible whitespace)
+    # This prevents matching EndProjectSection which is indented
+    $endProjectPattern = '(?m)^(\s*)EndProject(?!\w)'
+    $searchContent = $solutionContent.Substring($searchStartIndex)
+    $endProjectMatch = [regex]::Match($searchContent, $endProjectPattern)
     
-    if ($copilotSectionIndex -ge 0) {
-        # Copilot section exists - find where it ends
-        Write-Host "@Copilot section already exists. Replacing it..."
-        $searchStartIndex = $copilotSectionIndex + $copilotSectionBegin.Length
-        
-        # Use regex to find EndProject at the beginning of a line (with possible whitespace)
-        # This prevents matching EndProjectSection which is indented
-        $endProjectPattern = '(?m)^(\s*)EndProject(?!\w)'
-        $searchContent = $solutionContent.Substring($searchStartIndex)
-        $endProjectMatch = [regex]::Match($searchContent, $endProjectPattern)
-        
-        if ($endProjectMatch.Success) {
-            # Adjust the index to account for the substring offset
-            $endProjectIndex = $searchStartIndex + $endProjectMatch.Index
-            $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
-            if ($endOfSectionIndex -eq 0) {
-                $endOfSectionIndex = $endProjectIndex + "EndProject".Length
-            }
-            
-            $beforeCopilot = $solutionContent.Substring(0, $copilotSectionIndex)
-            $afterCopilot = $solutionContent.Substring($endOfSectionIndex)
-        } else {
-            Write-Host "Warning: Could not find EndProject after @Copilot section. Skipping replacement."
-            return
+    if ($endProjectMatch.Success) {
+        # Adjust the index to account for the substring offset
+        $endProjectIndex = $searchStartIndex + $endProjectMatch.Index
+        $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
+        if ($endOfSectionIndex -eq 0) {
+            $endOfSectionIndex = $endProjectIndex + "EndProject".Length
         }
+        
+        $beforeCopilot = $solutionContent.Substring(0, $copilotSectionIndex)
+        $afterCopilot = $solutionContent.Substring($endOfSectionIndex)
     } else {
-        # Copilot section doesn't exist - insert before Global section
-        Write-Host "@Copilot section not found. Adding it..."
-        $globalSectionIndex = $solutionContent.IndexOf("Global")
-        
-        if ($globalSectionIndex -gt 0) {
-            $beforeCopilot = $solutionContent.Substring(0, $globalSectionIndex)
-            $afterCopilot = $solutionContent.Substring($globalSectionIndex)
-        } else {
-            # No Global section - append at end
-            $beforeCopilot = $solutionContent
-            $afterCopilot = ""
-        }
+        Write-Host "Warning: Could not find EndProject after @Copilot section. Skipping replacement."
+        return
     }
-    
-    # Combine the three parts and write to file
-    $newContent = $beforeCopilot.TrimEnd() + "`r`n" + $copilotSection + "`r`n" + $afterCopilot.TrimStart()
-    $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
-    Write-Host "@Copilot section updated in solution file."
 } else {
-    Write-Host "Warning: $($slnFiles[0].Name) not found."
+    # Copilot section doesn't exist - insert before Global section
+    Write-Host "@Copilot section not found. Adding it..."
+    $globalSectionIndex = $solutionContent.IndexOf("Global")
+    
+    if ($globalSectionIndex -gt 0) {
+        $beforeCopilot = $solutionContent.Substring(0, $globalSectionIndex)
+        $afterCopilot = $solutionContent.Substring($globalSectionIndex)
+    } else {
+        # No Global section - append at end
+        $beforeCopilot = $solutionContent
+        $afterCopilot = ""
+    }
 }
 
-# Execute copilotPrepare.ps1 if it exists
-if (Test-Path ".\copilotPrepare.ps1") {
-    Write-Host "Executing copilotPrepare.ps1..."
-    & ".\copilotPrepare.ps1"
-} else {
-    Write-Host "Warning: copilotPrepare.ps1 not found in current directory."
-}
+# Combine the three parts and write to file
+$newContent = $beforeCopilot.TrimEnd() + "`r`n" + $copilotSection + "`r`n" + $afterCopilot.TrimStart()
+$newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
+Write-Host "@Copilot section updated in solution file."
 
 # Extract project name from current working directory
 $currentPath = Get-Location
@@ -147,8 +91,8 @@ if ($vczhLibrariesIndex -ne -1 -and ($vczhLibrariesIndex + 1) -lt $pathParts.Len
     $projectName = $pathParts[$vczhLibrariesIndex + 1]
     Write-Host "Detected project name: $projectName"
     
-    # Call copilotUpdatePrompt with the detected project name
-    & "$PSScriptRoot\copilotUpdatePrompt.ps1" -Project $projectName
+    & "$PSScriptRoot\copilotCopyPrompt.ps1" -Project $projectName
+    & "$PSScriptRoot\copilotCopyResource.ps1" -Project $projectName
 } else {
     Write-Host "Warning: Could not detect project name from current path."
 }
