@@ -5,49 +5,49 @@ param(
 $files_vlpp = @(
     "introduction\vlpp.md",
     "general-instructions.md",
-    "specific-linux\vlpp.md",
+    # "specific-linux\vlpp.md",
     "unittest.md"
 )
 
 $files_vlppos = @(
     "introduction\vlppos.md",
     "general-instructions.md",
-    "specific-linux\vlppos.md",
+    # "specific-linux\vlppos.md",
     "unittest.md"
 )
 
 $files_vlppregex = @(
     "introduction\vlppregex.md",
     "general-instructions.md",
-    "specific-linux\vlppregex.md",
+    # "specific-linux\vlppregex.md",
     "unittest.md"
 )
 
 $files_vlppreflection = @(
     "introduction\vlppreflection.md",
     "general-instructions.md",
-    "specific-linux\vlppreflection.md",
+    # "specific-linux\vlppreflection.md",
     "unittest.md"
 )
 
 $files_vlppparser2 = @(
     "introduction\vlppparser2.md",
     "general-instructions.md",
-    "specific-linux\vlppparser2.md",
+    # "specific-linux\vlppparser2.md",
     "unittest.md"
 )
 
 $files_workflow = @(
     "introduction\workflow.md",
     "general-instructions.md",
-    "specific-linux\workflow.md",
+    # "specific-linux\workflow.md",
     "unittest.md"
 )
 
 $files_gacui = @(
     "introduction\gacui.md",
     "general-instructions.md",
-    "specific-linux\gacui.md",
+    # "specific-linux\gacui.md",
     "unittest.md",
     "gacui\unittest.md",
     "gacui\xml.md",
