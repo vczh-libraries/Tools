@@ -37,4 +37,4 @@ if ($Project -eq "") {
 
 GenerateResource $Project "KnowledgeBase"
 GenerateResource $Project "TaskLogs"
-InitTaskLogs $Project
+# InitTaskLogs $Project
