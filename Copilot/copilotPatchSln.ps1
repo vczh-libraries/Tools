@@ -7,6 +7,7 @@ $tlBegin = 'Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaskLogs", "' +
 
 $nestedProjectsBegin = "`tGlobalSection(NestedProjects) = preSolution"
 $nestedProject = @"
+$nestedProjectsBegin
 `t`t{D178E490-7C2B-43FA-A8B3-A3BED748EB38} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 `t`t{8626528F-9C97-4480-A018-CDCCCB9CACAE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 `tEndGlobalSection
@@ -22,13 +23,14 @@ function PatchSln_AddSection([String]$solutionContent, [string]$projectSectionBe
         return $solutionContent
     }
 
-    # section doesn't exist - insert before Global section
-    $beforeSectionIndex = $solutionContent.IndexOf($beforeSection)
-    
-    if ($beforeSectionIndex -gt 0) {
+    # Use regex to find $beforeSection at the beginning of a line (with possible whitespace)
+    $beforeSectionPattern = "(?m)^(\s*)$beforeSection(?!\w)"
+    $beforeSectionMatch = [regex]::Match($solutionContent, $beforeSectionPattern)
+
+    if ($beforeSectionMatch.Success) {
         Write-Host "  Not exists, inserted before $beforeSection."
-        $beforeCopilot = $solutionContent.Substring(0, $beforeSectionIndex)
-        $afterCopilot = $solutionContent.Substring($beforeSectionIndex)
+        $beforeCopilot = $solutionContent.Substring(0, $beforeSectionMatch.Index)
+        $afterCopilot = $solutionContent.Substring($beforeSectionMatch.Index)
     }
     else {
         # No Global section - append at end
