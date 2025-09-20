@@ -5,6 +5,7 @@ param(
 $files_vlpp = @(
     "introduction\vlpp.md",
     "general-instructions.md",
+    "kb.md",
     # "specific-linux\vlpp.md",
     "unittest.md"
 )
@@ -12,6 +13,7 @@ $files_vlpp = @(
 $files_vlppos = @(
     "introduction\vlppos.md",
     "general-instructions.md",
+    "kb.md",
     # "specific-linux\vlppos.md",
     "unittest.md"
 )
@@ -19,6 +21,7 @@ $files_vlppos = @(
 $files_vlppregex = @(
     "introduction\vlppregex.md",
     "general-instructions.md",
+    "kb.md",
     # "specific-linux\vlppregex.md",
     "unittest.md"
 )
@@ -26,6 +29,7 @@ $files_vlppregex = @(
 $files_vlppreflection = @(
     "introduction\vlppreflection.md",
     "general-instructions.md",
+    "kb.md",
     # "specific-linux\vlppreflection.md",
     "unittest.md"
 )
@@ -33,6 +37,7 @@ $files_vlppreflection = @(
 $files_vlppparser2 = @(
     "introduction\vlppparser2.md",
     "general-instructions.md",
+    "kb.md",
     # "specific-linux\vlppparser2.md",
     "unittest.md"
 )
@@ -40,6 +45,7 @@ $files_vlppparser2 = @(
 $files_workflow = @(
     "introduction\workflow.md",
     "general-instructions.md",
+    "kb.md",
     # "specific-linux\workflow.md",
     "unittest.md"
 )
@@ -47,6 +53,7 @@ $files_workflow = @(
 $files_gacui = @(
     "introduction\gacui.md",
     "general-instructions.md",
+    "kb.md",
     # "specific-linux\gacui.md",
     "unittest.md",
     "gacui\unittest.md",
@@ -113,16 +120,10 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             
             # Append common content to all files
             $common_general_path = "$PSScriptRoot\prompts\$ide-common\general-instructions.md"
-            $kb_path = "$PSScriptRoot\prompts\common\kb.md"
             
             if (Test-Path $common_general_path) {
                 $common_general_content = Get-Content $common_general_path -Raw
                 $file_content += "`r`n" + $common_general_content
-            }
-            
-            if (Test-Path $kb_path) {
-                $kb_content = Get-Content $kb_path -Raw
-                $file_content += "`r`n" + $kb_content
             }
             
             # Special handling for 4-verifying.prompt.md
@@ -148,7 +149,6 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             $directory = $file.Directory.FullName
             $originalName = $file.Name
             $newName = "$ide-$originalName"
-            $newPath = Join-Path $directory $newName
             Rename-Item -Path $file.FullName -NewName $newName
         }
     }

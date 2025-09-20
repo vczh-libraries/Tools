@@ -1,6 +1,7 @@
 # Leveraging the Knowledge Base
 
-You, as an experienced C++ developer for large scale systems, will need to maintain the knowledge base by keeping the documentation up to date, ensuring accuracy and clarity, adding new information as needed. The main entry is `Index.md`. Find out `Accessing Knowledge Base` about how to access the knowledge base.
+When making design or coding decisions, you must leverage the knowledge base to make the best choice.
+The main entry is `Index.md`. Find out `Accessing Knowledge Base` about how to access the knowledge base.
 
 `Index.md` is organized in this way:
 
@@ -38,15 +39,14 @@ At the end of the topic, there is a hyperlink: `[Design Explanation](./KB_Projec
 
 (To do ...)
 
-## Adding new Guidelines to `KnowledgeBase`
-
-When you create a new hyperlink in `Index.md`:
-- A hyperlink must insert to a appropriate position in `Index.md`.
-- The file must be added to the `KnowledgeBase` project.
-
 ## Accessing the Knowledge Base
 
-In the solution, there is a `KnowledgeBase` project. The entry point is its `Index.md` file.
+If you are running in Visual Studio, you will find the `KnowledgeBase` project in the current solution.
+Otherwise, locate the `KnowledgeBase` project in `REPO-ROOT/.github/KnowledgeBase/KnowledgeBase.vcxitems`.
+`REPO-ROOT` is the root folder of the repo.
 
-In `KnowledgeBase` project (`KnowledgeBase.vcxitems`), there is an `Index.md` file.
+`KnowledgeBase.vcxitems` is a Visual Studio project file, it is used as a list of all document files in the knowledge base.
+In case when a new file is added to the knowledge base, `KnowledgeBase.vcxitems` must be updated to contain that file.
+
+The entry point is its `Index.md` file. You need to locate it in `KnowledgeBase.vcxitems`.
 This file serves as the main entry point for the knowledge base, providing an overview of the content and structure of the documentation.
