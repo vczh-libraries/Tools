@@ -1,7 +1,7 @@
 function UpdateResource([string]$name, [string]$vcxitems) {
     # Handle vcxitem folder
-    $output_folder = "$PSScriptRoot\vcxitems-$vcxitems\*"
-    $source_folder = "$PSScriptRoot\..\..\$name\.github\$vcxitems"
+    $source_folder = "$PSScriptRoot\..\..\$name\.github\$vcxitems\*"
+    $output_folder = "$PSScriptRoot\vcxitems-$vcxitems"
     
     # Delete the vcxitem folder if it exists (including all files)
     if (Test-Path $output_folder) {
