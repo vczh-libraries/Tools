@@ -127,7 +127,7 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
                 $file_content += "`r`n" + $common_general_content
             }
             
-            if ((Test-Path $tasklogs_path) -and ($file.Name -ne "ask.prompt.md") -and ($file.Name -ne "code.prompt.md")) {
+            if ((Test-Path $tasklogs_path) -and ($file.Name -ne "ask.prompt.md") -and ($file.Name -ne "code.prompt.md") -and ($file.Name -ne "kb-api.prompt.md")) {
                 $kb_content = Get-Content $tasklogs_path -Raw
                 $file_content += "`r`n" + $kb_content
             }
