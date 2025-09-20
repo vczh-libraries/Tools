@@ -43,6 +43,7 @@
 
 ## Step 3. Finish the Document
 
+- Your goal is to write a design document to `Copilot_Task.md`. DO NOT update any other file including source code.
 - Whatever you think or found, write it down in the `# INSIGHTS AND REASONING` section.
 
 ## Step 4. Mark the Completion
