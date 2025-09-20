@@ -95,7 +95,7 @@ function GenerateGeneralPrompt([string]$name, [string[]]$files) {
     Write-Host Updated: $output_path
 }
 
-function GenerateProcessPrompt([string]$name, [string]$ide) {
+function CleanPrompt([string]$name) {
     # Handle prompts folder
     $prompts_folder = "$PSScriptRoot\..\..\$name\.github\prompts"
     
@@ -106,16 +106,17 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
     
     # Create the prompts folder
     New-Item -ItemType Directory -Path $prompts_folder -Force | Out-Null
-    
+}
+
+function GenerateProcessPrompt([string]$name, [string]$ide) {
+    # Handle prompts folder
+    $source_folder = "$PSScriptRoot\prompts"
+    $prompts_folder = "$PSScriptRoot\..\..\$name\.github\prompts"
+
     # Copy all .md files from the source prompts folder
-    $source_prompts = "$PSScriptRoot\prompts\*.md"
+    $prompt_files = Get-ChildItem -Path $source_folder -Filter "*.md"
     if (Test-Path "$PSScriptRoot\prompts") {
-        Copy-Item $source_prompts -Destination $prompts_folder -Force
-        Write-Host "Copied prompts to: $prompts_folder"
-        
-        # Get all copied .md files and append content to each
-        $copied_files = Get-ChildItem -Path $prompts_folder -Filter "*.md"
-        foreach ($file in $copied_files) {
+        foreach ($file in $prompt_files) {
             $file_content = Get-Content $file.FullName -Raw
             
             # Append common content to all files
@@ -139,13 +140,7 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             }
             
             # Write the updated content back to the file
-            Set-Content -Path $file.FullName -Value $file_content
-            
-            # Rename the file to add "$ide-" prefix
-            $directory = $file.Directory.FullName
-            $originalName = $file.Name
-            $newName = "$ide-$originalName"
-            Rename-Item -Path $file.FullName -NewName $newName
+            Set-Content -Path "$prompts_folder\$ide-$($file.Name)" -Value $file_content
         }
     }
 }
@@ -164,6 +159,7 @@ $projects = @{
 # Check if the specified project exists and execute
 if ($projects.ContainsKey($Project)) {
     GenerateGeneralPrompt $Project $projects[$Project]
+    CleanPrompt $Project
     GenerateProcessPrompt $Project "vs"
     GenerateProcessPrompt $Project "win"
 } else {

@@ -22,8 +22,8 @@ function InitTaskLogs([string]$name) {
     $output_folder = "$PSScriptRoot\..\..\$name\.github\TaskLogs"
     
     # Add *.ps1 to .gitignore
-    $gitignore_path = "$output_folder\.gitignore"
-    Add-Content -Path $gitignore_path -Value "*.ps1"
+    # $gitignore_path = "$output_folder\.gitignore"
+    # Add-Content -Path $gitignore_path -Value "*.ps1"
     
     # Execute copilotPrepare.ps1
     & "$output_folder\copilotPrepare.ps1"
@@ -37,4 +37,4 @@ if ($Project -eq "") {
 
 GenerateResource $Project "KnowledgeBase"
 GenerateResource $Project "TaskLogs"
-# InitTaskLogs $Project
+InitTaskLogs $Project
