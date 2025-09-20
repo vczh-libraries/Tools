@@ -18,6 +18,10 @@ function GenerateResource([string]$name, [string]$vcxitems) {
     Copy-Item $source_folder -Destination $output_folder -Force
 }
 
+function InitTaskLogs([string]$name) {
+    $output_folder = "$PSScriptRoot\vcxitems-TaskLogs\"
+}
+
 # Define all available projects
 $projects = @{
     "Vlpp"           = $files_vlpp
@@ -42,6 +46,8 @@ if ($Project -eq "") {
 # Check if the specified project exists and execute
 if ($projects.ContainsKey($Project)) {
     GenerateResource $Project "KnowledgeBase"
+    GenerateResource $Project "TaskLogs"
+    InitTaskLogs $Project
 } else {
     Write-Host "Project '$Project' not found. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {

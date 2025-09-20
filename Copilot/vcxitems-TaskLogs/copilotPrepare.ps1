@@ -15,14 +15,14 @@ $filesToCreate = @{
 
 # Create each markdown file with the specified content
 foreach ($file in $filesToOverride.GetEnumerator()) {
-    $filePath = ".\$($file.Key)"
+    $filePath = "$PSScriptRoot\$($file.Key)"
     Write-Host "Creating/overriding $($file.Key)..."
     $file.Value | Out-File -FilePath $filePath -Encoding UTF8
 }
 
 # Create files only if they don't exist
 foreach ($file in $filesToCreate.GetEnumerator()) {
-    $filePath = ".\$($file.Key)"
+    $filePath = "$PSScriptRoot\$($file.Key)"
     if (-not (Test-Path $filePath)) {
         Write-Host "Creating $($file.Key)..."
         $file.Value | Out-File -FilePath $filePath -Encoding UTF8
