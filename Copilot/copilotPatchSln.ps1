@@ -1,18 +1,5 @@
 # Initialize Copilot workspace files
 
-$vcxitems_folder = "..\..\.github"
-$copilotBegin = 'Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Copilot", "@Copilot", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"'
-$kbBegin = 'Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KnowledgeBase", "' + $vcxitems_folder + '\KnowledgeBase\KnowledgeBase.vcxitems", "{D178E490-7C2B-43FA-A8B3-A3BED748EB38}"'
-$tlBegin = 'Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaskLogs", "' + $vcxitems_folder + '\TaskLogs\TaskLogs.vcxitems", "{8626528F-9C97-4480-A018-CDCCCB9CACAE}"'
-
-$nestedProjectsBegin = "`tGlobalSection(NestedProjects) = preSolution"
-$nestedProject = @"
-$nestedProjectsBegin
-`t`t{D178E490-7C2B-43FA-A8B3-A3BED748EB38} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-`t`t{8626528F-9C97-4480-A018-CDCCCB9CACAE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-`tEndGlobalSection
-"@
-
 function PatchSln_AddSection([String]$solutionContent, [string]$projectSectionBegin, [string]$projectSection, [string]$projectSectionEnd, [string]$beforeSection) {
     Write-Host "Checking $projectSectionBegin..."
 
@@ -65,6 +52,19 @@ elseif ($slnFiles.Count -eq 1) {
     $solutionPath = ".\$($slnFiles[0].Name)"
     Write-Host "Found solution file: $solutionPath"
     $solutionContent = Get-Content $solutionPath -Raw
+
+    $vcxitems_folder = "..\..\.github"
+    $copilotBegin = 'Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Copilot", "@Copilot", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"'
+    $kbBegin = 'Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KnowledgeBase", "' + $vcxitems_folder + '\KnowledgeBase\KnowledgeBase.vcxitems", "{D178E490-7C2B-43FA-A8B3-A3BED748EB38}"'
+    $tlBegin = 'Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaskLogs", "' + $vcxitems_folder + '\TaskLogs\TaskLogs.vcxitems", "{8626528F-9C97-4480-A018-CDCCCB9CACAE}"'
+
+    $nestedProjectsBegin = "`tGlobalSection(NestedProjects) = preSolution"
+    $nestedProject = @"
+    $nestedProjectsBegin
+`t`t{D178E490-7C2B-43FA-A8B3-A3BED748EB38} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+`t`t{8626528F-9C97-4480-A018-CDCCCB9CACAE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+`tEndGlobalSection
+"@
 
     $solutionContent = PatchSln_AddProject $solutionContent $copilotBegin
     $solutionContent = PatchSln_AddProject $solutionContent $kbBegin
