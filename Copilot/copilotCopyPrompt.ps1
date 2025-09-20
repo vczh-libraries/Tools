@@ -120,10 +120,16 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             
             # Append common content to all files
             $common_general_path = "$PSScriptRoot\prompts\$ide-common\general-instructions.md"
+            $tasklogs_path = "$PSScriptRoot\prompts\common\tasklogs.md"
             
             if (Test-Path $common_general_path) {
                 $common_general_content = Get-Content $common_general_path -Raw
                 $file_content += "`r`n" + $common_general_content
+            }
+            
+            if (Test-Path $tasklogs_path) {
+                $kb_content = Get-Content $tasklogs_path -Raw
+                $file_content += "`r`n" + $kb_content
             }
             
             # Special handling for 4-verifying.prompt.md
