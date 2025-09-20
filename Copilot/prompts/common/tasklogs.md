@@ -15,3 +15,11 @@ Otherwise, locate the `TaskLogs` project in `REPO-ROOT/.github/TaskLogs/TaskLogs
 
 `TaskLogs.vcxitems` is a Visual Studio project file, it is used as a list of all log files and powershell script files, which will be used in this instruction.
 You need to locate listed files in `TaskLogs.vcxitems`.
+
+## Important Rules for Markdown Document or Log
+
+- Do not print "````````" or "````````markdown" in markdown file.
+- It is totally fine to have multiple top level `# Topic`.
+- When mentioning a C++ name in markdown file:
+  - If it is defined in the standard C++ library or third-party library, use the full name.
+  - If it is defined in the source code, use the full name if there is ambiguity, and then mention the file containing its definition.
