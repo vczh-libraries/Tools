@@ -12,24 +12,27 @@ $nestedProject = @"
 `tEndGlobalSection
 "@
 
-function PatchSln_AddSection([String]$solutionContent, [string]$projectSectionBegin, [string]$projectSection, [string]$projectSectionEnd) {
+function PatchSln_AddSection([String]$solutionContent, [string]$projectSectionBegin, [string]$projectSection, [string]$projectSectionEnd, [string]$beforeSection) {
     Write-Host "Checking $projectSectionBegin..."
 
     # Find content before and after project section
     $projectSectionIndex = $solutionContent.IndexOf($projectSectionBegin)
     if ($projectSectionIndex -ge 0) {
+        Write-Host "  Already exists, skipped."
         return $solutionContent
     }
 
     # section doesn't exist - insert before Global section
-    $globalSectionIndex = $solutionContent.IndexOf("Global")
+    $beforeSectionIndex = $solutionContent.IndexOf($beforeSection)
     
-    if ($globalSectionIndex -gt 0) {
-        $beforeCopilot = $solutionContent.Substring(0, $globalSectionIndex)
-        $afterCopilot = $solutionContent.Substring($globalSectionIndex)
+    if ($beforeSectionIndex -gt 0) {
+        Write-Host "  Not exists, inserted before $beforeSection."
+        $beforeCopilot = $solutionContent.Substring(0, $beforeSectionIndex)
+        $afterCopilot = $solutionContent.Substring($beforeSectionIndex)
     }
     else {
         # No Global section - append at end
+        Write-Host "  Not exists, appended at the end."
         $beforeCopilot = $solutionContent
         $afterCopilot = ""
     }
@@ -47,7 +50,7 @@ $projectSectionBegin
 EndProject
 "@
 
-    PatchSln_AddSection $solutionContent $projectSectionBegin $projectSection "EndProject"
+    PatchSln_AddSection $solutionContent $projectSectionBegin $projectSection "EndProject" "Global"
 }
 
 # Check if current directory has exactly one .sln file
@@ -61,12 +64,12 @@ elseif ($slnFiles.Count -eq 1) {
     Write-Host "Found solution file: $solutionPath"
     $solutionContent = Get-Content $solutionPath -Raw
 
-    $solutionContent = PatchSln_AddProject $solutionPath $copilotBegin
-    $solutionContent = PatchSln_AddProject $solutionPath $kbBegin
-    $solutionContent = PatchSln_AddProject $solutionPath $tlBegin
-    # $solutionContent = PatchSln_AddSection $solutionPath $nestedProjectsBegin $nestedProject "`tEndGlobalSection"
+    $solutionContent = PatchSln_AddProject $solutionContent $copilotBegin
+    $solutionContent = PatchSln_AddProject $solutionContent $kbBegin
+    $solutionContent = PatchSln_AddProject $solutionContent $tlBegin
+    $solutionContent = PatchSln_AddSection $solutionContent $nestedProjectsBegin $nestedProject "EndGlobalSection" "EndGlobal"
     
-    $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
+    $solutionContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
     Write-Host "Updated in solution file."
 }
 elseif ($slnFiles.Count -gt 1) {
