@@ -1,70 +1,65 @@
 # Initialize Copilot workspace files
 
-function PatchSolutionFile($solutionPath) {
-    # Build the solution items section
+$vcxitems_folder = "..\..\.github"
+$copilotBegin = 'Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Copilot", "@Copilot", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"'
+$kbBegin = 'Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KnowledgeBase", "' + $vcxitems_folder + '\KnowledgeBase\KnowledgeBase.vcxitems", "{D178E490-7C2B-43FA-A8B3-A3BED748EB38}"'
+$tlBegin = 'Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TaskLogs", "' + $vcxitems_folder + '\TaskLogs\TaskLogs.vcxitems", "{8626528F-9C97-4480-A018-CDCCCB9CACAE}"'
 
-    $copilotSectionBegin = 'Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@Copilot", "@Copilot", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"'
-
-    $copilotSection = @"
-$copilotSectionBegin
-	ProjectSection(SolutionItems) = preProject
-	EndProjectSection
-EndProject
+$nestedProjectsBegin = "`tGlobalSection(NestedProjects) = preSolution"
+$nestedProject = @"
+`t`t{D178E490-7C2B-43FA-A8B3-A3BED748EB38} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+`t`t{8626528F-9C97-4480-A018-CDCCCB9CACAE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+`tEndGlobalSection
 "@
 
-    Write-Host "Updating $solutionPath..."
-    $solutionContent = Get-Content $solutionPath -Raw
+function PatchSln_AddSection([String]$solutionContent, [string]$projectSectionBegin, [string]$projectSection, [string]$projectSectionEnd) {
+    Write-Host "Checking $projectSectionBegin..."
+
+    # Find content before and after project section
+    $projectSectionIndex = $solutionContent.IndexOf($projectSectionBegin)
+    if ($projectSectionIndex -ge 0) {
+        return $solutionContent
+    }
+
+    # Project section exists - find where it ends
+    Write-Host "@Project section already exists. Replacing it..."
+    $searchStartIndex = $projectSectionIndex + $projectSectionBegin.Length
     
-    # Find content before and after copilot section
-    $copilotSectionIndex = $solutionContent.IndexOf($copilotSectionBegin)
+    # Use regex to find $projectSectionEnd at the beginning of a line (with possible whitespace)
+    $endProjectPattern = "(?m)^(\s*)$projectSectionEnd(?!\w)"
+    $searchContent = $solutionContent.Substring($searchStartIndex)
+    $endProjectMatch = [regex]::Match($searchContent, $endProjectPattern)
     
-    if ($copilotSectionIndex -ge 0) {
-        # Copilot section exists - find where it ends
-        Write-Host "@Copilot section already exists. Replacing it..."
-        $searchStartIndex = $copilotSectionIndex + $copilotSectionBegin.Length
-        
-        # Use regex to find EndProject at the beginning of a line (with possible whitespace)
-        # This prevents matching EndProjectSection which is indented
-        $endProjectPattern = '(?m)^(\s*)EndProject(?!\w)'
-        $searchContent = $solutionContent.Substring($searchStartIndex)
-        $endProjectMatch = [regex]::Match($searchContent, $endProjectPattern)
-        
-        if ($endProjectMatch.Success) {
-            # Adjust the index to account for the substring offset
-            $endProjectIndex = $searchStartIndex + $endProjectMatch.Index
-            $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
-            if ($endOfSectionIndex -eq 0) {
-                $endOfSectionIndex = $endProjectIndex + "EndProject".Length
-            }
-            
-            $beforeCopilot = $solutionContent.Substring(0, $copilotSectionIndex)
-            $afterCopilot = $solutionContent.Substring($endOfSectionIndex)
+    if ($endProjectMatch.Success) {
+        # Adjust the index to account for the substring offset
+        $endProjectIndex = $searchStartIndex + $endProjectMatch.Index
+        $endOfSectionIndex = $solutionContent.IndexOf("`n", $endProjectIndex) + 1
+        if ($endOfSectionIndex -eq 0) {
+            $endOfSectionIndex = $endProjectIndex + $projectSectionEnd.Length
         }
-        else {
-            Write-Host "Warning: Could not find EndProject after @Copilot section. Skipping replacement."
-            return
-        }
+        
+        $beforeCopilot = $solutionContent.Substring(0, $projectSectionIndex)
+        $afterCopilot = $solutionContent.Substring($endOfSectionIndex)
     }
     else {
-        # Copilot section doesn't exist - insert before Global section
-        Write-Host "@Copilot section not found. Adding it..."
-        $globalSectionIndex = $solutionContent.IndexOf("Global")
-        
-        if ($globalSectionIndex -gt 0) {
-            $beforeCopilot = $solutionContent.Substring(0, $globalSectionIndex)
-            $afterCopilot = $solutionContent.Substring($globalSectionIndex)
-        }
-        else {
-            # No Global section - append at end
-            $beforeCopilot = $solutionContent
-            $afterCopilot = ""
-        }
+        Write-Host "Warning: Could not find $projectSectionEnd after the specified section. Skipping replacement."
+        return $solutionContent
     }
     
     # Combine the three parts and write to file
-    $newContent = $beforeCopilot.TrimEnd() + "`r`n" + $copilotSection + "`r`n" + $afterCopilot.TrimStart()
-    $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
-    Write-Host "@Copilot section updated in solution file."
+    $newContent = $beforeCopilot.TrimEnd() + "`r`n" + $projectSection + "`r`n" + $afterCopilot.TrimStart()
+    return $newContent
+}
+
+function PatchSln_AddProject([String]$solutionContent, [string]$projectSectionBegin) {
+    # Build the solution items section
+
+    $projectSection = @"
+$projectSectionBegin
+EndProject
+"@
+
+    PatchSln_AddSection $solutionContent $projectSectionBegin $projectSection "EndProject"
 }
 
 # Check if current directory has exactly one .sln file
@@ -76,7 +71,15 @@ elseif ($slnFiles.Count -eq 1) {
     # Update UnitTest.sln to include the @Copilot section
     $solutionPath = ".\$($slnFiles[0].Name)"
     Write-Host "Found solution file: $solutionPath"
-    PatchSolutionFile $solutionPath
+    $solutionContent = Get-Content $solutionPath -Raw
+
+    $solutionContent = PatchSln_AddProject $solutionPath $copilotBegin
+    $solutionContent = PatchSln_AddProject $solutionPath $kbBegin
+    $solutionContent = PatchSln_AddProject $solutionPath $tlBegin
+    # $solutionContent = PatchSln_AddSection $solutionPath $nestedProjectsBegin $nestedProject "`tEndGlobalSection"
+    
+    $newContent | Out-File -FilePath $solutionPath -Encoding UTF8 -NoNewline
+    Write-Host "Updated in solution file."
 }
 elseif ($slnFiles.Count -gt 1) {
     throw "Multiple .sln files found in current directory. Please navigate to a directory containing exactly one solution file."
