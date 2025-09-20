@@ -16,7 +16,6 @@
     - A clear description of what to change in the source code.
     - A clear explanation of why this change is necessary.
 - `# TEST PLAN`.
-- `# !!!FINISHED!!!`: A mark to indicate the document reaches the end. Only add this title when the editing to the document is finished.
 
 ## Step 1. Identify the Problem
 

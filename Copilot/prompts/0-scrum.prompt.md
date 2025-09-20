@@ -20,7 +20,6 @@
     - `### rationale`: Reasons about why you think it is necessary to have this task, why you think it is the best for the task to be in this order.
 - `# Impact to the Knowledge Base`:
   - `## ProjectName`: What needs to be changed or added to the knowledge base in this project.
-- `# !!!FINISHED!!!`: A mark to indicate the document reaches the end. Only add this title when the editing to the document is finished.
 
 ## Step 1. Identify the Problem
 

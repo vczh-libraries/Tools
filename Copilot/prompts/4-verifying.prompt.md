@@ -9,7 +9,7 @@
 ## Step 1. Check and Respect my Code Change
 
 - If you spot any difference between `Copilot_Execution.md` and the source code:
-  - It means I edited them. I have my reason. DO NOT change the code back to match `Copilot_Execution.md`.
+  - It means I edited them. I have my reason. DO NOT change the code to match `Copilot_Execution.md`.
   - Write down every differences you spotted, make a `## User Update Spotted` section in the `# UPDATES` section in `Copilot_Execution.md`.
 
 ## Step 2. Compile
@@ -39,7 +39,7 @@
   - Explain why the original change did not work.
   - Explain what you need to do.
   - Explain why you think it would solve the build break or test break.
-  - Log these in `Copilot_Execution.md`, with section `# Fixing attempt No.<attempt_number>`.
+  - Log these in `Copilot_Execution.md`, with section `## Fixing attempt No.<attempt_number>` in `# FIXING ATTEMPTS`.
 
 ## Step 5. Check it Again
 

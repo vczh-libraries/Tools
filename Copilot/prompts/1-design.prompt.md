@@ -13,7 +13,6 @@
 - `# PROBLEM DESCRIPTION`: An exact copy of the problem description I gave you.
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
 - `# INSIGHTS AND REASONING`.
-- `# !!!FINISHED!!!`: A mark to indicate the document reaches the end. Only add this title when the editing to the document is finished.
 
 ## Step 1. Identify the Problem
 

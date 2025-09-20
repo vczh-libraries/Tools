@@ -14,7 +14,6 @@
   - `## STEP X: The Step Title`: Copied from `Copilot_Planning.md`, only include code changes, do not copy explanations.
   - It must include both code changes in improvement plan and test plan from `Copilot_Planning.md`.
   - Code changes in test plan do not have a step title and step number, just continue with the numeber and add new `## STEP X` in `Copilot_Execution.md`.
-- `# !!!FINISHED!!!`: A mark to indicate the document reaches the end. Only add this title when the editing to the document is finished.
 
 ## Step 1. Identify the Problem
 
