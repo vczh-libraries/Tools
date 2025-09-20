@@ -11,3 +11,7 @@
 - `BuiltInTest_Xml`
 - `BuiltInTest_Workflow`
 - `BuiltInTest_Cpp`
+
+### Calling copilotBuild.ps1 and copilotExecute.ps1
+
+This solution is in `Test\UnitTest`, after `ls` to this folder, scripts will be in `..\..\.github`.
