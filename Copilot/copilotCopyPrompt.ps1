@@ -61,6 +61,15 @@ $files_gacui = @(
     "gacui\workflow.md"
 )
 
+function PrepareGithubFolder([string]$name) {
+    $github_folder = "$PSScriptRoot\..\..\$name\.github"
+    
+    # Create the .github folder if it doesn't exist
+    if (-not (Test-Path $github_folder)) {
+        New-Item -ItemType Directory -Path $github_folder -Force | Out-Null
+    }
+}
+
 function GenerateGeneralPrompt([string]$name, [string[]]$files) {
     $output_path = "$PSScriptRoot\..\..\$name\.github\copilot-instructions.md"
     
@@ -160,6 +169,7 @@ $projects = @{
 
 # Check if the specified project exists and execute
 if ($projects.ContainsKey($Project)) {
+    PrepareGithubFolder $Project
     GenerateGeneralPrompt $Project $projects[$Project]
     CleanPrompt $Project
     GenerateProcessPrompt $Project "vs"
