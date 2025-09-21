@@ -6,4 +6,5 @@
   - The `ls` command helps.
   - This must be done because `copilotBuild.ps1` searches `*.sln` from the working directory, otherwise it will fail.
 - Execute `copilotBuild.ps1`.
+- DO NOT use msbuild by yourself.
 - You must keep fixing the code until all errors are eliminated.
