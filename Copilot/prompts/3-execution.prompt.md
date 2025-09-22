@@ -47,4 +47,5 @@
 ## Step 5. Make Sure the Code Compiles
 
 - Compile the solution and fix all compile errors.
-- You do not have to worry about running unit tests at the moment. Do not run unit tests, you are good if the code compiles.
+- Run the unit test once.
+- Do not worry about test failures. You are good if the code compiles.
