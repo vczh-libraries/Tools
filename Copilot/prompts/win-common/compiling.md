@@ -1,6 +1,6 @@
 # Compile the Solution
 
-- In `Unit Test Projects to Execute` section there are multiple project names.
+- In `Unit Test Projects to Work with` section there are multiple project names.
 - These projects are all `*.vcxproj` files. Locate them. In the parent folder there must be a `*.sln` file. That is the solution the compile.
 - You must move the current working directory to the folder containing the `*.sln` file.
   - The `ls` command helps.
