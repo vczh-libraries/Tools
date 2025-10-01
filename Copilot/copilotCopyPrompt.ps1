@@ -172,7 +172,7 @@ if ($projects.ContainsKey($Project)) {
     PrepareGithubFolder $Project
     GenerateGeneralPrompt $Project $projects[$Project]
     CleanPrompt $Project
-    GenerateProcessPrompt $Project "vs"
+    # GenerateProcessPrompt $Project "vs"
     GenerateProcessPrompt $Project "win"
 } else {
     Write-Host "Project '$Project' not found. Please specify a valid project name. Available projects:"
