@@ -68,10 +68,8 @@
   - For every attempt of fixing the source code:
     - Explain why the original change did not work.
     - Explain what you need to do.
-    - Explain why you think it would solve the build break or test break.
+    - Explain why you think it would solve the build break.
     - Log these in `Copilot_Execution.md`, with section `## Fixing attempt No.<attempt_number>` in `# FIXING ATTEMPTS`.
   - Go back to `Step 5. Make Sure the Code Compiles`
-    
-## Step 6. Finishing after Code Compiles
-
-- DO NOT run any test yet, it will be finished in future tasks.
+- When the code compiles:
+  - DO NOT run any tests, the code will be verified in future tasks.
