@@ -17,7 +17,7 @@
 
 ## Step 2. Compile
 
-- Check out `TOOLING/COMPILE` in `Copilot_Execution.md` and run the commands, it should compile the solution. If there is any compilation error, address all of them:
+- Check out `Compile the Solution` for details about compiling the solution but DO NOT run unit test. If there is any compilation error, address all of them:
   - If there is any compile warning, only fix warnings that caused by your code change. Do no fix any other warnings.
   - If there is any compile error, you need to carefully identify, is the issue in the callee side or the caller side. Check out similar code before making a decision.
   - For every attempt of fixing the source code:
@@ -29,7 +29,7 @@
 
 ## Step 3. Run Unit Test
 
-- Check out `TOOLING/TEST` in `Copilot_Execution.md` and run the commands, it should run the unit tests.
+- Check out `Executing Unit Test` for details about compiling the solution but DO NOT run unit test. If there is any compilation error, address all of them:
 - Run the unit test and see if they passed. If anything is good, you will only see test files and test cases that are executed.
   - Make sure added test cases are actually executed.
   - When all test cases pass, there will be a summarizing about how many test cases are executed. Otherwise it crashed.
