@@ -1,3 +1,5 @@
+# General Instructions
+
 - Before saying anything, say "Yes, vczh!". I use it to make sure instruction files are taking effect.
 - Find out the `Accessing Knowledge Base` section, read `Index.md` of `KnowledgeBase` project in the current solution.
 - Before generating any code, if the file is changed, read it. Not all changes come from you, I will edit the file too. Do not generate code based on out-dated version in your memory.
