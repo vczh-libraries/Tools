@@ -141,10 +141,10 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             }
             
             # These files need to know about testing
-            # 3-execution.prompt.md
-            # 4-verifying.prompt.md
+            # 4-execution.prompt.md
+            # 5-verifying.prompt.md
             # code.prompt.md
-            if (($file.Name -eq "3-execution.prompt.md") -or ($file.Name -eq "4-verifying.prompt.md") -or ($file.Name -eq "code.prompt.md")) {
+            if (($file.Name -eq "4-execution.prompt.md") -or ($file.Name -eq "5-verifying.prompt.md") -or ($file.Name -eq "code.prompt.md")) {
                 $file_content += "`r`n" + (Get-Content "$PSScriptRoot\specific-$ide\$name.md" -Raw)
                 $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\compiling.md" -Raw)
                 $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\verifying.md" -Raw)
