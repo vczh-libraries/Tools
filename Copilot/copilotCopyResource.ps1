@@ -15,7 +15,7 @@ function GenerateResource([string]$name, [string]$vcxitems) {
     # Create the vcxitem folder
     New-Item -ItemType Directory -Path $output_folder -Force | Out-Null
 
-    Copy-Item $source_folder -Destination $output_folder -Force
+    Copy-Item $source_folder -Destination $output_folder -Recurse -Force
 }
 
 function InitTaskLogs([string]$name) {
