@@ -5,7 +5,7 @@
 
 ## Implement the Knowledge Base
 
-- Find out the `Accessing Knowledge Base` section. Understand the organization of the knowledge base.
+- Find out the `Accessing the Knowledge Base` section. Understand the organization of the knowledge base.
 - Read the `Index.md` of the knowledge base first.
 - There could be multiple places as the request might include multiple objectives. For each objective:
   - Find out which project does it belong to.

@@ -1,7 +1,7 @@
 # Leveraging the Knowledge Base
 
 When making design or coding decisions, you must leverage the knowledge base to make the best choice.
-The main entry is `Index.md`. Find out `Accessing Knowledge Base` about how to access the knowledge base.
+The main entry is `Index.md`. Find out `Accessing the Knowledge Base` about how to access the knowledge base.
 
 `Index.md` is organized in this way:
 
