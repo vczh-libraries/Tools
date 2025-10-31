@@ -38,6 +38,37 @@ function Go {
     cd $VPATH
 }
 
+function UpdateMaster {
+    if [ "$1" == "" ]; then
+        UpdateMaster Tools
+        UpdateMaster Vlpp
+        UpdateMaster VlppOS
+        UpdateMaster VlppRegex
+        UpdateMaster VlppReflection
+        UpdateMaster VlppParser
+        UpdateMaster VlppParser2
+        UpdateMaster Workflow
+        UpdateMaster GacUI
+        UpdateMaster Release
+        UpdateMaster Document
+        UpdateMaster vczh-libraries.github.io
+        UpdateMaster WebsiteSource
+        UpdateMaster gGac
+    else
+        pushd . > /dev/null
+        printf "${VC_LIGHTGREEN}Pulling from ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
+        Go "" $1
+        if [ "$PWD" == "${VROOT}/$1" ]; then
+            git pull --all
+        fi
+        git remote prune origin
+        git checkout master
+        git pull origin master
+
+        popd > /dev/null
+    fi
+}
+
 function Update {
     if [ "$1" == "" ]; then
         Update Tools
@@ -95,6 +126,10 @@ case $1 in
     ;;
 
     u)
+    UpdateMaster $2
+    ;;
+
+    uall)
     Update $2
     ;;
 
