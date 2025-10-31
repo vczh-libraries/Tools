@@ -6,7 +6,6 @@ $files_vlpp = @(
     "introduction\vlpp.md",
     "general-instructions.md",
     "kb.md",
-    # "specific-linux\vlpp.md",
     "unittest.md"
 )
 
@@ -14,7 +13,6 @@ $files_vlppos = @(
     "introduction\vlppos.md",
     "general-instructions.md",
     "kb.md",
-    # "specific-linux\vlppos.md",
     "unittest.md"
 )
 
@@ -22,7 +20,6 @@ $files_vlppregex = @(
     "introduction\vlppregex.md",
     "general-instructions.md",
     "kb.md",
-    # "specific-linux\vlppregex.md",
     "unittest.md"
 )
 
@@ -30,7 +27,6 @@ $files_vlppreflection = @(
     "introduction\vlppreflection.md",
     "general-instructions.md",
     "kb.md",
-    # "specific-linux\vlppreflection.md",
     "unittest.md"
 )
 
@@ -38,7 +34,6 @@ $files_vlppparser2 = @(
     "introduction\vlppparser2.md",
     "general-instructions.md",
     "kb.md",
-    # "specific-linux\vlppparser2.md",
     "unittest.md"
 )
 
@@ -46,7 +41,6 @@ $files_workflow = @(
     "introduction\workflow.md",
     "general-instructions.md",
     "kb.md",
-    # "specific-linux\workflow.md",
     "unittest.md"
 )
 
@@ -54,11 +48,18 @@ $files_gacui = @(
     "introduction\gacui.md",
     "general-instructions.md",
     "kb.md",
-    # "specific-linux\gacui.md",
     "unittest.md",
     "gacui\unittest.md",
-    "gacui\xml.md",
-    "gacui\workflow.md"
+    "gacui\xml.md"
+)
+
+$files_release = @(
+    "introduction\release.md",
+    "general-instructions.md",
+    "kb.md",
+    "unittest.md",
+    "gacui\unittest.md",
+    "gacui\xml.md"
 )
 
 function PrepareGithubFolder([string]$name) {
@@ -165,6 +166,7 @@ $projects = @{
     "VlppParser2"    = $files_vlppparser2
     "Workflow"       = $files_workflow
     "GacUI"          = $files_gacui
+    "Release"        = $files_release
 }
 
 # Check if the specified project exists and execute

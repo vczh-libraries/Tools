@@ -15,4 +15,4 @@ This project is built on top of:
 - `VlppOS`: `Import\VlppOS.h`
 - `VlppRegex`: `Import\VlppRegex.h`
 - `VlppReflection`: `Import\VlppReflection.h`
-- `VlppParser2`: `Import\VlppParser2.h`
+- `VlppParser2`: `Import\VlppGlrParser.h`, `Import\VlppGlrParserCompiler.h`
