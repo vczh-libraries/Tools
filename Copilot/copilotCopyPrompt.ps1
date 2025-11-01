@@ -133,7 +133,7 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\ide.md" -Raw)
             $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\common\general-instructions.md" -Raw)
             
-            # These files do not need to know about log files
+            # These files DO NOT need to know about log files
             # ask.prompt.md
             # code.prompt.md
             # kb-api.prompt.md
@@ -141,7 +141,7 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
                 $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\common\tasklogs.md" -Raw)
             }
             
-            # These files need to know about testing
+            # These files DO need to know about testing
             # 4-execution.prompt.md
             # 5-verifying.prompt.md
             # code.prompt.md
