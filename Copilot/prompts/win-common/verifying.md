@@ -7,3 +7,9 @@
 - If Visual Studio Code is not well configured, you must warn me in chat with BIG BOLD TEXT and stop immediately.
 - DO NOT call executables or scripts yourself.
 - DO NOT modify `tasks.json`.
+
+### The Correct Way to Read Test Result
+
+- The only source of trust is the raw output of the unit test process.
+  - It is saved to `REPO-ROOT/.github/TaskLogs/Execute.log`. `REPO-ROOT` is the root folder of the repo.
+- DO NOT TRUST related tools Visual Studio Code offers you, like `get_errors` or `get_task_output`, etc.
