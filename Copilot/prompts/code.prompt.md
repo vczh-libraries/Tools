@@ -13,6 +13,8 @@
 
 - Check out `Compile the Solution` for details about compiling the solution but DO NOT run unit test yet.
   - `Compile the Solution` is the only way to build the project. DO NOT call any other tools or scripts.
+- Find out if there is any warning or error.
+  - `Compile the Solution` has the instruction about how to check compile result.
 - If there is any compilation error, address all of them:
   - If there is any compile warning, only fix warnings that caused by your code change. Do no fix any other warnings.
   - If there is any compile error, you need to carefully identify, is the issue in the callee side or the caller side. Check out similar code before making a decision.
