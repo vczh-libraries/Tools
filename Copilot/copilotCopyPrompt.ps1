@@ -146,13 +146,25 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             # 5-verifying.prompt.md
             # code.prompt.md
             if (($file.Name -eq "4-execution.prompt.md") -or ($file.Name -eq "5-verifying.prompt.md") -or ($file.Name -eq "code.prompt.md")) {
-                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\specific-$ide\$name.md" -Raw)
+                $specificFile = "$PSScriptRoot\specific-$ide\$name.md"
+                $generalFile = "$PSScriptRoot\specific-$ide\general.md"
+                
+                if (Test-Path $specificFile) {
+                    $file_content += "`r`n" + (Get-Content $specificFile -Raw)
+                } elseif (Test-Path $generalFile) {
+                    $file_content += "`r`n" + (Get-Content $generalFile -Raw)
+                } else {
+                    throw "Neither '$specificFile' nor '$generalFile' exist"
+                }
+                
                 $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\compiling.md" -Raw)
                 $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\verifying.md" -Raw)
             }
             
             # Write the updated content back to the file
             Set-Content -Path "$prompts_folder\$ide-$($file.Name)" -Value $file_content
+
+            Write-Host Updated: "$prompts_folder\$ide-$($file.Name)"
         }
     }
 }
