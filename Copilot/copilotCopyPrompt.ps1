@@ -118,7 +118,7 @@ function CleanPrompt([string]$name) {
     New-Item -ItemType Directory -Path $prompts_folder -Force | Out-Null
 }
 
-function GenerateProcessPrompt([string]$name, [string]$ide) {
+function GenerateProcessPrompt([string]$name, [string]$specificTag, [string]$ide) {
     # Handle prompts folder
     $source_folder = "$PSScriptRoot\prompts"
     $prompts_folder = "$PSScriptRoot\..\..\$name\.github\prompts"
@@ -146,8 +146,8 @@ function GenerateProcessPrompt([string]$name, [string]$ide) {
             # 5-verifying.prompt.md
             # code.prompt.md
             if (($file.Name -eq "4-execution.prompt.md") -or ($file.Name -eq "5-verifying.prompt.md") -or ($file.Name -eq "code.prompt.md")) {
-                $specificFile = "$PSScriptRoot\specific-$ide\$name.md"
-                $generalFile = "$PSScriptRoot\specific-$ide\general.md"
+                $specificFile = "$PSScriptRoot\specific-$specificTag\$name.md"
+                $generalFile = "$PSScriptRoot\specific-$specificTag\general.md"
                 
                 if (Test-Path $specificFile) {
                     $file_content += "`r`n" + (Get-Content $specificFile -Raw)
@@ -186,9 +186,9 @@ if ($projects.ContainsKey($Project)) {
     PrepareGithubFolder $Project
     GenerateGeneralPrompt $Project $projects[$Project]
     CleanPrompt $Project
-    # GenerateProcessPrompt $Project "vs"
-    GenerateProcessPrompt $Project "win"
-    GenerateProcessPrompt $Project "cursor"
+    # GenerateProcessPrompt $Project "ps1" "vs"
+    GenerateProcessPrompt $Project "vsc" "win"
+    GenerateProcessPrompt $Project "ps1" "cursor"
 } else {
     Write-Host "Project '$Project' not found. Please specify a valid project name. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {
