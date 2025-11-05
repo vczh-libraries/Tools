@@ -188,6 +188,7 @@ if ($projects.ContainsKey($Project)) {
     CleanPrompt $Project
     # GenerateProcessPrompt $Project "vs"
     GenerateProcessPrompt $Project "win"
+    GenerateProcessPrompt $Project "cursor"
 } else {
     Write-Host "Project '$Project' not found. Please specify a valid project name. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {
