@@ -7,5 +7,5 @@
 
 - The only source of trust is the raw output of the compiler.
   - It is saved to `REPO-ROOT/.github/TaskLogs/Build.log`. `REPO-ROOT` is the root folder of the repo.
-  - If you cannot find the file, it means the compiling has not finished yet.
+  - Wait for the task to finish before reading the log file. DO NOT HURRY.
 - DO NOT TRUST related tools Visual Studio Code offers you, like `get_errors` or `get_task_output`, etc.
