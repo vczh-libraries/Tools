@@ -115,3 +115,7 @@
 - These 3 files recorded how you interpreted the last completed task, and how I wanted you to adjust  your understanding.
 - Find out what you can learn from the updates, about my philosophy and preferences.
 - Check all future tasks, apply what you have learned, and adjust your approach accordingly.
+
+### Step 6.4
+
+- Find and execute `copilotPrepare.ps1 -Backup`. You MUST use the `-Backup` parameter.
