@@ -131,7 +131,6 @@ function GenerateProcessPrompt([string]$name, [string]$specificTag, [string]$ide
             
             # Append common content to all files
             $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\ide.md" -Raw)
-            $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\common\general-instructions.md" -Raw)
             
             # These files DO NOT need to know about log files
             # ask.prompt.md
