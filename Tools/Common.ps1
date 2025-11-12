@@ -6,7 +6,7 @@ function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir"
     $vsdevcmd = $env:VLPP_VSDEVCMD_PATH
     if ($vsdevcmd -eq $null) {
         local MESSAGE_1 = "You have to add an environment variable named VLPP_VSDEVCMD_PATH and set its value to the path of VsDevCmd.bat, e.g.:"
-        local MESSAGE_2 = "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
+        local MESSAGE_2 = "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat"
         throw "$MESSAGE_1\r\n$MESSAGE_2"
     }
     if ($OutputFolder.IndexOf(":\") -eq -1) {
