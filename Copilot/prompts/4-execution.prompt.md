@@ -3,7 +3,6 @@
 ## Goal and Constraints
 
 - You are going to apply changes on the source code as well following `Copilot_Execution.md`.
-- Make sure indentation and line breaks are applied correctly, following the same style in the target file.
 
 ## Copilot_Execution.md Structure
 
@@ -23,6 +22,7 @@
   - Follow my update to change the execution document and the source code.
 - If there is nothing:
   - Apply all code changes in `Copilot_Execution.md` to the source code.
+    - Make sure indentation and line breaks are applied correctly, following the same style in the target file.
   - After applying each step in `Copilot_Execution.md`, mark the step as completed by appending `[DONE]` after the step title. This allow you to find where you are if you are interrupted.
 
 ## Step 2. Make Sure the Code Compiles but DO NOT Run Unit Test
