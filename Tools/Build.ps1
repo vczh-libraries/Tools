@@ -165,6 +165,9 @@ Push-Location $PSScriptRoot | Out-Null
 try {
     switch ($Project) {
         "" {
+            $time_update = [DateTime]::Now
+            Task-Update-Repos; [Console]::ResetColor()
+
             $time_vlpp = [DateTime]::Now
             Task-Vlpp; [Console]::ResetColor()
 
@@ -189,9 +192,6 @@ try {
             $time_gacui = [DateTime]::Now
             Task-GacUI; [Console]::ResetColor()
 
-            $time_update = [DateTime]::Now
-            Task-Update-Repos; [Console]::ResetColor()
-
             $time_release = [DateTime]::Now
             Task-Update-ReleaseRepo; [Console]::ResetColor()
             Task-Verify-Workflow; [Console]::ResetColor()
@@ -200,6 +200,7 @@ try {
 
             $time_finished = [DateTime]::Now
             Write-Title Finished!
+            Write-Host "Update       : $time_update, Elapsed: $((New-TimeSpan $time_update $time_vlpp).ToString())"
             Write-Host "Vlpp         : $time_vlpp, Elapsed: $((New-TimeSpan $time_vlpp $time_vlpp_os).ToString())"
             Write-Host "  OS         : $time_vlpp_os, Elapsed: $((New-TimeSpan $time_vlpp_os $time_vlpp_regex).ToString())"
             Write-Host "  Regex      : $time_vlpp_regex, Elapsed: $((New-TimeSpan $time_vlpp_regex $time_vlpp_reflection).ToString())"
@@ -207,8 +208,7 @@ try {
             Write-Host "  Parser     : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser $time_vlpp_parser2).ToString())"
             Write-Host "  Parser2    : $time_vlpp_parser, Elapsed: $((New-TimeSpan $time_vlpp_parser2 $time_workflow).ToString())"
             Write-Host "Workflow     : $time_workflow, Elapsed: $((New-TimeSpan $time_workflow $time_gacui).ToString())"
-            Write-Host "GacUI        : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_update).ToString())"
-            Write-Host "Update       : $time_update, Elapsed: $((New-TimeSpan $time_update $time_release).ToString())"
+            Write-Host "GacUI        : $time_gacui, Elapsed: $((New-TimeSpan $time_gacui $time_release).ToString())"
             Write-Host "Release      : $time_release, Elapsed: $((New-TimeSpan $time_release $time_finished).ToString())"
             Write-Host "Total        : $((New-TimeSpan $time_vlpp $time_finished).ToString())"
             
