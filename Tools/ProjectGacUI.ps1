@@ -22,26 +22,28 @@ function Build-GacUI {
     Test-GacUI-SubProject "UnitTest"
 }
 
-function Build-Tool-GacGen {
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32
-    Test-Single-Binary GacGen.exe
-}
-
-function Update-GacUI {
+function Import-GacUI {
     # Import
     Import-Project GacUI ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser2","Workflow")
 
     # Update Parsers
     Update-Parser2 $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\Syntax\Parser.xml
+}
 
+function Build-Tool-GacGen {
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32
+    Test-Single-Binary GacGen.exe
+}
+
+function Release-GacUI {
     # Release
     Release-Project GacUI
     Build-Tool-GacGen
 
-    Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore32.bin $PSScriptRoot
-    Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore64.bin $PSScriptRoot
-    Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection32.bin $PSScriptRoot
-    Copy $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection64.bin $PSScriptRoot
+    Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore32.bin $PSScriptRoot
+    Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore64.bin $PSScriptRoot
+    Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection32.bin $PSScriptRoot
+    Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection64.bin $PSScriptRoot
 
     # Update DarkSkin
     Write-Host "Update GacUI::DarkSkin ..."
@@ -55,6 +57,6 @@ function Update-GacUI {
         Pop-Location
     }
 
-    # Release
+    # Release again
     Release-Project GacUI
 }

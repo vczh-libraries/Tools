@@ -3,10 +3,12 @@ function Build-VlppRegex {
     Test-Vlpp "VlppRegex"
 }
 
-function Update-VlppRegex {
+function Import-VlppRegex {
     # Import
     Import-Project VlppRegex ("Vlpp","VlppOS")
+}
 
+function Release-VlppRegex {
     # Release
     Release-Project VlppRegex
 }

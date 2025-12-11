@@ -6,15 +6,17 @@ function Build-VlppParser {
     Test-Vlpp-SubProject "VlppParser" "UnitTest_Generated_Reflection"
 }
 
+function Import-VlppParser {
+    # Import
+    Import-Project VlppParser ("Vlpp","VlppOS","VlppRegex","VlppReflection")
+}
+
 function Build-Tool-ParserGen {
     Build-Sln $PSScriptRoot\..\..\VlppParser\Tools\ParserGen\ParserGen\ParserGen.vcxproj Release x86
     Test-Single-Binary ParserGen.exe
 }
 
-function Update-VlppParser {
-    # Import
-    Import-Project VlppParser ("Vlpp","VlppOS","VlppRegex","VlppReflection")
-
+function Release-VlppParser {
     # Release
     Release-Project VlppParser
 

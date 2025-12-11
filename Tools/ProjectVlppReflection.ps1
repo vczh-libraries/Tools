@@ -5,10 +5,12 @@ function Build-VlppReflection {
     Test-Vlpp-SubProject "VlppReflection" "UnitTest"
 }
 
-function Update-VlppReflection {
+function Import-VlppReflection {
     # Import
     Import-Project VlppReflection ("Vlpp","VlppOS","VlppRegex")
+}
 
+function Release-VlppReflection {
     # Release
     Release-Project VlppReflection
 }

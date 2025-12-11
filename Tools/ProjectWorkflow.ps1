@@ -9,18 +9,20 @@ function Build-Workflow {
     Test-Vlpp-SubProject "Workflow" "RuntimeTest"
 }
 
-function Build-Tool-CppMerge {
-    Build-Sln $PSScriptRoot\..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj Release x86
-    Test-Single-Binary CppMerge.exe
-}
-
-function Update-Workflow {
+function Import-Workflow {
     # Import
     Import-Project Workflow ("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser2")
 
     # Update Parsers
     Update-Parser2 $PSScriptRoot\..\..\Workflow\Source\Parser\Syntax\Parser.xml
+}
 
+function Build-Tool-CppMerge {
+    Build-Sln $PSScriptRoot\..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj Release x86
+    Test-Single-Binary CppMerge.exe
+}
+
+function Release-Workflow {
     # Release
     Release-Project Workflow
     Build-Tool-CppMerge

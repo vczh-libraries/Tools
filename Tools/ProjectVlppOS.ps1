@@ -3,10 +3,12 @@ function Build-VlppOS {
     Test-Vlpp "VlppOS"
 }
 
-function Update-VlppOS {
+function Import-VlppOS {
     # Import
     Import-Project VlppOS ("Vlpp")
+}
 
+function Release-VlppOS {
     # Release
     Release-Project VlppOS
 }

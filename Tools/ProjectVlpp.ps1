@@ -22,7 +22,11 @@ function Build-Vlpp {
     Test-Vlpp "Vlpp"
 }
 
-function Update-Vlpp {
+function Import-Vlpp {
+    # Import
+}
+
+function Release-Vlpp {
     # Release
     Release-Project Vlpp
 }

@@ -27,7 +27,7 @@ function Update-Binaries-Prepare-CodePack {
                 Test-Single-Binary CodePack.exe
             }
         }
-        Copy $PSScriptRoot\CodePack.exe $PSScriptRoot\CodePack.backup.exe
+        Copy-Item $PSScriptRoot\CodePack.exe $PSScriptRoot\CodePack.backup.exe
     }
 }
 
@@ -46,22 +46,6 @@ function Update-Binaries-And-Bundle {
     New-Item .\.Output -ItemType directory -ErrorAction SilentlyContinue | Out-Null
     
     Update-Binaries-Prepare-CodePack
-    
-    Write-Title "    Updating Vlpp ..."
-    Update-Vlpp
-    Update-VlppOS
-    Update-VlppRegex
-    Update-VlppReflection
-    Update-VlppParser
-    Update-VlppParser2
-    
-    Update-Binaries-Prepare-CodePack
-    
-    Write-Title "    Updating Workflow ..."
-    Update-Workflow
-    
-    Write-Title "    Updating GacUI ..."
-    Update-GacUI
 }
 
 function Update-Repo-Commit-Records {
@@ -83,42 +67,58 @@ function Update-Repo-Commit-Records {
 
 function Task-Vlpp {
     Write-Title Build-Vlpp
+    Import-Vlpp
     Build-Vlpp
+    Release-Vlpp
 }
 
 function Task-VlppOS {
     Write-Title Build-VlppOS
+    Import-VlppOS
     Build-VlppOS
+    Release-VlppOS
 }
 
 function Task-VlppRegex {
     Write-Title Build-VlppRegex
+    Import-VlppRegex
     Build-VlppRegex
+    Release-VlppRegex
 }
 
 function Task-VlppReflection {
     Write-Title Build-VlppReflection
+    Import-VlppReflection
     Build-VlppReflection
+    Release-VlppReflection
 }
 
 function Task-VlppParser {
     Write-Title Build-VlppParser
+    Import-VlppParser
     Build-VlppParser
+    Release-VlppParser
 }
 
 function Task-VlppParser2 {
     Write-Title Build-VlppParser2
+    Import-VlppParser2
     Build-VlppParser2
+    Release-VlppParser2
 }
 
 function Task-Workflow {
     Write-Title Build-Workflow
+    Import-Workflow
     Build-Workflow
+    Release-Workflow
 }
 
 function Task-GacUI {
     Write-Title Build-GacUI
+    Import-GacUI
     Build-GacUI
+    Release-GacUI
 }
 
 function Task-Update-Repos {
@@ -215,46 +215,39 @@ try {
             Task-Check-Unsubmitted-Repos
         }
         "Vlpp" {
+            Update-Binaries-Prepare-CodePack
             Task-Vlpp
         }
         "VlppOS" {
+            Update-Binaries-Prepare-CodePack
             Task-VlppOS
         }
         "VlppRegex" {
+            Update-Binaries-Prepare-CodePack
             Task-VlppRegex
         }
         "VlppReflection" {
+            Update-Binaries-Prepare-CodePack
             Task-VlppReflection
         }
         "VlppParser" {
+            Update-Binaries-Prepare-CodePack
             Task-VlppParser
         }
         "VlppParser2" {
+            Update-Binaries-Prepare-CodePack
             Task-VlppParser2
         }
         "Workflow" {
+            Update-Binaries-Prepare-CodePack
             Task-Workflow
         }
         "GacUI" {
+            Update-Binaries-Prepare-CodePack
             Task-GacUI
-        }
-        "UnitTest" {
-            Task-Vlpp
-            Task-VlppOS
-            Task-VlppRegex
-            Task-VlppReflection
-            Task-VlppParser
-            Task-VlppParser2
-            Task-Workflow
-            Task-GacUI
-            Task-Check-Unsubmitted-Repos
         }
         "Update-Prepare-CodePack" {
             Update-Binaries-Prepare-CodePack
-        }
-        "Update" {
-            Task-Update-Repos
-            Task-Check-Unsubmitted-Repos
         }
         "UpdateCommits" {
             Write-Title Update-Repo-Commit-Records
@@ -291,7 +284,7 @@ try {
             Task-Check-Unsubmitted-Repos
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: UnitTest(Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI), Update, UpdateCommits, Release(UpdateRelease + VerifyRelease(VerifyReleaseWorkflow + VerifyReleaseXml + VerifyReleaseCpp))."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update-Prepare-CodePack, UpdateCommits, Release(UpdateRelease + VerifyRelease(VerifyReleaseWorkflow + VerifyReleaseXml + VerifyReleaseCpp))."
         }
     }
 }
