@@ -118,7 +118,7 @@ function CleanPrompt([string]$name) {
     New-Item -ItemType Directory -Path $prompts_folder -Force | Out-Null
 }
 
-function GenerateProcessPrompt([string]$name, [string]$specificTag, [string]$ide) {
+function GenerateProcessPrompt([string]$name, [string]$ide) {
     # Handle prompts folder
     $source_folder = "$PSScriptRoot\prompts"
     $prompts_folder = "$PSScriptRoot\..\..\$name\.github\prompts"
@@ -145,19 +145,19 @@ function GenerateProcessPrompt([string]$name, [string]$specificTag, [string]$ide
             # 5-verifying.prompt.md
             # code.prompt.md
             if (($file.Name -eq "4-execution.prompt.md") -or ($file.Name -eq "5-verifying.prompt.md") -or ($file.Name -eq "code.prompt.md")) {
-                $specificFile = "$PSScriptRoot\specific-$specificTag\$name.md"
-                $generalFile = "$PSScriptRoot\specific-$specificTag\general.md"
+                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\verifying.md" -Raw)
+                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\projects\general.md" -Raw)
+                
+                $specificFile = "$PSScriptRoot\prompts\$ide-common\projects\$name.md"
+                $defaultFile = "$PSScriptRoot\prompts\$ide-common\projects\default.md"
                 
                 if (Test-Path $specificFile) {
                     $file_content += "`r`n" + (Get-Content $specificFile -Raw)
-                } elseif (Test-Path $generalFile) {
-                    $file_content += "`r`n" + (Get-Content $generalFile -Raw)
+                } elseif (Test-Path $defaultFile) {
+                    $file_content += "`r`n" + (Get-Content $defaultFile -Raw)
                 } else {
-                    throw "Neither '$specificFile' nor '$generalFile' exist"
+                    throw "Neither '$specificFile' nor '$defaultFile' exist"
                 }
-                
-                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\compiling.md" -Raw)
-                $file_content += "`r`n" + (Get-Content "$PSScriptRoot\prompts\$ide-common\verifying.md" -Raw)
             }
             
             # Write the updated content back to the file
@@ -185,9 +185,7 @@ if ($projects.ContainsKey($Project)) {
     PrepareGithubFolder $Project
     GenerateGeneralPrompt $Project $projects[$Project]
     CleanPrompt $Project
-    # GenerateProcessPrompt $Project "ps1" "vs"
-    # GenerateProcessPrompt $Project "ps1" "cursor"
-    GenerateProcessPrompt $Project "vsc" "win"
+    GenerateProcessPrompt $Project "win"
 } else {
     Write-Host "Project '$Project' not found. Please specify a valid project name. Available projects:"
     foreach ($projectName in $projects.Keys | Sort-Object) {
