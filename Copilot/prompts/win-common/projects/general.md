@@ -1,16 +1,16 @@
 ## Understanding the Building Tools
 
-**WARNING**: Information offered in this section is for background knowledge only. You should always run `Build Unit Tests` and `Run Unit Tests` instead of running these scripts or calling msbuild by yourself. 
+**WARNING**: Information offered in this section is for background knowledge only. You should always run `Build Unit Tests` and `Run Unit Tests` instead of running these scripts or calling msbuild or other executable by yourself. 
 
 `REPO-ROOT` is the root folder of the repo.
 `SOLUTION-ROOT` is the folder containing the solution file.
 `PROJECT-NAME` is the name of the project.
 
-When verifying test projects on Windows, msbuild is used to build a solution (*.sln) file.
-A solution contains many project (*.vcxproj) files, a project generates a *.exe file.
+When verifying test projects on Windows, msbuild is used to build a solution (`*.sln`) file.
+A solution contains many project (`*.vcxproj`) files, a project generates an executable (`*.exe`) file.
 
 The `Build Unit Tests` task calls msbuild to build the only solution which contains all test cases.
-Inside the task, it basically runs `copilotBuild.ps1`
+Inside the task, it runs `copilotBuild.ps1`
 
 ```
 cd SOLUTION-ROOT
