@@ -118,6 +118,10 @@ https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/dx--disp
 if `var` is a struct, offsets, fields and field types will be listed
 `as name (var)` to define an alias, parentheses is necessary, use it later by `${name}`
 
+### Using Vlpp.natvis
+.nvload "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Packages\Debugger\Visualizers\vlpp.natvis"
+after running the command, `dx` will use `Vlpp.natvis` to format the output, use `dx var,!` to print raw data
+
 ### `Ptr<T>`
 `dx var.reference`
 
