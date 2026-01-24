@@ -73,7 +73,7 @@ installing as of Jan 2026:
 - Install the real `Windows Driver Kit` [Download the Windows Driver Kit (WDK)]([Download the Windows Driver Kit (WDK)](https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk))
 - Use `C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe`, you can make an environment variable
 
-`cdb -o ./Bin.exe args ...`
+`cdb -c "commands" -o ./Bin.exe args ...` to start a process and pause, and then execute commands
 or `& $env:CDBPATH ...` (need to create the variable manually)
 
 `g`: run/continue to breakpoint or end
