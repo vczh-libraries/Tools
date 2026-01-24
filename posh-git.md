@@ -82,6 +82,11 @@ or `& $env:CDBPATH ...` (need to create the variable manually)
 `dv [/t] [name]`: print variables
 `dt [-o] -r0 name`: print variable content one level of fields
 
+## cdb remote debugging
+
+`& $env:CDBPATH -server npipe:pipe=VlppUnitTest ...`: start a server
+`& $env:CDBPATH -remote npipe:server=.,pipe=VlppUnitTest`: start a client
+
 ## cdb Break-points
 
 `lm`: list modules, `UnitTest.exe` will be `UnitTest`
