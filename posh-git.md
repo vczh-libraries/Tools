@@ -67,6 +67,11 @@ gdb --args ./Bin.exe args ...
 
 ## cdb
 
+installing as of Jan 2026:
+- Install VS2022 or VS2026, jumps to `Individual Components` in setup and ensure `Windows Driver Kit`
+- Install the real `Windows Driver Kit` [Download the Windows Driver Kit (WDK)]([Download the Windows Driver Kit (WDK)](https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk))
+- Use `C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe`, you can make an environment variable
+
 `cdb -o ./Bin.exe args ...`
 or `& $env:CDBPATH ...` (need to create the variable manually)
 
