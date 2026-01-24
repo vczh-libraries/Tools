@@ -67,12 +67,42 @@ gdb --args ./Bin.exe args ...
 
 ## cdb
 
-cdb -o ./Bin.exe args ...
+`cdb -o ./Bin.exe args ...`
+or `& $env:CDBPATH ...` (need to create the variable manually)
 
 `g`: run/continue to breakpoint or end
+`q`: exit
 
 `.lines`: load callstack filename and line
 `kn`: list callstacks
 `.frame number`: inspect a function
 `dv [/t] [name]`: print variables
 `dt [-o] -r0 name`: print variable content one level of fields
+
+## cdb/dx with Vlpp data structures
+
+`dx var`: print variable, `var` could be any valid C expression
+if `var` is a struct, offsets, fields and field types will be listed
+`as name (var)` to define an alias, parentheses is necessary, use it later by `${name}`
+
+### `Ptr<T>`
+`dx var.reference`
+
+### `Nullable<T>`
+`dx var.object`, only valid when `dx.initialized` is true
+`dx var.initialized?var.object:nullptr` could do it in one command, always use `var.object` alone when you know it is initialized
+
+### `Variable<A, B, C>`
+`dx var.index` to know the actualy type, 0,1,2,... means A,B,C,...
+`dx (Type*)var.buffer` to interpret `var` strong typed
+
+### `ObjectString<wchar_t>` or other string:
+`dx var.buffer+var.start`
+when it is not null terminated `*(wchar_t(*)[10])(var.buffer+var.start)`
+length is the value in  `dx var.length` but do not put the expression directly
+
+### Containers that inherits from `ListBase<T>` (e.g. `Array<T>`, `List<T>`, `SortedList<T>`)
+`dx var.buffer,[var.count]` to list all items
+`dx var.buffer[var.count]` to inspect a specific item
+
+### `Dictionary<K, V>` or `Group<K, V>`, keys and values are stored separately in fields.
