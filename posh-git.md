@@ -87,6 +87,13 @@ or `& $env:CDBPATH ...` (need to create the variable manually)
 `& $env:CDBPATH -server npipe:pipe=VlppUnitTest ...`: start a server
 `& $env:CDBPATH -remote npipe:server=.,pipe=VlppUnitTest`: start a client
 
+If you want to start a client, execute some commands, and quit and keep server alive:
+```
+".cls`r`nmultiple-lines-of-commands`r`n.remote_exit" | Out-File -Encoding ASCII -FilePath VlppCdbInput.txt; & $env:CDBPATH -remote npipe:server=.,pipe=VlppUnitTest -cf VlppCdbInput.txt | Tee-Object -FilePath VlppCdbOutput.txt; del VlppCdbInput.txt
+```
+Open VlppCdbOutput.txt and search for the last line with this pattern: `xxx> .cls`
+everyting after that is the new output
+
 ## cdb Break-points
 
 `lm`: list modules, `UnitTest.exe` will be `UnitTest`
