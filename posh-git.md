@@ -49,8 +49,9 @@ git clean -d -f
 gdb --args ./Bin.exe args ...
 
 `r/c`: run/continue to breakpoint or end
+`n`: step next line,
 `s`: step in
-`n`: step out
+`finish`: step out
 
 `b file:line`: set break-point
 `c file:line`: reset break-point
@@ -78,13 +79,40 @@ or `& $env:CDBPATH ...` (need to create the variable manually)
 `g`: run/continue to breakpoint or end
 `q`: exit
 
-`.lines`: load callstack filename and line
-`kn`: list callstacks
-`.frame number`: inspect a function
 `dv [/t] [name]`: print variables
 `dt [-o] -r0 name`: print variable content one level of fields
 
-## cdb/dx with Vlpp data structures
+## cdb Break-points
+
+`lm`: list modules, `UnitTest.exe` will be `UnitTest`
+`bl/.bpcmds`: list break-points
+`be number ...`: enable break-points
+`bd number ...`: disable break-oints
+`bc number ...`: delete break-points
+`bsc number condition`: attach condition to a break point
+
+set break point at file.cpp:line in UnitTest.exe using:
+- bp `file.cpp:line`
+- bp `UnitTest!file.cpp:line`
+the target must be quoted using "`"
+
+## cdb Stepping
+
+`.lines`: load callstack filename and line
+`l+t`: switch to source stepping mode, `l-t` cancels
+`l+s`: print source line when stepping, `l-s` cancels
+
+`kn`: list callstacks
+`kn 5`: list callstacks limit to top 5
+`.frame number`: inspect a function
+
+`p`: step next line
+`t`: step in
+`pt`: step out
+
+## cdb/dx Working with Vlpp data structures
+
+https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/dx--display-visualizer-variables-
 
 `dx var`: print variable, `var` could be any valid C expression
 if `var` is a struct, offsets, fields and field types will be listed
