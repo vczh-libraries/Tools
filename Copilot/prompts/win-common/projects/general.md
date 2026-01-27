@@ -11,6 +11,13 @@ Only when you cannot access tools offered by Visual Studio Code, scripts below a
 When verifying test projects on Windows, msbuild is used to build a solution (`*.sln`) file.
 A solution contains many project (`*.vcxproj`) files, a project generates an executable (`*.exe`) file.
 
+Before building, ensure the debugger has stopped, otherwise the running unit test process will cause a linking failure.
+If there is any error message, it means the debugger is not alive, it is good.
+
+```
+& REPO-ROOT\.github\TaskLogs\copilotDebug_Stop.ps1
+```
+
 The `Build Unit Tests` task calls msbuild to build the only solution which contains all test cases.
 Inside the task, it runs `copilotBuild.ps1`
 
