@@ -71,6 +71,7 @@
   - If your change did not change the test result, make sure you followed `Step 2. Compile` to compile the code.
   - If the test result still not changed after redoing `Step 2. Compile` and `Step 3. Run Unit Test`, these two steps are absolutely no problem, the only reason is that your change is not correct.
 - You are able to debug the unit test following `Debugging Unit Test`. From there you can set break-points, walk through code by lines, and inspect variables.
+  - You must stop the debugger after you finish debugging.
 - You must carefully identify, if the cause is in the source code or in the failed test. In most of the cases, the cause is in the source code.
   - You can reference to `Copilot_Task.md` and `Copilot_Planning.md` for more details before making a decision, about fixing the test case or the source code.
 - DO NOT delete any test case.
