@@ -23,7 +23,7 @@ Inside the task, it runs `copilotBuild.ps1`
 
 ```
 cd SOLUTION-ROOT
-start powershell {& REPO-ROOT\.github\TaskLogs\copilotBuild.ps1}
+& REPO-ROOT\.github\TaskLogs\copilotBuild.ps1
 ```
 
 The `Run Unit Tests` task runs all generated *.exe file for each *.vcxproj that is created for test cases.

@@ -48,9 +48,10 @@ Execute the following powershell commands:
 
 ```
 cd SOLUTION-ROOT
-& REPO-ROOT\.github\TaskLogs\copilotDebug_Start.ps1 -Executable PROJECT-NAME
+start powershell {& REPO-ROOT\.github\TaskLogs\copilotDebug_Start.ps1 -Executable PROJECT-NAME}
 ```
 
+The `start powershell {}` is necessary otherwise the script will block the execution forever causing you to wait infinitely.
 The script will finish immediately, leaving a debugger running in the background. You can send commands to the debugger.
 The process being debugged is paused at the beginning, you are given a chance to set break-points.
 After you are prepared, send the `g` command to start running.
