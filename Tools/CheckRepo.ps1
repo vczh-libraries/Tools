@@ -42,6 +42,7 @@ function RepoSyncUnversioned([String]$name) {
     Write-Host "Pulling repo: $name ..."
 
     Set-Location $PSScriptRoot\..\..\$name | Out-Null
+    git checkout master
     git pull origin master
 }
 
@@ -76,6 +77,8 @@ try {
             foreach ($project in $projects_versioned) {
                 RepoSyncVersioned $project
             }
+        }
+        "SyncMaster" {
             foreach ($project in $projects_unversionsed) {
                 RepoSyncUnversioned $project
             }
@@ -91,7 +94,7 @@ try {
             }
         }
         default {
-            throw "Unknown action `"$Action`". Action should be one of the following value: Check, CheckAll, Sync, Master, 1.0."
+            throw "Unknown action `"$Action`". Action should be one of the following value: Check, CheckAll, Sync, SyncMaster, Master, 1.0."
         }
     }
 }
