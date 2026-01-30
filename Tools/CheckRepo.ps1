@@ -32,7 +32,7 @@ function RepoSyncVersioned([String]$name, [bool]$oldVersions) {
     Write-Host "Pulling repo: $name ..."
 
     Set-Location $PSScriptRoot\..\..\$name | Out-Null
-    if (oldVersions) {
+    if ($oldVersions) {
         git checkout release-1.0
         git pull origin release-1.0
     }
