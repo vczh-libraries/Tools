@@ -28,12 +28,14 @@ function RepoCheckAllDirty([String]$name) {
     }
 }
 
-function RepoSyncVersioned([String]$name) {
+function RepoSyncVersioned([String]$name, [bool]$oldVersions) {
     Write-Host "Pulling repo: $name ..."
 
     Set-Location $PSScriptRoot\..\..\$name | Out-Null
-    git checkout release-1.0
-    git pull origin release-1.0
+    if (oldVersions) {
+        git checkout release-1.0
+        git pull origin release-1.0
+    }
     git checkout master
     git pull origin master
 }
@@ -75,10 +77,16 @@ try {
         }
         "Sync" {
             foreach ($project in $projects_versioned) {
-                RepoSyncVersioned $project
+                RepoSyncVersioned $project $false
+            }
+            foreach ($project in $projects_unversionsed) {
+                RepoSyncUnversioned $project
             }
         }
-        "SyncMaster" {
+        "SyncAllVersions" {
+            foreach ($project in $projects_versioned) {
+                RepoSyncVersioned $project $true
+            }
             foreach ($project in $projects_unversionsed) {
                 RepoSyncUnversioned $project
             }
@@ -94,7 +102,7 @@ try {
             }
         }
         default {
-            throw "Unknown action `"$Action`". Action should be one of the following value: Check, CheckAll, Sync, SyncMaster, Master, 1.0."
+            throw "Unknown action `"$Action`". Action should be one of the following value: Check, CheckAll, Sync, SyncAllVersions, Master, 1.0."
         }
     }
 }
