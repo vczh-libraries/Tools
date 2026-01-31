@@ -28,6 +28,7 @@ function Import-GacUI {
 
     # Update Parsers
     Update-Parser2 $PSScriptRoot\..\..\GacUI\Source\Compiler\InstanceQuery\Syntax\Parser.xml
+    Update-Parser2 $PSScriptRoot\..\..\GacUI\Source\Compiler\RemoteProtocol\Syntax\Parser.xml
 }
 
 function Build-Tool-GacGen {
