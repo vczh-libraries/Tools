@@ -8,6 +8,18 @@ for CPP_VCXPROJ_ITEM in "${CPP_VCXPROJS[@]}"; do
     CPP_FILES=(${CPP_FILES[@]} ${CPP_FILES_FROM_VCXPROJ[@]})
 done
 
+# Remove duplicated items (preserve the first occurrence, like LINQ Distinct)
+declare -A __vutil_seen_cpp_files
+__vutil_distinct_cpp_files=()
+for __vutil_cpp_file in "${CPP_FILES[@]}"; do
+    if [ "${__vutil_seen_cpp_files["${__vutil_cpp_file}"]+x}" == "" ]; then
+        __vutil_seen_cpp_files["${__vutil_cpp_file}"]=1
+        __vutil_distinct_cpp_files+=("${__vutil_cpp_file}")
+    fi
+done
+CPP_FILES=("${__vutil_distinct_cpp_files[@]}")
+unset __vutil_seen_cpp_files __vutil_distinct_cpp_files __vutil_cpp_file
+
 for CPP_REMOVE in "${CPP_REMOVES[@]}"; do
     CPP_FILES=(${CPP_FILES[@]/$CPP_REMOVE})
 done
