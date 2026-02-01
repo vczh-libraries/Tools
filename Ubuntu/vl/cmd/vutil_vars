@@ -1,3 +1,4 @@
 #!/bin/bash
-GITHUB_REPOS_VERSIONED=(Tools Vlpp VlppOS VlppRegex VlppReflection VlppParser VlppParser2 Workflow GacUI Release Document)
+GITHUB_REPOS_CPP=(Vlpp VlppOS VlppRegex VlppReflection VlppParser VlppParser2 Workflow GacUI Release)
+GITHUB_REPOS_VERSIONED=(Tools "${GITHUB_REPOS_CPP[@]}" Document)
 GITHUB_REPOS=("${GITHUB_REPOS_VERSIONED[@]}" vczh-libraries.github.io WebsiteSource wGac)
