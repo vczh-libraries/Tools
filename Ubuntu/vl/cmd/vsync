@@ -4,6 +4,8 @@ source "${SCRIPT_DIR}/vutil_vars"
 
 function Help {
     echo "Usage:"
+    echo "--check"
+    echo "    Check if any repo has uncommitted changes."
     echo "--fix"
     echo "    Clone all missing repos."
     echo "--sync"
@@ -16,6 +18,21 @@ function Help {
 
 function GitClone {
     git clone git@github.com:vczh-libraries/${1}.git
+}
+
+function Check {
+    pushd ${VROOT} > /dev/null
+    for i in "${GITHUB_REPOS[@]}"; do
+        if [ -d "$i" ]; then
+            pushd $i > /dev/null
+            local STATUS="$(git status --porcelain)"
+            if [ "${STATUS}" != "" ]; then
+                printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}uncommitted changes${VC_DEFAULT}\n"
+            fi
+            popd > /dev/null
+        fi
+    done
+    popd > /dev/null
 }
 
 function Fix {
@@ -73,6 +90,10 @@ function ReleaseOne {
 case $1 in
     --help)
     Help
+    ;;
+
+    --check)
+    Check
     ;;
 
     --fix)
