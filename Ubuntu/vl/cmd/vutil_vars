@@ -1,0 +1,2 @@
+GITHUB_REPOS_VERSIONED=(Tools Vlpp VlppOS VlppRegex VlppReflection VlppParser VlppParser2 Workflow GacUI Release Document)
+GITHUB_REPOS=("${GITHUB_REPOS_VERSIONED[@]}" vczh-libraries.github.io WebsiteSource wGac)

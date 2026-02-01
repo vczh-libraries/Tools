@@ -1,4 +1,5 @@
 #!/bin/bash
+source ./vutil_vars
 
 function Help {
     echo "Usage:"
@@ -42,20 +43,9 @@ function Go {
 
 function UpdateMaster {
     if [ "$1" == "" ]; then
-        UpdateMaster Tools
-        UpdateMaster Vlpp
-        UpdateMaster VlppOS
-        UpdateMaster VlppRegex
-        UpdateMaster VlppReflection
-        UpdateMaster VlppParser
-        UpdateMaster VlppParser2
-        UpdateMaster Workflow
-        UpdateMaster GacUI
-        UpdateMaster Release
-        UpdateMaster Document
-        UpdateMaster vczh-libraries.github.io
-        UpdateMaster WebsiteSource
-        UpdateMaster wGac
+        for i in "${GITHUB_REPOS[@]}"; do
+            UpdateMaster $i
+        done
     else
         pushd . > /dev/null
         printf "${VC_LIGHTGREEN}Pulling from ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
@@ -73,20 +63,9 @@ function UpdateMaster {
 
 function Update {
     if [ "$1" == "" ]; then
-        Update Tools
-        Update Vlpp
-        Update VlppOS
-        Update VlppRegex
-        Update VlppReflection
-        Update VlppParser
-        Update VlppParser2
-        Update Workflow
-        Update GacUI
-        Update Release
-        Update Document
-        Update vczh-libraries.github.io
-        Update WebsiteSource
-        Update wGac
+        for i in "${GITHUB_REPOS[@]}"; do
+            Update $i
+        done
     else
         pushd . > /dev/null
         printf "${VC_LIGHTGREEN}Pulling from ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
