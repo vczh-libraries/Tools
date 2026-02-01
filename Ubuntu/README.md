@@ -1,5 +1,7 @@
 # Ubuntu Development Environment
 
+Set-VMVideo -VMName `Virtual Machine Name` -HorizontalResolution:1920 -VerticalResolution:1080 -ResolutionType Single
+
 ## Create
 
 Assuming you want to create a desktop launcher icon at the desktop,
@@ -39,6 +41,7 @@ and the name changed from `vl.desktop` to `VL++ DevEnv`.
 - Use `vssh` to setup a connection to github.
 - Use `vsync --fix` to clone all missing repos.
 - Use `vgo u` to sync all remote branches.
+- Use `vgo vmake` and `vgo vbuild` to run CI.
 
 ## Start to work
 
