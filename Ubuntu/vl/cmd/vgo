@@ -14,6 +14,10 @@ function Help {
     echo "    Get the latest code of this project's master branch, or all projects if it is not specified."
     echo "uall [<project>]"
     echo "    Get the latest code of this project's all branch, or all projects if it is not specified."
+    echo "vmake [<project>]"
+    echo "    Call vmake on this project's all available folders, or all projects if it is not specified."
+    echo "vbuild [<project>]"
+    echo "    Call vbuild on this project's all available folders, or all projects if it is not specified."
 }
 
 function Go {
@@ -90,6 +94,30 @@ function Update {
     fi
 }
 
+function VMake {
+    if [ "$1" == "" ]; then
+        for i in "${GITHUB_REPOS_VERSIONED[@]}"; do
+            Update $i
+        done
+    else
+        pushd . > /dev/null
+        local GITHEAD="$(git symbolic-ref HEAD 2>/dev/null)"
+        local CURRENT_BRANCH="${GITHEAD##refs/heads/}"
+        popd > /dev/null
+    fi
+}
+
+function VBuild {
+    if [ "$1" == "" ]; then
+        for i in "${GITHUB_REPOS_VERSIONED[@]}"; do
+            Update $i
+        done
+    else
+        pushd . > /dev/null
+        popd > /dev/null
+    fi
+}
+
 case $1 in
     --help)
     Help
@@ -113,6 +141,14 @@ case $1 in
 
     uall)
     Update $2
+    ;;
+
+    vmake)
+    VMake $2
+    ;;
+
+    vbuild)
+    VBuild $2
     ;;
 
     *)
