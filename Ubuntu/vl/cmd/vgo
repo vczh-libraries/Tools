@@ -253,9 +253,6 @@ function VBuild {
                 fi
             fi
 
-            # print git status --porcelain
-            git status --porcelain
-
             popd > /dev/null
         done
 
@@ -263,6 +260,9 @@ function VBuild {
         if [ ${LOG_WRITTEN} -eq 0 ]; then
             rm -f "${LOG_FILE}" 2>/dev/null || true
         fi
+
+        # print git status --porcelain
+        git status --porcelain
 
         popd > /dev/null
     fi
