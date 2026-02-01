@@ -58,7 +58,7 @@ function Check {
                     elif [ "${AHEAD}" != "0" ] && [ "${BEHIND}" == "0" ]; then
                         printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}is ${VC_RED}%s ahead${VC_DEFAULT} (${UPSTREAM})\n" "${AHEAD}"
                     else
-                        printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}diverged${VC_DEFAULT} (${UPSTREAM}, ahead %s / behind %s)\n" "${AHEAD}" "${BEHIND}"
+                        printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}%s ahead %s behind${VC_DEFAULT} (${UPSTREAM})\n" "${AHEAD}" "${BEHIND}"
                     fi
                 else
                     printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}no upstream branch configured${VC_DEFAULT}\n"
