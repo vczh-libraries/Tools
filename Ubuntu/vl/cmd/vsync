@@ -26,7 +26,40 @@ function Check {
         if [ -d "$i" ]; then
             pushd $i > /dev/null
             local STATUS="$(git status --porcelain)"
-            if [ "${STATUS}" != "" ]; then
+            if [ "${STATUS}" == "" ]; then
+                # Fetch remote-tracking refs so the comparison uses up-to-date information.
+                git fetch --prune > /dev/null 2>&1
+
+                # Compare local HEAD with the configured upstream of the current branch.
+                # If no upstream is configured, fall back to origin/<current-branch> when it exists.
+                local UPSTREAM="$(git rev-parse --abbrev-ref --symbolic-full-name @{upstream} 2>/dev/null)"
+                if [ "${UPSTREAM}" == "" ]; then
+                    local GITHEAD="$(git symbolic-ref HEAD 2>/dev/null)"
+                    local CURRENT_BRANCH="${GITHEAD##refs/heads/}"
+                    if git show-ref --verify --quiet "refs/remotes/origin/${CURRENT_BRANCH}"; then
+                        UPSTREAM="origin/${CURRENT_BRANCH}"
+                    fi
+                fi
+
+                if [ "${UPSTREAM}" != "" ]; then
+                    local COUNTS
+                    COUNTS="$(git rev-list --left-right --count HEAD...${UPSTREAM} 2>/dev/null)"
+                    local BEHIND="${COUNTS%% *}"
+                    local AHEAD="${COUNTS##* }"
+
+                    if [ "${BEHIND}" == "0" ] && [ "${AHEAD}" == "0" ]; then
+                        :
+                    elif [ "${BEHIND}" != "0" ] && [ "${AHEAD}" == "0" ]; then
+                        printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}is ${VC_RED}%s behind${VC_DEFAULT} (${UPSTREAM})\n" "${BEHIND}"
+                    elif [ "${BEHIND}" == "0" ] && [ "${AHEAD}" != "0" ]; then
+                        printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}is ${VC_RED}%s ahead${VC_DEFAULT} (${UPSTREAM})\n" "${AHEAD}"
+                    else
+                        printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}diverged${VC_DEFAULT} (${UPSTREAM}, ahead %s / behind %s)\n" "${AHEAD}" "${BEHIND}"
+                    fi
+                else
+                    printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}no upstream branch configured${VC_DEFAULT}\n"
+                fi
+            else
                 printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}uncommitted changes${VC_DEFAULT}\n"
             fi
             popd > /dev/null
