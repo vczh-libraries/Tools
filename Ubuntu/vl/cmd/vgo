@@ -97,20 +97,55 @@ function Update {
 function VMake {
     if [ "$1" == "" ]; then
         for i in "${GITHUB_REPOS_CPP[@]}"; do
-            Update $i
+            VMake $i
         done
     else
         pushd . > /dev/null
+        Go "" $1
         local GITHEAD="$(git symbolic-ref HEAD 2>/dev/null)"
         local CURRENT_BRANCH="${GITHEAD##refs/heads/}"
 
-        # find all folders that has a file called vmake
-        # for each folder:
-        #   pushd
-        #   vmake --make, and if it prints anything, remember the folder
-        #   popd
-        #   list all remembered folders
-        #   run the following git commands only when there is no remembered folders
+        local VMAKE_FOLDERS=()
+        while IFS= read -r -d '' VMAKE_FILE; do
+            VMAKE_FOLDERS+=("$(dirname "${VMAKE_FILE}")")
+        done < <(find . -type f -name vmake -print0 2>/dev/null)
+
+        IFS=$'\n' VMAKE_FOLDERS=($(printf '%s\n' "${VMAKE_FOLDERS[@]}" | sort -u))
+        unset IFS
+
+        local DIRS_WITH_OUTPUT=()
+        for VDIR in "${VMAKE_FOLDERS[@]}"; do
+            if [ "${VDIR}" == "" ]; then
+                continue
+            fi
+
+            pushd "${VDIR}" > /dev/null
+            printf "${VC_LIGHTGREEN}Running vmake in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
+
+            local OUT
+            OUT="$(vmake --make 2>&1)"
+            local RC=$?
+            if [ "${OUT}" != "" ] || [ ${RC} -ne 0 ]; then
+                DIRS_WITH_OUTPUT+=("${VDIR}")
+                if [ "${OUT}" != "" ]; then
+                    printf "%s\n" "${OUT}"
+                fi
+                if [ ${RC} -ne 0 ] && [ "${OUT}" == "" ]; then
+                    printf "${VC_LIGHTRED}vmake exited with code ${RC}${VC_DEFAULT}\n"
+                fi
+            fi
+
+            popd > /dev/null
+        done
+
+        if [ ${#DIRS_WITH_OUTPUT[@]} -ne 0 ]; then
+            printf "${VC_LIGHTRED}vmake produced output in the following folders:${VC_DEFAULT}\n"
+            for VDIR in "${DIRS_WITH_OUTPUT[@]}"; do
+                printf "  ${VC_LIGHTCYAN}%s${VC_DEFAULT}\n" "${VDIR}"
+            done
+            popd > /dev/null
+            return 1
+        fi
 
         local STATUS="$(git status --porcelain)"
         if [ "${STATUS}" != "" ]; then
@@ -130,6 +165,7 @@ function VBuild {
         done
     else
         pushd . > /dev/null
+        Go "" $1
         popd > /dev/null
     fi
 }
