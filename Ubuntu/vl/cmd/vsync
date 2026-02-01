@@ -42,16 +42,20 @@ function Check {
                 fi
 
                 if [ "${UPSTREAM}" != "" ]; then
+                    # Output format is: <left-count><whitespace><right-count>
+                    # For HEAD...UPSTREAM: left = commits reachable from HEAD only (ahead), right = commits reachable from UPSTREAM only (behind).
                     local COUNTS
                     COUNTS="$(git rev-list --left-right --count HEAD...${UPSTREAM} 2>/dev/null)"
-                    local BEHIND="${COUNTS%% *}"
-                    local AHEAD="${COUNTS##* }"
 
-                    if [ "${BEHIND}" == "0" ] && [ "${AHEAD}" == "0" ]; then
+                    local AHEAD="0"
+                    local BEHIND="0"
+                    read -r AHEAD BEHIND <<< "${COUNTS}"
+
+                    if [ "${AHEAD}" == "0" ] && [ "${BEHIND}" == "0" ]; then
                         :
-                    elif [ "${BEHIND}" != "0" ] && [ "${AHEAD}" == "0" ]; then
+                    elif [ "${AHEAD}" == "0" ] && [ "${BEHIND}" != "0" ]; then
                         printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}is ${VC_RED}%s behind${VC_DEFAULT} (${UPSTREAM})\n" "${BEHIND}"
-                    elif [ "${BEHIND}" == "0" ] && [ "${AHEAD}" != "0" ]; then
+                    elif [ "${AHEAD}" != "0" ] && [ "${BEHIND}" == "0" ]; then
                         printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}is ${VC_RED}%s ahead${VC_DEFAULT} (${UPSTREAM})\n" "${AHEAD}"
                     else
                         printf "${VC_LIGHTGREEN}Repo ${VC_LIGHTBLUE}$i ${VC_LIGHTGREEN}has ${VC_RED}diverged${VC_DEFAULT} (${UPSTREAM}, ahead %s / behind %s)\n" "${AHEAD}" "${BEHIND}"
