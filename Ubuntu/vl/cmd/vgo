@@ -264,6 +264,7 @@ function VBuild {
         # if nothing needs to be written to the log, delete that log file, ignore deletion failure
         if [ ${LOG_WRITTEN} -eq 0 ]; then
             rm -f "${LOG_FILE}" 2>/dev/null || true
+            "$( (git add .) 2>&1 )"
         fi
 
         # print git status --porcelain

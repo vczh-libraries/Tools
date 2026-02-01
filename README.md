@@ -23,3 +23,9 @@ To update only one repo, open PowerShell in folder `repo\Release` and run:
 `CodePack.exe` and `CodePack.backup.exe` could be created by `.\Build.ps1 -Project Update-Prepare-CodePack`.
 
 `CodePack.backup.exe` keeps the last successful `CodePack.exe` build, it will be updated when a new `CodePack.exe` is available.
+
+## Enable a Repo with Copilot
+
+Run `Copilot\copilotInit.ps1` in that repo.
+
+Run `Copilot\copilotUpdateKB.ps1` to copy updated documents back to `Tools` repo.
