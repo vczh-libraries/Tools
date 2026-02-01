@@ -162,7 +162,7 @@ function VMake {
 function VBuild {
     if [ "$1" == "" ]; then
         for i in "${GITHUB_REPOS_CPP[@]}"; do
-            Update $i
+            VBuild $i
         done
     else
         pushd . > /dev/null
