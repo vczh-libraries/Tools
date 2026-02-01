@@ -169,6 +169,14 @@ function VBuild {
         printf "${VC_LIGHTGREEN}Running vbuild in ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
         Go "" $1
 
+        # create folder $VROOT/.vbuild if not exists
+        local VBUILD_DIR="${VROOT}/.vbuild"
+        mkdir -p "${VBUILD_DIR}"
+
+        # prepare to write what is required to the log file $VROOT/.vbuild/$1
+        local LOG_FILE="${VBUILD_DIR}/$1"
+        local LOG_WRITTEN=0
+
         local VMAKE_FOLDERS=()
         while IFS= read -r -d '' VMAKE_FILE; do
             VMAKE_FOLDERS+=("$(dirname "${VMAKE_FILE}")")
@@ -185,17 +193,76 @@ function VBuild {
             pushd "${VDIR}" > /dev/null
             printf "${VC_LIGHTGREEN}Running vbuild in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
 
-            # create folder $VROOT/.vbuild if not exists
-            # prepare to write what is required to the log file $VROOT/.vbuild/$1
             # run vbuild --clean in a subshell, e.g. (vbuild --clean)
+            local CLEAN_OUT
+            CLEAN_OUT="$( (vbuild --clean) 2>&1 )"
+            local CLEAN_RC=$?
+            if [ ${CLEAN_RC} -ne 0 ]; then
+                {
+                    printf "Clean failed\n"
+                    printf "Project: %s\n" "$1"
+                    printf "Folder: %s\n" "${VDIR}"
+                    printf "%s\n" "${CLEAN_OUT}"
+                    printf "\n"
+                } >> "${LOG_FILE}"
+                LOG_WRITTEN=1
+            fi
+
             # run vbuild --build in a subshell, remember the output, if it contains anything like "warning:" or "error:", log the complete output, the first line is "Build failed"
+            local BUILD_OUT
+            BUILD_OUT="$( (vbuild --build) 2>&1 )"
+            local BUILD_RC=$?
+            if printf "%s" "${BUILD_OUT}" | grep -E -i -q "(^|[^A-Za-z])(warning:|error:)"; then
+                {
+                    printf "Build failed\n"
+                    printf "Project: %s\n" "$1"
+                    printf "Folder: %s\n" "${VDIR}"
+                    printf "%s\n" "${BUILD_OUT}"
+                    printf "\n"
+                } >> "${LOG_FILE}"
+                LOG_WRITTEN=1
+            elif [ ${BUILD_RC} -ne 0 ]; then
+                {
+                    printf "Build failed\n"
+                    printf "Project: %s\n" "$1"
+                    printf "Folder: %s\n" "${VDIR}"
+                    printf "%s\n" "${BUILD_OUT}"
+                    printf "\n"
+                } >> "${LOG_FILE}"
+                LOG_WRITTEN=1
+            fi
+
             # check if ./Bin/UnitTest exists, skip if not
-            # run ./Bin/UnitTest in a subshell, remember the output
-            # if it crashed, log the complete output, the first line is "Unit Test Failed"
+            if [ -x "./Bin/UnitTest" ]; then
+                # run ./Bin/UnitTest in a subshell, remember the output
+                local UT_OUT
+                UT_OUT="$( (./Bin/UnitTest) 2>&1 )"
+                local UT_RC=$?
+
+                # if it crashed (non-zero), log the complete output, the first line is "Unit Test Failed"
+                if [ ${UT_RC} -ne 0 ]; then
+                    {
+                        printf "Unit Test Failed\n"
+                        printf "Project: %s\n" "$1"
+                        printf "Folder: %s\n" "${VDIR}"
+                        printf "ExitCode: %s\n" "${UT_RC}"
+                        printf "%s\n" "${UT_OUT}"
+                        printf "\n"
+                    } >> "${LOG_FILE}"
+                    LOG_WRITTEN=1
+                fi
+            fi
+
             # print git status --porcelain
+            git status --porcelain
 
             popd > /dev/null
         done
+
+        # if nothing needs to be written to the log, delete that log file, ignore deletion failure
+        if [ ${LOG_WRITTEN} -eq 0 ]; then
+            rm -f "${LOG_FILE}" 2>/dev/null || true
+        fi
 
         popd > /dev/null
     fi
