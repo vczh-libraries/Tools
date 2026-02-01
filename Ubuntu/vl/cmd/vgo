@@ -9,7 +9,9 @@ function Help {
     echo "s <project>"
     echo "    Go to the \"Source\" folder of this project"
     echo "u [<project>]"
-    echo "    Get the latset code of this project, or all projects if it is not specified."
+    echo "    Get the latest code of this project's master branch, or all projects if it is not specified."
+    echo "uall [<project>]"
+    echo "    Get the latest code of this project's all branch, or all projects if it is not specified."
 }
 
 function Go {
@@ -53,7 +55,7 @@ function UpdateMaster {
         UpdateMaster Document
         UpdateMaster vczh-libraries.github.io
         UpdateMaster WebsiteSource
-        UpdateMaster gGac
+        UpdateMaster wGac
     else
         pushd . > /dev/null
         printf "${VC_LIGHTGREEN}Pulling from ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
@@ -84,7 +86,7 @@ function Update {
         Update Document
         Update vczh-libraries.github.io
         Update WebsiteSource
-        Update gGac
+        Update wGac
     else
         pushd . > /dev/null
         printf "${VC_LIGHTGREEN}Pulling from ${VC_LIGHTBLUE}$1${VC_DEFAULT}\n"
