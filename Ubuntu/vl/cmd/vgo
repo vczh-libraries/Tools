@@ -209,6 +209,7 @@ function VBuild {
                     printf "%s\n" "${CLEAN_OUT}"
                     printf "\n"
                 } >> "${LOG_FILE}"
+                printf "${VC_RED}  FAILED (crashed)${VC_DEFAULT}\n"
                 LOG_WRITTEN=1
             fi
 
@@ -225,6 +226,7 @@ function VBuild {
                     printf "%s\n" "${BUILD_OUT}"
                     printf "\n"
                 } >> "${LOG_FILE}"
+                printf "${VC_RED}  FAILED (warnings/errors)${VC_DEFAULT}\n"
                 LOG_WRITTEN=1
             elif [ ${BUILD_RC} -ne 0 ]; then
                 {
@@ -234,6 +236,7 @@ function VBuild {
                     printf "%s\n" "${BUILD_OUT}"
                     printf "\n"
                 } >> "${LOG_FILE}"
+                printf "${VC_RED}  FAILED (crashed)${VC_DEFAULT}\n"
                 LOG_WRITTEN=1
             fi
 
@@ -255,6 +258,7 @@ function VBuild {
                         printf "%s\n" "${UT_OUT}"
                         printf "\n"
                     } >> "${LOG_FILE}"
+                    printf "${VC_RED}  FAILED (crashed)${VC_DEFAULT}\n"
                     LOG_WRITTEN=1
                 fi
             fi
