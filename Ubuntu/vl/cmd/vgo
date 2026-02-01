@@ -175,6 +175,9 @@ function VBuild {
 
         # prepare to write what is required to the log file $VROOT/.vbuild/$1
         local LOG_FILE="${VBUILD_DIR}/$1"
+        # delete the log file if it exists after trying to create the .vbuild folder (ignore deletion failure)
+        rm -f "${LOG_FILE}" 2>/dev/null || true
+
         local LOG_WRITTEN=0
 
         local VMAKE_FOLDERS=()
@@ -191,9 +194,9 @@ function VBuild {
             fi
 
             pushd "${VDIR}" > /dev/null
-            printf "${VC_LIGHTGREEN}Running vbuild in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
 
             # run vbuild --clean in a subshell, e.g. (vbuild --clean)
+            printf "${VC_LIGHTGREEN}Running vbuild --clean in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
             local CLEAN_OUT
             CLEAN_OUT="$( (vbuild --clean) 2>&1 )"
             local CLEAN_RC=$?
@@ -209,6 +212,7 @@ function VBuild {
             fi
 
             # run vbuild --build in a subshell, remember the output, if it contains anything like "warning:" or "error:", log the complete output, the first line is "Build failed"
+            printf "${VC_LIGHTGREEN}Running vbuild --build in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
             local BUILD_OUT
             BUILD_OUT="$( (vbuild --build) 2>&1 )"
             local BUILD_RC=$?
@@ -235,6 +239,7 @@ function VBuild {
             # check if ./Bin/UnitTest exists, skip if not
             if [ -x "./Bin/UnitTest" ]; then
                 # run ./Bin/UnitTest in a subshell, remember the output
+                printf "${VC_LIGHTGREEN}Running ./Bin/UnitTest in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
                 local UT_OUT
                 UT_OUT="$( (./Bin/UnitTest) 2>&1 )"
                 local UT_RC=$?
