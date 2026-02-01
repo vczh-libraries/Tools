@@ -196,7 +196,8 @@ function VBuild {
             pushd "${VDIR}" > /dev/null
 
             # run vbuild --clean in a subshell, e.g. (vbuild --clean)
-            printf "${VC_LIGHTGREEN}Running vbuild --clean in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
+                printf "${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
+                printf "${VC_LIGHTGREEN}  vbuild --clean${VC_DEFAULT}\n"
             local CLEAN_OUT
             CLEAN_OUT="$( (vbuild --clean) 2>&1 )"
             local CLEAN_RC=$?
@@ -212,7 +213,7 @@ function VBuild {
             fi
 
             # run vbuild --build in a subshell, remember the output, if it contains anything like "warning:" or "error:", log the complete output, the first line is "Build failed"
-            printf "${VC_LIGHTGREEN}Running vbuild --build in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
+            printf "${VC_LIGHTGREEN}  vbuild --build${VC_DEFAULT}\n"
             local BUILD_OUT
             BUILD_OUT="$( (vbuild --build) 2>&1 )"
             local BUILD_RC=$?
@@ -239,7 +240,7 @@ function VBuild {
             # check if ./Bin/UnitTest exists, skip if not
             if [ -x "./Bin/UnitTest" ]; then
                 # run ./Bin/UnitTest in a subshell, remember the output
-                printf "${VC_LIGHTGREEN}Running ./Bin/UnitTest in ${VC_LIGHTCYAN}${VDIR}${VC_DEFAULT}\n"
+                printf "${VC_LIGHTGREEN}  ./Bin/UnitTest${VC_DEFAULT}\n"
                 local UT_OUT
                 UT_OUT="$( (./Bin/UnitTest) 2>&1 )"
                 local UT_RC=$?
