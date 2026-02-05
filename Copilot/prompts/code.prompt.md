@@ -14,19 +14,20 @@
 
 ## Step 2. Compile
 
-- Check out `Compile the Solution` for details about compiling the solution but DO NOT run unit test yet.
-  - `Compile the Solution` is the only way to build the project. DO NOT call any other tools or scripts.
-  - Each attempt of build-fix process should be executed in a sub agent.
-    - One build-fix process includes one attempt following `Build Unit Test` and `Fix Compile Errors`.
-    - The main agent should call different sub agent for each build-fix process.
-    - Do not build and retrieve build results in the main agent.
+- Check out `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` for accessing scripts for building.
+  - Strictly follow the instruction above as this repo does not use ordinaly tools.
+- Each attempt of build-fix process should be executed in a sub agent.
+  - One build-fix process includes one attempt following `Build Unit Test` and `Fix Compile Errors`.
+  - The main agent should call different sub agent for each build-fix process.
+  - Do not build and retrieve build results in the main agent.
 
 ### Use a sub agent to run the following instructions (`Build Unit Test` and `Fix Compile Errors`)
 
 #### Build Unit Test
 
+- Check out `REPO-ROOT/.github/project.md` to find out what solutions you need to build.
 - Find out if there is any warning or error.
-  - `Compile the Solution` has the instruction about how to check compile result.
+  - `External Tools Environment and Context` has the instruction about how to check compile result.
 
 #### Fix Compile Errors
 
@@ -37,17 +38,18 @@
 
 ## Step 3. Run Unit Test
 
-- Check out `Executing Unit Test` for details about running unit test projects.
-  - `Executing Unit Test` is the only way to run the unit test. DO NOT call any other tools or scripts.
-  - Each attempt of test-fix process should be executed in a sub agent.
-    - One test-fix process includes one attempt following `Execute Unit Test` and `Fix Failed Test Cases`.
-    - The main agent should call different sub agent for each test-fix process.
-    - Do not test and retrieve test results in the main agent.
+- Check out `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` for accessing scripts for testing and debugging.
+  - Strictly follow the instruction above as this repo does not use ordinaly tools.
+- Each attempt of test-fix process should be executed in a sub agent.
+  - One test-fix process includes one attempt following `Execute Unit Test` and `Fix Failed Test Cases`.
+  - The main agent should call different sub agent for each test-fix process.
+  - Do not test and retrieve test results in the main agent.
 
 ### Use a sub agent to run the following instructions (`Execute Unit Test`, `Identify the Cause of Failure` and `Fix Failed Test Cases`)
 
 #### Execute Unit Test
 
+- Check out `REPO-ROOT/.github/project.md` to find out what projects you need to execute.
 - Run the unit test and see if they passed. If anything is good, you will only see test files and test cases that are executed.
   - Make sure added test cases are actually executed.
   - If any test case fails on a test assertion, the content of `TEST_ASSERT` or other macros will be printed to the output.

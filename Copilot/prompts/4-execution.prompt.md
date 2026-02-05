@@ -42,19 +42,20 @@ I am going to propose some change to the source code.
 
 ## Step 2. Make Sure the Code Compiles but DO NOT Run Unit Test
 
-- Check out `Compile the Solution` for details about compiling the solution but DO NOT run unit test.
-  - `Compile the Solution` is the only way to build the project. DO NOT call any other tools or scripts.
-  - Each attempt of build-fix process should be executed in a sub agent.
-    - One build-fix process includes one attempt following `Build Unit Test` and `Fix Compile Errors`.
-    - The main agent should call different sub agent for each build-fix process.
-    - Do not build and retrieve build results in the main agent.
+- Check out `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` for accessing scripts for building.
+  - Strictly follow the instruction above as this repo does not use ordinaly tools.
+- Each attempt of build-fix process should be executed in a sub agent.
+  - One build-fix process includes one attempt following `Build Unit Test` and `Fix Compile Errors`.
+  - The main agent should call different sub agent for each build-fix process.
+  - Do not build and retrieve build results in the main agent.
 
 ### Use a sub agent to run the following instructions (`Build Unit Test` and `Fix Compile Errors`)
 
 #### Build Unit Test
 
+- Check out `# AFFECTED PROJECTS` in `Copilot_Execution.md` to find out what solutions you need to build.
 - Find out if there is any warning or error.
-  - `Compile the Solution` has the instruction about how to check compile result.
+  - `External Tools Environment and Context` has the instruction about how to check compile result.
 
 #### Fix Compile Errors
 
@@ -72,7 +73,7 @@ I am going to propose some change to the source code.
 
 # Step 3. Verify Coding Style
 
-- Code changes in `Copilot_Execution.md` may not consider about indentation and coding style.
+- Code changes in `Copilot_Execution.md` may not have correct indentation and coding style.
   - Go over each code change and ensure:
     - Indentation is correct and consistent with the surrounding code.
     - Coding style especially line breaks follows the same conventions as the surrounding code.
