@@ -34,21 +34,21 @@
   - Find `Steps for Execute` section for the complete instructions.
 
 - If there is nothing: it means you are accidentally stopped. Please continue your work.
-  - Read `Copilot_KB.md` througly, it is highly possibly that you were working on the request described in the last section in `# DOCUMENT REQUEST`.
+  - Read `Copilot_KB.md` thoroughly, it is highly possible that you were working on the request described in the last section in `# DOCUMENT REQUEST`.
 
-- Existing content in `# DOCUMENT REQUEST` should be frozen, you can change it only when you find out the analysis is incorrect during my clarification (try limit the scope to `## TOPIC`).
+- Existing content in `# DOCUMENT REQUEST` should be frozen, you can change it only when you find out the analysis is incorrect during my clarification (try to limit the scope to `## TOPIC`).
 
 ## Steps for Topic
 
 - Your goal is to complete a `### Insight` section in the `## TOPIC` of the `# DOCUMENT REQUEST` section.
 - The topic I would like you to research about is in the `# Topic` section in the LATEST chat message.
 - The topic is around a feature of the project. It involves multiple places of the source code across many components.
-- You need to find out the details of the code logic abount:
+- You need to find out the details of the code logic about:
   - The entry point.
   - The core part.
   - Whether there are multiple branches of cases, find all of them.
   - Whether there are recursive calls, find the structure.
-- Explain in details about the design and:
+- Explain in detail about the design and:
   - architecture
   - organization of components
   - execution flows
@@ -79,13 +79,13 @@
   - But at the moment only edit `Copilot_KB.md`, do not edit `Index.md`. You are drafting a document, it will be implemented in `Index.md` only after my approval.
 - Make a `# DRAFT-TITLE` section, you need to make a comprehensive but short title for the draft document.
 - Make a `# DRAFT-CONTENT` section, you need to complete the content of the draft document here.
-- The draft document is completedly based on the source code of the project, and all findings in the `# DOCUMENT REQUEST` section.
+- The draft document is completely based on the source code of the project, and all findings in the `# DOCUMENT REQUEST` section.
   - You must not miss any details, you must use every single point mentioned in the document.
   - Since `# DOCUMENT REQUEST` is organized as multiple rounds of questions and answers, it cannot be just directly used as a document. You must reorganize them.
-  - Similar knowledges under the same categories might be spread in different answers, pay attention to them, bring a well-organized document.
+  - Similar knowledge under the same categories might be spread in different answers, pay attention to them, bring a well-organized document.
 - Quality of the draft:
   - The document is for understanding the source code, so you must keep mentioning names instead of using a too high-level abstraction language.
-  - You must use everything in `# DOCUMENT REQUEST`. Do not just make a summarize, `# DOCUMENT REQUEST` is already a summarize.
+  - You must use everything in `# DOCUMENT REQUEST`. Do not just make a summary, `# DOCUMENT REQUEST` is already a summary.
   - Multiple levels of `#` markdown topic containing bullet points are favored.
 
 ## Steps for Improve

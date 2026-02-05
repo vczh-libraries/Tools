@@ -25,7 +25,7 @@ Read the first word of the request, and read an additional instruction file when
 
 ## Step 2
 
-Read the second word if exists, convert it to a title `# THE-WORD`.
+Read the second word if it exists, convert it to a title `# THE-WORD`.
 
 ## Step 3
 
@@ -35,7 +35,7 @@ Follow the additional instruction file and start working immediately, there will
 
 ## Fixing Typos
 
-If the whole request has almost no new lines or punctuations,
+If the whole request has almost no new lines or punctuation,
 it means I am typing the text by voice,
 which would introduce a huge amount of typos,
 you need to carefully consider possible words with similar pronunciation.
@@ -51,7 +51,7 @@ When the request is `scrum learn`, follow `0-scrum.prompt.md` and "the LATEST ch
 
 When the request is `design problem next`, follow `1-design.prompt.md` and "the LATEST chat message" becomes
 ```
-#Problem
+# Problem
 next
 ```
 

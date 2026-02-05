@@ -1,8 +1,8 @@
 # Planning
 
-- Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
-- All `*.md` and `*.ps1` files should exist, you should not create any new files.
-- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
+- Check out `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist; you should not create any new files unless explicitly instructed.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
@@ -13,7 +13,7 @@
 
 ## Copilot_Planning.md Structure
 
-- `# !!!PLANNING!!!`: This file always begin with this title.
+- `# !!!PLANNING!!!`: This file always begins with this title.
 - `# UPDATES`: For multiple `## UPDATE` sections. It should always exist even there is no update.
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
 - `# AFFECTED PROJECTS`.
@@ -26,9 +26,9 @@
 
 - The design document is in `Copilot_Task.md`. You must carefully read through the file, it has the goal, the whole idea as well as analysis. If `Copilot_Task.md` mentions anything about updating the knowledge base, ignore it.
 - Find `# Problem` or `# Update` in the LATEST chat message.
-  - Ignore any these titles in the chat history.
+  - Ignore any of these titles in the chat history.
   - If there is nothing: it means you are accidentally stopped. Please continue your work.
-    - Read `Copilot_Planning.md` througly, it is highly possibly that you were working on the request described in the last section in `# UPDATES`.
+    - Read `Copilot_Planning.md` thoroughly, it is highly possible that you were working on the request described in the last section in `# UPDATES`.
 
 ### Create new Document (only when "# Problem" appears in the LATEST chat message)
 
@@ -49,12 +49,12 @@ I am going to propose some change to `Copilot_Planning.md`.
 
 ## Step 2. Understand the Goal and Quality Requirement
 
-- You need to write complete two main sections in `Copilot_Planning.md`, an improvement plan and a test plan.
+- You need to write two complete main sections in `Copilot_Planning.md`, an improvement plan and a test plan.
 - Read through and understand the task in `Copilot_Task.md`.
 
 ### Tips for a Feature Planning Task
 
-- C++ source files depends on each other, by just implementing the task it may not enough. Find out what will be affected.
+- C++ source files depend on each other, by just implementing the task it may not be enough. Find out what will be affected.
 - Propose any code change you would like to do. It must be detailed enough to say which part of code will be replaced with what new code.
 - Explain why you want to make these changes.
 - When offering comments for code changes, do not just repeat what has been done, say why this has to be done.
@@ -71,10 +71,10 @@ I am going to propose some change to `Copilot_Planning.md`.
 ## Step 3. Finish the Document
 
 - Your goal is to write a design document to `Copilot_Planning.md`. DO NOT update any other file including source code.
-- The code change proposed in the improvement plan must contain actual code. I need to review them before going to the next phrase.
+- The code change proposed in the improvement plan must contain actual code. I need to review them before going to the next phase.
 - DO NOT copy `# UPDATES` from `Copilot_Task.md` to `Copilot_Planning.md`.
 - Fill the `# AFFECTED PROJECTS` section:
-  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
+  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/Project.md`.
   - When creating `Copilot_Planning.md` from the first time, copy `# AFFECTED PROJECTS` section from `Copilot_Task.md`. Otherwise, review the list whenever `Copilot_Planning.md` is updated, and fix this section in the following format:
     - Identify affected solutions, write `- Build the solution in folder <SOLUTION-ROOT>`.
     - For each solution, identify affected unit test projects, write `  - Run Test Project <PROJECT-NAME>`.

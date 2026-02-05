@@ -2,12 +2,12 @@
 
 - This is a brief introduction for GacUI XML Resource.
 - Detailed document can be found in `REPO-ROOT/.github/KnowledgeBase/Index.md` under `# Copy of Online Manual`:
-  - In `## GacUI`, the `GacUI XML Resource` item and all sub items detailed explain the syntax for GacUI XMl Resource.
-  - In `## Workflow Script`, the `Syntax` item and all sub items detailed explain the syntax for the script language used in GacUI XMl Resource.
+  - In `## GacUI`, the `GacUI XML Resource` item and all sub items detailed explain the syntax for GacUI XML Resource.
+  - In `## Workflow Script`, the `Syntax` item and all sub items detailed explain the syntax for the script language used in GacUI XML Resource.
 
 ## Mapping XML Entity to C++ Entity
 
-Most of XML tags are calling to constructors for classes in the follow folder:
+Most XML tags are calling constructors for classes in the following folder:
 
 - Source\Controls
 - Source\Application
@@ -117,8 +117,8 @@ To expand a composition to the whole parent client area:
 <AnyComposition AlignmentToParent="left:0 top:0 right:0 bottom:0"/>
 ```
 
-- `MinSizeLimitation="LimitToElementAndChildren"` for a composition limites its minimum size to the sum of its all children.
-- `AlignmentToParent="left:8 top:8 right:8 bottom:8"` for a composition stickes itself to the parent's whole client area with 8 pixels on each side. If the number is -1, it means it doesn't stick the the specific parent's client area side. When both `left` and `right` is -1, it stick to the left. When both `top` and `bottom` is -1, it stick to the top. The default value is all -1.
+- `MinSizeLimitation="LimitToElementAndChildren"` for a composition limits its minimum size to the sum of all its children.
+- `AlignmentToParent="left:8 top:8 right:8 bottom:8"` for a composition sticks itself to the parent's whole client area with 8 pixels on each side. If the number is -1, it means it doesn't stick to the specific parent's client area side. When both `left` and `right` are -1, it sticks to the left. When both `top` and `bottom` are -1, it sticks to the top. The default value is all -1.
 
 `BoundsComposition` of a control is its boundary composition. To expand a control to the whole parent client area:
 
@@ -128,7 +128,7 @@ To expand a composition to the whole parent client area:
 </AnyControl>
 ```
 
-`<Cell>`, `<RowSplitter>`, `<ColumnSplitter>`, `<StackItem>` and `<FlowItem>` are controlled by its parent composition, no positions or size limits needs to adjusted.
+`<Cell>`, `<RowSplitter>`, `<ColumnSplitter>`, `<StackItem>` and `<FlowItem>` are controlled by its parent composition, no positions or size limits need to be adjusted.
 
 ### Bounds
 
@@ -141,7 +141,7 @@ The most useful composition is `<Table>`, it is a grid layout with rows and colu
 - `<_>composeType:Absolute absolute:10</_>`: The size is 10.
 - `<_>composeType:Percentage percentage:0.5</_>`: The size is 50% of all space excludes MinSizes and Absolutes.
 
-The `CellPadding` property defines the space between cells, default 0. The `BorderVisible` adds `CellPadding` arounds the border, default true. Obviously the following two tables are identical.
+The `CellPadding` property defines the space between cells, default 0. The `BorderVisible` adds `CellPadding` around the border, default true. Obviously the following two tables are identical.
 ```XML
 <Table AlignmentToParent="left:8 top:8 right:8 bottom:8" CellPadding="5" BorderVisible="false"/>
 <Table AlignmentToParent="left:3 top:3 right:3 bottom:3" CellPadding="5" BorderVisible="true"/>
@@ -198,7 +198,7 @@ To access properties in the nested level, the `-set` binding is required:
 
 ```xml
 <Label>
-  <att.BoundsComposition-set AlignmentToParent="left:0 top:0 right:0 botton:0"/>
+  <att.BoundsComposition-set AlignmentToParent="left:0 top:0 right:0 bottom:0"/>
 </Label>
 ```
 

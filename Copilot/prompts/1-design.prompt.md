@@ -1,8 +1,8 @@
 # Design
 
-- Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
-- All `*.md` and `*.ps1` files should exist, you should not create any new files.
-- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
+- Check out `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist; you should not create any new files unless explicitly instructed.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
@@ -13,7 +13,7 @@
 
 ## Copilot_Task.md Structure
 
-- `# !!!TASK!!!`: This file always begin with this title.
+- `# !!!TASK!!!`: This file always begins with this title.
 - `# PROBLEM DESCRIPTION`: An exact copy of the problem description I gave you.
 - `# UPDATES`: For multiple `## UPDATE` sections. It should always exist even there is no update.
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
@@ -22,11 +22,11 @@
 
 ## Step 1. Identify the Problem
 
-- The problem I would like to solve is in the chat messages sending with this request.
+- The problem I would like to solve is in the chat messages sent with this request.
 - Find `# Problem` or `# Update` in the LATEST chat message.
-  - Ignore any these titles in the chat history.
+  - Ignore any of these titles in the chat history.
   - If there is nothing: it means you are accidentally stopped. Please continue your work.
-    - Read `Copilot_Task.md` througly, it is highly possibly that you were working on the request described in the last section in `# PROBLEM DESCRIPTION`.
+    - Read `Copilot_Task.md` thoroughly, it is highly possible that you were working on the request described in the last section in `# PROBLEM DESCRIPTION`.
 
 ### Create new Document (only when "# Problem" appears in the LATEST chat message)
 
@@ -80,7 +80,7 @@ I am going to propose some change to `Copilot_Task.md`.
 - Your goal is to write a design document to `Copilot_Task.md`. DO NOT update any other file including source code.
 - Whatever you think or found, write it down in the `# INSIGHTS AND REASONING` section.
 - Fill the `# AFFECTED PROJECTS` section:
-  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
+  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/Project.md`.
   - Complete this section in this format:
     - Identify affected solutions, write `- Build the solution in folder <SOLUTION-ROOT>`.
     - For each solution, identify affected unit test projects, write `  - Run Test Project <PROJECT-NAME>`.

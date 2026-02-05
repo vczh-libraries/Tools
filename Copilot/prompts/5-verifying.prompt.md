@@ -1,26 +1,26 @@
 # Verifying
 
-- Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
-- All `*.md` and `*.ps1` files should exist, you should not create any new files.
-- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
+- Check out `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist; you should not create any new files unless explicitly instructed.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
 - All instructions in `Copilot_Execution.md` should have been applied to the source code, your goal is to test it.
 - You must ensure the source code compiles.
 - You must ensure all tests pass.
-- Until the code compiles and all test cases pass. Ensure there is a `# !!!VERIFIED!!!` mark at the end of `Copilot_Execution.md`.
+- Until the code compiles and all test cases pass, ensure there is a `# !!!VERIFIED!!!` mark at the end of `Copilot_Execution.md`.
 
 ## Step 1. Check and Respect my Code Change
 
 - If you spot any difference between `Copilot_Execution.md` and the source code:
   - It means I edited them. I have my reason. DO NOT change the code to match `Copilot_Execution.md`.
-  - Write down every differences you spotted, make a `## User Update Spotted` section in the `# UPDATES` section in `Copilot_Execution.md`.
+  - Write down every difference you spotted, make a `## User Update Spotted` section in the `# UPDATES` section in `Copilot_Execution.md`.
 
 ## Step 2. Compile
 
 - Check out `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` for accessing scripts for building.
-  - Strictly follow the instruction above as this repo does not use ordinaly tools.
+  - Strictly follow the instruction above as this repo does not use ordinary tools.
 - Each attempt of build-fix process should be executed in a sub agent.
   - One build-fix process includes one attempt following `Build Unit Test` and `Fix Compile Errors`.
   - The main agent should call different sub agent for each build-fix process.
@@ -37,7 +37,7 @@
 #### Fix Compile Errors
 
 - If there is any compilation error, address all of them:
-  - If there is any compile warning, only fix warnings that caused by your code change. Do no fix any other warnings.
+  - If there is any compile warning, only fix warnings that caused by your code change. Do not fix any other warnings.
   - If there is any compile error, you need to carefully identify, is the issue in the callee side or the caller side. Check out similar code before making a decision.
   - For every attempt of fixing the source code:
     - Explain why the original change did not work.
@@ -49,7 +49,7 @@
 ## Step 3. Run Unit Test
 
 - Check out `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` for accessing scripts for testing and debugging.
-  - Strictly follow the instruction above as this repo does not use ordinaly tools.
+  - Strictly follow the instruction above as this repo does not use ordinary tools.
 - Each attempt of test-fix process should be executed in a sub agent.
   - One test-fix process includes one attempt following `Execute Unit Test` and `Fix Failed Test Cases`.
   - The main agent should call different sub agent for each test-fix process.
@@ -76,10 +76,10 @@
   - They can make sure the expected code path is executed.
   - They can print variable values after converting to strings.
 - Debug the unit test directly to get accurate clues if you are not confident of the assumption
-  - Follow `Debugging Unit Test` to start a debugger and run WinDBG commands.
+  - Follow `Debugging a Project` to start a debugger and run WinDBG commands.
   - From there you can set break-points, walk through code by lines, and inspect variables.
   - You must stop the debugger after you finish debugging.
-- When you have made a few guess but did not progress, you are recommended to debug the unit test directly.
+- When you have made a few guesses but did not progress, you are recommended to debug the unit test directly.
   - Break-points are very useful to ensure the expected code path is executed, and you can inspect variable values.
 
 #### Fix Failed Test Cases

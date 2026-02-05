@@ -2,18 +2,18 @@
 
 - `REPO-ROOT` refers to the root directory of the repository.
 - `SOLUTION-ROOT` refers to the root directory of a solution (`*.sln` or `*.slnx`).
-- Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
-- Following `Leveraging the Knowledge Base`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
+- Solutions and projects you need to work on could be found in `REPO-ROOT/.github/Project.md`.
+- Following `Leveraging the Knowledge Base`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 - Before writing to a source file, read it again and make sure you respect my parallel editing.
 - If any `*.prompt.md` file is referenced, take immediate action following the instructions in that file.
 
 ## External Tools Environment and Context
 
 - If you are on Windows OS:
-  - Always prefer offered script files instead of direct CLI commands.
+  - Always prefer the offered script files instead of direct CLI commands.
   - DO NOT call `msbuild` or other executable files directly.
   - DO NOT create or delete any file unless explicitly directed.
-  - MUST run any powershell script in this format: `& absolute-path.ps1 parameters...`.
+  - MUST run any PowerShell script in this format: `& absolute-path.ps1 parameters...`.
 
 - If you are on Linux, offered powershell script files won't work and here are replacements:
   - You still need to maintain `*.sln`, `*.slnx`, `*.vcxitems`, `*.vcxproj`, `*.vcxproj.filters`.
@@ -24,7 +24,7 @@
     - If `vmake` is directly in that folder, that is the only project you can and need to work on.
     - Otherwise, any important `*.vcxproj` will have a corresponding folder containing the `vmake` for that project.
   - DO NOT modify `makefile` as they will be re-generated and your modification will be lost. Modify `vmake` instead. In `vmake` you can:
-    - Add a `*.vcxitems` or `*.vcxproj` project too add every files they use
+    - Add a `*.vcxitems` or `*.vcxproj` project to add every file they use
     - Remove C++ source files added from projects that only work for Windows
     - Add new C++ source files for Linux replacement, etc.
   - All following commands should run in the folder containing the `vmake` file:
@@ -70,7 +70,7 @@ If you need to find any document for the current working task, they are in the `
 
 ### Important Rules for Writing Markdown Files
 
-- Do not print "````````" or "````````markdown" in markdown file.
+- Do not print "````````" or "````````markdown" in a markdown file.
 - It is totally fine to have multiple top level `# Topic`.
 - When mentioning a C++ name in markdown file:
   - If it is defined in the standard C++ library or third-party library, use the full name.
@@ -90,8 +90,8 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
 
 ## Writing C++ Code
 
-- This project uses C++ 20, you are recommended to use new C++ 20 feature aggresively.
-- All code should be crossed-platform. In case when OS feature is needed, a Windows version and a Linux version should be prepared in different files, following the `*.Windows.cpp` and `*.Linux.cpp` naming convention, and keep them as small as possible.
+- This project uses C++ 20, you are recommended to use new C++ 20 feature aggressively.
+- All code should be cross-platform. In case when an OS feature is needed, a Windows version and a Linux version should be prepared in different files, following the `*.Windows.cpp` and `*.Linux.cpp` naming convention, and keep them as small as possible.
 - DO NOT MODIFY any source code in the `Import` folder, they are dependencies.
 - DO NOT MODIFY any source code in the `Release` folder, they are generated release files.
 - You can modify source code in the `Source` and `Test` folder.
@@ -106,10 +106,10 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
     - "." means the dot character, "/." or "\." (or "\\." in C++ string literal) means any character.
     - Both "/" and "\" escape characters, you are recommended to use "/" in C++ string literals.
     - Therefore you need "//" for the "/" character and "/\\" or "/\\\\" for the "\" character in C++ string literals.
-  - Checkout `REPO-ROOT/.github/KnowledgeBase/Index.md` for more information of how to choose correct C++ data types.
+  - Check out `REPO-ROOT/.github/KnowledgeBase/Index.md` for more information of how to choose correct C++ data types.
 - Rules for C++ header files:
   - Guard them with macros instead of `#pragma once`.
-  - In a class/struct/union declaration, member names must be aligned in the same column at least in the same public, protected or private session.
+  - In a class/struct/union declaration, member names must be aligned in the same column at least in the same public, protected or private section.
   - Keep the coding style consistent with other header files in the same project.
 - Extra Rules for C++ header files in `Source` folder:
   - Do not use `using namespace` statement, full name of types are always required.
@@ -120,16 +120,16 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
 ## Leveraging the Knowledge Base
 
 - When making design or coding decisions, you must leverage the knowledge base to make the best choice.
-- The main entry is ``REPO-ROOT/.github/KnowledgeBase/Index.md`, it is organized in this way:
-  - `## Guidance`: A general guidance that play a super important part repo-wide.
+- The main entry is `REPO-ROOT/.github/KnowledgeBase/Index.md`, it is organized in this way:
+  - `## Guidance`: A general guidance that plays a super important part repo-wide.
   - Each `## Project`: A brief description of each project and its purpose.
     - `### Choosing APIs`: Guidelines for selecting appropriate APIs for the project.
     - `### Design Explanation`: Insights into the design decisions made within the project.
   - `## Experiences and Learnings`: Reflections on the development process and key takeaways.
-  - `# Copy of Online Manual`: A copy of online manual so that you don't need network access. They are much more detailed offering selective important information.
+  - `# Copy of Online Manual`: A copy of the online manual so that you don't need network access. They are much more detailed, offering selectively important information.
     - Each `## Project`: A copy of online manual for that project, organized in the same way as the knowledge base.
-    - Not every projects are included.
-    - Manual for the unit test framework are in `## Unit Testing`.
+    - Not every project is included.
+    - Manual for the unit test framework is in `## Unit Testing`.
 
 ### Project/Choosing APIs
 

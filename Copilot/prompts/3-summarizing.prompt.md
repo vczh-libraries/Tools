@@ -1,8 +1,8 @@
 # Summarizing
 
-- Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
-- All `*.md` and `*.ps1` files should exist, you should not create any new files.
-- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
+- Check out `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist; you should not create any new files unless explicitly instructed.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
@@ -13,7 +13,7 @@
 
 ## Copilot_Execution.md Structure
 
-- `# !!!EXECUTION!!!`: This file always begin with this title.
+- `# !!!EXECUTION!!!`: This file always begins with this title.
 - `# UPDATES`: For multiple `## UPDATE` sections. It should always exist even there is no update.
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
 - `# AFFECTED PROJECTS`.
@@ -24,7 +24,7 @@
 
 - The design document is in `Copilot_Task.md`, the planning document is in `Copilot_Planning.md`.
 - Find `# Problem` or `# Update` in the LATEST chat message.
-  - Ignore any these titles in the chat history.
+  - Ignore any of these titles in the chat history.
   - If there is nothing:
     - If there is a `# !!!FINISHED!!!` mark in `Copilot_Execution.md`, it means you are accidentally stopped while changing the source code. Please continue your work.
     - If there is no `# !!!FINISHED!!!` mark in `Copilot_Execution.md`, it means you are accidentally stopped while finishing the document. Please continue your work.
@@ -48,8 +48,8 @@ I am going to propose some change to `Copilot_Execution.md`.
 
 ## Step 2. Finish the Document
 
-- Your need to summary code change in `Copilot_Execution.md`.
-- All changes you need to made is already in `Copilot_Planning.md`, but it contains many explanations.
+- You need to summarize code change in `Copilot_Execution.md`.
+- All changes you need to make are already in `Copilot_Planning.md`, but it contains many explanations.
 - Read `Copilot_Planning.md`, copy the following parts to `Copilot_Execution.md`:
   - `# EXECUTION PLAN`
     - Copy EVERY code block exactly as written
@@ -70,9 +70,9 @@ I am going to propose some change to `Copilot_Execution.md`.
 ## Step 3. Document Quality Check List
 
 - Is `Copilot_Execution.md` contains enough information so that one can follow the document to make actual code change, without having to refer to `Copilot_Planning.md`?
-- Is `Copilot_Execution.md` include all code changes mentioned in `Copilot_Planning.md`?
+- Does `Copilot_Execution.md` include all code changes mentioned in `Copilot_Planning.md`?
 - Fill the `# AFFECTED PROJECTS` section:
-  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
+  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/Project.md`.
   - When creating `Copilot_Execution.md` from the first time, copy `# AFFECTED PROJECTS` section from `Copilot_Planning.md`. Otherwise, review the list whenever `Copilot_Execution.md` is updated, and fix this section in the following format:
     - Identify affected solutions, write `- Build the solution in folder <SOLUTION-ROOT>`.
     - For each solution, identify affected unit test projects, write `  - Run Test Project <PROJECT-NAME>`.

@@ -1,8 +1,8 @@
 # Execution
 
-- Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
-- All `*.md` and `*.ps1` files should exist, you should not create any new files.
-- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
+- Check out `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist; you should not create any new files unless explicitly instructed.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
@@ -10,7 +10,7 @@
 
 ## Copilot_Execution.md Structure
 
-- `# !!!EXECUTION!!!`: This file always begin with this title.
+- `# !!!EXECUTION!!!`: This file always begins with this title.
 - `# UPDATES`:
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
 - `# EXECUTION PLAN`.
@@ -20,7 +20,7 @@
 
 - The execution document is in `Copilot_Execution.md`
 - Find `# Update` in the LATEST chat message.
-  - Ignore any these titles in the chat history.
+  - Ignore any of these titles in the chat history.
 
 ### Execute the Plan (only when no title appears in the LATEST chat message)
 
@@ -29,7 +29,7 @@ I am starting a fresh new request.
 
 - Apply all code changes in `Copilot_Execution.md` to the source code.
   - Make sure indentation and line breaks are applied correctly, following the same style in the target file.
-- After applying each step in `Copilot_Execution.md`, mark the step as completed by appending `[DONE]` after the step title. This allow you to find where you are if you are interrupted.
+- After applying each step in `Copilot_Execution.md`, mark the step as completed by appending `[DONE]` after the step title. This allows you to find where you are if you are interrupted.
 
 ### Update the Source Code and Document (only when "# Update" appears in the LATEST chat message)
 
@@ -43,7 +43,7 @@ I am going to propose some change to the source code.
 ## Step 2. Make Sure the Code Compiles but DO NOT Run Unit Test
 
 - Check out `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` for accessing scripts for building.
-  - Strictly follow the instruction above as this repo does not use ordinaly tools.
+  - Strictly follow the instruction above as this repo does not use ordinary tools.
 - Each attempt of build-fix process should be executed in a sub agent.
   - One build-fix process includes one attempt following `Build Unit Test` and `Fix Compile Errors`.
   - The main agent should call different sub agent for each build-fix process.
@@ -60,7 +60,7 @@ I am going to propose some change to the source code.
 #### Fix Compile Errors
 
 - If there is any compilation error, address all of them:
-  - If there is any compile warning, only fix warnings that caused by your code change. Do no fix any other warnings.
+  - If there is any compile warning, only fix warnings that caused by your code change. Do not fix any other warnings.
   - If there is any compile error, you need to carefully identify, is the issue in the callee side or the caller side. Check out similar code before making a decision.
   - For every attempt of fixing the source code:
     - Explain why the original change did not work.
@@ -71,7 +71,7 @@ I am going to propose some change to the source code.
 - When the code compiles:
   - DO NOT run any tests, the code will be verified in future tasks.
 
-# Step 3. Verify Coding Style
+## Step 3. Verify Coding Style
 
 - Code changes in `Copilot_Execution.md` may not have correct indentation and coding style.
   - Go over each code change and ensure:
