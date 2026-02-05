@@ -1,23 +1,35 @@
 # General Instruction
 
 - `REPO-ROOT` refers to the root directory of the repository.
-- `SOLUTION-ROOT` refers to the root directory of a solution (`*.sln` or `*.slnx`), this repo has a solution for development and testing purpose, and a few others for tools release.
-  - Detailed information could be found in `REPO-ROOT/.github/project.md`.
+- `SOLUTION-ROOT` refers to the root directory of a solution (`*.sln` or `*.slnx`).
+- Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
 - Following `Leveraging the Knowledge Base`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
-- Before writing to a source file, read it to ensure you respect my parallel editing.
+- Before writing to a source file, read it again and make sure you respect my parallel editing.
 - If any `*.prompt.md` file is referenced, take immediate action following the instructions in that file.
 
 ## External Tools Environment and Context
 
-- You are on Windows running in Visual Studio Code.
-- Always prefer offered script files instead of direct CLI commands.
-- DO NOT call `msbuild` or other executable files directly.
-- DO NOT create or delete any file unless explicitly directed.
-- MUST run any powershell script in this format: `& absolute-path.ps1 parameters...`.
+- If you are on Windows OS:
+  - Always prefer offered script files instead of direct CLI commands.
+  - DO NOT call `msbuild` or other executable files directly.
+  - DO NOT create or delete any file unless explicitly directed.
+  - MUST run any powershell script in this format: `& absolute-path.ps1 parameters...`.
+
+- If you are on Linux, offered powershell script files won't work and here are replacements:
+  - You still need to maintain `*.sln`, `*.slnx`, `*.vcxitems`, `*.vcxproj`, `*.vcxproj.filters`.
+  - All `makefile` files are generated out of these solution and project files.
+  - All `vmake` files are in `REPO-ROOT/Test/Linux` or its sub folders.
+    - If `vmake` is directly in that folder, that is the only project you can and need to work on.
+    - Otherwise, any important `*.vcxproj` will have a corresponding folder containing the `vmake` for that project.
+  - All following commands should run in the folder containing the `vmake` file:
+    - `vmake --make` to generate `makefile` according to the latest content in solution and project files.
+    - `vbuild --build` to incrementally build the project.
+    - `vbuild --full-build` to fully rebuild the project.
+    - An executable file `./Bin/UnitTest` is generated after a successful `vbuild`.
 
 ## Coding Guidelines and Tools
 
-The C++ project in this repo is built and tested using itw own system.
+The C++ project in this repo is built and tested using its own system.
 You must strictly follow the instructions in the following documents,
 otherwise it won't work properly.
 
@@ -29,7 +41,7 @@ otherwise it won't work properly.
   - GacUI Application: `REPO-ROOT/.github/Guidelines/Running-GacUI.md`
 - Debugging a Project: `REPO-ROOT/.github/Guidelines/Debugging.md`
 - Using Unit Test Framework: `REPO-ROOT/.github/KnowledgeBase/manual/unittest/vlpp.md`
-- Using Unit Test Framework for GacUI Applicatiln:
+- Using Unit Test Framework for GacUI Application:
   - Running GacUI in Unit Test Framework: `REPO-ROOT/.github/KnowledgeBase/manual/unittest/gacui.md`
   - Snapshots and Frames: `REPO-ROOT/.github/KnowledgeBase/manual/unittest/gacui_frame.md`
   - IO Interaction: `REPO-ROOT/.github/KnowledgeBase/manual/unittest/gacui_io.md`
