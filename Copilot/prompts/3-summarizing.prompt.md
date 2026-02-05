@@ -2,6 +2,7 @@
 
 - Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
 - All `*.md` and `*.ps1` files should exist, you should not create any new files.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
@@ -15,6 +16,7 @@
 - `# !!!EXECUTION!!!`: This file always begin with this title.
 - `# UPDATES`: For multiple `## UPDATE` sections. It should always exist even there is no update.
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
+- `# AFFECTED PROJECTS`.
 - `# EXECUTION PLAN`.
 - `# FIXING ATTEMPTS`.
 
@@ -41,7 +43,7 @@ Ignore this section if there is no "# Update" in the LATEST chat message
 I am going to propose some change to `Copilot_Execution.md`.
 
 - Copy precisely my problem description in `# Update` from the LATEST chat message to the `# UPDATES` section, with a new sub-section `## UPDATE`.
-- The new `## UPDATE` should be appended to the end of the existing `# UPDATES` section (aka before `# EXECUTION PLAN`).
+- The new `## UPDATE` should be appended to the end of the existing `# UPDATES` section (aka before `# AFFECTED PROJECTS`).
 - Follow my update to change the execution document.
 
 ## Step 2. Finish the Document
@@ -69,6 +71,12 @@ I am going to propose some change to `Copilot_Execution.md`.
 
 - Is `Copilot_Execution.md` contains enough information so that one can follow the document to make actual code change, without having to refer to `Copilot_Planning.md`?
 - Is `Copilot_Execution.md` include all code changes mentioned in `Copilot_Planning.md`?
+- Fill the `# AFFECTED PROJECTS` section:
+  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
+  - When creating `Copilot_Execution.md` from the first time, copy `# AFFECTED PROJECTS` section from `Copilot_Planning.md`. Otherwise, review the list whenever `Copilot_Execution.md` is updated, and fix this section in the following format:
+    - Identify affected solutions, write `- Build the solution in folder <SOLUTION-ROOT>`.
+    - For each solution, identify affected unit test projects, write `  - Run Test Project <PROJECT-NAME>`.
+      - The list should only include unit test projects.
 
 ## Step 4. Completion
 - Ensure there is a `# !!!FINISHED!!!` mark at the end of `Copilot_Execution.md` to indicate the document reaches the end.

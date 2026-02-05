@@ -2,11 +2,12 @@
 
 - Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
 - All `*.md` and `*.ps1` files should exist, you should not create any new files.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
 - Your goal is to finish a design document in `Copilot_Task.md` to address a problem.
-- You are only allowed to update `Copilot_Task.md` and mark a task completed in `Copilot_Scrum.md`.
+- You are only allowed to update `Copilot_Task.md` and mark a task being taken in `Copilot_Scrum.md`.
 - You are not allowed to modify any other files.
 - The phrasing of the request may look like asking for code change, but your actual work is to write the design document.
 
@@ -17,6 +18,7 @@
 - `# UPDATES`: For multiple `## UPDATE` sections. It should always exist even there is no update.
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
 - `# INSIGHTS AND REASONING`.
+- `# AFFECTED PROJECTS`.
 
 ## Step 1. Identify the Problem
 
@@ -34,11 +36,11 @@ I am starting a fresh new request.
 - Find and execute `copilotPrepare.ps1` to clean up everything from the last run.
 - After `copilotPrepare.ps1` finishes, copy precisely my problem description in `# Problem` from the LATEST chat message under a `# PROBLEM DESCRIPTION`.
   - If the problem description is `Next`:
-    - Find the first incomplete task in `Copilot_Scrum.md`, and follow the intruction below to process that task.
+    - Find the first incomplete task in `Copilot_Scrum.md`.
   - If the problem description is like `Complete task No.X`:
     - Locate the specific task in `Copilot_Scrum.md`.
-    - There is a bullet list of all tasks at the beginning of `# TASKS`. Mark the specific task as being processed by changing `[ ]` to `[x]`.
-    - Find the details of the specific task, copy everything in this task to `# PROBLEM DESCRIPTION`.
+  - There is a bullet list of all tasks at the beginning of `# TASKS`. Mark the specific task as being taken by changing `[ ]` to `[x]`.
+  - Find the details of the specific task, copy everything in this task to `# PROBLEM DESCRIPTION`.
 - Add an empty `# UPDATES` section after `# PROBLEM DESCRIPTION`.
 
 ### Update current Document (only when "# Update" appears in the LATEST chat message)
@@ -77,6 +79,12 @@ I am going to propose some change to `Copilot_Task.md`.
 
 - Your goal is to write a design document to `Copilot_Task.md`. DO NOT update any other file including source code.
 - Whatever you think or found, write it down in the `# INSIGHTS AND REASONING` section.
+- Fill the `# AFFECTED PROJECTS` section:
+  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
+  - Complete this section in this format:
+    - Identify affected solutions, write `- Build the solution in folder <SOLUTION-ROOT>`.
+    - For each solution, identify affected unit test projects, write `  - Run Test Project <PROJECT-NAME>`.
+      - The list should only include unit test projects.
 
 ## Step 4. Mark the Completion
 

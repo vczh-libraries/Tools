@@ -2,6 +2,7 @@
 
 - Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
 - All `*.md` and `*.ps1` files should exist, you should not create any new files.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 
 ## Goal and Constraints
 
@@ -15,6 +16,7 @@
 - `# !!!PLANNING!!!`: This file always begin with this title.
 - `# UPDATES`: For multiple `## UPDATE` sections. It should always exist even there is no update.
   - `## UPDATE`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
+- `# AFFECTED PROJECTS`.
 - `# EXECUTION PLAN`.
   - `## STEP X: The Step Title`: One step in the improvement plan.
     - A clear description of what to change in the source code.
@@ -42,7 +44,7 @@ Ignore this section if there is no "# Update" in the LATEST chat message
 I am going to propose some change to `Copilot_Planning.md`.
 
 - Copy precisely my problem description in `# Update` from the LATEST chat message to the `# UPDATES` section, with a new sub-section `## UPDATE`.
-- The new `## UPDATE` should be appended to the end of the existing `# UPDATES` section (aka before `# EXECUTION PLAN`).
+- The new `## UPDATE` should be appended to the end of the existing `# UPDATES` section (aka before `# AFFECTED PROJECTS`).
 - Follow my update to change the planning document.
 
 ## Step 2. Understand the Goal and Quality Requirement
@@ -71,6 +73,12 @@ I am going to propose some change to `Copilot_Planning.md`.
 - Your goal is to write a design document to `Copilot_Planning.md`. DO NOT update any other file including source code.
 - The code change proposed in the improvement plan must contain actual code. I need to review them before going to the next phrase.
 - DO NOT copy `# UPDATES` from `Copilot_Task.md` to `Copilot_Planning.md`.
+- Fill the `# AFFECTED PROJECTS` section:
+  - Solutions and projects you need to work on could be found in `REPO-ROOT/.github/project.md`.
+  - When creating `Copilot_Planning.md` from the first time, copy `# AFFECTED PROJECTS` section from `Copilot_Task.md`. Otherwise, review the list whenever `Copilot_Planning.md` is updated, and fix this section in the following format:
+    - Identify affected solutions, write `- Build the solution in folder <SOLUTION-ROOT>`.
+    - For each solution, identify affected unit test projects, write `  - Run Test Project <PROJECT-NAME>`.
+      - The list should only include unit test projects.
 
 ## Step 4. Mark the Completion
 
