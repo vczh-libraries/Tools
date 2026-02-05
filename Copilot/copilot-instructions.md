@@ -56,6 +56,8 @@ otherwise it won't work properly.
 - Syntax of GacUI XML Resources:
   - Brief Introduction: `REPO-ROOT/.github/Guidelines/GacUIXmlResource.md`
   - Detailed document can be found in `REPO-ROOT/.github/KnowledgeBase/Index.md` under `# Copy of Online Manual` / `## GacUI`, in the `GacUI XML Resource` item and all sub items.
+- Syntax of Workflow Script (the script language in GacUI XML Resource):
+  - Detailed document can be found in `REPO-ROOT/.github/KnowledgeBase/Index.md` under `# Copy of Online Manual` / `## Workflow Script`, in the `Syntax` item and all sub items.
 
 ## Accessing Task Documents
 

@@ -1,6 +1,9 @@
 # Syntax of GacUI XML Resources
 
-This is the document of GacUI XML: https://gaclib.net/doc/current/gacui/xmlres/home.html
+- This is a brief introduction for GacUI XML Resource.
+- Detailed document can be found in `REPO-ROOT/.github/KnowledgeBase/Index.md` under `# Copy of Online Manual`:
+  - In `## GacUI`, the `GacUI XML Resource` item and all sub items detailed explain the syntax for GacUI XMl Resource.
+  - In `## Workflow Script`, the `Syntax` item and all sub items detailed explain the syntax for the script language used in GacUI XMl Resource.
 
 ## Mapping XML Entity to C++ Entity
 
