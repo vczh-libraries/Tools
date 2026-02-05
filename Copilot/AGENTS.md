@@ -1,5 +1,5 @@
-Read through REPO-ROOT/.github/copilot-instructions.md before performing any work.
-This is the guideline you should follow.
+Read through `REPO-ROOT/.github/copilot-instructions.md` before performing any work.
+`copilot-instructions.md` is the guideline you should follow, MUST READ `Coding Guidelines and Tools` before touching the source code.
 Interpret the request (in the latest chat message, not including conversation history) following the steps:
 
 ## Step 1
