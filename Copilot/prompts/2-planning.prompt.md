@@ -1,7 +1,7 @@
 # Planning
 
-- Checkout `Accessing Log Files and PowerShell Scripts` for context about mentioned `*.md` and `*.ps1` files.
-  - All `*.md` and `*.ps1` files should already be existing, you should not create any new files.
+- Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist, you should not create any new files.
 
 ## Goal and Constraints
 

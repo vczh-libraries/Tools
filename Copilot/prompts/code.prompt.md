@@ -1,5 +1,8 @@
 # Task
 
+- Checkout `Accessing Task Documents` and `Accessing Script Files` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist, you should not create any new files.
+
 ## Goal and Constraints
 
 - You must ensure the source code compiles.
