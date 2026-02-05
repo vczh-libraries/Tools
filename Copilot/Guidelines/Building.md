@@ -2,10 +2,9 @@
 
 - Only run `copilotBuild.ps1` to build a solution.
 - DO NOT use msbuild by yourself.
+- The script builds all projects in a solution.
 
 ## Executing copilotBuild.ps1
-
-`PROJECT-NAME` is the name of the project.
 
 Before building, ensure the debugger has stopped.
 If there is any error message, it means the debugger is not alive, it is good.
@@ -24,10 +23,12 @@ cd SOLUTION-ROOT
 ## The Correct Way to Read Compiler Result
 
 - The only source of trust is the raw output of the compiler.
-- Wait for the script to finish before reading the log file. DO NOT hurry. DO NOT need to read the output from the script.
+- Wait for the script to finish before reading the log file.
+  - DO NOT need to read the output from the script.
+  - Building takes a long time. DO NOT hurry.
   - When the script finishes, the result is saved to `REPO-ROOT/.github/Scripts/Build.log`.
   - A temporary file `Build.log.unfinished` is created during building. It will be automatically deleted as soon as the building finishes. If you see this file, it means the building is not finished yet.
-- When build succeeds, the last several lines of `Build.log` should be in the following pattern, otherwise there are either warnings or errors:
+- When build succeeds, the last several lines of `Build.log` indicates the number of warnings and errors in the following pattern:
   - "Build succeeded."
   - "0 Warning(s)"
   - "0 Error(s)"
