@@ -17,10 +17,16 @@
 
 - If you are on Linux, offered powershell script files won't work and here are replacements:
   - You still need to maintain `*.sln`, `*.slnx`, `*.vcxitems`, `*.vcxproj`, `*.vcxproj.filters`.
+  - DO NOT call `cmake` (as cmake is not in use), `make`, `clang++`, `g++`.
+  - DO NOT call `gdb` or `lldb` unless you can interact with it, otherwise a running debugger will cause subsequent building to fail.
   - All `makefile` files are generated out of these solution and project files.
   - All `vmake` files are in `REPO-ROOT/Test/Linux` or its sub folders.
     - If `vmake` is directly in that folder, that is the only project you can and need to work on.
     - Otherwise, any important `*.vcxproj` will have a corresponding folder containing the `vmake` for that project.
+  - DO NOT modify `makefile` as they will be re-generated and your modification will be lost. Modify `vmake` instead. In `vmake` you can:
+    - Add a `*.vcxitems` or `*.vcxproj` project too add every files they use
+    - Remove C++ source files added from projects that only work for Windows
+    - Add new C++ source files for Linux replacement, etc.
   - All following commands should run in the folder containing the `vmake` file:
     - `vmake --make` to generate `makefile` according to the latest content in solution and project files.
     - `vbuild --build` to incrementally build the project.
@@ -29,7 +35,7 @@
 
 ## Coding Guidelines and Tools
 
-The C++ project in this repo is built and tested using its own system.
+The C++ project in this repo is built and tested using its own msbuild wrappers.
 You must strictly follow the instructions in the following documents,
 otherwise it won't work properly.
 
@@ -37,8 +43,8 @@ otherwise it won't work properly.
 - Building a Solution: `REPO-ROOT/.github/Guidelines/Building.md`
 - Running a Project:
   - Unit Test: `REPO-ROOT/.github/Guidelines/Running-UnitTest.md`
-  - CLI Application: `REPO-ROOT/.github/Guidelines/Running-CLI.md`
-  - GacUI Application: `REPO-ROOT/.github/Guidelines/Running-GacUI.md`
+  - CLI Application: `REPO-ROOT/.github/Guidelines/Running-CLI.md` (to edit ...)
+  - GacUI Application: `REPO-ROOT/.github/Guidelines/Running-GacUI.md` (to edit ...)
 - Debugging a Project: `REPO-ROOT/.github/Guidelines/Debugging.md`
 - Using Unit Test Framework: `REPO-ROOT/.github/KnowledgeBase/manual/unittest/vlpp.md`
 - Using Unit Test Framework for GacUI Application:
@@ -49,7 +55,7 @@ otherwise it won't work properly.
   - Snapshot Viewer: `REPO-ROOT/.github/KnowledgeBase/manual/unittest/gacui_snapshots.md`
 - Syntax of GacUI XML Resources:
   - Brief Introduction: `REPO-ROOT/.github/Guidelines/GacUIXmlResource.md`
-  - Detailed document can be found in `REPO-ROOT/.github/KnowledgeBase/Index.md` under `# Copy of Online Manual` / `## GacUI`
+  - Detailed document can be found in `REPO-ROOT/.github/KnowledgeBase/Index.md` under `# Copy of Online Manual` / `## GacUI`, in the `GacUI XML Resource` item and all sub items.
 
 ## Accessing Task Documents
 
@@ -60,7 +66,7 @@ If you need to find any document for the current working task, they are in the `
 - `Copilot_Execution.md`
 - `Copilot_KB.md`
 
-### Important Rules for Writing Markdown File
+### Important Rules for Writing Markdown Files
 
 - Do not print "````````" or "````````markdown" in markdown file.
 - It is totally fine to have multiple top level `# Topic`.
@@ -80,14 +86,6 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
 - `Build.log`
 - `Execute.log`
 
-## Important Rules for Markdown Document or Log
-
-- Do not print "````````" or "````````markdown" in markdown file.
-- It is totally fine to have multiple top level `# Topic`.
-- When mentioning a C++ name in markdown file:
-  - If it is defined in the standard C++ library or third-party library, use the full name.
-  - If it is defined in the source code, use the full name if there is ambiguity, and then mention the file containing its definition.
-
 ## Writing C++ Code
 
 - This project uses C++ 20, you are recommended to use new C++ 20 feature aggresively.
@@ -95,17 +93,27 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
 - DO NOT MODIFY any source code in the `Import` folder, they are dependencies.
 - DO NOT MODIFY any source code in the `Release` folder, they are generated release files.
 - You can modify source code in the `Source` and `Test` folder.
-- Use tabs for indentation in C++ source code. For JSON or XML embedded in C++ source code, use double spaces.
-- Header files are guarded with macros instead of `#pragma once`.
+- Use tabs for indentation in C++ source code.
+- Use double spaces for indentation for JSON or XML embedded in C++ source code.
 - Use `auto` to define variables if it is doable. Use `auto&&` when the type is big or when it is a collection type.
-- In header files, do not use `using namespace` statement, full name of types are always required. In a class/struct/union declaration, member names must be aligned in the same column at least in the same public, protected or private session. Please follow this coding style just like other part of the code.
-  - If the header file is in a unit test project, the only rule is to keep it consistent with other unit test only header in the same project.
-- In cpp files, use `using namespace` statement if necessary to prevent from repeating namespace everywhere.
 - The project only uses a very minimal subset of the standard library. I have substitutions for most of the STL constructions. Always use mine if possible:
   - Always use `vint` instead of `int`.
   - Always use `L'x'`, `L"x"`, `wchar_t`, `const wchar_t` and `vl::WString`, instead of `std::string` or `std::wstring`.
   - Use my own collection types vl::collections::* instead of std::*
+  - Regular expression utilities are offered by `vl::regex::Regex`, here are important syntax differences with other regular expression implementation:
+    - "." means the dot character, "/." or "\." (or "\\." in C++ string literal) means any character.
+    - Both "/" and "\" escape characters, you are recommended to use "/" in C++ string literals.
+    - Therefore you need "//" for the "/" character and "/\\" or "/\\\\" for the "\" character in C++ string literals.
   - Checkout `REPO-ROOT/.github/KnowledgeBase/Index.md` for more information of how to choose correct C++ data types.
+- Rules for C++ header files:
+  - Guard them with macros instead of `#pragma once`.
+  - In a class/struct/union declaration, member names must be aligned in the same column at least in the same public, protected or private session.
+  - Keep the coding style consistent with other header files in the same project.
+- Extra Rules for C++ header files in `Source` folder:
+  - Do not use `using namespace` statement, full name of types are always required.
+- Rules for cpp files:
+  - Use `using namespace` statement if necessary to prevent from repeating namespace everywhere.
+  - `vl::stream::` is an exception, always use `stream::` with `using namespace vl;`, DO NOT use `using namespace vl::stream;`.
 
 ## Leveraging the Knowledge Base
 
@@ -116,6 +124,10 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
     - `### Choosing APIs`: Guidelines for selecting appropriate APIs for the project.
     - `### Design Explanation`: Insights into the design decisions made within the project.
   - `## Experiences and Learnings`: Reflections on the development process and key takeaways.
+  - `# Copy of Online Manual`: A copy of online manual so that you don't need network access. They are much more detailed offering selective important information.
+    - Each `## Project`: A copy of online manual for that project, organized in the same way as the knowledge base.
+    - Not every projects are included.
+    - Manual for the unit test framework are in `## Unit Testing`.
 
 ### Project/Choosing APIs
 
