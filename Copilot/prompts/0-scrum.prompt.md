@@ -160,8 +160,8 @@ I made important updates to the source code manually during the execution of the
 
 ### Step 6.4 Learn
 
-- There will be multiple `# UPDATES` or `# FIXING ATTEMPTS` or `# Comparing to User Edit` sections in `Copilot_Task.md`, `Copilot_Planning.md` and `Copilot_Execution.md`.
-- These 3 files recorded how you interpreted the last completed task, and how I wanted you to adjust  your understanding.
+- There will be multiple `# UPDATES` or `# FIXING ATTEMPTS` or `# Comparing to User Edit` sections in `Copilot_Task.md`, `Copilot_Planning.md`, `Copilot_Execution.md` and `Copilot_Execution_Finding.md`.
+- These 3 files recorded how you interpreted the last completed task, and how I wanted you to adjust your understanding.
 - Find out what you can learn from the updates, about my philosophy and preferences.
 - Check all future tasks, apply what you have learned, and adjust your approach accordingly.
   - For each unfinished tasks that can be improved, update releated learnings in `Copilot_Scrum.md`.
@@ -172,7 +172,4 @@ I made important updates to the source code manually during the execution of the
   - In the above steps, necessary change will be updated to `Copilot_Execution.md` and `Copilot_Scrum.md`.
 - Find and execute `copilotPrepare.ps1 -Backup`. You MUST use the `-Backup` parameter.
   - Remember the first line of the output, it has the absolute path to the backup folder.
-  - By running the backup script, `Copilot_Task.md`, `Copilot_Planning.md` and `Copilot_Execution.md` will be backed up and deleted.
-  - If you created `Copilot_Execution_Finding.md`, in Step 6.3:
-    - In the backup folder, there will be a copied `Copilot_Execution.md`, append all contents from `Copilot_Execution_Finding.md` to the end of it.
-    - Delete the `Copilot_Execution_Finding.md` you created.
+  - By running the backup script, `Copilot_Task.md`, `Copilot_Planning.md`, `Copilot_Execution.md` and `Copilot_Execution_Finding.md` will be backed up and deleted.
