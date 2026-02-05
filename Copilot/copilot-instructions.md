@@ -93,20 +93,17 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
   - Always use `vint` instead of `int`.
   - Always use `L'x'`, `L"x"`, `wchar_t`, `const wchar_t` and `vl::WString`, instead of `std::string` or `std::wstring`.
   - Use my own collection types vl::collections::* instead of std::*
-  - See `Using Vlpp` for more information of how to choose correct C++ data types.
+  - Checkout `REPO-ROOT/.github/KnowledgeBase/Index.md` for more information of how to choose correct C++ data types.
 
 ## Leveraging the Knowledge Base
 
-When making design or coding decisions, you must leverage the knowledge base to make the best choice.
-The main entry is `Index.md`. Find out `Accessing the Knowledge Base` about how to access the knowledge base.
-
-`Index.md` is organized in this way:
-
-- `## Guidance`: A general guidance that play a super important part repo-wide.
-- Each `## Project`: A brief description of each project and its purpose.
-  - `### Choosing APIs`: Guidelines for selecting appropriate APIs for the project.
-  - `### Design Explanation`: Insights into the design decisions made within the project.
-- `## Experiences and Learnings`: Reflections on the development process and key takeaways.
+- When making design or coding decisions, you must leverage the knowledge base to make the best choice.
+- The main entry is ``REPO-ROOT/.github/KnowledgeBase/Index.md`, it is organized in this way:
+  - `## Guidance`: A general guidance that play a super important part repo-wide.
+  - Each `## Project`: A brief description of each project and its purpose.
+    - `### Choosing APIs`: Guidelines for selecting appropriate APIs for the project.
+    - `### Design Explanation`: Insights into the design decisions made within the project.
+  - `## Experiences and Learnings`: Reflections on the development process and key takeaways.
 
 ### Project/Choosing APIs
 
