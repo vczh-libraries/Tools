@@ -1,4 +1,4 @@
-# Writing GacUI XML
+# Syntax of GacUI XML Resources
 
 This is the document of GacUI XML: https://gaclib.net/doc/current/gacui/xmlres/home.html
 
