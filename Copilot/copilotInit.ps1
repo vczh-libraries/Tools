@@ -33,7 +33,7 @@ function SyncFolder($folderName, $sourceFolder, $targetFolder, $skipIfExists) {
 
     if (Test-Path -Path $targetPath) {
         if ($skipIfExists) {
-            Write-Host "Skipping (already exists): $targetPath"
+            Write-Host "Skipping (already exists)"
             return
         }
         Remove-Item -Path $targetPath -Recurse -Force
@@ -43,10 +43,13 @@ function SyncFolder($folderName, $sourceFolder, $targetFolder, $skipIfExists) {
 }
 
 $projectName = ExtractProjectName
-$targetFolder = "$PSScriptRoot\..\..\$projectName\.copilot"
+$targetFolder = "$PSScriptRoot\..\..\$projectName\.github"
 Write-Host "Detected project name: $projectName"
 
 if ($UpdateKB) {
+    SyncFolder "KnowledgeBase" "$targetFolder" "$PSScriptRoot" $False
+}
+else {
     SyncFolder "Guidelines"    "$PSScriptRoot" "$targetFolder" $False
     SyncFolder "KnowledgeBase" "$PSScriptRoot" "$targetFolder" $False
     SyncFolder "prompts"       "$PSScriptRoot" "$targetFolder" $False
@@ -56,22 +59,23 @@ if ($UpdateKB) {
     New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 
     # Copy from $PSScriptRoot to $targetFolder
+    Write-Host "Copying: copilot-instructions.md"
     Copy-Item -Path (Join-Path $PSScriptRoot "copilot-instructions.md") -Destination (Join-Path $targetFolder "copilot-instructions.md") -Force
 
     $projectMdTarget = Join-Path $targetFolder "Project.md"
     if (-not (Test-Path -Path $projectMdTarget)) {
+        Write-Host "Copying: Project.md"
         Copy-Item -Path (Join-Path $PSScriptRoot "Project.md") -Destination $projectMdTarget -Force
     }
     else {
-        Write-Host "Skipping Project.md (already exists): $projectMdTarget"
+        Write-Host "Skipping Project.md (already exists)"
     }
 
     # Copy from $PSScriptRoot to $targetFolder\..
     $projectRoot = Split-Path -Path $targetFolder -Parent
     $agentsSource = Join-Path $PSScriptRoot "AGENTS.md"
+    Write-Host "Copying: AGENTS.md"
     Copy-Item -Path $agentsSource -Destination (Join-Path $projectRoot "AGENTS.md") -Force
+    Write-Host "Copying: CLAUDE.md"
     Copy-Item -Path $agentsSource -Destination (Join-Path $projectRoot "CLAUDE.md") -Force
-}
-else {
-    SyncFolder "KnowledgeBase" "$targetFolder" "$PSScriptRoot" $False
 }
