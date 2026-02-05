@@ -1,7 +1,7 @@
 # General Instruction
 
 - `REPO-ROOT` refers to the root directory of the repository.
-- `SOLUTION-ROOT` refers to the root directory of a solution (*.sln or *.slnx), this repo has a solution for development and testing purpose, and a few others for tools release.
+- `SOLUTION-ROOT` refers to the root directory of a solution (`*.sln` or `*.slnx`), this repo has a solution for development and testing purpose, and a few others for tools release.
   - Detailed information could be found in `REPO-ROOT/.github/project.md`.
 - Following `Leveraging the Knowledge Base`, find knowledges and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 - Before writing to a source file, read it to ensure you respect my parallel editing.
@@ -67,10 +67,6 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
 - `copilotDebug_RunCommand.ps1`
 - `Build.log`
 - `Execute.log`
-
-## If you are running in Visual Studio
-
-You will find the `TaskLogs` project in the current solution, which should contain these files.
 
 ## Important Rules for Markdown Document or Log
 

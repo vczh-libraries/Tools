@@ -6,8 +6,8 @@
 ### The Correct Way to Read Compiler Result
 
 - The only source of trust is the raw output of the compiler.
-  - It is saved to `REPO-ROOT/.github/TaskLogs/Build.log`. `REPO-ROOT` is the root folder of the repo.
-  - Wait for the task to finish before reading the log file. DO NOT HURRY.
+  - It is saved to `REPO-ROOT/.github/Scripts/Build.log`. `REPO-ROOT` is the root folder of the repo.
+  - Wait for the task to finish before reading the log file. DO NOT hurry. DO NOT need to read the output from the script.
     - A temporary file `Build.log.unfinished` is created during building. It will be automatically deleted as soon as the building finishes . If you see this file, it means the building is not finished yet.
   - When build succeeds, the last several lines will show the following 3 lines, otherwise there are either warnings or errors. You can check the last 10 lines to make sure if build succceeded:
     - "Build succeeded."

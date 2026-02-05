@@ -8,14 +8,14 @@ Only when you cannot access tools offered by Visual Studio Code, scripts below a
 `SOLUTION-ROOT` is the folder containing the solution file.
 `PROJECT-NAME` is the name of the project.
 
-When verifying test projects on Windows, msbuild is used to build a solution (`*.sln`) file.
+When verifying test projects on Windows, msbuild is used to build a solution (`*.sln` or `*.slnx`) file.
 A solution contains many project (`*.vcxproj`) files, a project generates an executable (`*.exe`) file.
 
 Before building, ensure the debugger has stopped, otherwise the running unit test process will cause a linking failure.
 If there is any error message, it means the debugger is not alive, it is good.
 
 ```
-& REPO-ROOT\.github\TaskLogs\copilotDebug_Stop.ps1
+& REPO-ROOT\.github\Scripts\copilotDebug_Stop.ps1
 ```
 
 The `Build Unit Tests` task calls msbuild to build the only solution which contains all test cases.
@@ -23,7 +23,7 @@ Inside the task, it runs `copilotBuild.ps1`
 
 ```
 cd SOLUTION-ROOT
-& REPO-ROOT\.github\TaskLogs\copilotBuild.ps1
+& REPO-ROOT\.github\Scripts\copilotBuild.ps1
 ```
 
 The `Run Unit Tests` task runs all generated *.exe file for each *.vcxproj that is created for test cases.
@@ -31,7 +31,7 @@ To run test cases in `SOLUTION-ROOT\PROJECT-NAME\PROJECT-NAME.vcxproj`
 
 ```
 cd SOLUTION-ROOT
-& REPO-ROOT\.github\TaskLogs\copilotExecute.ps1 -Executable PROJECT-NAME
+& REPO-ROOT\.github\Scripts\copilotExecute.ps1 -Executable PROJECT-NAME
 ```
 
 Test cases are organized in multiple test files.

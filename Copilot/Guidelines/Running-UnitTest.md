@@ -6,8 +6,8 @@
 ### The Correct Way to Read Test Result
 
 - The only source of trust is the raw output of the unit test process.
-  - It is saved to `REPO-ROOT/.github/TaskLogs/Execute.log`. `REPO-ROOT` is the root folder of the repo.
-  - Wait for the task to finish before reading the log file. DO NOT HURRY.
+  - It is saved to `REPO-ROOT/.github/Scripts/Execute.log`. `REPO-ROOT` is the root folder of the repo.
+  - Wait for the task to finish before reading the log file. DO NOT hurry. DO NOT need to read the output from the script.
     - A temporary file `Execute.log.unfinished` is created during testing. It will be automatically deleted as soon as the testing finishes. If you see this file, it means the testing is not finished yet.
   - When all test case passes, the last several lines will show the following 2 lines, otherwise it crashed at the last showing test case. You can check the last 5 lines to make sure if all test cases passed:
     - "Passed test files: X/X"
