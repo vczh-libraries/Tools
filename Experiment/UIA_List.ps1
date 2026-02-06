@@ -290,7 +290,11 @@ if ([string]::IsNullOrEmpty($RuntimeId)) {
 } else {
     $target = $windows | Select-Object -First 1
     if ($null -eq $target) {
-        "null"
+        if ($RawTree) {
+            exit 1
+        } else {
+            "null"
+        }
     } else {
         $skipInvisible = -not $IncludeInvisible
         $tree = Build-UiaTreeObject -Element $target.Element -SkipInvisible:$skipInvisible -View $View -MaxDepth $MaxDepth -MaxChildren $MaxChildren

@@ -164,12 +164,12 @@ if ($Overlay) {
                 $h = [double]$Node.Bounds.Height
 
                 if ($w -gt 0 -and $h -gt 0) {
-                    $Graphics.DrawRectangle($Pen, (float)$x, (float)$y, (float)$w, (float)$h)
+                    $Graphics.DrawRectangle($Pen, [float]$x, [float]$y, [float]$w, [float]$h)
 
                     $rid = [string]$Node.RuntimeId
                     if (-not [string]::IsNullOrWhiteSpace($rid)) {
-                        $Graphics.DrawString($rid, $Font, $ShadowBrush, (float)($x + 1), (float)($y + 1))
-                        $Graphics.DrawString($rid, $Font, $TextBrush, (float)$x, (float)$y)
+                        $Graphics.DrawString($rid, $Font, $ShadowBrush, [float]($x + 1), [float]($y + 1))
+                        $Graphics.DrawString($rid, $Font, $TextBrush, [float]$x, [float]$y)
                     }
                 }
             }
@@ -183,7 +183,17 @@ if ($Overlay) {
         }
     }
 
-    $bmp = [System.Drawing.Bitmap]::FromFile($outPath)
+    $fileStream = [System.IO.File]::Open($outPath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+    try {
+        $sourceImage = [System.Drawing.Image]::FromStream($fileStream)
+        try {
+            $bmp = New-Object System.Drawing.Bitmap $sourceImage
+        } finally {
+            $sourceImage.Dispose()
+        }
+    } finally {
+        $fileStream.Dispose()
+    }
     try {
         $gfx = [System.Drawing.Graphics]::FromImage($bmp)
         try {
