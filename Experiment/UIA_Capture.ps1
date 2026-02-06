@@ -11,11 +11,10 @@ param(
 )
 
 Set-StrictMode -Version Latest
+. $PSScriptRoot\UIA_Common.ps1
 
 $outPath = Join-Path $PSScriptRoot "UIA_Capture.png"
 Remove-Item -LiteralPath $outPath -Force -ErrorAction SilentlyContinue
-
-. (Join-Path $PSScriptRoot "UIA_Common.ps1")
 
 Add-Type -AssemblyName System.Drawing | Out-Null
 

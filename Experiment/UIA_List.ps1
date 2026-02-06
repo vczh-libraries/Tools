@@ -22,12 +22,7 @@ param(
 )
 
 Set-StrictMode -Version Latest
-
-if ($null -ne $PSScriptRoot) {
-    . (Join-Path $PSScriptRoot "UIA_Common.ps1")
-} else {
-    . ".\\Experiment\\UIA_Common.ps1"
-}
+. $PSScriptRoot\UIA_Common.ps1
 
 function Trim-Text {
     param([string]$Text)
