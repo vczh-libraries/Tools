@@ -259,23 +259,6 @@ function Build-UiaTreeObject {
         }
     }
 
-    if ($Depth -ge $MaxDepth) {
-        return [pscustomobject]@{
-            RuntimeId      = (Format-RuntimeId -RuntimeId ($Element.GetRuntimeId()))
-            Type           = (Get-ElementTypeString -Element $Element)
-            TypeLocalized  = (Get-ElementLocalizedTypeString -Element $Element)
-            Text           = (Get-ElementText -Element $Element)
-            AutomationId   = ""
-            ClassName      = ""
-            FrameworkId    = ""
-            IsControl      = $false
-            IsContent      = $false
-            Bounds         = $null
-            Children       = @()
-            DepthTruncated = $true
-        }
-    }
-
     $bounds = $null
     try {
         $rect = $Element.Current.BoundingRectangle
@@ -294,35 +277,38 @@ function Build-UiaTreeObject {
         $bounds = [pscustomobject]@{ X = 0; Y = 0; Width = 0; Height = 0 }
     }
 
-    $children = @()
-    try {
-        $walker = switch ($View) {
-            'Raw' { [System.Windows.Automation.TreeWalker]::RawViewWalker }
-            'Content' { [System.Windows.Automation.TreeWalker]::ContentViewWalker }
-            default { [System.Windows.Automation.TreeWalker]::ControlViewWalker }
-        }
+    $children = $null
+    if ($Depth -lt $MaxDepth) {
+        $children = @()
+        try {
+            $walker = switch ($View) {
+                'Raw' { [System.Windows.Automation.TreeWalker]::RawViewWalker }
+                'Content' { [System.Windows.Automation.TreeWalker]::ContentViewWalker }
+                default { [System.Windows.Automation.TreeWalker]::ControlViewWalker }
+            }
 
-        $child = $walker.GetFirstChild($Element)
-        $childCount = 0
-        while ($null -ne $child) {
-            try {
-                $childObj = Build-UiaTreeObject -Element $child -SkipInvisible:$SkipInvisible -View $View -MaxDepth $MaxDepth -MaxChildren $MaxChildren -Depth ($Depth + 1)
-                if ($null -ne $childObj) {
-                    $children += $childObj
+            $child = $walker.GetFirstChild($Element)
+            $childCount = 0
+            while ($null -ne $child) {
+                try {
+                    $childObj = Build-UiaTreeObject -Element $child -SkipInvisible:$SkipInvisible -View $View -MaxDepth $MaxDepth -MaxChildren $MaxChildren -Depth ($Depth + 1)
+                    if ($null -ne $childObj) {
+                        $children += $childObj
+                    }
+                } catch {
                 }
-            } catch {
-            }
 
-            $childCount++
-            if ($MaxChildren -gt 0 -and $childCount -ge $MaxChildren) { break }
+                $childCount++
+                if ($MaxChildren -gt 0 -and $childCount -ge $MaxChildren) { break }
 
-            try {
-                $child = $walker.GetNextSibling($child)
-            } catch {
-                break
+                try {
+                    $child = $walker.GetNextSibling($child)
+                } catch {
+                    break
+                }
             }
+        } catch {
         }
-    } catch {
     }
 
     $automationId = ""
@@ -338,7 +324,6 @@ function Build-UiaTreeObject {
         Text           = (Get-ElementText -Element $Element)
         AutomationId   = $automationId
         Bounds         = $bounds
-        DepthTruncated = $false
         Children       = $children
     }
 }
