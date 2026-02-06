@@ -54,6 +54,8 @@ public static class UiaOpNative {
         public MOUSEINPUT mi;
         [FieldOffset(0)]
         public KEYBDINPUT ki;
+        [FieldOffset(0)]
+        public HARDWAREINPUT hi;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -75,10 +77,20 @@ public static class UiaOpNative {
         public IntPtr dwExtraInfo;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct HARDWAREINPUT {
+        public uint uMsg;
+        public ushort wParamL;
+        public ushort wParamH;
+    }
+
     public const int INPUT_MOUSE = 0;
     public const int INPUT_KEYBOARD = 1;
+    public const int INPUT_HARDWARE = 2;
 
     public const uint MOUSEEVENTF_MOVE = 0x0001;
+    public const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+    public const uint MOUSEEVENTF_VIRTUALDESK = 0x4000;
     public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
     public const uint MOUSEEVENTF_LEFTUP = 0x0004;
     public const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
@@ -88,7 +100,7 @@ public static class UiaOpNative {
     public const uint KEYEVENTF_UNICODE = 0x0004;
 
     [DllImport("user32.dll", SetLastError=true)]
-    public static extern bool SetCursorPos(int X, int Y);
+    public static extern int GetSystemMetrics(int nIndex);
 
     [DllImport("user32.dll", SetLastError=true)]
     public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
@@ -100,19 +112,119 @@ function Invoke-Sleep {
     if ($Ms -gt 0) { Start-Sleep -Milliseconds $Ms }
 }
 
-function Set-MousePos {
-    param([Parameter(Mandatory = $true)][int]$X, [Parameter(Mandatory = $true)][int]$Y)
-    [void][UiaOpNative]::SetCursorPos($X, $Y)
+function Get-InputSize {
+    return [Runtime.InteropServices.Marshal]::SizeOf([type]([UiaOpNative+INPUT]))
 }
 
-function Send-MouseEvent {
-    param([Parameter(Mandatory = $true)][uint32]$Flags)
+function Throw-Win32Error {
+    param([Parameter(Mandatory = $true)][string]$Context)
+    $err = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
+    throw "$Context failed. GetLastError=$err"
+}
+
+function Invoke-SendInputChecked {
+    param(
+        [Parameter(Mandatory = $true)][UiaOpNative+INPUT[]]$Inputs,
+        [Parameter(Mandatory = $true)][string]$Context
+    )
+
+    $size = Get-InputSize
+    $sent = [UiaOpNative]::SendInput([uint32]$Inputs.Length, $Inputs, $size)
+    if ($sent -ne [uint32]$Inputs.Length) {
+        Throw-Win32Error -Context "SendInput($Context, sent=$sent, expected=$($Inputs.Length), cbSize=$size)"
+    }
+}
+
+function New-MouseInput {
+    param(
+        [Parameter(Mandatory = $true)][uint32]$Flags,
+        [int]$Dx = 0,
+        [int]$Dy = 0,
+        [uint32]$MouseData = 0
+    )
 
     $input = New-Object UiaOpNative+INPUT
     $input.type = [UiaOpNative]::INPUT_MOUSE
-    $input.U.mi = New-Object UiaOpNative+MOUSEINPUT
-    $input.U.mi.dwFlags = $Flags
-    [void][UiaOpNative]::SendInput(1, @($input), [Runtime.InteropServices.Marshal]::SizeOf([type]([UiaOpNative+INPUT])))
+    $mi = New-Object UiaOpNative+MOUSEINPUT
+    $mi.dx = $Dx
+    $mi.dy = $Dy
+    $mi.mouseData = $MouseData
+    $mi.dwFlags = $Flags
+
+    $u = New-Object UiaOpNative+InputUnion
+    $u.mi = $mi
+    $input.U = $u
+    return $input
+}
+
+function New-KeyboardInputVk {
+    param(
+        [Parameter(Mandatory = $true)][uint16]$Vk,
+        [Parameter(Mandatory = $true)][uint32]$Flags
+    )
+
+    $input = New-Object UiaOpNative+INPUT
+    $input.type = [UiaOpNative]::INPUT_KEYBOARD
+    $ki = New-Object UiaOpNative+KEYBDINPUT
+    $ki.wVk = $Vk
+    $ki.wScan = 0
+    $ki.dwFlags = $Flags
+
+    $u = New-Object UiaOpNative+InputUnion
+    $u.ki = $ki
+    $input.U = $u
+    return $input
+}
+
+function New-KeyboardInputUnicode {
+    param(
+        [Parameter(Mandatory = $true)][uint16]$Scan,
+        [Parameter(Mandatory = $true)][uint32]$Flags
+    )
+
+    $input = New-Object UiaOpNative+INPUT
+    $input.type = [UiaOpNative]::INPUT_KEYBOARD
+    $ki = New-Object UiaOpNative+KEYBDINPUT
+    $ki.wVk = 0
+    $ki.wScan = $Scan
+    $ki.dwFlags = $Flags
+
+    $u = New-Object UiaOpNative+InputUnion
+    $u.ki = $ki
+    $input.U = $u
+    return $input
+}
+
+function Move-MousePos {
+    param([Parameter(Mandatory = $true)][int]$X, [Parameter(Mandatory = $true)][int]$Y)
+
+    # Use SendInput absolute movement to ensure subsequent clicks are not ignored on some systems.
+    # Map screen pixels to 0..65535 over the virtual screen.
+    $SM_XVIRTUALSCREEN = 76
+    $SM_YVIRTUALSCREEN = 77
+    $SM_CXVIRTUALSCREEN = 78
+    $SM_CYVIRTUALSCREEN = 79
+
+    $vx = [UiaOpNative]::GetSystemMetrics($SM_XVIRTUALSCREEN)
+    $vy = [UiaOpNative]::GetSystemMetrics($SM_YVIRTUALSCREEN)
+    $vw = [UiaOpNative]::GetSystemMetrics($SM_CXVIRTUALSCREEN)
+    $vh = [UiaOpNative]::GetSystemMetrics($SM_CYVIRTUALSCREEN)
+    if ($vw -le 0 -or $vh -le 0) { throw "GetSystemMetrics returned invalid virtual screen size." }
+
+    $nx = [int][Math]::Round((($X - $vx) * 65535.0) / ($vw - 1))
+    $ny = [int][Math]::Round((($Y - $vy) * 65535.0) / ($vh - 1))
+
+    $nx = [Math]::Max(0, [Math]::Min(65535, $nx))
+    $ny = [Math]::Max(0, [Math]::Min(65535, $ny))
+
+    $move = New-MouseInput -Flags ([UiaOpNative]::MOUSEEVENTF_MOVE -bor [UiaOpNative]::MOUSEEVENTF_ABSOLUTE -bor [UiaOpNative]::MOUSEEVENTF_VIRTUALDESK) -Dx $nx -Dy $ny
+    Invoke-SendInputChecked -Inputs @($move) -Context "MouseMove($X,$Y)"
+}
+
+function Send-MouseFlags {
+    param([Parameter(Mandatory = $true)][uint32]$Flags)
+    $ev = New-MouseInput -Flags $Flags
+    Invoke-SendInputChecked -Inputs @($ev) -Context "MouseFlags(0x$('{0:X}' -f $Flags))"
 }
 
 function Send-KeyVk {
@@ -121,13 +233,9 @@ function Send-KeyVk {
         [Parameter(Mandatory = $true)][bool]$Down
     )
 
-    $input = New-Object UiaOpNative+INPUT
-    $input.type = [UiaOpNative]::INPUT_KEYBOARD
-    $input.U.ki = New-Object UiaOpNative+KEYBDINPUT
-    $input.U.ki.wVk = $Vk
-    $input.U.ki.wScan = 0
-    $input.U.ki.dwFlags = if ($Down) { 0 } else { [UiaOpNative]::KEYEVENTF_KEYUP }
-    [void][UiaOpNative]::SendInput(1, @($input), [Runtime.InteropServices.Marshal]::SizeOf([type]([UiaOpNative+INPUT])))
+    $flags = if ($Down) { 0 } else { [UiaOpNative]::KEYEVENTF_KEYUP }
+    $input = New-KeyboardInputVk -Vk $Vk -Flags $flags
+    Invoke-SendInputChecked -Inputs @($input) -Context "KeyVk(vk=$Vk, down=$Down)"
 }
 
 function Send-TextUnicode {
@@ -136,21 +244,10 @@ function Send-TextUnicode {
     foreach ($ch in $Text.ToCharArray()) {
         $scan = [uint16][int][char]$ch
 
-        $down = New-Object UiaOpNative+INPUT
-        $down.type = [UiaOpNative]::INPUT_KEYBOARD
-        $down.U.ki = New-Object UiaOpNative+KEYBDINPUT
-        $down.U.ki.wVk = 0
-        $down.U.ki.wScan = $scan
-        $down.U.ki.dwFlags = [UiaOpNative]::KEYEVENTF_UNICODE
+        $down = New-KeyboardInputUnicode -Scan $scan -Flags ([UiaOpNative]::KEYEVENTF_UNICODE)
+        $up = New-KeyboardInputUnicode -Scan $scan -Flags ([UiaOpNative]::KEYEVENTF_UNICODE -bor [UiaOpNative]::KEYEVENTF_KEYUP)
 
-        $up = New-Object UiaOpNative+INPUT
-        $up.type = [UiaOpNative]::INPUT_KEYBOARD
-        $up.U.ki = New-Object UiaOpNative+KEYBDINPUT
-        $up.U.ki.wVk = 0
-        $up.U.ki.wScan = $scan
-        $up.U.ki.dwFlags = [UiaOpNative]::KEYEVENTF_UNICODE -bor [UiaOpNative]::KEYEVENTF_KEYUP
-
-        [void][UiaOpNative]::SendInput(2, @($down, $up), [Runtime.InteropServices.Marshal]::SizeOf([type]([UiaOpNative+INPUT])))
+        Invoke-SendInputChecked -Inputs @($down, $up) -Context "UnicodeChar($([int]$scan))"
         Invoke-Sleep -Ms $DelayMs
     }
 }
@@ -230,23 +327,23 @@ if ([string]::IsNullOrWhiteSpace($verb)) { exit 1 }
 switch ($verb.ToUpperInvariant()) {
     "MOVE" {
         if ($parts.Count -ne 3) { throw "Expected Move:x:y" }
-        Set-MousePos -X ([int]$parts[1]) -Y ([int]$parts[2])
+        Move-MousePos -X ([int]$parts[1]) -Y ([int]$parts[2])
     }
     "LEFT" {
         if ($parts.Count -ne 3) { throw "Expected Left:x:y" }
-        Set-MousePos -X ([int]$parts[1]) -Y ([int]$parts[2])
+        Move-MousePos -X ([int]$parts[1]) -Y ([int]$parts[2])
         Invoke-Sleep -Ms $DelayMs
-        Send-MouseEvent -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTDOWN)
+        Send-MouseFlags -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTDOWN)
         Invoke-Sleep -Ms $DelayMs
-        Send-MouseEvent -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTUP)
+        Send-MouseFlags -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTUP)
     }
     "RIGHT" {
         if ($parts.Count -ne 3) { throw "Expected Right:x:y" }
-        Set-MousePos -X ([int]$parts[1]) -Y ([int]$parts[2])
+        Move-MousePos -X ([int]$parts[1]) -Y ([int]$parts[2])
         Invoke-Sleep -Ms $DelayMs
-        Send-MouseEvent -Flags ([UiaOpNative]::MOUSEEVENTF_RIGHTDOWN)
+        Send-MouseFlags -Flags ([UiaOpNative]::MOUSEEVENTF_RIGHTDOWN)
         Invoke-Sleep -Ms $DelayMs
-        Send-MouseEvent -Flags ([UiaOpNative]::MOUSEEVENTF_RIGHTUP)
+        Send-MouseFlags -Flags ([UiaOpNative]::MOUSEEVENTF_RIGHTUP)
     }
     "DRAG" {
         if ($parts.Count -ne 5) { throw "Expected Drag:x1:y1:x2:y2" }
@@ -254,13 +351,13 @@ switch ($verb.ToUpperInvariant()) {
         $y1 = [int]$parts[2]
         $x2 = [int]$parts[3]
         $y2 = [int]$parts[4]
-        Set-MousePos -X $x1 -Y $y1
+        Move-MousePos -X $x1 -Y $y1
         Invoke-Sleep -Ms $DelayMs
-        Send-MouseEvent -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTDOWN)
+        Send-MouseFlags -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTDOWN)
         Invoke-Sleep -Ms ([Math]::Max($DelayMs, 30))
-        Set-MousePos -X $x2 -Y $y2
+        Move-MousePos -X $x2 -Y $y2
         Invoke-Sleep -Ms ([Math]::Max($DelayMs, 30))
-        Send-MouseEvent -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTUP)
+        Send-MouseFlags -Flags ([UiaOpNative]::MOUSEEVENTF_LEFTUP)
     }
     "TYPE" {
         $text = ""
