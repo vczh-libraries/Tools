@@ -328,27 +328,18 @@ function Build-UiaTreeObject {
     $automationId = ""
     $className = ""
     $frameworkId = ""
-    $isControl = $false
-    $isContent = $false
     try { $automationId = $Element.Current.AutomationId } catch { }
     try { $className = $Element.Current.ClassName } catch { }
     try { $frameworkId = $Element.Current.FrameworkId } catch { }
-    try { $isControl = [bool]$Element.Current.IsControlElement } catch { }
-    try { $isContent = [bool]$Element.Current.IsContentElement } catch { }
 
     [pscustomobject]@{
         RuntimeId      = (Format-RuntimeId -RuntimeId ($Element.GetRuntimeId()))
-        Type           = (Get-ElementTypeString -Element $Element)
-        TypeLocalized  = (Get-ElementLocalizedTypeString -Element $Element)
+        Type           = "$($frameworkId):$(Get-ElementTypeString -Element $Element):$($className)"
         Text           = (Get-ElementText -Element $Element)
-        AutomationId   = (Trim-Text -Text $automationId)
-        ClassName      = (Trim-Text -Text $className)
-        FrameworkId    = (Trim-Text -Text $frameworkId)
-        IsControl      = $isControl
-        IsContent      = $isContent
+        AutomationId   = $automationId
         Bounds         = $bounds
-        Children       = $children
         DepthTruncated = $false
+        Children       = $children
     }
 }
 
