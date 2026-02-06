@@ -12,6 +12,8 @@
 # Parameters / switches:
 # - `-RuntimeId <id>`: When omitted, lists all visible top-level windows (Name + RuntimeId).
 #   When provided, finds the first visible top-level window whose UIA RuntimeId matches and dumps its tree.
+#   When listing windows in a non-admin PowerShell, an extra column `NeedsAdmin` is shown to indicate windows that are
+#   likely elevated (and therefore need an elevated inspector to see a full UIA tree).
 # - `-SkipNameless`: When listing windows, skips windows with an empty UIA Name.
 # - `-NoSort`: When listing windows, keeps the UIA enumeration order (no Name/RuntimeId sorting).
 # - `-View Raw|Control|Content`: Chooses which UIA view to traverse when dumping the tree:
@@ -43,6 +45,78 @@ param(
 
 Set-StrictMode -Version Latest
 . $PSScriptRoot\UIA_Common.ps1
+
+function Test-IsAdmin {
+    try {
+        return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    } catch {
+        return $false
+    }
+}
+
+function Ensure-TokenQueryNative {
+    if ("UiaTokenQueryNative" -as [type]) { return }
+
+    Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public static class UiaTokenQueryNative {
+    [DllImport("kernel32.dll", SetLastError=true)]
+    public static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
+
+    [DllImport("kernel32.dll", SetLastError=true)]
+    public static extern bool CloseHandle(IntPtr h);
+
+    [DllImport("advapi32.dll", SetLastError=true)]
+    public static extern bool OpenProcessToken(IntPtr h, uint access, out IntPtr token);
+
+    [DllImport("advapi32.dll", SetLastError=true)]
+    public static extern bool GetTokenInformation(IntPtr token, int cls, out int info, int len, out int retLen);
+}
+"@ -ErrorAction Stop | Out-Null
+}
+
+function Test-ProcessIsElevated {
+    param([Parameter(Mandatory = $true)][int]$ProcessId)
+
+    Ensure-TokenQueryNative
+
+    $PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    $TOKEN_QUERY = 0x0008
+    $TokenElevation = 20
+
+    $processHandle = [UiaTokenQueryNative]::OpenProcess($PROCESS_QUERY_LIMITED_INFORMATION, $false, $ProcessId)
+    if ($processHandle -eq [IntPtr]::Zero) {
+        $err = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
+        if ($err -eq 5) { return $true } # Access denied => likely higher integrity than us.
+        return $null
+    }
+
+    try {
+        $tokenHandle = [IntPtr]::Zero
+        if (-not [UiaTokenQueryNative]::OpenProcessToken($processHandle, $TOKEN_QUERY, [ref]$tokenHandle)) {
+            $err = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
+            if ($err -eq 5) { return $true }
+            return $null
+        }
+
+        try {
+            $elev = 0
+            $retLen = 0
+            if (-not [UiaTokenQueryNative]::GetTokenInformation($tokenHandle, $TokenElevation, [ref]$elev, 4, [ref]$retLen)) {
+                $err = [Runtime.InteropServices.Marshal]::GetLastWin32Error()
+                if ($err -eq 5) { return $true }
+                return $null
+            }
+            return ($elev -ne 0)
+        } finally {
+            [void][UiaTokenQueryNative]::CloseHandle($tokenHandle)
+        }
+    } finally {
+        [void][UiaTokenQueryNative]::CloseHandle($processHandle)
+    }
+}
 
 function Trim-Text {
     param([string]$Text)
@@ -286,7 +360,19 @@ function Build-UiaTreeObject {
 $windows = EnumerateWindows -RuntimeId $RuntimeId -SkipNameless:$SkipNameless -NoSort:$NoSort
 
 if ([string]::IsNullOrEmpty($RuntimeId)) {
-    $windows | Select-Object Name, RuntimeId
+    if (-not (Test-IsAdmin)) {
+        $windows | Select-Object Name, RuntimeId, @{
+            Name       = "NeedsAdmin"
+            Expression = {
+                $processId = 0
+                try { $processId = $_.Element.Current.ProcessId } catch { }
+                if ($processId -le 0) { return $null }
+                Test-ProcessIsElevated -ProcessId $processId
+            }
+        }
+    } else {
+        $windows | Select-Object Name, RuntimeId
+    }
 } else {
     $target = $windows | Select-Object -First 1
     if ($null -eq $target) {
