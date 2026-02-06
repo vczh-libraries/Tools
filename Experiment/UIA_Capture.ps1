@@ -110,13 +110,11 @@ function Save-WindowScreenshot {
 
 $target = (EnumerateWindows -RuntimeId $RuntimeId -SkipNameless:$false -NoSort:$true | Select-Object -First 1)
 if ($null -eq $target) {
-    "null"
-    exit 0
+    exit 1
 }
 
 if (Save-WindowScreenshot -Element $target.Element -Path $outPath) {
-    $outPath
+    [System.IO.Path]::GetFullPath($outPath)
 } else {
-    "null"
+    exit 1
 }
-
