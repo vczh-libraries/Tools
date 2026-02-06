@@ -1,8 +1,27 @@
-# Lists all visible top-level windows (UI Automation) with their names and runtime IDs.
-# Note: Some UIA providers behave better in an STA host. If you see COM/UIA errors, try:
-#   powershell.exe -STA -File .\Experiment\UIA_List.ps1
-# Tree output is provider-dependent. Many frameworks expose "container" nodes as ControlType.Pane.
-# If you see too many Pane nodes, try `-View Content` (or `-View Control`) to reduce noise.
+# UIA_List.ps1
+#
+# Lists visible top-level windows via UI Automation, or dumps a UIA element tree for a chosen window.
+# This script is meant for quick inspection/debugging from a terminal or VS Code.
+#
+# Notes:
+# - Some UIA providers behave better in an STA host. If you see COM/UIA errors, run with:
+#     powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\Experiment\UIA_List.ps1
+# - Tree output is provider-dependent. Many apps/frameworks expose generic container nodes as
+#   ControlType.Pane (layout containers, HWND hosts, custom-drawn surfaces).
+#
+# Parameters / switches:
+# - `-RuntimeId <id>`: When omitted, lists all visible top-level windows (Name + RuntimeId).
+#   When provided, finds the first visible top-level window whose UIA RuntimeId matches and dumps its tree.
+# - `-SkipNameless`: When listing windows, skips windows with an empty UIA Name.
+# - `-NoSort`: When listing windows, keeps the UIA enumeration order (no Name/RuntimeId sorting).
+# - `-View Raw|Control|Content`: Chooses which UIA view to traverse when dumping the tree:
+#   - Raw: raw provider tree (most complete, often noisy)
+#   - Control: control view (default; typically what UIA tools show)
+#   - Content: content view (tries to hide purely-structural containers, varies by provider)
+# - `-MaxDepth <n>`: Limits recursion depth when dumping the tree. At/after this depth, `Children` becomes `$null`.
+# - `-MaxChildren <n>`: Limits number of siblings expanded per node (0 = unlimited).
+# - `-IncludeInvisible`: By default invisible/offscreen/zero-sized nodes are skipped; this includes them.
+# - `-RawTree`: When dumping a tree, outputs the raw `[pscustomobject]` tree (PowerShell objects) instead of JSON text.
 
 #requires -Version 5.1
 
@@ -18,7 +37,8 @@ param(
     [int]$MaxDepth = 80,
     [int]$MaxChildren = 0,
 
-    [switch]$IncludeInvisible
+    [switch]$IncludeInvisible,
+    [switch]$RawTree
 )
 
 Set-StrictMode -Version Latest
@@ -274,8 +294,12 @@ if ([string]::IsNullOrEmpty($RuntimeId)) {
     } else {
         $skipInvisible = -not $IncludeInvisible
         $tree = Build-UiaTreeObject -Element $target.Element -SkipInvisible:$skipInvisible -View $View -MaxDepth $MaxDepth -MaxChildren $MaxChildren
-        $jsonDepth = [Math]::Min(100, [Math]::Max(10, $MaxDepth + 5))
-        $json = $tree | ConvertTo-Json -Depth $jsonDepth -Compress
-        Format-Json2Spaces -Json $json
+        if ($RawTree) {
+            $tree
+        } else {
+            $jsonDepth = [Math]::Min(100, [Math]::Max(10, $MaxDepth + 5))
+            $json = $tree | ConvertTo-Json -Depth $jsonDepth -Compress
+            Format-Json2Spaces -Json $json
+        }
     }
 }
