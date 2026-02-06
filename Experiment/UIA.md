@@ -9,6 +9,11 @@ They are designed to be composable: list a window → capture/overlay it → per
   - `powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File ...`
 - UIA is provider-driven: if an application doesn’t expose rich semantics, many nodes will show up as generic containers
   like `Pane` with empty `Name`.
+- When UIA data is poor, screenshots can still be very useful:
+  - A snapshot gives human-verifiable ground truth (what the user actually sees).
+  - With additional vision/OCR, you can sometimes infer labels/regions and drive actions by coordinates.
+  - This is less robust than UIA (themes/DPI/layout changes break coordinate targeting), but it’s a practical fallback
+    for custom-drawn or poorly-instrumented UIs.
 - Cross-integrity UIA is restricted (UIPI):
   - If the target application is elevated (high integrity) and the inspector is not, the UIA tree is often shallow and
     missing important children (e.g., Task Manager tabs).
@@ -127,4 +132,3 @@ Goal: find Notepad, clear all text, type `I love .NET`, then verify by capture.
 6) Verify
 - Call `UIA_Capture.ps1 -RuntimeId <id>` and visually confirm the content (title bar should be black = focused).
 - Optional: use UIA `TextPattern` on Notepad’s document to programmatically read the text.
-
