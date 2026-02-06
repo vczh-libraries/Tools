@@ -84,6 +84,88 @@ function Get-ElementText {
     return ""
 }
 
+function Format-Json2Spaces {
+    param([Parameter(Mandatory = $true)][string]$Json)
+
+    $chars = $Json.ToCharArray()
+    $indentLevel = 0
+    $inString = $false
+    $escape = $false
+    $sb = New-Object System.Text.StringBuilder
+
+    for ($i = 0; $i -lt $chars.Length; $i++) {
+        $ch = $chars[$i]
+
+        if ($inString) {
+            [void]$sb.Append($ch)
+            if ($escape) {
+                $escape = $false
+            } elseif ($ch -eq '\') {
+                $escape = $true
+            } elseif ($ch -eq '"') {
+                $inString = $false
+            }
+            continue
+        }
+
+        switch ($ch) {
+            '"' {
+                $inString = $true
+                [void]$sb.Append($ch)
+            }
+            '{' {
+                if ($i + 1 -lt $chars.Length -and $chars[$i + 1] -eq '}') {
+                    [void]$sb.Append("{}")
+                    $i++
+                    break
+                }
+                [void]$sb.Append('{')
+                $indentLevel++
+                [void]$sb.Append("`n")
+                [void]$sb.Append((' ' * ($indentLevel * 2)))
+            }
+            '[' {
+                if ($i + 1 -lt $chars.Length -and $chars[$i + 1] -eq ']') {
+                    [void]$sb.Append("[]")
+                    $i++
+                    break
+                }
+                [void]$sb.Append('[')
+                $indentLevel++
+                [void]$sb.Append("`n")
+                [void]$sb.Append((' ' * ($indentLevel * 2)))
+            }
+            '}' {
+                $indentLevel = [Math]::Max(0, $indentLevel - 1)
+                [void]$sb.Append("`n")
+                [void]$sb.Append((' ' * ($indentLevel * 2)))
+                [void]$sb.Append('}')
+            }
+            ']' {
+                $indentLevel = [Math]::Max(0, $indentLevel - 1)
+                [void]$sb.Append("`n")
+                [void]$sb.Append((' ' * ($indentLevel * 2)))
+                [void]$sb.Append(']')
+            }
+            ',' {
+                [void]$sb.Append(',')
+                [void]$sb.Append("`n")
+                [void]$sb.Append((' ' * ($indentLevel * 2)))
+            }
+            ':' {
+                [void]$sb.Append(': ')
+            }
+            default {
+                if (-not [char]::IsWhiteSpace($ch)) {
+                    [void]$sb.Append($ch)
+                }
+            }
+        }
+    }
+
+    return $sb.ToString()
+}
+
 function EnumerateWindows {
     [CmdletBinding()]
     param(
@@ -145,7 +227,35 @@ function EnumerateWindows {
 }
 
 function Build-UiaTreeObject {
-    param([System.Windows.Automation.AutomationElement]$Element)
+    param(
+        [System.Windows.Automation.AutomationElement]$Element,
+        [switch]$SkipInvisible
+    )
+
+    if ($SkipInvisible) {
+        try {
+            if ($Element.Current.IsOffscreen) { return $null }
+        } catch {
+        }
+    }
+
+    $bounds = $null
+    try {
+        $rect = $Element.Current.BoundingRectangle
+        $bounds = [pscustomobject]@{
+            X      = $rect.X
+            Y      = $rect.Y
+            Width  = $rect.Width
+            Height = $rect.Height
+        }
+
+        if ($SkipInvisible -and ($rect.Width -le 0 -or $rect.Height -le 0)) {
+            return $null
+        }
+    } catch {
+        if ($SkipInvisible) { return $null }
+        $bounds = [pscustomobject]@{ X = 0; Y = 0; Width = 0; Height = 0 }
+    }
 
     $children = @()
     try {
@@ -155,7 +265,10 @@ function Build-UiaTreeObject {
         )
         foreach ($child in $childElements) {
             try {
-                $children += (Build-UiaTreeObject -Element $child)
+                $childObj = Build-UiaTreeObject -Element $child -SkipInvisible:$SkipInvisible
+                if ($null -ne $childObj) {
+                    $children += $childObj
+                }
             } catch {
             }
         }
@@ -166,6 +279,7 @@ function Build-UiaTreeObject {
         RuntimeId = (Format-RuntimeId -RuntimeId ($Element.GetRuntimeId()))
         Type      = (Get-ElementTypeString -Element $Element)
         Text      = (Get-ElementText -Element $Element)
+        Bounds    = $bounds
         Children  = $children
     }
 }
@@ -186,7 +300,8 @@ if ([string]::IsNullOrEmpty($RuntimeId)) {
     if ($null -eq $target) {
         "null"
     } else {
-        $tree = Build-UiaTreeObject -Element $target.Element
-        $tree | ConvertTo-Json -Depth 100
+        $tree = Build-UiaTreeObject -Element $target.Element -SkipInvisible:$true
+        $json = $tree | ConvertTo-Json -Depth 100 -Compress
+        Format-Json2Spaces -Json $json
     }
 }
