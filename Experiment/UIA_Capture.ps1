@@ -14,6 +14,15 @@
 #   (8pt text) at the rectangle's top-left corner. Uses `UIA_List.ps1 -RawTree` to obtain bounds.
 # - `-Base64`: Outputs the PNG content as a Base64 string instead of writing `UIA_Capture.png`.
 
+# Key knowledge (maintenance notes):
+# - UIA element bounds are in screen coordinates (`BoundingRectangle`), not relative to the window image.
+#   Overlay converts bounds to image coordinates by subtracting the window's `BoundingRectangle.X/Y` (origin).
+# - Capturing:
+#   - Prefer `PrintWindow` when a valid `NativeWindowHandle` exists (captures even when occluded in some cases).
+#   - Fallback to `CopyFromScreen` when `PrintWindow` fails (requires the window to be visible on screen).
+# - If `-Base64` is enabled, everything stays in-memory (no PNG file is created at the end),
+#   but the script still deletes `UIA_Capture.png` at startup for consistent behavior.
+
 #requires -Version 5.1
 
 [CmdletBinding()]

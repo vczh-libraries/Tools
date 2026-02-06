@@ -25,6 +25,18 @@
 # - `-IncludeInvisible`: By default invisible/offscreen/zero-sized nodes are skipped; this includes them.
 # - `-RawTree`: When dumping a tree, outputs the raw `[pscustomobject]` tree (PowerShell objects) instead of JSON text.
 
+# Key knowledge (maintenance notes):
+# - UIA is provider-driven: if an app doesn’t expose rich semantics, many nodes will appear as `Pane` or have no text.
+# - Cross-integrity UIA is restricted (UIPI): a non-admin inspector often cannot see full UIA trees of elevated windows.
+#   This is why the window list adds `NeedsAdmin` when not elevated.
+# - `RuntimeId` is great for “within this session” targeting, but it is not stable across reboots/app restarts.
+# - `-View` selects a `TreeWalker` view:
+#   - Raw view can expose more infrastructure nodes.
+#   - Control/Content views filter by `IsControlElement` / `IsContentElement` (provider-dependent).
+# - Tree output contract:
+#   - `Children = $null` means expansion was intentionally stopped (depth limit).
+#   - `Children = @()` means expanded and there were no children.
+
 #requires -Version 5.1
 
 [CmdletBinding()]

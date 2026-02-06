@@ -23,6 +23,20 @@
 # - Common aliases are also accepted: `Ctrl`, `Control`, `Alt`, `Shift`, `Win`, `Enter`, `Esc`, `Del`, `PgUp`, `PgDn`,
 #   arrow keys (`Left`, `Right`, `Up`, `Down`), etc.
 
+# Key knowledge (maintenance notes):
+# - Input simulation uses Win32 `SendInput` and is easy to get subtly wrong:
+#   - `INPUT` contains a UNION; populate the union explicitly (mouse/keyboard/hardware) before calling `SendInput`.
+#   - The `cbSize` argument must be `sizeof(INPUT)` as marshaled by .NET, not `sizeof(union)`.
+#   - Always check the return value: `SendInput` returns how many events were successfully injected.
+#     If it’s less than requested, call `GetLastError` and fail fast so bugs are caught during testing.
+# - Mouse move reliability:
+#   - Some systems ignore “button only” injections unless there is a preceding injected move.
+#   - This script uses an absolute move injection (`MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_VIRTUALDESK`) for `Move/Left/Right/Drag`.
+#   - Pixel coordinates are mapped into the 0..65535 range using virtual screen metrics.
+# - Focus matters:
+#   - Keyboard injection goes to the focused window/control. If your capture shows a grey title bar, the target app
+#     wasn’t focused. Use a preceding click on the target window/control (or explicitly bring it to foreground).
+
 #requires -Version 5.1
 
 [CmdletBinding()]
