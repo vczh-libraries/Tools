@@ -82,7 +82,11 @@ function Get-WindowBitmap {
                         $gfx.ReleaseHdc($hdc)
                     }
 
-                    if ($ok) { return $bmp }
+                    if ($ok) {
+                        $result = $bmp
+                        $bmp = $null
+                        return $result
+                    }
                 } finally {
                     $gfx.Dispose()
                     if ($null -ne $bmp) { $bmp.Dispose() }
