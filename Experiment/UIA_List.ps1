@@ -1,6 +1,8 @@
 # Lists all visible top-level windows (UI Automation) with their names and runtime IDs.
 # Note: Some UIA providers behave better in an STA host. If you see COM/UIA errors, try:
 #   powershell.exe -STA -File .\Experiment\UIA_List.ps1
+# Tree output is provider-dependent. Many frameworks expose "container" nodes as ControlType.Pane.
+# If you see too many Pane nodes, try `-View Content` (or `-View Control`) to reduce noise.
 
 #requires -Version 5.1
 
@@ -8,7 +10,15 @@
 param(
     [switch]$SkipNameless,
     [switch]$NoSort,
-    [string]$RuntimeId = ""
+    [string]$RuntimeId = "",
+
+    [ValidateSet('Raw', 'Control', 'Content')]
+    [string]$View = "Control",
+
+    [int]$MaxDepth = 80,
+    [int]$MaxChildren = 0,
+
+    [switch]$IncludeInvisible
 )
 
 Set-StrictMode -Version Latest
@@ -37,6 +47,12 @@ function Get-ElementTypeString {
     } catch {
     }
 
+    return "Unknown"
+}
+
+function Get-ElementLocalizedTypeString {
+    param([System.Windows.Automation.AutomationElement]$Element)
+
     try {
         $localized = $Element.Current.LocalizedControlType
         if (-not [string]::IsNullOrWhiteSpace($localized)) {
@@ -45,7 +61,7 @@ function Get-ElementTypeString {
     } catch {
     }
 
-    return "Unknown"
+    return ""
 }
 
 function Get-ElementText {
@@ -229,13 +245,34 @@ function EnumerateWindows {
 function Build-UiaTreeObject {
     param(
         [System.Windows.Automation.AutomationElement]$Element,
-        [switch]$SkipInvisible
+        [switch]$SkipInvisible,
+        [ValidateSet('Raw', 'Control', 'Content')][string]$View = "Control",
+        [int]$MaxDepth = 80,
+        [int]$MaxChildren = 0,
+        [int]$Depth = 0
     )
 
     if ($SkipInvisible) {
         try {
             if ($Element.Current.IsOffscreen) { return $null }
         } catch {
+        }
+    }
+
+    if ($Depth -ge $MaxDepth) {
+        return [pscustomobject]@{
+            RuntimeId      = (Format-RuntimeId -RuntimeId ($Element.GetRuntimeId()))
+            Type           = (Get-ElementTypeString -Element $Element)
+            TypeLocalized  = (Get-ElementLocalizedTypeString -Element $Element)
+            Text           = (Get-ElementText -Element $Element)
+            AutomationId   = ""
+            ClassName      = ""
+            FrameworkId    = ""
+            IsControl      = $false
+            IsContent      = $false
+            Bounds         = $null
+            Children       = @()
+            DepthTruncated = $true
         }
     }
 
@@ -259,28 +296,59 @@ function Build-UiaTreeObject {
 
     $children = @()
     try {
-        $childElements = $Element.FindAll(
-            [System.Windows.Automation.TreeScope]::Children,
-            [System.Windows.Automation.Condition]::TrueCondition
-        )
-        foreach ($child in $childElements) {
+        $walker = switch ($View) {
+            'Raw' { [System.Windows.Automation.TreeWalker]::RawViewWalker }
+            'Content' { [System.Windows.Automation.TreeWalker]::ContentViewWalker }
+            default { [System.Windows.Automation.TreeWalker]::ControlViewWalker }
+        }
+
+        $child = $walker.GetFirstChild($Element)
+        $childCount = 0
+        while ($null -ne $child) {
             try {
-                $childObj = Build-UiaTreeObject -Element $child -SkipInvisible:$SkipInvisible
+                $childObj = Build-UiaTreeObject -Element $child -SkipInvisible:$SkipInvisible -View $View -MaxDepth $MaxDepth -MaxChildren $MaxChildren -Depth ($Depth + 1)
                 if ($null -ne $childObj) {
                     $children += $childObj
                 }
             } catch {
             }
+
+            $childCount++
+            if ($MaxChildren -gt 0 -and $childCount -ge $MaxChildren) { break }
+
+            try {
+                $child = $walker.GetNextSibling($child)
+            } catch {
+                break
+            }
         }
     } catch {
     }
 
+    $automationId = ""
+    $className = ""
+    $frameworkId = ""
+    $isControl = $false
+    $isContent = $false
+    try { $automationId = $Element.Current.AutomationId } catch { }
+    try { $className = $Element.Current.ClassName } catch { }
+    try { $frameworkId = $Element.Current.FrameworkId } catch { }
+    try { $isControl = [bool]$Element.Current.IsControlElement } catch { }
+    try { $isContent = [bool]$Element.Current.IsContentElement } catch { }
+
     [pscustomobject]@{
-        RuntimeId = (Format-RuntimeId -RuntimeId ($Element.GetRuntimeId()))
-        Type      = (Get-ElementTypeString -Element $Element)
-        Text      = (Get-ElementText -Element $Element)
-        Bounds    = $bounds
-        Children  = $children
+        RuntimeId      = (Format-RuntimeId -RuntimeId ($Element.GetRuntimeId()))
+        Type           = (Get-ElementTypeString -Element $Element)
+        TypeLocalized  = (Get-ElementLocalizedTypeString -Element $Element)
+        Text           = (Get-ElementText -Element $Element)
+        AutomationId   = (Trim-Text -Text $automationId)
+        ClassName      = (Trim-Text -Text $className)
+        FrameworkId    = (Trim-Text -Text $frameworkId)
+        IsControl      = $isControl
+        IsContent      = $isContent
+        Bounds         = $bounds
+        Children       = $children
+        DepthTruncated = $false
     }
 }
 
@@ -300,8 +368,10 @@ if ([string]::IsNullOrEmpty($RuntimeId)) {
     if ($null -eq $target) {
         "null"
     } else {
-        $tree = Build-UiaTreeObject -Element $target.Element -SkipInvisible:$true
-        $json = $tree | ConvertTo-Json -Depth 100 -Compress
+        $skipInvisible = -not $IncludeInvisible
+        $tree = Build-UiaTreeObject -Element $target.Element -SkipInvisible:$skipInvisible -View $View -MaxDepth $MaxDepth -MaxChildren $MaxChildren
+        $jsonDepth = [Math]::Min(100, [Math]::Max(10, $MaxDepth + 5))
+        $json = $tree | ConvertTo-Json -Depth $jsonDepth -Compress
         Format-Json2Spaces -Json $json
     }
 }
