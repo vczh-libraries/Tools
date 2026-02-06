@@ -12,6 +12,7 @@
 # - `-RuntimeId <id>`: Required. UIA RuntimeId of a visible top-level window (from `UIA_List.ps1`).
 # - `-Overlay`: Draws a green rectangle for each UIA node over the captured image and prints that node's RuntimeId
 #   (8pt text) at the rectangle's top-left corner. Uses `UIA_List.ps1 -RawTree` to obtain bounds.
+# - `-Base64`: Outputs the PNG content as a Base64 string instead of writing `UIA_Capture.png`.
 
 #requires -Version 5.1
 
@@ -20,7 +21,8 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$RuntimeId,
 
-    [switch]$Overlay
+    [switch]$Overlay,
+    [switch]$Base64
 )
 
 Set-StrictMode -Version Latest
@@ -52,17 +54,14 @@ public static class UiaCaptureNative {
 }
 "@ -ErrorAction Stop | Out-Null
 
-function Save-WindowScreenshot {
+function Get-WindowBitmap {
     param(
-        [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Element,
-        [Parameter(Mandatory = $true)][string]$Path
+        [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Element
     )
 
     $hwndValue = 0
     try { $hwndValue = $Element.Current.NativeWindowHandle } catch { }
     $hwnd = [IntPtr]$hwndValue
-
-    $saved = $false
 
     if ($hwndValue -ne 0) {
         $rect = New-Object UiaCaptureNative+RECT
@@ -83,42 +82,33 @@ function Save-WindowScreenshot {
                         $gfx.ReleaseHdc($hdc)
                     }
 
-                    if ($ok) {
-                        $bmp.Save($Path, [System.Drawing.Imaging.ImageFormat]::Png)
-                        $saved = $true
-                    }
+                    if ($ok) { return $bmp }
                 } finally {
                     $gfx.Dispose()
-                    $bmp.Dispose()
+                    if ($null -ne $bmp) { $bmp.Dispose() }
                 }
             }
         }
     }
 
-    if (-not $saved) {
-        $rect = $null
-        try { $rect = $Element.Current.BoundingRectangle } catch { }
-        if ($null -eq $rect) { return $false }
+    $rect = $null
+    try { $rect = $Element.Current.BoundingRectangle } catch { }
+    if ($null -eq $rect) { return $null }
 
-        $x = [int][Math]::Round($rect.X)
-        $y = [int][Math]::Round($rect.Y)
-        $w = [int][Math]::Round($rect.Width)
-        $h = [int][Math]::Round($rect.Height)
-        if ($w -le 0 -or $h -le 0) { return $false }
+    $x = [int][Math]::Round($rect.X)
+    $y = [int][Math]::Round($rect.Y)
+    $w = [int][Math]::Round($rect.Width)
+    $h = [int][Math]::Round($rect.Height)
+    if ($w -le 0 -or $h -le 0) { return $null }
 
-        $bmp = New-Object System.Drawing.Bitmap $w, $h
-        $gfx = [System.Drawing.Graphics]::FromImage($bmp)
-        try {
-            $gfx.CopyFromScreen($x, $y, 0, 0, $bmp.Size)
-            $bmp.Save($Path, [System.Drawing.Imaging.ImageFormat]::Png)
-            return $true
-        } finally {
-            $gfx.Dispose()
-            $bmp.Dispose()
-        }
+    $bmp = New-Object System.Drawing.Bitmap $w, $h
+    $gfx = [System.Drawing.Graphics]::FromImage($bmp)
+    try {
+        $gfx.CopyFromScreen($x, $y, 0, 0, $bmp.Size)
+        return $bmp
+    } finally {
+        $gfx.Dispose()
     }
-
-    return $true
 }
 
 $uiListScript = Join-Path $PSScriptRoot "UIA_List.ps1"
@@ -134,68 +124,56 @@ if ($null -eq $target) {
     exit 1
 }
 
-if (-not (Save-WindowScreenshot -Element $target.Element -Path $outPath)) {
-    exit 1
-}
+try {
+    $bitmap = Get-WindowBitmap -Element $target.Element
+    if ($null -eq $bitmap) { exit 1 }
 
-if ($Overlay) {
-    $windowRect = $null
-    try { $windowRect = $target.Element.Current.BoundingRectangle } catch { }
-    if ($null -eq $windowRect) { exit 1 }
+    if ($Overlay) {
+        $windowRect = $null
+        try { $windowRect = $target.Element.Current.BoundingRectangle } catch { }
+        if ($null -eq $windowRect) { exit 1 }
 
-    $originX = [double]$windowRect.X
-    $originY = [double]$windowRect.Y
+        $originX = [double]$windowRect.X
+        $originY = [double]$windowRect.Y
 
-    function Draw-OverlayNode {
-        param(
-            [Parameter(Mandatory = $true)]$Node,
-            [Parameter(Mandatory = $true)][System.Drawing.Graphics]$Graphics,
-            [Parameter(Mandatory = $true)][System.Drawing.Pen]$Pen,
-            [Parameter(Mandatory = $true)][System.Drawing.Font]$Font,
-            [Parameter(Mandatory = $true)][System.Drawing.Brush]$TextBrush,
-            [Parameter(Mandatory = $true)][System.Drawing.Brush]$ShadowBrush
-        )
+        function Draw-OverlayNode {
+            param(
+                [Parameter(Mandatory = $true)]$Node,
+                [Parameter(Mandatory = $true)][System.Drawing.Graphics]$Graphics,
+                [Parameter(Mandatory = $true)][System.Drawing.Pen]$Pen,
+                [Parameter(Mandatory = $true)][System.Drawing.Font]$Font,
+                [Parameter(Mandatory = $true)][System.Drawing.Brush]$TextBrush,
+                [Parameter(Mandatory = $true)][System.Drawing.Brush]$ShadowBrush
+            )
 
-        try {
-            if ($null -ne $Node.Bounds) {
-                $x = [double]$Node.Bounds.X - $originX
-                $y = [double]$Node.Bounds.Y - $originY
-                $w = [double]$Node.Bounds.Width
-                $h = [double]$Node.Bounds.Height
+            try {
+                if ($null -ne $Node.Bounds) {
+                    $x = [double]$Node.Bounds.X - $originX
+                    $y = [double]$Node.Bounds.Y - $originY
+                    $w = [double]$Node.Bounds.Width
+                    $h = [double]$Node.Bounds.Height
 
-                if ($w -gt 0 -and $h -gt 0) {
-                    $Graphics.DrawRectangle($Pen, [float]$x, [float]$y, [float]$w, [float]$h)
+                    if ($w -gt 0 -and $h -gt 0) {
+                        $Graphics.DrawRectangle($Pen, [float]$x, [float]$y, [float]$w, [float]$h)
 
-                    $rid = [string]$Node.RuntimeId
-                    if (-not [string]::IsNullOrWhiteSpace($rid)) {
-                        $Graphics.DrawString($rid, $Font, $ShadowBrush, [float]($x + 1), [float]($y + 1))
-                        $Graphics.DrawString($rid, $Font, $TextBrush, [float]$x, [float]$y)
+                        $rid = [string]$Node.RuntimeId
+                        if (-not [string]::IsNullOrWhiteSpace($rid)) {
+                            $Graphics.DrawString($rid, $Font, $ShadowBrush, [float]($x + 1), [float]($y + 1))
+                            $Graphics.DrawString($rid, $Font, $TextBrush, [float]$x, [float]$y)
+                        }
                     }
                 }
+            } catch {
             }
-        } catch {
+
+            if ($null -ne $Node.Children) {
+                foreach ($child in $Node.Children) {
+                    Draw-OverlayNode -Node $child -Graphics $Graphics -Pen $Pen -Font $Font -TextBrush $TextBrush -ShadowBrush $ShadowBrush
+                }
+            }
         }
 
-        if ($null -ne $Node.Children) {
-            foreach ($child in $Node.Children) {
-                Draw-OverlayNode -Node $child -Graphics $Graphics -Pen $Pen -Font $Font -TextBrush $TextBrush -ShadowBrush $ShadowBrush
-            }
-        }
-    }
-
-    $fileStream = [System.IO.File]::Open($outPath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
-    try {
-        $sourceImage = [System.Drawing.Image]::FromStream($fileStream)
-        try {
-            $bmp = New-Object System.Drawing.Bitmap $sourceImage
-        } finally {
-            $sourceImage.Dispose()
-        }
-    } finally {
-        $fileStream.Dispose()
-    }
-    try {
-        $gfx = [System.Drawing.Graphics]::FromImage($bmp)
+        $gfx = [System.Drawing.Graphics]::FromImage($bitmap)
         try {
             $gfx.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::None
             $pen = New-Object System.Drawing.Pen ([System.Drawing.Color]::Lime), 1
@@ -211,11 +189,20 @@ if ($Overlay) {
         } finally {
             $gfx.Dispose()
         }
-
-        $bmp.Save($outPath, [System.Drawing.Imaging.ImageFormat]::Png)
-    } finally {
-        $bmp.Dispose()
     }
-}
 
-[System.IO.Path]::GetFullPath($outPath)
+    if ($Base64) {
+        $ms = New-Object System.IO.MemoryStream
+        try {
+            $bitmap.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+            [Convert]::ToBase64String($ms.ToArray())
+        } finally {
+            $ms.Dispose()
+        }
+    } else {
+        $bitmap.Save($outPath, [System.Drawing.Imaging.ImageFormat]::Png)
+        [System.IO.Path]::GetFullPath($outPath)
+    }
+} finally {
+    if ($null -ne $bitmap) { $bitmap.Dispose() }
+}
