@@ -23,10 +23,10 @@ param(
 
 Set-StrictMode -Version Latest
 
-function Format-RuntimeId {
-    param([int[]]$RuntimeId)
-    if ($null -eq $RuntimeId -or $RuntimeId.Count -eq 0) { return "" }
-    return ($RuntimeId -join ".")
+if ($null -ne $PSScriptRoot) {
+    . (Join-Path $PSScriptRoot "UIA_Common.ps1")
+} else {
+    . ".\\Experiment\\UIA_Common.ps1"
 }
 
 function Trim-Text {
@@ -182,66 +182,6 @@ function Format-Json2Spaces {
     return $sb.ToString()
 }
 
-function EnumerateWindows {
-    [CmdletBinding()]
-    param(
-        [string]$RuntimeId = "",
-        [switch]$SkipNameless,
-        [switch]$NoSort
-    )
-
-    $root = [System.Windows.Automation.AutomationElement]::RootElement
-    if ($null -eq $root) {
-        throw "AutomationElement.RootElement is null."
-    }
-
-    $condWindow = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
-        [System.Windows.Automation.ControlType]::Window
-    )
-
-    $condVisible = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::IsOffscreenProperty,
-        $false
-    )
-
-    $cond = New-Object System.Windows.Automation.AndCondition($condWindow, $condVisible)
-    $windows = $root.FindAll([System.Windows.Automation.TreeScope]::Children, $cond)
-
-    $results = foreach ($window in $windows) {
-        try {
-            $name = $window.Current.Name
-            if ([string]::IsNullOrWhiteSpace($name)) {
-                if ($SkipNameless) { continue }
-                $name = "<NoName>"
-            }
-
-            $rect = $window.Current.BoundingRectangle
-            if ($rect.Width -le 0 -or $rect.Height -le 0) {
-                continue
-            }
-
-            $rid = (Format-RuntimeId -RuntimeId ($window.GetRuntimeId()))
-            if (-not [string]::IsNullOrEmpty($RuntimeId) -and $rid -ne $RuntimeId) {
-                continue
-            }
-
-            [pscustomobject]@{
-                Name      = $name
-                RuntimeId = $rid
-                Element   = $window
-            }
-        } catch {
-        }
-    }
-
-    if (-not $NoSort) {
-        $results = $results | Sort-Object -Property Name, RuntimeId
-    }
-
-    return @($results)
-}
-
 function Build-UiaTreeObject {
     param(
         [System.Windows.Automation.AutomationElement]$Element,
@@ -326,13 +266,6 @@ function Build-UiaTreeObject {
         Bounds         = $bounds
         Children       = $children
     }
-}
-
-try {
-    Add-Type -AssemblyName UIAutomationClient -ErrorAction Stop | Out-Null
-    Add-Type -AssemblyName UIAutomationTypes -ErrorAction Stop | Out-Null
-} catch {
-    throw "Failed to load UI Automation assemblies (UIAutomationClient/UIAutomationTypes): $($_.Exception.Message)"
 }
 
 $windows = EnumerateWindows -RuntimeId $RuntimeId -SkipNameless:$SkipNameless -NoSort:$NoSort
