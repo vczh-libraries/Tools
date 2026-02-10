@@ -48,21 +48,13 @@
 
 ## Step 4. Write Learnings
 
-- Log whatever is found to the appropriate learning file.
-- If any finding repeats an existing learning, increase its counter.
-- If a finding is new, add it with counter `[1]`.
-- Create the learning file if it does not exist.
-
-### Learning File Format
-
-Each learning file follows this structure:
-
-- The first section is an index listing all learnings sorted by counter in descending order:
-  ```
-  - [N] Short title with key idea
-  ```
-- Each learning has its own section with the short title as the heading, containing the detailed description.
-- The title must be short and include the key idea.
+- For each finding, determine the appropriate learning file based on the categorization in `Goal and Constraints`.
+- Each finding must have a short title that includes the key idea.
+- If the title matches an existing entry in `# Orders`, increase its counter.
+- If the title matches an existing entry but the finding need to modify, keep the counter.
+  - It happens when I improved and have a different idea with what I used to agree.
+- If the title is new, add `- TITLE [1]` to `# Orders` and add a new `## Title` section under `# Refinements` with the detailed description.
+- Keep `# Orders` sorted by counter in descending order.
 
 ## Step 5. Delete the Processed Folder
 
