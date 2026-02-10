@@ -20,8 +20,6 @@ function ExtractProjectName {
 }
 
 function SyncFolder($folderName, $sourceFolder, $targetFolder, $skipIfExists) {
-    Write-Host "Copying: $folderName"
-
     $sourcePath = Join-Path $sourceFolder $folderName
     $targetPath = Join-Path $targetFolder $folderName
 
@@ -33,12 +31,13 @@ function SyncFolder($folderName, $sourceFolder, $targetFolder, $skipIfExists) {
 
     if (Test-Path -Path $targetPath) {
         if ($skipIfExists) {
-            Write-Host "Skipping (already exists)"
+            Write-Host "Skipping: $folderName (already exists)"
             return
         }
         Remove-Item -Path $targetPath -Recurse -Force
     }
 
+    Write-Host "Copying: $folderName"
     Copy-Item -Path $sourcePath -Destination $targetFolder -Recurse -Force
 }
 
@@ -55,6 +54,7 @@ else {
     SyncFolder "prompts"       "$PSScriptRoot" "$targetFolder" $False
     SyncFolder "Scripts"       "$PSScriptRoot" "$targetFolder" $False
     SyncFolder "TaskLogs"      "$PSScriptRoot" "$targetFolder" $True
+    SyncFolder "Learning"      "$PSScriptRoot" "$targetFolder" $True
 
     New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 
@@ -68,7 +68,7 @@ else {
         Copy-Item -Path (Join-Path $PSScriptRoot "Project.md") -Destination $projectMdTarget -Force
     }
     else {
-        Write-Host "Skipping Project.md (already exists)"
+        Write-Host "Skipping: Project.md (already exists)"
     }
 
     # Copy from $PSScriptRoot to $targetFolder\..
