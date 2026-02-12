@@ -91,6 +91,8 @@ It does the same thing as pressing CTRL+ENTER.
 When the button is disabled, pressing CTRL+ENTER should also does nothing.
 `api/copilot/session/query/{session-id}` is used here.
 
+User request should generate a "User" message block, append the request and immediatelly complete it.
+
 When a request is sent, the button is disabled.
 When `ICopilotSessionCallbacks::onAgentEnd` triggers, it is enabled again.
 
@@ -105,7 +107,7 @@ It exposes some APIs in this schema
 
 ```typescript
 export class MessageBlock {
-  constructor(blockType: "Reasoning" | "Tool" | "Message");
+  constructor(blockType: "User" | "Reasoning" | "Tool" | "Message");
   appendData(data: string): void;
   complete(): void;
   get isCompleted(): boolean;
@@ -116,11 +118,12 @@ export function getMessageBlock(div: HTMLDivElement): MessageBlock | undefined;
 ```
 
 Each message block has a title, displaying: "blockType [receiving...]" or "blockType".
+Receiving appears when it is not completed yet.
 
 When a message block is created and receiving data, the height is limited to 150px, clicking the header does nothing
 
 When a message block is completed:
-- A message block will expand and others will collapse.
+- "User" and "Message" block will expand, others will collapse.
 - Clicking the header of a completed message block switch between expanding or collapsing.
 - There is no more height limit, it should expands to render all data.
 
@@ -169,6 +172,8 @@ Start a new copilot session and return in this schema
 }
 ```
 
+Multiple sessions could be running parallelly, start a `CopilotClient` if it is not started yet, it shares between all sessions.
+
 ### copilot/session/stop/{session-id}
 
 Stop the session and return in this schema
@@ -176,6 +181,8 @@ Stop the session and return in this schema
 ```typescript
 {result:"Closed"} | {error:"SessionNotFound"}
 ```
+
+If all session is closed, close the `CopilotClient` as well.
 
 ### copilot/session/query/{session-id}
 
