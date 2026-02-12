@@ -1,4 +1,4 @@
-import { CopilotClient } from "@github/copilot-sdk";
+import { CopilotClient, CopilotSession } from "@github/copilot-sdk";
 import * as readline from "readline";
 import * as path from "path";
 
@@ -9,13 +9,34 @@ interface ICopilotSession {
 }
 
 interface ICopilotSessionCallbacks {
-  onStartReasoning(reasongId: number): void;
-  onReasoning(reasongId: number, delta: string): void;
-  onEndReasoning(reasongId: number): void;
+  get rawSection(): CopilotSession;
+
+  // assistant.reasoning_delta with a new id
+  onStartReasoning(reasoningId: string): void;
+  // assistant.reasoning_delta with an existing id
+  onReasoning(reasoningId: string, delta: string): void;
+  // assistant.reasoning with an existing id
+  onEndReasoning(reasoningId: string, completeContent: string): void;
   
-  onStartMessage(reasongId: number): void;
-  onMessage(reasongId: number, delta: string): void;
-  onEndMessage(reasongId: number): void;
+  // assistant.message_delta with a new id
+  onStartMessage(messageId: string): void;
+  // assistant.message_delta with an existing id
+  onMessage(messageId: string, delta: string): void;
+  // assistant.message with an existing id
+  onEndMessage(messageId: string, completeContent: string): void;
+
+  // tool.execution_start with a new id
+  onStartToolExecution(toolCallId: string, toolName: string, parentToolCallId: string | undefined): void;
+  // tool.execution_partial_result with an existing id
+  onToolExecution(toolCallId: string, delta: string): void;
+  // tool.execution_complete with an existing id
+  onEndToolExecution(toolCallId: string, result: {content: string, detailedContent?: string} | undefined, error: {message: string, code?: string} | undefined): void;
+
+  // assistant.turn_start
+  onAgentStart(turnId: string): void;
+
+  // assistant.turn_end
+  onAgentEnd(turnId: string): void;
 }
 
 function startSession(client: CopilotClient, modelId: string, callback: ICopilotSessionCallbacks): ICopilotSession {
