@@ -43,3 +43,89 @@ Returns `{"message":"Hello, world!"}`
 ### stop
 
 Returns `{}` and stops.
+
+### copilot/models
+
+Returns all copilot sdk supported models in this schema
+
+```typescript
+{
+  models: {
+    name: string;
+    id: string;
+    multiplier: number;
+  }[]
+}
+```
+
+### copilot/session/start/{model-id}
+
+Start a new copilot session and return in this schema
+
+```typescript
+{
+  sessionId: string;
+}
+```
+
+### copilot/session/stop/{session-id}
+
+Stop the session and return in this schema
+
+```typescript
+{result:"Closed"} | {error:"SessionNotFound"}
+```
+
+### copilot/session/query/{session-id}
+
+The body will be the query prompt string.
+
+Send the query to the session, and the session begins to work.
+
+Returns in this schema
+
+```typescript
+{
+  error?:"SessionNotFound"
+}
+```
+
+### copilot/session/live/{session-id}
+
+This is a query to wait for any data sending back for this session.
+
+Returns in this schema if any error happens
+
+```typescript
+{
+  error: "SessionNotFound" | "HttpRequestTimeout"
+}
+```
+
+Returns in this schema if an exception it thrown from inside the session
+
+```typescript
+{
+  sessionError: string
+}
+```
+
+Other response maps to all methods in ICopilotSessionCallbacks in CopilotApi/src/copilotSession.ts in this schema
+
+```typescript
+{
+  callback: string,
+  argument1: ...,
+  ...
+}
+```
+
+For example, when `onReasoning(reasoningId: string, delta: string): void;` is called, it returns
+
+```typescript
+{
+  callback: "onReasoning",
+  reasoningId: string,
+  delta: string
+}
+```
