@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspace copilot-test build",
+    "build": "yarn workspaces run build",
     "chat": "yarn workspace copilot-test start"
   },
   "devDependencies": {
