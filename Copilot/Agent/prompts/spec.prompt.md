@@ -5,10 +5,10 @@ you need to cd/pushd to this folder first before doing any development or testin
 
 When this file is tagged:
 - Read the latest commit affecting any of the following folders, it is the anchor commit:
-  - REPO-ROOT/Copilot/Agent/packages/CopilotPortal/src
-  - REPO-ROOT/Copilot/Agent/packages/CopilotPortal/assets
+  - REPO-ROOT/Copilot/Agent/packages/CopilotPortal
+  - REPO-ROOT/Copilot/Agent/packages/CopilotApi
 - All commits with title "Update Spec.md" that newer than the anchor commit are new changes.
-  - These commits updates REPO-ROOT/Copilot/Agent/packages/CopilotPortal/Spec.md.
+  - These commits updates REPO-ROOT/Copilot/Agent/prompts/Spec.md.
   - The Spec.md file defines how CopilotPortal should work.
 - Implement all new changes.
 

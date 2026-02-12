@@ -68,7 +68,6 @@ Copilot/Agent/
 │   │   │   ├── messageBlock.js   # MessageBlock component
 │   │   │   ├── messageBlock.css  # MessageBlock styles
 │   │   │   └── test.html     # Simple API test page
-│   │   ├── Spec.md           # Detailed specification
 │   │   └── package.json
 │   └── CopilotTest/          # CLI chat application
 │       ├── src/
