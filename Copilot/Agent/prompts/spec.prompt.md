@@ -1,5 +1,8 @@
 # Spec.md Driven Development
 
+The root of this project "REPO-ROOT/Copilot/Agent" is not the workspace root,
+you need to cd/pushd to this folder first before doing any development or testing.
+
 When this file is tagged:
 - Read the latest commit affecting any of the following folders, it is the anchor commit:
   - REPO-ROOT/Copilot/Agent/packages/CopilotPortal/src
