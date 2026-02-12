@@ -80,6 +80,8 @@ Responses for different message blocks are identified by its id.
 A message blocks stack vertically from top to bottom in the session part.
 `MessageBlock` in messageBlock.js should be used to control any message block.
 
+You are recommended to maintain a list of message blocks in a map with key "blockType-blockId" in its rendering order.
+
 #### Request Part
 
 It is a multiline text box. I can type any text, and press CTRL+ENTER to send the request.
@@ -99,15 +101,18 @@ It ends the session with `api/copilot/session/stop/{session-id}`, followed by an
 
 Put messageBlock.js specific css file in messageBlock.css.
 
-It exposes a class in this schema
+It exposes some APIs in this schema
 
 ```typescript
-class MessageBlock {
+export class MessageBlock {
   constructor(blockType: "Reasoning" | "Tool" | "Message");
-  get divElement(): HTMLDivElement;
   appendData(data: string): void;
   complete(): void;
+  get isCompleted(): boolean;
+  get divElement(): HTMLDivElement;
 }
+
+export function getMessageBlock(div: HTMLDivElement): MessageBlock | undefined;
 ```
 
 Each message block has a title, displaying: "blockType [receiving...]" or "blockType".
@@ -118,6 +123,9 @@ When a message block is completed:
 - A message block will expand and others will collapse.
 - Clicking the header of a completed message block switch between expanding or collapsing.
 - There is no more height limit, it should expands to render all data.
+
+Inside the `MessageBlock`, it holds a `<div/>` to change the rendering.
+And it should also put itself in the element (e.g. in a field with a unique name) so that the object will not be garbage-collected.
 
 ## API
 
