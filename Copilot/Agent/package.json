@@ -1,0 +1,16 @@
+{
+  "name": "copilot-agent-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn workspace copilot-test build",
+    "chat": "yarn workspace copilot-test start"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
