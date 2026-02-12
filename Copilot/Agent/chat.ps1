@@ -3,14 +3,14 @@
 # Get the absolute path of the Copilot/Agent folder
 $AgentFolder = $PSScriptRoot
 
-# Function to find the Git repository root by searching upward from current directory
-function Find-GitRoot {
+# Function to find the repository root by searching upward from current directory
+function Find-RepositoryRoot {
     $currentPath = (Get-Location).Path
     
     while ($true) {
-        $gitDir = Join-Path $currentPath ".git"
-        if (Test-Path -Path $gitDir -PathType Container) {
-            Write-Host "Found Git repository root: $currentPath"
+        $copilotInstructionsFile = Join-Path $currentPath ".github\copilot-instructions.md"
+        if (Test-Path -Path $copilotInstructionsFile -PathType Leaf) {
+            Write-Host "Found repository root: $currentPath"
             return $currentPath
         }
         
@@ -25,12 +25,12 @@ function Find-GitRoot {
         $currentPath = $parentPath
     }
     
-    Write-Warning "Could not find Git repository root (.git directory). Using current directory."
+    Write-Warning "Could not find repository root (.github\copilot-instructions.md file). Using current directory."
     return (Get-Location).Path
 }
 
-# Find the working directory (Git repository root)
-$WorkingDirectory = Find-GitRoot
+# Find the working directory (repository root)
+$WorkingDirectory = Find-RepositoryRoot
 
 # Change to the Agent folder to run yarn commands
 Push-Location $AgentFolder

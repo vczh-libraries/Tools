@@ -15,6 +15,16 @@ async function main() {
   const workingDirectory = process.argv[2] || process.cwd();
   const absoluteWorkingDirectory = path.resolve(workingDirectory);
   
+  // Ensure the input is an absolute path without trailing separators
+  // The path before and after resolving must be identical
+  if (workingDirectory !== absoluteWorkingDirectory && workingDirectory !== process.cwd()) {
+    throw new Error(
+      `Working directory must be an absolute path without trailing separators or relative components.\n` +
+      `Received: "${workingDirectory}"\n` +
+      `Expected: "${absoluteWorkingDirectory}"`
+    );
+  }
+  
   console.log(`Working directory: ${absoluteWorkingDirectory}\n`);
   
   const client = new CopilotClient({
