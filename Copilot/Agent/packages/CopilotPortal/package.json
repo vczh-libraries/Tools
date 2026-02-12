@@ -6,13 +6,10 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "test": "node dist/test.js"
-  },
-  "dependencies": {
-    "playwright": "^1.49.0"
+    "start": "node dist/index.js"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3"
   }
