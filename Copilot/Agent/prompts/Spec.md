@@ -117,14 +117,15 @@ export class MessageBlock {
 export function getMessageBlock(div: HTMLDivElement): MessageBlock | undefined;
 ```
 
-Each message block has a title, displaying: "blockType [receiving...]" or "blockType".
+Each `MessageBlock` has a title, displaying: "blockType [receiving...]" or "blockType".
 Receiving appears when it is not completed yet.
 
-When a message block is created and receiving data, the height is limited to 150px, clicking the header does nothing
+When a `MessageBlock` is created and receiving data, the height is limited to 150px, clicking the header does nothing
 
-When a message block is completed:
-- "User" and "Message" block will expand, others will collapse.
-- Clicking the header of a completed message block switch between expanding or collapsing.
+When a `MessageBlock` is completed:
+- If this `MessageBlock` is "User" and "Message", it will expand, otherwise collapse.
+- Completing a `MessageBlock` should not automatically expand or collapse other blocks.
+- Clicking the header of a completed `MessageBlock` switch between expanding or collapsing.
 - There is no more height limit, it should expands to render all data.
 
 Inside the `MessageBlock`, it holds a `<div/>` to change the rendering.
