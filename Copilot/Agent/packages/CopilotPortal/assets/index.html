@@ -3,7 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Copilot Portal</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="messageBlock.css">
 </head>
 <body>
+    <div id="setup-ui">
+        <label>
+            Model
+            <select id="model-select"></select>
+        </label>
+        <label>
+            Working Directory
+            <input type="text" id="working-dir" placeholder="Absolute path...">
+        </label>
+        <button id="start-button">Start</button>
+    </div>
+
+    <div id="session-ui">
+        <div id="session-part"></div>
+        <div id="resize-bar"></div>
+        <div id="request-part">
+            <textarea id="request-textarea" placeholder="Type your request..."></textarea>
+            <div id="request-buttons">
+                <button id="stop-button">Stop</button>
+                <button id="send-button" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="index.js"></script>
 </body>
 </html>

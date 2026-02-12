@@ -1,0 +1,39 @@
+.message-block {
+    border: 1px solid #ccc;
+    margin: 4px 0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.message-block-header {
+    padding: 6px 12px;
+    background: #f0f0f0;
+    font-weight: bold;
+    font-size: 14px;
+    user-select: none;
+}
+
+.message-block-header.completed {
+    cursor: pointer;
+}
+
+.message-block-header.completed:hover {
+    background: #e0e0e0;
+}
+
+.message-block-body {
+    padding: 8px 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+    font-size: 13px;
+    overflow: auto;
+}
+
+.message-block.receiving .message-block-body {
+    max-height: 150px;
+}
+
+.message-block.completed.collapsed .message-block-body {
+    display: none;
+}
