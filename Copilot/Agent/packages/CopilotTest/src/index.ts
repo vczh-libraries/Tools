@@ -80,7 +80,7 @@ async function main() {
     });
 
     // Listen for response chunks
-    session.on("assistant.message_delta", (event: any) => {
+    session.on("assistant.message_delta", (event) => {
       process.stdout.write(event.data.deltaContent);
     });
 
