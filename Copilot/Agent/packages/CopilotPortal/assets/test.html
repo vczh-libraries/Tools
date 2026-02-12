@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+</head>
+<body>
+    <script>
+        fetch("/api/test")
+            .then(r => r.text())
+            .then(text => {
+                document.body.textContent = text;
+            });
+    </script>
+</body>
+</html>

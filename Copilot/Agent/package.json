@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "build": "yarn workspaces run build",
-    "chat": "yarn workspace copilot-test start"
+    "chat": "yarn workspace copilot-test start",
+    "portal": "yarn workspace copilot-portal start"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
