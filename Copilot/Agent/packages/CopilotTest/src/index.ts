@@ -2,6 +2,26 @@ import { CopilotClient } from "@github/copilot-sdk";
 import * as readline from "readline";
 import * as path from "path";
 
+// DOCUMENT: https://github.com/github/copilot-sdk/blob/main/nodejs/README.md
+
+interface ICopilotSession {
+  sendRequest(message: string, timeout: 2147483647): Promise<void>;
+}
+
+interface ICopilotSessionCallbacks {
+  onStartReasoning(reasongId: number): void;
+  onReasoning(reasongId: number, delta: string): void;
+  onEndReasoning(reasongId: number): void;
+  
+  onStartMessage(reasongId: number): void;
+  onMessage(reasongId: number, delta: string): void;
+  onEndMessage(reasongId: number): void;
+}
+
+function startSession(client: CopilotClient, modelId: string, callback: ICopilotSessionCallbacks): ICopilotSession {
+
+}
+
 async function main() {
   // Get working directory from command line argument
   // Usage: node dist/index.js [workingDirectory]
