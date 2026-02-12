@@ -168,11 +168,11 @@ async function main() {
               formatter.logStop(`message_${messageId}`, completeContent);
             },
 
-            onStartToolExecution: (toolCallId, toolName, parentToolCallId) => {
+            onStartToolExecution: (toolCallId, parentToolCallId, toolName, toolArguments) => {
               formatter.logStart(`tool_${toolCallId}`);
               formatter.log(
                 `tool_${toolCallId}`,
-                `[START] ${toolName}${parentToolCallId ? ` (parent: ${parentToolCallId})` : ""}\n`
+                `[START] ${toolName}${parentToolCallId ? ` (parent: ${parentToolCallId})` : ""}\n${toolArguments}\n`
               );
             },
             onToolExecution: (toolCallId, delta) => {

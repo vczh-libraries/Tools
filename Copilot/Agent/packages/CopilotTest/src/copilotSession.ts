@@ -23,8 +23,9 @@ interface ICopilotSessionCallbacks {
   // tool.execution_start with a new id
   onStartToolExecution(
     toolCallId: string,
+    parentToolCallId: string | undefined,
     toolName: string,
-    parentToolCallId: string | undefined
+    toolArguments: string
   ): void;
   // tool.execution_partial_result with an existing id
   onToolExecution(toolCallId: string, delta: string): void;
@@ -115,8 +116,9 @@ export async function startSession(
   session.on("tool.execution_start", (event) => {
     callback.onStartToolExecution(
       event.data.toolCallId,
+      event.data.parentToolCallId,
       event.data.toolName,
-      event.data.parentToolCallId
+      (event.data.arguments ? JSON.stringify(event.data.arguments, undefined, 2) : "")
     );
   });
 
