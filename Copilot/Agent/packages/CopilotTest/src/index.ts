@@ -2,19 +2,13 @@ import { CopilotClient } from "@github/copilot-sdk";
 import * as readline from "readline";
 import * as path from "path";
 
-interface ModelInfo {
-  id: string;
-  name: string;
-  multiplier: number;
-}
-
 async function main() {
   // Get working directory from command line argument
   // Usage: node dist/index.js [workingDirectory]
   // If not provided, defaults to current working directory
   const workingDirectory = process.argv[2] || process.cwd();
   const absoluteWorkingDirectory = path.resolve(workingDirectory);
-  
+
   // Ensure the input is an absolute path without trailing separators or relative components
   // The path before and after resolving must be identical (no normalization should occur)
   if (process.argv[2] && workingDirectory !== absoluteWorkingDirectory) {
@@ -24,9 +18,9 @@ async function main() {
       `Expected: "${absoluteWorkingDirectory}"`
     );
   }
-  
+
   console.log(`Working directory: ${absoluteWorkingDirectory}\n`);
-  
+
   const client = new CopilotClient({
     cwd: absoluteWorkingDirectory
   });
@@ -36,17 +30,8 @@ async function main() {
     // List available models
     console.log("=== Available Models ===\n");
     const models = await client.listModels();
-    
-    const modelList: ModelInfo[] = models.map((model: any) => ({
-      id: model.id,
-      name: model.name || model.id,
-      multiplier: model.multiplier || 1
-    }));
-
-    modelList.forEach((model) => {
-      console.log(`Model: ${model.name}`);
-      console.log(`  ID: ${model.id}`);
-      console.log(`  Multiplier: ${model.multiplier}x\n`);
+    models.forEach((model) => {
+      console.log(`${model.id}: ${model.billing?.multiplier}x`);
     });
 
     // Create readline interface for user input
@@ -68,9 +53,12 @@ async function main() {
     let selectedModelId: string | null = null;
     while (!selectedModelId) {
       const userInput = await selectModel();
-      
+      if (userInput.toLowerCase() === "exit") {
+        break;
+      }
+
       // Try to find matching model
-      const matchedModel = modelList.find(
+      const matchedModel = models.find(
         (m) => m.id === userInput || m.name === userInput
       );
 
@@ -81,6 +69,8 @@ async function main() {
         console.log(`\n✗ Error: Model "${userInput}" not found. Please enter a valid model name or ID.\n`);
       }
     }
+
+    if (selectedModelId) {
 
     // Create session with selected model
     const session = await client.createSession({
@@ -112,8 +102,8 @@ async function main() {
           }
 
           if (message) {
-            process.stdout.write("Assistant: ");
-            await session.sendAndWait({ prompt: message });
+            process.stdout.write("\nAssistant: ");
+            await session.sendAndWait({ prompt: message }, 2147483647);
           }
 
           // Continue the chat loop
@@ -126,6 +116,7 @@ async function main() {
     await chat();
 
     rl.close();
+    }
     await client.stop();
     process.exit(0);
   } catch (error) {
