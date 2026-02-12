@@ -20,8 +20,15 @@ Remember to update REPO-ROOT/Copilot/Agent/README.md to describe:
 - How to maintain and run the project.
 - Brief description of the project structure.
 
+### Git Push
+
+This section only applies when you are running locally (aka not running in github.com maintaining a pull request).
+
 When you think you have implemented all changes and all tests including playwright and unit test pass,
-git commit the change with title "Updated Copilot/Agent" but do not git push.
+git commit the change with title "Updated Copilot/Agent" and git push.
+Git push may fail when the remote branch has new commits:
+- Do the merge when it could be automatically done. And then git push again.
+- If there is any merge conflict, tell me and stop.
 
 ## RESTful API Testing
 
