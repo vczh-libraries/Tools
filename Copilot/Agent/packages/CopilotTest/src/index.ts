@@ -15,9 +15,9 @@ async function main() {
   const workingDirectory = process.argv[2] || process.cwd();
   const absoluteWorkingDirectory = path.resolve(workingDirectory);
   
-  // Ensure the input is an absolute path without trailing separators
-  // The path before and after resolving must be identical
-  if (workingDirectory !== absoluteWorkingDirectory && workingDirectory !== process.cwd()) {
+  // Ensure the input is an absolute path without trailing separators or relative components
+  // The path before and after resolving must be identical (no normalization should occur)
+  if (process.argv[2] && workingDirectory !== absoluteWorkingDirectory) {
     throw new Error(
       `Working directory must be an absolute path without trailing separators or relative components.\n` +
       `Received: "${workingDirectory}"\n` +
