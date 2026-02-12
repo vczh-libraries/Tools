@@ -196,6 +196,15 @@ async function sendRequest() {
     setSendEnabled(false);
     requestTextarea.value = "";
 
+    // Create a "User" message block, append the request and immediately complete it
+    const userBlock = new MessageBlock("User");
+    const userKey = `User-request-${Date.now()}`;
+    messageBlocks.set(userKey, userBlock);
+    sessionPart.appendChild(userBlock.divElement);
+    userBlock.appendData(text);
+    userBlock.complete();
+    sessionPart.scrollTop = sessionPart.scrollHeight;
+
     try {
         await fetch(`/api/copilot/session/query/${encodeURIComponent(sessionId)}`, {
             method: "POST",

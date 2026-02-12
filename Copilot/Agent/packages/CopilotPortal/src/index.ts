@@ -26,13 +26,20 @@ const mimeTypes: Record<string, string> = {
 const assetsDir = path.resolve(__dirname, "..", "assets");
 
 // ---- Copilot Client ----
-const copilotClient = new CopilotClient();
-let copilotClientStarted = false;
+let copilotClient: CopilotClient | null = null;
 
-async function ensureCopilotClient(): Promise<void> {
-    if (!copilotClientStarted) {
+async function ensureCopilotClient(): Promise<CopilotClient> {
+    if (!copilotClient) {
+        copilotClient = new CopilotClient();
         await copilotClient.start();
-        copilotClientStarted = true;
+    }
+    return copilotClient;
+}
+
+async function closeCopilotClientIfNoSessions(): Promise<void> {
+    if (sessions.size === 0 && copilotClient) {
+        await copilotClient.stop();
+        copilotClient = null;
     }
 }
 
@@ -122,9 +129,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
     if (apiPath === "stop") {
         jsonResponse(res, 200, {});
         console.log("Shutting down...");
-        if (copilotClientStarted) {
+        if (copilotClient) {
             await copilotClient.stop();
-            copilotClientStarted = false;
+            copilotClient = null;
         }
         server.close(() => {
             process.exit(0);
@@ -135,8 +142,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
     // api/copilot/models
     if (apiPath === "copilot/models") {
         try {
-            await ensureCopilotClient();
-            const modelList = await copilotClient.listModels();
+            const client = await ensureCopilotClient();
+            const modelList = await client.listModels();
             const models = modelList.map((m: { name: string; id: string; billing?: { multiplier?: number } }) => ({
                 name: m.name,
                 id: m.id,
@@ -156,7 +163,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
         const body = await readBody(req);
         const workingDirectory = body.trim() || undefined;
         try {
-            await ensureCopilotClient();
+            const client = await ensureCopilotClient();
             const sessionId = `session-${nextSessionId++}`;
             const state: SessionState = {
                 session: null as unknown as SessionState["session"],
@@ -165,7 +172,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
                 sessionError: null,
             };
 
-            const session = await startSession(copilotClient, modelId, {
+            const session = await startSession(client, modelId, {
                 onStartReasoning(reasoningId: string) {
                     pushResponse(state, { callback: "onStartReasoning", reasoningId });
                 },
@@ -233,6 +240,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
             state.waitingResolve = null;
             resolve({ error: "SessionNotFound" });
         }
+        // Close CopilotClient if all sessions are closed
+        await closeCopilotClientIfNoSessions();
         jsonResponse(res, 200, { result: "Closed" });
         return;
     }

@@ -41,18 +41,27 @@ export class MessageBlock {
         this.#divElement.classList.remove("receiving");
         this.#divElement.classList.add("completed");
 
-        // Collapse all other completed blocks, expand this one
-        const parent = this.#divElement.parentElement;
-        if (parent) {
-            for (const child of parent.children) {
-                const other = child[MESSAGE_BLOCK_FIELD];
-                if (other && other !== this && other.isCompleted) {
-                    other.#collapsed = true;
-                    other.#divElement.classList.add("collapsed");
+        // "User" and "Message" blocks expand, others collapse
+        const shouldExpand = this.#blockType === "User" || this.#blockType === "Message";
+        if (shouldExpand) {
+            // Collapse all other completed blocks, then expand this one
+            const parent = this.#divElement.parentElement;
+            if (parent) {
+                for (const child of parent.children) {
+                    const other = child[MESSAGE_BLOCK_FIELD];
+                    if (other && other !== this && other.isCompleted) {
+                        other.#collapsed = true;
+                        other.#divElement.classList.add("collapsed");
+                    }
                 }
             }
+            this.#collapsed = false;
+            this.#divElement.classList.remove("collapsed");
+        } else {
+            // Reasoning/Tool blocks just collapse themselves
+            this.#collapsed = true;
+            this.#divElement.classList.add("collapsed");
         }
-        this.#divElement.classList.remove("collapsed");
 
         this.#headerElement.onclick = () => {
             if (!this.#completed) return;
