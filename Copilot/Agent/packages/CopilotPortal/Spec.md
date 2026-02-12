@@ -12,7 +12,7 @@ API entry is http://localhost:port/api/...
 
 "yarn portal" to run src/index.ts.
 
-It starts both Website and RESTful API. Awaits for an ENTER and stops.
+It starts both Website and RESTful API. Awaits for api/stop to stops.
 
 ## Website
 
@@ -24,7 +24,7 @@ Requesting for http://localhost:port/index.html returns assets/index.html.
 
 ### test.html
 
-This is a test page, when it is loaded, it queries api/test and print the content to the body.
+This is a test page, when it is loaded, it queries api/test and print the message field to the body.
 
 ### index.html
 
@@ -32,10 +32,14 @@ It is blank
 
 ## API
 
-All restful read arguments from the path and returns a JSON document (except for api/test)
+All restful read arguments from the path and returns a JSON document.
 
 All title names below represents http://localhost:port/api/TITLE
 
 ### test
 
-Returns a string "Hello, world!"
+Returns `{"message":"Hello, world!"}`
+
+### stop
+
+Returns `{}` and stops.
