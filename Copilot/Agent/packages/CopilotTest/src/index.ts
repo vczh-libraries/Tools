@@ -37,6 +37,9 @@ interface ICopilotSessionCallbacks {
 
   // assistant.turn_end
   onAgentEnd(turnId: string): void;
+
+  // session.idle
+  onIdle(): void;
 }
 
 function startSession(client: CopilotClient, modelId: string, callback: ICopilotSessionCallbacks): ICopilotSession {
