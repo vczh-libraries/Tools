@@ -2,7 +2,7 @@ import { CopilotClient, type CopilotSession } from "@github/copilot-sdk";
 
 interface ICopilotSession {
   get rawSection(): CopilotSession;
-  sendRequest(message: string, timeout: 2147483647): Promise<void>;
+  sendRequest(message: string, timeout?: number): Promise<void>;
 }
 
 interface ICopilotSessionCallbacks {
@@ -145,7 +145,7 @@ export async function startSession(
       return session;
     },
 
-    async sendRequest(message: string, timeout: 2147483647): Promise<void> {
+    async sendRequest(message: string, timeout: number = 2147483647): Promise<void> {
       await session.sendAndWait({ prompt: message }, timeout);
     },
   };

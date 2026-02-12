@@ -222,7 +222,7 @@ async function main() {
             continue;
           }
 
-          await session.sendRequest(message, 2147483647);
+          await session.sendRequest(message);
         }
       }
     } finally {
