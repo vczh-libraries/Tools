@@ -1,5 +1,6 @@
 import { CopilotClient } from "@github/copilot-sdk";
 import * as readline from "readline";
+import * as path from "path";
 
 interface ModelInfo {
   id: string;
@@ -8,7 +9,15 @@ interface ModelInfo {
 }
 
 async function main() {
-  const client = new CopilotClient();
+  // Get working directory from command line argument
+  const workingDirectory = process.argv[2] || process.cwd();
+  const absoluteWorkingDirectory = path.resolve(workingDirectory);
+  
+  console.log(`Working directory: ${absoluteWorkingDirectory}\n`);
+  
+  const client = new CopilotClient({
+    cwd: absoluteWorkingDirectory
+  });
   await client.start();
 
   try {
@@ -65,6 +74,7 @@ async function main() {
     const session = await client.createSession({
       model: selectedModelId,
       streaming: true,
+      workingDirectory: absoluteWorkingDirectory,
     });
 
     // Listen for response chunks
