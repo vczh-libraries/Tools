@@ -65,6 +65,21 @@ After "Stop" is pressed, responses from this api will be ignored and no more suc
 
 #### Session Part
 
+Session responses generates 3 types of message block:
+- Reasoning
+- Tool
+- Message
+Multiple of them could happen parallelly.
+
+When `ICopilotSessionCallbacks::onStartXXX` happens, a new message block should be created.
+When `ICopilotSessionCallbacks::onXXX` happens, the data should be appended to the message block.
+When `ICopilotSessionCallbacks::onEndXXX` happens, the message block is completed, no data needs to append to the message block.
+As an exception, `ICopilotSessionCallbacks::onEndToolExecution` will gives you an optional error message.
+Responses for different message blocks are identified by its id.
+
+A message blocks stack vertically from top to bottom in the session part.
+`MessageBlock` in messageBlock.js should be used to control any message block.
+
 #### Request Part
 
 It is a multiline text box. I can type any text, and press CTRL+ENTER to send the request.
@@ -72,14 +87,37 @@ It is a multiline text box. I can type any text, and press CTRL+ENTER to send th
 There is a "Send" button at the right bottom corner of the text box.
 It does the same thing as pressing CTRL+ENTER.
 When the button is disabled, pressing CTRL+ENTER should also does nothing.
+`api/copilot/session/query/{session-id}` is used here.
 
 When a request is sent, the button is disabled.
 When `ICopilotSessionCallbacks::onAgentEnd` triggers, it is enabled again.
 
 There is a "Stop" button at the left bottom corner of the text box.
-It ends the session, send `api/stop`, do all necessary finishing work, close the webpage.
+It ends the session with `api/copilot/session/stop/{session-id}`, followed by an `api/stop`, do all necessary finishing work, close the webpage.
 
 ### messageBlock.js
+
+Put messageBlock.js specific css file in messageBlock.css.
+
+It exposes a class in this schema
+
+```typescript
+class MessageBlock {
+  constructor(blockType: "Reasoning" | "Tool" | "Message");
+  get divElement(): HTMLDivElement;
+  appendData(data: string): void;
+  complete(): void;
+}
+```
+
+Each message block has a title, displaying: "blockType [receiving...]" or "blockType".
+
+When a message block is created and receiving data, the height is limited to 150px, clicking the header does nothing
+
+When a message block is completed:
+- A message block will expand and others will collapse.
+- Clicking the header of a completed message block switch between expanding or collapsing.
+- There is no more height limit, it should expands to render all data.
 
 ## API
 
