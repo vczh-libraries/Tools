@@ -1,7 +1,6 @@
 import * as http from "node:http";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import * as readline from "node:readline";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,8 +38,18 @@ function serveStaticFile(res: http.ServerResponse, filePath: string): void {
 
 function handleApi(req: http.IncomingMessage, res: http.ServerResponse, apiPath: string): void {
     if (apiPath === "test") {
-        res.writeHead(200, { "Content-Type": "text/plain" });
-        res.end("Hello, world!");
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ message: "Hello, world!" }));
+        return;
+    }
+
+    if (apiPath === "stop") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({}));
+        console.log("Shutting down...");
+        server.close(() => {
+            process.exit(0);
+        });
         return;
     }
 
@@ -70,14 +79,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    console.log("Press ENTER to stop the server.");
-});
-
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-rl.on("line", () => {
-    console.log("Shutting down...");
-    server.close(() => {
-        rl.close();
-        process.exit(0);
-    });
+    console.log("Use api/stop to stop the server.");
 });
