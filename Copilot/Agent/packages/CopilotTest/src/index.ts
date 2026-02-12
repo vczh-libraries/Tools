@@ -10,6 +10,8 @@ interface ModelInfo {
 
 async function main() {
   // Get working directory from command line argument
+  // Usage: node dist/index.js [workingDirectory]
+  // If not provided, defaults to current working directory
   const workingDirectory = process.argv[2] || process.cwd();
   const absoluteWorkingDirectory = path.resolve(workingDirectory);
   
