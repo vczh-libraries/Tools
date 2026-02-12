@@ -1,7 +1,7 @@
 # Spec.md Driven Development
 
 When this file is tagged:
-- Read the latest commit the following folders, it is the anchor commit:
+- Read the latest commit affecting any of the following folders, it is the anchor commit:
   - REPO-ROOT/Copilot/Agent/packages/CopilotPortal/src
   - REPO-ROOT/Copilot/Agent/packages/CopilotPortal/assets
 - All commits with title "Update Spec.md" that newer than the anchor commit are new changes.
