@@ -3,6 +3,12 @@ import * as readline from "readline";
 import * as path from "path";
 import { startSession } from "./copilotSession.js";
 
+// TODO:
+// - Detect when the session is broken, like disconnected or something.
+// - Dump all communication history including all reasoning or tool calling.
+// - Create a new session but inject all history to continue.
+// - Being able to switch model.
+
 class FormatOutput {
   private readonly contentById = new Map<string, string>();
   private currentId: string | undefined = undefined;
