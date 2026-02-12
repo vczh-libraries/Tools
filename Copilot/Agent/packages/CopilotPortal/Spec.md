@@ -36,6 +36,8 @@ All restful read arguments from the path and returns a JSON document.
 
 All title names below represents http://localhost:port/api/TITLE
 
+Copilot hosting is implemented by "@github/copilot-sdk" and the CopilotApi (copilot-api) package
+
 ### test
 
 Returns `{"message":"Hello, world!"}`
@@ -59,6 +61,8 @@ Returns all copilot sdk supported models in this schema
 ```
 
 ### copilot/session/start/{model-id}
+
+The body will be an absolute path for working directory
 
 Start a new copilot session and return in this schema
 
