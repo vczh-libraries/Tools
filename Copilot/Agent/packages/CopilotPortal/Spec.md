@@ -24,11 +24,62 @@ Requesting for http://localhost:port/index.html returns assets/index.html.
 
 ### test.html
 
-This is a test page, when it is loaded, it queries api/test and print the message field to the body.
+This is a test page, when it is loaded, it queries `api/test` and print the message field to the body.
 
 ### index.html
 
-It is blank
+Put index.html specific css file in index.css.
+
+Put index.html specific javascript file in index.js.
+
+#### Starting an Copilot Session
+
+When the webpage is loaded, it renders a UI in the middle to let me input:
+- Model. A combo box with contents retrieved from `api/copilot/models`.
+  - Items must be sorted.
+  - Names instead of ids are displayed, but be aware of that other API needs the id.
+  - Default to the model whose id is "gpt-5.2"
+- Working Directory. A text box receiving an absolute full path.
+  - When the url is `index.html?project=XXX`, the text box defaults to "C:\Code\VczhLibraries\XXX"
+  - When there is no `project` argument, leave it blanks.
+
+When I hit the "Start" button, the UI above disappears and show the session UI.
+Send `api/copilot/session/start/{model-id}` to get the session id.
+
+#### Session Interaction
+
+The agent UI has two part.
+
+The upper part (session part) renders what the session replies.
+The lower part (request part) renders a text box to send my request to the session.
+The session part and the request part should always fill the whole webpage.
+Between two parts there is a bar to drag vertically to adjust the height of the request part which defaults to 300px.
+
+After the UI is loaded,
+the page must keep sending `api/copilot/session/live/{session-id}` to the server sequentially (aka not parallelly).
+When a timeout happens, resend the api.
+When it returns any response, process it and still keep sending the api.
+Whenever `ICopilotSessionCallbacks::METHOD` is mentioned, it means a response from this api.
+
+After "Stop" is pressed, responses from this api will be ignored and no more such api is sending.
+
+#### Session Part
+
+#### Request Part
+
+It is a multiline text box. I can type any text, and press CTRL+ENTER to send the request.
+
+There is a "Send" button at the right bottom corner of the text box.
+It does the same thing as pressing CTRL+ENTER.
+When the button is disabled, pressing CTRL+ENTER should also does nothing.
+
+When a request is sent, the button is disabled.
+When `ICopilotSessionCallbacks::onAgentEnd` triggers, it is enabled again.
+
+There is a "Stop" button at the left bottom corner of the text box.
+It ends the session, send `api/stop`, do all necessary finishing work, close the webpage.
+
+### messageBlock.js
 
 ## API
 
@@ -96,7 +147,11 @@ Returns in this schema
 
 ### copilot/session/live/{session-id}
 
-This is a query to wait for any data sending back for this session.
+This is a query to wait for one response back for this session.
+Each session generates many responses, storing in a queue.
+When the api comes, it pop one response and send back. Responses must be send back in its generating orders.
+If there is no response, do not reply the API. If there is no response after 5 seconds, send back a time out error.
+Be aware of that api requests and session responses could happen in any order.
 
 Returns in this schema if any error happens
 
