@@ -12,6 +12,7 @@
     "chat": "yarn workspace copilot-test start"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "typescript": "^5.7.3"
   }
 }

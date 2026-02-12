@@ -1,7 +1,7 @@
 import { CopilotClient } from "@github/copilot-sdk";
 import * as readline from "readline";
 import * as path from "path";
-import { startSession } from "./copilotSession.js";
+import { startSession } from "copilot-api";
 
 // TODO:
 // - Detect when the session is broken, like disconnected or something.
