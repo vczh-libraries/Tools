@@ -14,6 +14,12 @@ The CopilotPortal package serves a website and a RESTful API that can be tested 
 
 ## Post Implementation
 
+Remember to update REPO-ROOT/Copilot/Agent/README.md to describe:
+- What this project is.
+- What does it use.
+- How to maintain and run the project.
+- Brief description of the project structure.
+
 When you think you have implemented all changes and all tests including playwright and unit test pass,
 git commit the change with title "Updated Copilot/Agent" but do not git push.
 
@@ -27,4 +33,4 @@ It starts a copilot session so it could be hard to predict what the response wil
 
 ## Playwright Testing
 
-When the website is changed, you must always try all webpage features described in Spec.md
+When the website is changed, you must always try all webpage features described in Spec.md.
