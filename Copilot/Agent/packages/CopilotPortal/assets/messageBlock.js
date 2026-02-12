@@ -42,23 +42,12 @@ export class MessageBlock {
         this.#divElement.classList.add("completed");
 
         // "User" and "Message" blocks expand, others collapse
+        // Completing a block should NOT automatically expand or collapse other blocks
         const shouldExpand = this.#blockType === "User" || this.#blockType === "Message";
         if (shouldExpand) {
-            // Collapse all other completed blocks, then expand this one
-            const parent = this.#divElement.parentElement;
-            if (parent) {
-                for (const child of parent.children) {
-                    const other = child[MESSAGE_BLOCK_FIELD];
-                    if (other && other !== this && other.isCompleted) {
-                        other.#collapsed = true;
-                        other.#divElement.classList.add("collapsed");
-                    }
-                }
-            }
             this.#collapsed = false;
             this.#divElement.classList.remove("collapsed");
         } else {
-            // Reasoning/Tool blocks just collapse themselves
             this.#collapsed = true;
             this.#divElement.classList.add("collapsed");
         }
