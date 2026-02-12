@@ -3,6 +3,66 @@ import * as readline from "readline";
 import * as path from "path";
 import { startSession } from "./copilotSession.js";
 
+class FormatOutput {
+  private readonly contentById = new Map<string, string>();
+  private currentId: string | undefined = undefined;
+
+  public constructor(private readonly write: (text: string) => void) {}
+
+  public logStart(id: string): void {
+    this.contentById.set(id, "");
+    this.switchTo(id);
+  }
+
+  public log(id: string, delta: string): void {
+    if (!this.contentById.has(id)) {
+      this.contentById.set(id, "");
+    }
+
+    this.switchTo(id);
+    this.write(delta);
+    this.contentById.set(id, (this.contentById.get(id) ?? "") + delta);
+  }
+
+  public logStop(id: string, completeContent?: string): void {
+    if (completeContent !== undefined) {
+      if (!this.contentById.has(id)) {
+        this.contentById.set(id, "");
+      }
+
+      this.switchTo(id);
+      const existing = this.contentById.get(id) ?? "";
+      if (completeContent.startsWith(existing)) {
+        const tail = completeContent.substring(existing.length);
+        if (tail.length > 0) {
+          this.write(tail);
+        }
+      } else if (completeContent !== existing) {
+        this.write(completeContent);
+      }
+    }
+
+    this.contentById.delete(id);
+    if (this.currentId === id) {
+      this.currentId = undefined;
+    }
+  }
+
+  private switchTo(id: string): void {
+    if (this.currentId === id) {
+      return;
+    }
+
+    this.currentId = id;
+    this.write(`\n========${id}========\n`);
+
+    const content = this.contentById.get(id);
+    if (content !== undefined && content.length > 0) {
+      this.write(content);
+    }
+  }
+}
+
 function createQuestion(rl: readline.Interface) {
   return (prompt: string): Promise<string> =>
     new Promise((resolve) => {
@@ -80,23 +140,59 @@ async function main() {
       }
 
       if (selectedModelId) {
+        const formatter = new FormatOutput((text) => {
+          process.stdout.write(text);
+        });
+
         const session = await startSession(
           client,
           selectedModelId,
           {
-            onStartReasoning: () => {},
-            onReasoning: () => {},
-            onEndReasoning: () => {},
-
-            onStartMessage: () => {},
-            onMessage: (_messageId, delta) => {
-              process.stdout.write(delta);
+            onStartReasoning: (reasoningId) => {
+              formatter.logStart(`reasoning_${reasoningId}`);
             },
-            onEndMessage: () => {},
+            onReasoning: (reasoningId, delta) => {
+              formatter.log(`reasoning_${reasoningId}`, delta);
+            },
+            onEndReasoning: (reasoningId, completeContent) => {
+              formatter.logStop(`reasoning_${reasoningId}`, completeContent);
+            },
 
-            onStartToolExecution: () => {},
-            onToolExecution: () => {},
-            onEndToolExecution: () => {},
+            onStartMessage: (messageId) => {
+              formatter.logStart(`message_${messageId}`);
+            },
+            onMessage: (messageId, delta) => {
+              formatter.log(`message_${messageId}`, delta);
+            },
+            onEndMessage: (messageId, completeContent) => {
+              formatter.logStop(`message_${messageId}`, completeContent);
+            },
+
+            onStartToolExecution: (toolCallId, toolName, parentToolCallId) => {
+              formatter.logStart(`tool_${toolCallId}`);
+              formatter.log(
+                `tool_${toolCallId}`,
+                `[START] ${toolName}${parentToolCallId ? ` (parent: ${parentToolCallId})` : ""}\n`
+              );
+            },
+            onToolExecution: (toolCallId, delta) => {
+              formatter.log(`tool_${toolCallId}`, delta);
+            },
+            onEndToolExecution: (toolCallId, result, error) => {
+              const id = `tool_${toolCallId}`;
+              if (error) {
+                formatter.log(
+                  id,
+                  `[ERROR] ${error.code ? `${error.code}: ` : ""}${error.message}\n`
+                );
+              } else if (result) {
+                formatter.log(id, result.content);
+                if (result.detailedContent) {
+                  formatter.log(id, result.detailedContent);
+                }
+              }
+              formatter.logStop(id);
+            },
 
             onAgentStart: () => {},
             onAgentEnd: () => {},
@@ -120,7 +216,6 @@ async function main() {
             continue;
           }
 
-          process.stdout.write("\nAssistant: ");
           await session.sendRequest(message, 2147483647);
         }
       }
