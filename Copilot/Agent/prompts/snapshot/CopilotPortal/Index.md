@@ -53,6 +53,8 @@ After "Stop Server" or "Close Session" is pressed, responses from this api will 
 
 #### Session Part
 
+The session part div is passed to a `SessionResponseRenderer` (from `sessionResponse.js`) which handles all rendering within it.
+
 Session responses generates 3 types of message block:
 - Reasoning
 - Tool

@@ -8,6 +8,8 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `assets`
   - `messageBlock.css`
   - `messageBlock.js`
+  - `sessionResponse.css`
+  - `sessionResponse.js`
 
 ### messageBlock.css
 
@@ -53,3 +55,33 @@ After it is completed, assuming the data is markdown document and render it prop
 
 Inside the `MessageBlock`, it holds a `<div/>` to change the rendering.
 And it should also put itself in the element (e.g. in a field with a unique name) so that the object will not be garbage-collected.
+
+### sessionResponse.css
+
+Put sessionResponse.js specific css file in sessionResponse.css.
+
+### sessionResponse.js
+
+It exposes a `SessionResponseRenderer` class in this schema:
+
+```typescript
+export class SessionResponseRenderer {
+  constructor(div: HTMLDivElement);
+  processCallback(data: object): string;
+  addUserMessage(text: string): void;
+  setAwaiting(awaiting: boolean): void;
+  scrollToBottom(): void;
+}
+```
+
+`SessionResponseRenderer` is a pure rendering component that does not touch any Copilot related API.
+An empty div element is passed to the constructor; all child elements are dynamically created inside it.
+The container div gets a CSS class `session-response-container` for styling (scrollable, padded).
+
+It manages an internal map of `MessageBlock` instances keyed by `"blockType-blockId"`.
+An "Awaits responses ..." status element is created and appended to the container.
+
+- `processCallback(data)`: Processes a callback object (from the live polling API) and handles creating/updating/completing message blocks for Reasoning, Message, and Tool callbacks. Returns the callback name string so the caller can react to lifecycle events (e.g. `"onAgentEnd"`).
+- `addUserMessage(text)`: Creates a "User" `MessageBlock`, appends the text, completes it, and scrolls to bottom.
+- `setAwaiting(awaiting)`: Shows or hides the "Awaits responses ..." status text.
+- `scrollToBottom()`: Scrolls the container to the bottom.

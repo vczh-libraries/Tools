@@ -53,17 +53,7 @@ After "Stop Server" or "Close Session" is pressed, responses from this api will 
 
 #### Session Part
 
-**TASK-BEGIN**
-I would like you to do a refactor:
-- Move the session part to another comonent `sessionResponse.js` and `sessionResponse.css`.
-- Update the `Shared.md` spec to keep track for the `sessionResponse` component.
-
-The `sessionResponse` component handles rendering of multiple stacking sessionResponse, including everything described below.
-You must design a class, e.g. `SessionResponseRenderer` to handle the rendering in a div element passing into the constructor.
-An empty div element should be passed to the constructor, you need to dynamically create everything inside it.
-It should not touch any Copilot related API. It should be a pure rendering component.
-The `processCallback` function seems to be a good method for the new `SessionResponseRenderer`, but make your own decision.
-**TASK-END**
+The session part div is passed to a `SessionResponseRenderer` (from `sessionResponse.js`) which handles all rendering within it.
 
 Session responses generates 3 types of message block:
 - Reasoning
@@ -112,4 +102,3 @@ When "Close Session" is clicked:
 - Close the current webpage window or tab.
 When "Stop Server" is clicked:
 - It does what "Stop Server" does, with an extra `api/stop` to stop the server before closing the webpage.
-**BUG**: The `window.close();` seems not executed, when I run the page in Chrome, clicking these button doesn't make the tab to disappear anyway.

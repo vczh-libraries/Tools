@@ -79,8 +79,10 @@ Copilot/Agent/
 │   │   │   ├── index.html    # Main portal page
 │   │   │   ├── index.js      # Portal JS (session interaction, live polling)
 │   │   │   ├── index.css     # Portal styles
-│   │   │   ├── messageBlock.js   # MessageBlock component
-│   │   │   ├── messageBlock.css  # MessageBlock styles
+│   │   │   ├── messageBlock.js       # MessageBlock component
+│   │   │   ├── messageBlock.css      # MessageBlock styles
+│   │   │   ├── sessionResponse.js    # SessionResponseRenderer component
+│   │   │   ├── sessionResponse.css   # SessionResponseRenderer styles
 │   │   │   └── test.html     # Simple API test page
 │   │   └── package.json
 │   └── CopilotTest/          # CLI chat application

@@ -1,10 +1,9 @@
-import { MessageBlock } from "./messageBlock.js";
+import { SessionResponseRenderer } from "./sessionResponse.js";
 
 // ---- State ----
 let sessionId = null;
 let livePollingActive = false;
 let sendEnabled = false;
-const messageBlocks = new Map(); // key: "blockType-blockId" -> MessageBlock
 
 // ---- DOM references ----
 const setupUi = document.getElementById("setup-ui");
@@ -19,7 +18,9 @@ const stopServerButton = document.getElementById("stop-server-button");
 const closeSessionButton = document.getElementById("close-session-button");
 const resizeBar = document.getElementById("resize-bar");
 const requestPart = document.getElementById("request-part");
-const awaitingStatus = document.getElementById("awaiting-status");
+
+// ---- Session Response Renderer ----
+const sessionRenderer = new SessionResponseRenderer(sessionPart);
 
 // ---- Setup: Load models and defaults ----
 
@@ -123,66 +124,11 @@ async function pollLive() {
 
 // ---- Process Callbacks ----
 
-function getOrCreateBlock(blockType, blockId) {
-    const key = `${blockType}-${blockId}`;
-    let block = messageBlocks.get(key);
-    if (!block) {
-        block = new MessageBlock(blockType);
-        messageBlocks.set(key, block);
-        sessionPart.insertBefore(block.divElement, awaitingStatus);
-    }
-    return block;
-}
-
 function processCallback(data) {
-    const cb = data.callback;
-
-    // Reasoning
-    if (cb === "onStartReasoning") {
-        getOrCreateBlock("Reasoning", data.reasoningId);
-    } else if (cb === "onReasoning") {
-        const block = getOrCreateBlock("Reasoning", data.reasoningId);
-        block.appendData(data.delta);
-    } else if (cb === "onEndReasoning") {
-        const block = getOrCreateBlock("Reasoning", data.reasoningId);
-        block.complete();
-    }
-
-    // Message
-    else if (cb === "onStartMessage") {
-        getOrCreateBlock("Message", data.messageId);
-    } else if (cb === "onMessage") {
-        const block = getOrCreateBlock("Message", data.messageId);
-        block.appendData(data.delta);
-    } else if (cb === "onEndMessage") {
-        const block = getOrCreateBlock("Message", data.messageId);
-        block.complete();
-    }
-
-    // Tool
-    else if (cb === "onStartToolExecution") {
-        const block = getOrCreateBlock("Tool", data.toolCallId);
-        block.title = data.toolName;
-        block.appendData(data.toolArguments);
-        block.appendData("\n");
-    } else if (cb === "onToolExecution") {
-        const block = getOrCreateBlock("Tool", data.toolCallId);
-        block.appendData(data.delta);
-    } else if (cb === "onEndToolExecution") {
-        const block = getOrCreateBlock("Tool", data.toolCallId);
-        if (data.error) {
-            block.appendData(`\nError: ${data.error.message}`);
-        }
-        block.complete();
-    }
-
-    // Agent lifecycle
-    else if (cb === "onAgentEnd") {
+    const cb = sessionRenderer.processCallback(data);
+    if (cb === "onAgentEnd") {
         setSendEnabled(true);
     }
-
-    // Auto-scroll session part to bottom
-    sessionPart.scrollTop = sessionPart.scrollHeight;
 }
 
 // ---- Send / Request ----
@@ -190,7 +136,7 @@ function processCallback(data) {
 function setSendEnabled(enabled) {
     sendEnabled = enabled;
     sendButton.disabled = !enabled;
-    awaitingStatus.style.display = enabled ? "none" : "block";
+    sessionRenderer.setAwaiting(!enabled);
 }
 
 async function sendRequest() {
@@ -201,14 +147,8 @@ async function sendRequest() {
     setSendEnabled(false);
     requestTextarea.value = "";
 
-    // Create a "User" message block, append the request and immediately complete it
-    const userBlock = new MessageBlock("User");
-    const userKey = `User-request-${Date.now()}`;
-    messageBlocks.set(userKey, userBlock);
-    sessionPart.insertBefore(userBlock.divElement, awaitingStatus);
-    userBlock.appendData(text);
-    userBlock.complete();
-    sessionPart.scrollTop = sessionPart.scrollHeight;
+    // Create a "User" message block via the renderer
+    sessionRenderer.addUserMessage(text);
 
     try {
         await fetch(`/api/copilot/session/query/${encodeURIComponent(sessionId)}`, {
@@ -232,6 +172,13 @@ requestTextarea.addEventListener("keydown", (e) => {
 
 // ---- Stop / Close ----
 
+function closeWindow() {
+    // Chrome blocks window.close() for pages not opened by script.
+    // Navigate to about:blank first so the page is considered script-opened.
+    window.open("", "_self");
+    window.close();
+}
+
 async function closeSession() {
     livePollingActive = false;
     try {
@@ -239,7 +186,7 @@ async function closeSession() {
     } catch (err) {
         // Ignore errors during shutdown
     }
-    window.close();
+    closeWindow();
 }
 
 closeSessionButton.addEventListener("click", closeSession);
@@ -252,7 +199,7 @@ stopServerButton.addEventListener("click", async () => {
     } catch (err) {
         // Ignore errors during shutdown
     }
-    window.close();
+    closeWindow();
 });
 
 // ---- Resize Bar ----
