@@ -17,9 +17,9 @@ The availability will be refreshed after every jobs.
 - summary problem : `planning ready`
 - summary update `text` : `execution ready`
 - execute : `execution ready`
-- execute update `text` : `execution ready` and the previous job was `execute`
-- verify : `execution ready` and the previous job was `execute`
-- verify update `text` : `execution ready` and the previous job was `verify`
+- execute update `text` : `execution ready` and the previous job was `execute` or `verify` keyworded
+- verify : `execution ready` and the previous job was `execute` or `verify` keyworded
+- verify update `text` : `execution ready` and the previous job was `execute` or `verify` keyworded
 - scrum learn : `execution ready` and has the "verified" mark
 
 Lists as a table, when automate is clicked, it executes all third-column jobs from the current row to the end
