@@ -48,6 +48,19 @@ Starts an HTTP server at `http://localhost:8888` serving a web UI and RESTful AP
 - "Close Session" ends the session and closes the tab; "Stop Server" also shuts down the server.
 - Use `http://localhost:8888/index.html?project=XXX` to default working directory to `C:\Code\VczhLibraries\XXX`.
 
+## Specification Structure
+
+There are two folders storing specification:
+- `prompts/snapshot`: The specification that the project implemented, it reflects the current state.
+- `prompts/spec`: The specification that the project need to be.
+
+File organization in these two folders are identical:
+- `CopilotPortal` folder: about `packages/CopilotPortal`
+  - `API.md`: RESTful API, and how to start the project.
+  - `Index.md`: index.html page.
+  - `Test.md`: test.html page.
+  - `Shared.md`: Shared components between multiple web pages.
+
 ## Project Structure
 
 ```

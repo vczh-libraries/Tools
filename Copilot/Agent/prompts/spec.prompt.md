@@ -1,3 +1,4 @@
+
 # Spec Driven Development
 
 The root of this project `REPO-ROOT/Copilot/Agent` is not the workspace root,
@@ -10,6 +11,8 @@ When this file is tagged, find out new changes in the spec:
 - Copy all files in `prompts/spec` to `prompts/snapshot`.
 - You can see what has been changed in the spec by git diff.
   - Ignore CRLF and LF differences if there is any.
+- You are recommended to read `README.md` to understand the whole picture of the project as well as specification organizations.
+- You are recommended to read all spec files to understand dependencies and relationships between each component.
 - Implement all changes.
 
 ## Changing the Spec
@@ -18,11 +21,23 @@ You are allowed to change the spec although you do not have to.
 When you think the spec needs to update,
 You will have to change files in both `prompts/snapshot` and `prompts/spec`, keep them sync.
 
-## Fixing Bugs
+### Fixing Bugs
 
 You might find some lines begins with `**BUG**:` in the spec.
 It means you need to fix the bug about the surrounding context.
 Delete the bug from the spec after you fix it, keep `prompts/snapshot` and `prompts/spec` sync.
+
+### Performing Tasks
+
+You might find some lines begins with `**TASK**:` in the spec.
+It means you need to complete the task described in the surrounding context.
+Delete the task from the spec after you complete it, keep `prompts/snapshot` and `prompts/spec` sync.
+
+## Testing with a Free Model
+
+There are some models whose multiplier is 0.
+Try your best to pick them, therefore it doesn't cost for performing any testing.
+List all models by `api/copilot/models`.
 
 ## RESTful API Testing
 
@@ -30,11 +45,17 @@ When RESTful API implementation is changed,
 you are recommended to start the server and test the API directly first.
 Walk through all APIs.
 Pay attention to the working directory argument in the API, you can use the `REPO-ROOT` of this project.
-It starts a copilot session so it could be hard to predict what the response will be, just make some random conversation without making any side effect to the project.
+Make some random conversation without making any side effect to the project (specified by working directory argument).
 
 ## Playwright Testing
 
 When the website is changed, you must always try all webpage features described in the spec.
+
+## Maintaining Unit Test
+
+It starts a copilot session so it could be hard to predict what the response will be.
+But try your best to design and maintain a set of unit test files in the `test` folder of any working package.
+Cover as much as you can against RESTful API and website features.
 
 ## Post Implementation
 
