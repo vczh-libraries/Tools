@@ -5,6 +5,8 @@ Login:
   Premium model for planning: default to GPT-5.2
   Premium model for coding: default to GPT-5.3-codex
 
+Need to mention: `Read REPO-ROOT/AGENTS.md to interpret the following content:`
+
 JSON file as an entry to define all jobs and their availability.
 The availability will be refreshed after every jobs.
 - scrum problem `text` : always available
