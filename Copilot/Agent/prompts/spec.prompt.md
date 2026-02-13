@@ -29,7 +29,7 @@ Delete the bug from the spec after you fix it, keep `prompts/snapshot` and `prom
 
 ### Performing Tasks
 
-You might find some lines begins with `**TASK**:` in the spec.
+You might find some lines begins with `**TASK**:` in the spec, or `**TASK-BEGIN**` to its nearest `**TASK-END**` blocks.
 It means you need to complete the task described in the surrounding context.
 Delete the task from the spec after you complete it, keep `prompts/snapshot` and `prompts/spec` sync.
 
