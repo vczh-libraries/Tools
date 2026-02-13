@@ -144,9 +144,14 @@ When a `MessageBlock` is completed:
 - Completing a `MessageBlock` should not automatically expand or collapse other blocks.
 - Clicking the header of a completed `MessageBlock` switch between expanding or collapsing.
 - There is no more height limit, it should expands to render all data.
+- A button appears at the very right of the header, it should fills full height.
+  - When the content is rendering as markdown, it shows "View Raw Data", clicking it shows the raw data.
+  - When the content is raw data, it shows "View Markdown", clicking it shows the markdown rendering of the raw data.
 
 Before a `MessageBlock` is completed, raw data should render.
-After it is completed, assuming the data is markdown document and render it properly, except for "Tool" block.
+After it is completed, assuming the data is markdown document and render it properly:
+- Except for "Tool" block, and "Tool" block should not render the button switching between raw data and markdown.
+- Try to tell if the raw content is markdown or just ordinary text, if it doesn't look like a markdown, do not do the markdown rendering automatically.
 
 Inside the `MessageBlock`, it holds a `<div/>` to change the rendering.
 And it should also put itself in the element (e.g. in a field with a unique name) so that the object will not be garbage-collected.

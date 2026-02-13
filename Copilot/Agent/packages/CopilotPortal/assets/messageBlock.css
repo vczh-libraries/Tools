@@ -6,11 +6,34 @@
 }
 
 .message-block-header {
-    padding: 6px 12px;
+    display: flex;
+    align-items: stretch;
     background: #f0f0f0;
     font-weight: bold;
     font-size: 14px;
     user-select: none;
+}
+
+.message-block-header-text {
+    flex: 1;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+}
+
+.message-block-toggle {
+    padding: 0 12px;
+    border: none;
+    border-left: 1px solid #ddd;
+    background: #e8e8e8;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    align-self: stretch;
+}
+
+.message-block-toggle:hover {
+    background: #d8d8d8;
 }
 
 .message-block-header.completed {
