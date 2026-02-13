@@ -43,11 +43,13 @@ all documentation jobs will:
 - review `keyword`
 - until all  
 - review final
+
 using review model
 - GPT-5.3-codex
 - opus 4.6
 - Grok
 - Gemini Pro 3
+
 and summary model (premium model for planning)
 
 Each job has its own JSON file defining a workflow with multiple tasks:
