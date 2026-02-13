@@ -12,14 +12,26 @@ The availability will be refreshed after every jobs.
 - design problem next : `scrum ready`
 - design update `text` : `task ready`
 - design problem `text` : always available
-- plan : `task ready`
+- plan problem : `task ready`
 - plan update `text` : `planning ready`
-- summary : `planning ready`
+- summary problem : `planning ready`
 - summary update `text` : `execution ready`
-- execute task
-  - execute : `execution ready`
-  - verify : `execution ready` and the previous job was execute
-  - scrum learn : `execution ready` and has the "verified" mark
+- execute : `execution ready`
+- execute update `text` : `execution ready` and the previous job was `execute`
+- verify : `execution ready` and the previous job was `execute`
+- verify update `text` : `execution ready` and the previous job was `verify`
+- scrum learn : `execution ready` and has the "verified" mark
+
+Lists as a table, when automate is clicked, it executes all third-column jobs from the current row to the end
+| keyword | | | | |
+|-|-|-|-|-|
+| scrum | | problem | update |
+| design | automate | problem next | update | problem |
+| plan | automate | problem | update |
+| summary | automate | problem | update |
+| execute | automate | | update |
+| verify | automate | | update |
+| scrum | | learn |
 
 conditions:
 - scrum ready: when Copilot_Scrum.md is not just an title
