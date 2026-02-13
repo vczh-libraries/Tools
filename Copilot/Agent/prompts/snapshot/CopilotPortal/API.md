@@ -107,6 +107,10 @@ Returns in this schema if any error happens
 }
 ```
 
+TEST-NOTE: Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
+It requires the underlying copilot agent to not generate any response for 5 seconds,
+which is almost impossible.
+
 Returns in this schema if an exception it thrown from inside the session
 
 ```typescript
