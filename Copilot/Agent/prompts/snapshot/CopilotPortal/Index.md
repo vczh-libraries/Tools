@@ -80,6 +80,6 @@ There is a "Stop Server" and "Close Session" button (in the mentioning order) at
 When "Close Session" is clicked:
 - Ends the session with `api/copilot/session/stop/{session-id}`.
 - Do whatever needs for finishing.
-- Close the current webpage window or tab.
+- Try to close the current webpage window or tab. If the browser blocks it (e.g. Chrome blocks `window.close()` for tabs not opened by script), replace the page content with a message indicating the session has ended and the tab may be closed manually.
 When "Stop Server" is clicked:
-- It does what "Stop Server" does, with an extra `api/stop` to stop the server before closing the webpage.
+- It does what "Close Session" does, with an extra `api/stop` to stop the server before attempting to close the webpage.
