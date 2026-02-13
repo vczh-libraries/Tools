@@ -173,10 +173,14 @@ requestTextarea.addEventListener("keydown", (e) => {
 // ---- Stop / Close ----
 
 function closeWindow() {
-    // Chrome blocks window.close() for pages not opened by script.
-    // Navigate to about:blank first so the page is considered script-opened.
-    window.open("", "_self");
+    // Chrome blocks window.close() for tabs not opened by script.
+    // Try to close, then fall back to a "safe to close" page.
     window.close();
+    // If we're still here after a short delay, the browser blocked window.close().
+    setTimeout(() => {
+        document.title = "Session Ended";
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#ccc;background:#1e1e1e;"><h1>Session ended — you may close this tab.</h1></div>';
+    }, 200);
 }
 
 async function closeSession() {
