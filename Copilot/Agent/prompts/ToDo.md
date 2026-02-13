@@ -29,8 +29,8 @@ Lists as a table, when automate is clicked, it executes all third-column jobs fr
 | design | automate | problem next | update | problem |
 | plan | automate | problem | update |
 | summary | automate | problem | update |
-| execute | automate | do | update |
-| verify | automate | do | update |
+| execute | automate | start | update |
+| verify | automate | start | update |
 | scrum | | learn |
 
 conditions:
