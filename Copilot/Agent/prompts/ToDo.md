@@ -6,6 +6,7 @@ Login:
   Premium model for coding: default to GPT-5.3-codex
 
 Need to mention: `Read REPO-ROOT/AGENTS.md to interpret the following content:`
+or just tag `copilot-instructions.md` and the actual prompt file directly.
 
 JSON file as an entry to define all jobs and their availability.
 The availability will be refreshed after every jobs.
