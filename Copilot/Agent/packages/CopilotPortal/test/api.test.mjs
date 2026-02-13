@@ -104,6 +104,23 @@ describe("API: full session lifecycle", () => {
         assert.strictEqual(data.error, "HttpRequestTimeout");
     });
 
+    it("live returns ParallelCallNotSupported for concurrent calls", async () => {
+        assert.ok(sessionId, "session must be started");
+        // Fire two live calls in parallel; the first will block (5s timeout),
+        // the second should get ParallelCallNotSupported immediately.
+        const [first, second] = await Promise.all([
+            fetchJson(`/api/copilot/session/live/${sessionId}`),
+            // Small delay to ensure the first call registers its waitingResolve
+            new Promise((r) => setTimeout(r, 100)).then(() =>
+                fetchJson(`/api/copilot/session/live/${sessionId}`)
+            ),
+        ]);
+        assert.strictEqual(second.error, "ParallelCallNotSupported",
+            "second parallel live call should be rejected");
+        assert.strictEqual(first.error, "HttpRequestTimeout",
+            "first live call should still timeout normally");
+    });
+
     it("query sends request and returns empty object (no error)", async () => {
         assert.ok(sessionId, "session must be started");
         const data = await fetchJson(`/api/copilot/session/query/${sessionId}`, {

@@ -109,11 +109,15 @@ When the api comes, it pop one response and send back. Responses must be send ba
 If there is no response, do not reply the API. If there is no response after 5 seconds, send back a time out error.
 Be aware of that api requests and session responses could happen in any order.
 
+This api does not support parallel calling on the same id.
+If a call with a session-id is pending,
+the second call with the same session-id should return an error.
+
 Returns in this schema if any error happens
 
 ```typescript
 {
-  error: "SessionNotFound" | "HttpRequestTimeout"
+  error: "SessionNotFound" | "HttpRequestTimeout" | "ParallelCallNotSupported"
 }
 ```
 

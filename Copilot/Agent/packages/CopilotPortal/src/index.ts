@@ -297,6 +297,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
             jsonResponse(res, 200, { error: "SessionNotFound" });
             return;
         }
+        if (state.waitingResolve) {
+            jsonResponse(res, 200, { error: "ParallelCallNotSupported" });
+            return;
+        }
         const response = await waitForResponse(state, 5000);
         if (response === null) {
             jsonResponse(res, 200, { error: "HttpRequestTimeout" });
