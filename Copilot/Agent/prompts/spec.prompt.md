@@ -17,6 +17,12 @@ You are allowed to change the spec although you do not have to.
 When you think the spec needs to update,
 You will have to change files in both `prompts/snapshot` and `prompts/spec`, keep them sync.
 
+## Fixing Bugs
+
+You might find some lines begins with `**BUG**:` in the spec.
+It means you need to fix the bug about the surrounding context.
+Delete the bug from the spec after you fix it, keep `prompts/snapshot` and `prompts/spec` sync.
+
 ## RESTful API Testing
 
 When RESTful API implementation is changed,
