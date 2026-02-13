@@ -74,7 +74,10 @@ Multiple of them could happen parallelly.
 When `ICopilotSessionCallbacks::onStartXXX` happens, a new message block should be created.
 When `ICopilotSessionCallbacks::onXXX` happens, the data should be appended to the message block.
 When `ICopilotSessionCallbacks::onEndXXX` happens, the message block is completed, no data needs to append to the message block.
-As an exception, `ICopilotSessionCallbacks::onEndToolExecution` will gives you an optional error message.
+
+The content of a "Tool" `MessageBlock` needs to be taken care of specially:
+- The first line should be in its title. It is easy to tell when the `title` property is empty.
+- `ICopilotSessionCallbacks::onEndToolExecution` will gives you an optional error message.
 Responses for different message blocks are identified by its id.
 
 A message blocks stack vertically from top to bottom in the session part.
@@ -123,12 +126,15 @@ export class MessageBlock {
   complete(): void;
   get isCompleted(): boolean;
   get divElement(): HTMLDivElement;
+  get title(): string;
+  set title(value: string);
 }
 
 export function getMessageBlock(div: HTMLDivElement): MessageBlock | undefined;
 ```
 
-Each `MessageBlock` has a title, displaying: "blockType [receiving...]" or "blockType".
+Each `MessageBlock` has a title, displaying: "blockType (title) [receiving...]" or "blockType (title)".
+When `title` is empty, "()" and the space before it must be omitted.
 Receiving appears when it is not completed yet.
 
 When a `MessageBlock` is created and receiving data, the height is limited to 150px, clicking the header does nothing

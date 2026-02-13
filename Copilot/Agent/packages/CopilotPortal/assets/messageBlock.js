@@ -2,6 +2,7 @@ const MESSAGE_BLOCK_FIELD = "__copilotMessageBlock";
 
 export class MessageBlock {
     #blockType;
+    #title = "";
     #completed = false;
     #collapsed = false;
     #rawData = "";
@@ -11,6 +12,7 @@ export class MessageBlock {
 
     constructor(blockType) {
         this.#blockType = blockType;
+        this.#title = "";
         this.#completed = false;
         this.#collapsed = false;
         this.#rawData = "";
@@ -21,12 +23,27 @@ export class MessageBlock {
 
         this.#headerElement = document.createElement("div");
         this.#headerElement.classList.add("message-block-header");
-        this.#headerElement.textContent = `${blockType} [receiving...]`;
+        this.#updateHeader();
         this.#divElement.appendChild(this.#headerElement);
 
         this.#bodyElement = document.createElement("div");
         this.#bodyElement.classList.add("message-block-body");
         this.#divElement.appendChild(this.#bodyElement);
+    }
+
+    #updateHeader() {
+        const titlePart = this.#title ? ` (${this.#title})` : "";
+        const receiving = this.#completed ? "" : " [receiving...]";
+        this.#headerElement.textContent = `${this.#blockType}${titlePart}${receiving}`;
+    }
+
+    get title() {
+        return this.#title;
+    }
+
+    set title(value) {
+        this.#title = value;
+        this.#updateHeader();
     }
 
     appendData(data) {
@@ -39,7 +56,7 @@ export class MessageBlock {
     complete() {
         this.#completed = true;
         this.#collapsed = false;
-        this.#headerElement.textContent = this.#blockType;
+        this.#updateHeader();
         this.#headerElement.classList.add("completed");
         this.#divElement.classList.remove("receiving");
         this.#divElement.classList.add("completed");

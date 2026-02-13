@@ -162,7 +162,8 @@ function processCallback(data) {
     // Tool
     else if (cb === "onStartToolExecution") {
         const block = getOrCreateBlock("Tool", data.toolCallId);
-        block.appendData(`${data.toolName}\n${data.toolArguments}`);
+        block.title = data.toolName;
+        block.appendData(data.toolArguments);
     } else if (cb === "onToolExecution") {
         const block = getOrCreateBlock("Tool", data.toolCallId);
         block.appendData(data.delta);
