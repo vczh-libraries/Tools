@@ -57,6 +57,8 @@ It starts a copilot session so it could be hard to predict what the response wil
 But try your best to design and maintain a set of unit test files in the `test` folder of any working package.
 Cover as much as you can against RESTful API and website features.
 
+If anything cannot be covered in the unit test, a `TEST-NODE: REASON` is required in the spec.
+
 ## Post Implementation
 
 Remember to update `README.md` to describe:
