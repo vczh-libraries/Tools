@@ -87,6 +87,8 @@ Copilot/Agent/
 
 - **Web Portal**: Browser-based UI for Copilot sessions with real-time streaming
 - **Message Blocks**: User, Reasoning, Tool, and Message blocks with expand/collapse behavior
+- **Markdown Rendering**: Completed message blocks (except Tool) render markdown content as formatted HTML using marked.js
+- **Awaiting Status**: "Awaits responses ..." indicator shown in the session part while the agent is working
 - **Lazy CopilotClient**: Client starts on demand and stops when all sessions close
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
 - **CLI Chat**: Terminal-based interactive chat with model selection and streaming

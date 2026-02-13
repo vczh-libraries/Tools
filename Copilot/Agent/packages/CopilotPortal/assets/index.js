@@ -18,6 +18,7 @@ const sendButton = document.getElementById("send-button");
 const stopButton = document.getElementById("stop-button");
 const resizeBar = document.getElementById("resize-bar");
 const requestPart = document.getElementById("request-part");
+const awaitingStatus = document.getElementById("awaiting-status");
 
 // ---- Setup: Load models and defaults ----
 
@@ -186,6 +187,7 @@ function processCallback(data) {
 function setSendEnabled(enabled) {
     sendEnabled = enabled;
     sendButton.disabled = !enabled;
+    awaitingStatus.style.display = enabled ? "none" : "block";
 }
 
 async function sendRequest() {

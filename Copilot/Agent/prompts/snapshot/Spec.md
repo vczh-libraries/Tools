@@ -82,6 +82,12 @@ A message blocks stack vertically from top to bottom in the session part.
 
 You are recommended to maintain a list of message blocks in a map with key "blockType-blockId" in its rendering order.
 
+When the session is generating responses (aka the "Send" button is disabled),
+there must be a text at the left buttom corner of the session part saying "Awaits responses ...".
+When the session finishes, this text disappears.
+
+The session part is scrollable.
+
 #### Request Part
 
 It is a multiline text box. I can type any text, and press CTRL+ENTER to send the request.
@@ -127,6 +133,9 @@ When a `MessageBlock` is completed:
 - Completing a `MessageBlock` should not automatically expand or collapse other blocks.
 - Clicking the header of a completed `MessageBlock` switch between expanding or collapsing.
 - There is no more height limit, it should expands to render all data.
+
+Before a `MessageBlock` is completed, raw data should render.
+After it is completed, assuming the data is markdown document and render it properly, except for "Tool" block.
 
 Inside the `MessageBlock`, it holds a `<div/>` to change the rendering.
 And it should also put itself in the element (e.g. in a field with a unique name) so that the object will not be garbage-collected.

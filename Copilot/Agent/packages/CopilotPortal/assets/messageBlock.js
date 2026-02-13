@@ -4,6 +4,7 @@ export class MessageBlock {
     #blockType;
     #completed = false;
     #collapsed = false;
+    #rawData = "";
     #divElement;
     #headerElement;
     #bodyElement;
@@ -12,6 +13,7 @@ export class MessageBlock {
         this.#blockType = blockType;
         this.#completed = false;
         this.#collapsed = false;
+        this.#rawData = "";
 
         this.#divElement = document.createElement("div");
         this.#divElement.classList.add("message-block", "receiving");
@@ -28,7 +30,8 @@ export class MessageBlock {
     }
 
     appendData(data) {
-        this.#bodyElement.textContent += data;
+        this.#rawData += data;
+        this.#bodyElement.textContent = this.#rawData;
         // Auto-scroll to bottom while receiving
         this.#bodyElement.scrollTop = this.#bodyElement.scrollHeight;
     }
@@ -40,6 +43,12 @@ export class MessageBlock {
         this.#headerElement.classList.add("completed");
         this.#divElement.classList.remove("receiving");
         this.#divElement.classList.add("completed");
+
+        // Render markdown for completed blocks (except Tool blocks)
+        if (this.#blockType !== "Tool" && typeof marked !== "undefined") {
+            this.#bodyElement.classList.add("markdown-rendered");
+            this.#bodyElement.innerHTML = marked.parse(this.#rawData);
+        }
 
         // "User" and "Message" blocks expand, others collapse
         // Completing a block should NOT automatically expand or collapse other blocks
