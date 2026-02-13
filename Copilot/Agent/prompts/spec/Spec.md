@@ -134,7 +134,8 @@ When a `MessageBlock` is completed:
 - Clicking the header of a completed `MessageBlock` switch between expanding or collapsing.
 - There is no more height limit, it should expands to render all data.
 
-Before a `MessageBlock` is completed, raw data should render. After it is completed, assuming the data is markdown document and render it properly.
+Before a `MessageBlock` is completed, raw data should render.
+After it is completed, assuming the data is markdown document and render it properly, except for "Tool" block.
 
 Inside the `MessageBlock`, it holds a `<div/>` to change the rendering.
 And it should also put itself in the element (e.g. in a field with a unique name) so that the object will not be garbage-collected.
