@@ -43,6 +43,9 @@ Each job has its own JSON file defining a workflow with multiple tasks:
 - task name
 - prompt
 - condition (satisfied and go, dissatisfied and ask for continuation)
+  - when dissatisfied, the command will feed to the current driving session and ask for:
+    - further verification for satisfaction
+    - which criteria was not hold
 
 Workflow progress n a job visible, each task has a separate `sessionResponse` control.
 The job availability will be verified again before execution.
@@ -51,6 +54,6 @@ api:
 /jobs: list all jobs name and id
 /jobs/availabilities: evaluate all jobs availability
 /jobs/start/`job-id`: start a job
-/jobs/live/`job-id`: receiving progress updates, session start/stop, call copilot/session/live/`session-id` for session responses
+/jobs/live/`job-id`: receiving progress updates, session start/stop (including the driving session), call copilot/session/live/`session-id` for session responses
 
 Consider inject condition_satisfied and condition_dissatisfied tool for deterministic answer.
