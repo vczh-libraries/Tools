@@ -12,9 +12,9 @@ When this file is tagged:
   - The Spec.md file defines how CopilotPortal should work.
   - To identify the new changes added to Spec.md:
     1. Navigate to REPO-ROOT/Copilot/Agent/prompts
-    2. Delete all files in the snapshot folder: `rm -rf snapshot/*`
-    3. Copy all files from spec to snapshot: `cp -r spec/* snapshot/`
-    4. Use git diff to see what changed: `git diff --no-index snapshot/Spec.md spec/Spec.md`
+    2. Delete all files in the snapshot folder
+    3. Copy all files from spec to snapshot
+    4. Use git diff to compare the snapshot and spec folders
     5. The diff output shows exactly what specifications have been added or modified
 - Implement all new changes.
 
