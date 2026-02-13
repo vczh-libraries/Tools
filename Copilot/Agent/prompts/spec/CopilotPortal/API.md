@@ -108,6 +108,7 @@ Each session generates many responses, storing in a queue.
 When the api comes, it pop one response and send back. Responses must be send back in its generating orders.
 If there is no response, do not reply the API. If there is no response after 5 seconds, send back a time out error.
 Be aware of that api requests and session responses could happen in any order.
+**BUG**: The current implementation seem to just wait for 5 seconds if it can't pop a session response at the call begins. My intent was that, before this 5 seconds of waiting ending, if a session response is generated, it should stop waiting and response the RESTful call immediately.
 
 Returns in this schema if any error happens
 
