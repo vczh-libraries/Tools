@@ -25,6 +25,9 @@ const mimeTypes: Record<string, string> = {
 // assets folder is at packages/CopilotPortal/assets, __dirname is packages/CopilotPortal/dist
 const assetsDir = path.resolve(__dirname, "..", "assets");
 
+// REPO-ROOT: the root folder of the repo (5 levels up from dist/)
+const repoRoot = path.resolve(__dirname, "..", "..", "..", "..", "..");
+
 // ---- Copilot Client ----
 let copilotClient: CopilotClient | null = null;
 
@@ -122,6 +125,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
     // api/test
     if (apiPath === "test") {
         jsonResponse(res, 200, { message: "Hello, world!" });
+        return;
+    }
+
+    // api/config
+    if (apiPath === "config") {
+        jsonResponse(res, 200, { repoRoot });
         return;
     }
 

@@ -74,9 +74,13 @@ describe("Web: index.html setup UI", () => {
         assert.strictEqual(selected, "gpt-5.2");
     });
 
-    it("has empty working directory by default", async () => {
+    it("has working directory defaulting to REPO-ROOT", async () => {
         const value = await page.locator("#working-dir").inputValue();
-        assert.strictEqual(value, "");
+        // Should be the repo root (non-empty, absolute path)
+        assert.ok(value.length > 0, "working dir should not be empty");
+        // Verify it matches the server's config
+        const config = await (await fetch(`${BASE}/api/config`)).json();
+        assert.strictEqual(value, config.repoRoot, "working dir should default to REPO-ROOT");
     });
 });
 
@@ -97,7 +101,14 @@ describe("Web: index.html project parameter", () => {
 
     it("sets working directory from project parameter", async () => {
         const value = await page.locator("#working-dir").inputValue();
-        assert.strictEqual(value, "C:\\Code\\VczhLibraries\\TestProject");
+        // Should be REPO-ROOT\..\TestProject
+        const config = await (await fetch(`${BASE}/api/config`)).json();
+        const repoRoot = config.repoRoot;
+        const sep = repoRoot.includes("\\") ? "\\" : "/";
+        const parentIdx = Math.max(repoRoot.lastIndexOf("/"), repoRoot.lastIndexOf("\\"));
+        const parentDir = parentIdx > 0 ? repoRoot.substring(0, parentIdx) : repoRoot;
+        const expected = parentDir + sep + "TestProject";
+        assert.strictEqual(value, expected, `working dir should be ${expected}`);
     });
 });
 

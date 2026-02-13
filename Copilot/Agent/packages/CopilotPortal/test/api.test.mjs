@@ -15,6 +15,14 @@ describe("API: /api/test", () => {
     });
 });
 
+describe("API: /api/config", () => {
+    it("returns repoRoot as a non-empty string", async () => {
+        const data = await fetchJson("/api/config");
+        assert.ok(typeof data.repoRoot === "string", "repoRoot should be a string");
+        assert.ok(data.repoRoot.length > 0, "repoRoot should not be empty");
+    });
+});
+
 describe("API: /api/copilot/models", () => {
     it("returns an array of models", async () => {
         const data = await fetchJson("/api/copilot/models");

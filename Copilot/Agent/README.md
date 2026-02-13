@@ -59,7 +59,8 @@ Starts an HTTP server at `http://localhost:8888` serving a web UI and RESTful AP
 - Send requests via the text box (Ctrl+Enter or Send button).
 - Session responses (reasoning, tool calls, messages) appear as collapsible message blocks.
 - "Close Session" ends the session and closes the tab; "Stop Server" also shuts down the server.
-- Use `http://localhost:8888/index.html?project=XXX` to default working directory to `C:\Code\VczhLibraries\XXX`.
+- Use `http://localhost:8888/index.html?project=XXX` to default working directory to the sibling folder `XXX` next to the repo root.
+- Without `project` parameter, working directory defaults to the repo root.
 
 ## Specification Structure
 

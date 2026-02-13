@@ -46,11 +46,23 @@ async function loadModels() {
     }
 }
 
-function initWorkingDir() {
-    const params = new URLSearchParams(window.location.search);
-    const project = params.get("project");
-    if (project) {
-        workingDirInput.value = `C:\\Code\\VczhLibraries\\${project}`;
+async function initWorkingDir() {
+    try {
+        const res = await fetch("/api/config");
+        const config = await res.json();
+        const repoRoot = config.repoRoot;
+        const params = new URLSearchParams(window.location.search);
+        const project = params.get("project");
+        if (project) {
+            const sep = repoRoot.includes("\\") ? "\\" : "/";
+            const parentIdx = Math.max(repoRoot.lastIndexOf("/"), repoRoot.lastIndexOf("\\"));
+            const parentDir = parentIdx > 0 ? repoRoot.substring(0, parentIdx) : repoRoot;
+            workingDirInput.value = parentDir + sep + project;
+        } else {
+            workingDirInput.value = repoRoot;
+        }
+    } catch (err) {
+        console.error("Failed to load config:", err);
     }
 }
 
