@@ -28,8 +28,9 @@ When the webpage is loaded, it renders a UI in the middle to let me input:
   - Names instead of ids are displayed, but be aware of that other API needs the id.
   - Default to the model whose id is "gpt-5.2"
 - Working Directory. A text box receiving an absolute full path.
-  - When the url is `index.html?project=XXX`, the text box defaults to "C:\Code\VczhLibraries\XXX"
-  - When there is no `project` argument, leave it blanks.
+  - When the url is `index.html?project=XXX`, the text box defaults to `REPO-ROOT\..\XXX`
+  - When there is no `project` argument, it becomes `REPO-ROOT`.
+  - `REPO-ROOT` is the root folder of the repo that the source code of this project is in (no hardcoding).
 
 When I hit the "Start" button, the UI above disappears and show the session UI.
 Send `api/copilot/session/start/{model-id}` to get the session id.
