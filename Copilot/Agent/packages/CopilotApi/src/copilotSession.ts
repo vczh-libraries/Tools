@@ -57,6 +57,7 @@ export async function startSession(
     model: modelId,
     streaming: true,
     workingDirectory,
+    onPermissionRequest: () => ({ kind: "approved" })
   });
 
   const reasoningContentById = new Map<string, string>();

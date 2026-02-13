@@ -86,6 +86,12 @@ export class SessionResponseRenderer {
             block.appendData(data.delta);
         } else if (cb === "onEndToolExecution") {
             const block = this.#getOrCreateBlock("Tool", data.toolCallId);
+            if (data.result) {
+                block.appendData(`\nResult: ${data.result.content}`);
+                if (data.result.detailedContent) {
+                    block.appendData(`\nDetails: ${data.result.detailedContent}`);
+                }
+            }
             if (data.error) {
                 block.appendData(`\nError: ${data.error.message}`);
             }
