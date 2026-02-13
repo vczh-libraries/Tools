@@ -54,32 +54,13 @@ After "Stop Server" or "Close Session" is pressed, responses from this api will 
 #### Session Part
 
 The session part div is passed to a `SessionResponseRenderer` (from `sessionResponse.js`) which handles all rendering within it.
+See `Shared.md` for `SessionResponseRenderer` specification.
 
-Session responses generates 3 types of message block:
-- Reasoning
-- Tool
-- Message
-Multiple of them could happen parallelly.
+Live polling callbacks are forwarded to `sessionRenderer.processCallback(data)`.
+When its return value is `"onAgentEnd"`, the send button is re-enabled.
 
-When `ICopilotSessionCallbacks::onStartXXX` happens, a new message block should be created.
-When `ICopilotSessionCallbacks::onXXX` happens, the data should be appended to the message block.
-When `ICopilotSessionCallbacks::onEndXXX` happens, the message block is completed, no data needs to append to the message block.
-
-The content of a "Tool" `MessageBlock` needs to be taken care of specially:
-- The first line should be in its title. It is easy to tell when the `title` property is empty.
-- `ICopilotSessionCallbacks::onEndToolExecution` will gives you an optional error message.
-Responses for different message blocks are identified by its id.
-
-A message blocks stack vertically from top to bottom in the session part.
-`MessageBlock` in messageBlock.js should be used to control any message block.
-
-You are recommended to maintain a list of message blocks in a map with key "blockType-blockId" in its rendering order.
-
-When the session is generating responses (aka the "Send" button is disabled),
-there must be a text at the left buttom corner of the session part saying "Awaits responses ...".
-When the session finishes, this text disappears.
-
-The session part is scrollable.
+User requests should call `sessionRenderer.addUserMessage(text)` to create a "User" message block.
+Call `sessionRenderer.setAwaiting(true)` when waiting for responses, and `sessionRenderer.setAwaiting(false)` when done.
 
 #### Request Part
 

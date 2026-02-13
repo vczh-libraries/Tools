@@ -8,7 +8,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspaces run build",
+    "compile": "yarn workspaces run build",
+    "testStart": "yarn workspace copilot-portal testStart",
+    "testExecute": "yarn workspace copilot-portal testExecute",
+    "build": "yarn compile && yarn testStart && yarn testExecute",
     "chat": "yarn workspace copilot-test start",
     "portal": "yarn workspace copilot-portal start"
   },

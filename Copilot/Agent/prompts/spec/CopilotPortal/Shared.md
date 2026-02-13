@@ -85,3 +85,31 @@ An "Awaits responses ..." status element is created and appended to the containe
 - `addUserMessage(text)`: Creates a "User" `MessageBlock`, appends the text, completes it, and scrolls to bottom.
 - `setAwaiting(awaiting)`: Shows or hides the "Awaits responses ..." status text.
 - `scrollToBottom()`: Scrolls the container to the bottom.
+
+#### Session Response Rendering
+
+Session responses generates 3 types of message block:
+- Reasoning
+- Tool
+- Message
+Multiple of them could happen parallelly.
+
+When `ICopilotSessionCallbacks::onStartXXX` happens, a new message block should be created.
+When `ICopilotSessionCallbacks::onXXX` happens, the data should be appended to the message block.
+When `ICopilotSessionCallbacks::onEndXXX` happens, the message block is completed, no data needs to append to the message block.
+
+The content of a "Tool" `MessageBlock` needs to be taken care of specially:
+- The first line should be in its title. It is easy to tell when the `title` property is empty.
+- `ICopilotSessionCallbacks::onEndToolExecution` will gives you an optional error message.
+Responses for different message blocks are identified by its id.
+
+Message blocks stack vertically from top to bottom.
+`MessageBlock` in messageBlock.js should be used to control any message block.
+
+You are recommended to maintain a list of message blocks in a map with key "blockType-blockId" in its rendering order.
+
+When `setAwaiting(true)` is called,
+there must be a text at the left bottom corner of the session part saying "Awaits responses ...".
+When `setAwaiting(false)` is called, this text disappears.
+
+The session response container is scrollable.

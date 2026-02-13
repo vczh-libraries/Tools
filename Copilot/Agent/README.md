@@ -17,10 +17,23 @@ yarn install
 
 ## Build
 
-To build the application:
+To build and test the application:
 
 ```bash
 yarn build
+```
+
+This runs three steps in sequence:
+1. `yarn compile` — compiles all TypeScript packages
+2. `yarn testStart` — starts the portal server in the background
+3. `yarn testExecute` — runs all API and Playwright tests, then stops the server
+
+The server is always stopped via `api/stop` after tests, regardless of pass/fail.
+
+To compile only (no tests):
+
+```bash
+yarn compile
 ```
 
 ## Usage
@@ -84,6 +97,11 @@ Copilot/Agent/
 │   │   │   ├── sessionResponse.js    # SessionResponseRenderer component
 │   │   │   ├── sessionResponse.css   # SessionResponseRenderer styles
 │   │   │   └── test.html     # Simple API test page
+│   │   ├── test/             # Test files
+│   │   │   ├── startServer.mjs       # Starts server for testing
+│   │   │   ├── runTests.mjs          # Test runner (always stops server)
+│   │   │   ├── api.test.mjs          # RESTful API tests
+│   │   │   └── web.test.mjs          # Playwright UI tests
 │   │   └── package.json
 │   └── CopilotTest/          # CLI chat application
 │       ├── src/
@@ -93,9 +111,11 @@ Copilot/Agent/
 
 ## Maintaining the Project
 
-- **Build**: `yarn build` compiles all packages via TypeScript.
+- **Build**: `yarn build` compiles all packages and runs tests.
+- **Compile only**: `yarn compile` compiles all packages via TypeScript.
 - **Run portal**: `yarn portal` starts the web server (default port 8888).
 - **Run chat**: `yarn chat` starts the CLI chat.
+- **Run tests only**: `yarn testStart && yarn testExecute` starts server and runs tests.
 - **Playwright**: Install with `npx playwright install chromium`. Used for testing the portal UI.
 - **Spec-driven**: Portal features are defined in `packages/CopilotPortal/Spec.md`.
 

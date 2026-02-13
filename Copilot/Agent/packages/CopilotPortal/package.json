@@ -6,7 +6,9 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "testStart": "node test/startServer.mjs",
+    "testExecute": "node test/runTests.mjs"
   },
   "dependencies": {
     "@github/copilot-sdk": "^0.1.4",
