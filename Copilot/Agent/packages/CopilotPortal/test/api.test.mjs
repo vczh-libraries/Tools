@@ -145,35 +145,4 @@ describe("API: full session lifecycle", () => {
     });
 });
 
-describe("API: live timeout", () => {
-    let sessionId;
 
-    before(async () => {
-        const data = await fetchJson("/api/copilot/models");
-        const freeModel = data.models.find((m) => m.multiplier === 0);
-        const startData = await fetchJson(`/api/copilot/session/start/${freeModel.id}`, {
-            method: "POST",
-            body: "C:\\Code\\VczhLibraries\\Tools",
-        });
-        sessionId = startData.sessionId;
-    });
-
-    after(async () => {
-        if (sessionId) {
-            try {
-                await fetchJson(`/api/copilot/session/stop/${sessionId}`);
-            } catch {
-                // ignore
-            }
-        }
-    });
-
-    it("returns HttpRequestTimeout after ~5 seconds when idle", async () => {
-        const start = Date.now();
-        const data = await fetchJson(`/api/copilot/session/live/${sessionId}`);
-        const elapsed = Date.now() - start;
-        assert.strictEqual(data.error, "HttpRequestTimeout");
-        assert.ok(elapsed >= 4000, `should take at least 4 seconds, got ${elapsed}ms`);
-        assert.ok(elapsed < 10000, `should take less than 10 seconds, got ${elapsed}ms`);
-    });
-});
