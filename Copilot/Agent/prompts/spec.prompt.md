@@ -9,6 +9,7 @@ When this file is tagged, find out new changes in the spec:
 - Delete all files in `prompts/snapshot`.
 - Copy all files in `prompts/spec` to `prompts/snapshot`.
 - You can see what has been changed in the spec by git diff.
+  - Ignore CRLF and LF differences if there is any.
 - Implement all changes.
 
 ## Changing the Spec
