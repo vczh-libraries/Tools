@@ -45,6 +45,7 @@ Starts an HTTP server at `http://localhost:8888` serving a web UI and RESTful AP
 - Select a model and working directory, then click Start.
 - Send requests via the text box (Ctrl+Enter or Send button).
 - Session responses (reasoning, tool calls, messages) appear as collapsible message blocks.
+- "Close Session" ends the session and closes the tab; "Stop Server" also shuts down the server.
 - Use `http://localhost:8888/index.html?project=XXX` to default working directory to `C:\Code\VczhLibraries\XXX`.
 
 ## Project Structure

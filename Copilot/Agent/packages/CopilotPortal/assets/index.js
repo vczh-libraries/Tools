@@ -15,7 +15,8 @@ const startButton = document.getElementById("start-button");
 const sessionPart = document.getElementById("session-part");
 const requestTextarea = document.getElementById("request-textarea");
 const sendButton = document.getElementById("send-button");
-const stopButton = document.getElementById("stop-button");
+const stopServerButton = document.getElementById("stop-server-button");
+const closeSessionButton = document.getElementById("close-session-button");
 const resizeBar = document.getElementById("resize-bar");
 const requestPart = document.getElementById("request-part");
 const awaitingStatus = document.getElementById("awaiting-status");
@@ -128,7 +129,7 @@ function getOrCreateBlock(blockType, blockId) {
     if (!block) {
         block = new MessageBlock(blockType);
         messageBlocks.set(key, block);
-        sessionPart.appendChild(block.divElement);
+        sessionPart.insertBefore(block.divElement, awaitingStatus);
     }
     return block;
 }
@@ -202,7 +203,7 @@ async function sendRequest() {
     const userBlock = new MessageBlock("User");
     const userKey = `User-request-${Date.now()}`;
     messageBlocks.set(userKey, userBlock);
-    sessionPart.appendChild(userBlock.divElement);
+    sessionPart.insertBefore(userBlock.divElement, awaitingStatus);
     userBlock.appendData(text);
     userBlock.complete();
     sessionPart.scrollTop = sessionPart.scrollHeight;
@@ -227,9 +228,21 @@ requestTextarea.addEventListener("keydown", (e) => {
     }
 });
 
-// ---- Stop ----
+// ---- Stop / Close ----
 
-stopButton.addEventListener("click", async () => {
+async function closeSession() {
+    livePollingActive = false;
+    try {
+        await fetch(`/api/copilot/session/stop/${encodeURIComponent(sessionId)}`);
+    } catch (err) {
+        // Ignore errors during shutdown
+    }
+    window.close();
+}
+
+closeSessionButton.addEventListener("click", closeSession);
+
+stopServerButton.addEventListener("click", async () => {
     livePollingActive = false;
     try {
         await fetch(`/api/copilot/session/stop/${encodeURIComponent(sessionId)}`);

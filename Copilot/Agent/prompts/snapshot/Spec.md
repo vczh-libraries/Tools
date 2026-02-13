@@ -61,7 +61,7 @@ When a timeout happens, resend the api.
 When it returns any response, process it and still keep sending the api.
 Whenever `ICopilotSessionCallbacks::METHOD` is mentioned, it means a response from this api.
 
-After "Stop" is pressed, responses from this api will be ignored and no more such api is sending.
+After "Stop Server" or "Close Session" is pressed, responses from this api will be ignored and no more such api is sending.
 
 #### Session Part
 
@@ -102,8 +102,13 @@ User request should generate a "User" message block, append the request and imme
 When a request is sent, the button is disabled.
 When `ICopilotSessionCallbacks::onAgentEnd` triggers, it is enabled again.
 
-There is a "Stop" button at the left bottom corner of the text box.
-It ends the session with `api/copilot/session/stop/{session-id}`, followed by an `api/stop`, do all necessary finishing work, close the webpage.
+There is a "Stop Server" and "Close Session" button (in the mentioning order) at the left bottom corner of the text box.
+When "Close Session" is clicked:
+- Ends the session with `api/copilot/session/stop/{session-id}`.
+- Do whatever needs for finishing.
+- Close the current webpage window or tab.
+When "Stop Server" is clicked:
+- It does what "Stop Server" does, with an extra `api/stop` to stop the server before closing the webpage.
 
 ### messageBlock.js
 

@@ -85,7 +85,6 @@ You are recommended to maintain a list of message blocks in a map with key "bloc
 When the session is generating responses (aka the "Send" button is disabled),
 there must be a text at the left buttom corner of the session part saying "Awaits responses ...".
 When the session finishes, this text disappears.
-**BUG**: The text is currently at the left top corner, I would like to put it at the left bottom corner, below all `MessageBlock`.
 
 The session part is scrollable.
 
