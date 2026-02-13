@@ -58,10 +58,10 @@ The session part div is passed to a `SessionResponseRenderer` (from `sessionResp
 See `Shared.md` for `SessionResponseRenderer` specification.
 
 Live polling callbacks are forwarded to `sessionRenderer.processCallback(data)`.
-When its return value is `"onAgentEnd"`, the send button is re-enabled.
+When its return value is `onIdle`, the send button is re-enabled.
 
 User requests should call `sessionRenderer.addUserMessage(text)` to create a "User" message block.
-Call `sessionRenderer.setAwaiting(true)` when waiting for responses, and `sessionRenderer.setAwaiting(false)` when done.
+Call `sessionRenderer.setAwaiting(true)` when waiting for responses, and `sessionRenderer.setAwaiting(false)` when done (sync with "Send" button's enability).
 
 #### Request Part
 
@@ -75,7 +75,7 @@ When the button is disabled, pressing CTRL+ENTER should also does nothing.
 User request should generate a "User" message block, append the request and immediatelly complete it.
 
 When a request is sent, the button is disabled.
-When `ICopilotSessionCallbacks::onAgentEnd` triggers, it is enabled again.
+When `ICopilotSessionCallbacks::onIdle` triggers, it is enabled again.
 
 There is a "Stop Server" and "Close Session" button (in the mentioning order) at the left bottom corner of the text box.
 When "Close Session" is clicked:

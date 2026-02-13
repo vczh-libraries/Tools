@@ -138,7 +138,7 @@ async function pollLive() {
 
 function processCallback(data) {
     const cb = sessionRenderer.processCallback(data);
-    if (cb === "onAgentEnd") {
+    if (cb === "onIdle") {
         setSendEnabled(true);
     }
 }
