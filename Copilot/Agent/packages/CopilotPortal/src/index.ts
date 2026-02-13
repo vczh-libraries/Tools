@@ -25,8 +25,22 @@ const mimeTypes: Record<string, string> = {
 // assets folder is at packages/CopilotPortal/assets, __dirname is packages/CopilotPortal/dist
 const assetsDir = path.resolve(__dirname, "..", "assets");
 
-// REPO-ROOT: the root folder of the repo (5 levels up from dist/)
-const repoRoot = path.resolve(__dirname, "..", "..", "..", "..", "..");
+// REPO-ROOT: walk up from __dirname until we find a .git folder
+function findRepoRoot(startDir: string): string {
+    let dir = startDir;
+    while (true) {
+        if (fs.existsSync(path.join(dir, ".git"))) {
+            return dir;
+        }
+        const parent = path.dirname(dir);
+        if (parent === dir) {
+            // Reached filesystem root without finding .git; fall back to startDir
+            return startDir;
+        }
+        dir = parent;
+    }
+}
+const repoRoot = findRepoRoot(__dirname);
 
 // ---- Copilot Client ----
 let copilotClient: CopilotClient | null = null;

@@ -31,6 +31,16 @@ All title names below represents http://localhost:port/api/TITLE
 
 Copilot hosting is implemented by "@github/copilot-sdk" and the CopilotApi (copilot-api) package
 
+### config
+
+Returns the repo root path (detected by walking up from the server's directory until a `.git` folder is found).
+
+```typescript
+{
+  repoRoot: string;
+}
+```
+
 ### test
 
 Returns `{"message":"Hello, world!"}`
