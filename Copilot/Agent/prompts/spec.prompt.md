@@ -17,7 +17,11 @@ When this file is tagged, find out new changes in the spec:
 
 ## Changing the Spec
 
-You are allowed to change the spec although you do not have to.
+You are allowed to change the spec. And you must change the spec when you decide to:
+- Add a new feature but the spec doesn't describe it.
+- Change the implementation when the spec describes the old one.
+- Delete a feature but the spec describes it.
+
 When you think the spec needs to update,
 You will have to change files in both `prompts/snapshot` and `prompts/spec`, keep them sync.
 
