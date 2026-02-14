@@ -16,11 +16,12 @@ export interface Task {
     prompt: Prompt;
     availability?: {
         previousJobKeywords?: string[];
-        condition: Prompt;
+        previousTasks?: string[];
+        condition?: Prompt;
     };
     criteria?: {
         toolExecuted?: string[];
-        condition: Prompt;
+        condition?: Prompt;
     };
 }
 
@@ -36,6 +37,11 @@ export interface Entry {
     tasks: {[key in string]: Task};
 }
 
+export const runtimeVariables: string[] = [
+    "$user-input",
+    "$reported-document"
+];
+
 const entryInput: Entry = {
     models: {
         driving: "gpt-5-mini",
@@ -48,10 +54,11 @@ const entryInput: Entry = {
         ]
     },
     promptPrefix: {
-        mandatory: [
+        defineRepoRoot: [
             "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)"
         ],
         cppjob: [
+            "$defineRepoRoot",
             "YOU MUST FOLLOW REPO-ROOT/.github/copilot-instructions.md as a general guideline for all your tasks."
         ],
         scrum: [
@@ -84,21 +91,45 @@ const entryInput: Entry = {
         reportBoolean: [
             "YOU MUST call either job_boolean_true or job_boolean_false to answer an yes/no question, with the reason in the argument."
         ],
+        simpleCondition: [
+            "$defineRepoRoot",
+            "$reportBoolean",
+            "Call job_boolean_true if the below condition satisfies, or call job_boolean_false if it does not satisfy."
+        ],
         scrumDocReady: [
+            "$defineRepoRoot",
+            "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Scrum.md should exist and its content should not be just a title."
         ],
         designDocReady: [
+            "$defineRepoRoot",
+            "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Task.md should exist and its content should not be just a title."
         ],
         planDocReady: [
+            "$defineRepoRoot",
+            "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Planning.md should exist and its content should not be just a title."
         ],
         execDocReady: [
+            "$defineRepoRoot",
+            "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its content should not be just a title."
         ],
         execDocVerified: [
+            "$defineRepoRoot",
+            "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its has a `# !!!VERIFIED!!!`."
-        ]
+        ],
+        reviewDocReady: [
+            "$defineRepoRoot",
+            "$simpleCondition",
+            "REPO-ROOT/.github/TaskLogs/Copilot_Review.md should exist and its content should not be just a title."
+        ],
+        reportedDocReady: [
+            "$simpleCondition",
+            "$reported-document should exist and its content should not be just a title."
+        ],
     },
     grid: [{
         keyword: "scrum",
@@ -159,126 +190,143 @@ const entryInput: Entry = {
     tasks: {
         "scrum-problem-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$scrum", "$reportDocument", "#Problem", "$user-input"],
+            prompt: ["$cppjob", "$scrum", "#Problem", "$user-input"],
             criteria: {
-                toolExecuted: ["job_prepare_document"],
-                condition: ["$mandatory", "$reportDocument", "$scrumDocReady"]
+                condition: ["$scrumDocReady"]
             }
         },
         "scrum-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$scrum", "$reportDocument", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$scrum", "#Update", "$user-input"],
             availability: {
-                condition: ["$mandatory", "$scrumDocReady"]
+                condition: ["$scrumDocReady"]
             }
         },
         "design-problem-next-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Problem", "Next"],
+            prompt: ["$cppjob", "$design", "#Problem", "Next"],
             availability: {
-                condition: ["$mandatory", "$scrumDocReady"]
+                condition: ["$scrumDocReady"]
+            },
+            criteria: {
+                condition: ["$designDocReady"]
             }
         },
         "design-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$design", "#Update", "$user-input"],
             availability: {
-                condition: ["$mandatory", "$designDocReady"]
+                condition: ["$designDocReady"]
             }
         },
         "design-problem-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Problem", "$user-input"]
+            prompt: ["$cppjob", "$design", "#Problem", "$user-input"],
+            criteria: {
+                condition: ["$designDocReady"]
+            }
         },
         "plan-problem-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Problem"],
+            prompt: ["$cppjob", "$plan", "#Problem"],
             availability: {
-                condition: ["$mandatory", "$designDocReady"]
+                condition: ["$designDocReady"]
+            },
+            criteria: {
+                condition: ["$planDocReady"]
             }
         },
         "plan-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$plan", "#Update", "$user-input"],
             availability: {
-                condition: ["$mandatory", "$planDocReady"]
+                condition: ["$planDocReady"]
             }
         },
         "summary-problem-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Problem"],
+            prompt: ["$cppjob", "$summary", "#Problem"],
             availability: {
-                condition: ["$mandatory", "$planDocReady"]
+                condition: ["$planDocReady"]
+            },
+            criteria: {
+                condition: ["$execDocReady"]
             }
         },
         "summary-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$summary", "#Update", "$user-input"],
             availability: {
-                condition: ["$mandatory", "$execDocReady"]
+                condition: ["$execDocReady"]
             }
         },
         "execute-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$execute"],
+            prompt: ["$cppjob", "$execute"],
             availability: {
-                condition: ["$mandatory", "$execDocReady"]
+                condition: ["$execDocReady"]
             }
         },
         "execute-update-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$execute", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$execute", "#Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
-                condition: ["$mandatory", "$execDocReady"]
+                condition: ["$execDocReady"]
             }
         },
         "verify-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$verify"],
+            prompt: ["$cppjob", "$verify"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
-                condition: ["$mandatory", "$execDocReady"]
+                condition: ["$execDocReady"]
             }
         },
         "verify-update-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$verify", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$verify", "#Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
-                condition: ["$mandatory", "$execDocReady"]
+                condition: ["$execDocReady"]
             }
         },
         "scrum-learn-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$scrum", "#Learn"],
+            prompt: ["$cppjob", "$scrum", "#Learn"],
             availability: {
-                condition: ["$mandatory", "$execDocVerified"]
+                condition: ["$execDocVerified"]
             }
         },
         "refine-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$refine"]
+            prompt: ["$cppjob", "$refine"],
+            availability: {
+                previousTasks: ["scrum-learn-task"]
+            }
         },
         "review-scrum": {
-            prompt: ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Scrum"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum"]
         },
         "review-design": {
-            prompt: ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Design"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Design"]
         },
         "review-plan": {
-            prompt: ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Plan"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Plan"]
         },
         "review-summary": {
-            prompt: ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Summary"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Summary"]
         },
         "review-final": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Final"]
+            prompt: ["$cppjob", "$review", "#Final"]
         },
         "review-apply": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$review", "#Apply"]
+            prompt: ["$cppjob", "$review", "#Apply"],
+            availability: {
+                condition: ["$review-final"]
+            }
         }
     }
 }
