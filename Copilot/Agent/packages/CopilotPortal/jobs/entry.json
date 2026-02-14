@@ -1,0 +1,85 @@
+{
+    "models": {
+        "driving": "gpt-5-mini",
+        "planning": "gpt-5.2",
+        "coding": "gpt-5.2-codex",
+        "reviewers": [
+            "gpt-5.2-codex",
+            "claude-opus-4.5",
+            "gemini-3-pro-preview"
+        ]
+    },
+    "promptPrefix": {
+        "cppjob": [
+            "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)",
+            "YOU MUST FOLLOW REPO-ROOT/.github/copilot-instructions.md as a general guideline for all your tasks."
+        ],
+        "scrum": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/0-scrum.prompt.md immediately."
+        ],
+        "design": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/1-design.prompt.md immediately."
+        ],
+        "plan": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/2-planning.prompt.md immediately."
+        ],
+        "summary": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/3-summarizing.prompt.md immediately."
+        ],
+        "execute": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/4-execution.prompt.md immediately."
+        ],
+        "verify": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/5-verifying.prompt.md immediately."
+        ],
+        "refine": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/refine.prompt.md immediately."
+        ],
+        "review": [
+            "Execute the instruction in REPO-ROOT/.github/prompts/review.prompt.md immediately."
+        ]
+    },
+    "grid": [{
+        "keyword": "scrum",
+        "jobs": [
+            {"name": "problem", "id": "scrum-problem" },
+            {"name": "update", "id": "scrum-update" }
+        ]
+    }, {
+        "keyword": "design",
+        "jobs": [
+            {"name": "problem next", "id": "design-problem-next" },
+            {"name": "update", "id": "design-update" },
+            {"name": "problem", "id": "design-problem" }
+        ]
+    }, {
+        "keyword": "plan",
+        "jobs": [
+            {"name": "problem", "id": "plan-problem" },
+            {"name": "update", "id": "plan-update" }
+        ]
+    }, {
+        "keyword": "summary",
+        "jobs": [
+            {"name": "problem", "id": "summary-problem" },
+            {"name": "update", "id": "summary-update" }
+        ]
+    }, {
+        "keyword": "execute",
+        "jobs": [
+            {"name": "start", "id": "execute-start" },
+            {"name": "update", "id": "execute-update" }
+        ]
+    }, {
+        "keyword": "verify",
+        "jobs": [
+            {"name": "start", "id": "verify-start" },
+            {"name": "update", "id": "verify-update" }
+        ]
+    }, {
+        "keyword": "scrum",
+        "jobs": [
+            {"name": "learn", "id": "scrum-learn" }
+        ]
+    }]
+}

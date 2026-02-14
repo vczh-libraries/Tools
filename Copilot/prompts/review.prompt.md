@@ -6,7 +6,7 @@
 
 ## Goal and Constraints
 
-- Your goal is to review a document as one member of a 4-model review panel.
+- Your goal is to review a document as one member of a review panel.
 - The `KnowledgeBase` and `Learning` folders mentioned in this document are in `REPO-ROOT/.github/`.
 - The mentioned `Copilot_Review.md` and `Copilot_Review_*_*.md` files are in `REPO-ROOT/.github/TaskLogs/`.
 - Each model writes its review to a separate file.
@@ -16,10 +16,9 @@
 
 ## Identify Yourself
 
-- You are one of the 4 models in the review panel. Identify yourself:
+- You are one of the models in the review panel. Identify yourself:
   - If you are GPT, your file name fragment is `GPT`.
   - If you are Claude (Opus), your file name fragment is `Opus`.
-  - If you are Grok, your file name fragment is `Grok`.
   - If you are Gemini, your file name fragment is `Gemini`.
 - Use your file name fragment in all file operations below.
 
@@ -42,7 +41,6 @@
 - If the current round index is greater that 1, here are a list of review files from the previous round:
   - `Copilot_Review_PREVIOUSINDEX_GPT.md`
   - `Copilot_Review_PREVIOUSINDEX_Opus.md`
-  - `Copilot_Review_PREVIOUSINDEX_Grok.md`
   - `Copilot_Review_PREVIOUSINDEX_Gemini.md`
 
 ## Step 3. Read Context
@@ -162,7 +160,7 @@ Ignore this section if there is no `# Apply` in the LATEST chat message.
   - For `Copilot_Scrum.md`, follow `REPO-ROOT/.github/prompts/0-scrum.prompt.md`.
   - For `Copilot_Task.md`, follow `REPO-ROOT/.github/prompts/1-design.prompt.md`.
   - For `Copilot_Planning.md`, follow `REPO-ROOT/.github/prompts/2-planning.prompt.md`.
-  - For `Copilot_Execution.md`, follow `REPO-ROOT/.github/prompts/4-execution.prompt.md`.
+  - For `Copilot_Execution.md`, follow `REPO-ROOT/.github/prompts/3-summarizing.prompt.md`.
 
 ### Step A2. Apply the Review
 
