@@ -28,10 +28,11 @@ export interface Task {
     };
     criteria?: {
         toolExecuted?: string[];
-        condition?: Prompt;
-        runConditionInSameSession?: boolean;
         failureAction: FailureAction;
-    };
+    } & ({
+        condition: Prompt;
+        runConditionInSameSession: boolean;
+    } | never);
 }
 
 export interface Entry {
@@ -111,6 +112,12 @@ const entryInput: Entry = {
         review: [
             "Execute the instruction in REPO-ROOT/.github/prompts/review.prompt.md immediately."
         ],
+        ask: [
+            "Execute the instruction in REPO-ROOT/.github/prompts/ask.prompt.md immediately."
+        ],
+        code: [
+            "Execute the instruction in REPO-ROOT/.github/prompts/code.prompt.md immediately."
+        ],
         reportDocument: [
             "YOU MUST call the job_prepare_document with an argument: an absolute path of the document you are about to create or update."
         ],
@@ -150,6 +157,12 @@ const entryInput: Entry = {
             "$simpleCondition",
             "$reported-document should exist and its content should not be just a title."
         ],
+        buildSucceededFragment: [
+            "REPO-ROOT/.github/Scripts/Build.log must exists and the last several lines shows there is no error"
+        ],
+        testPassedFragment: [
+            "REPO-ROOT/.github/Scripts/Execute.log must exists and the last several lines shows how many test files and test cases passed"
+        ]
     },
     grid: [{
         keyword: "scrum",
@@ -298,7 +311,7 @@ const entryInput: Entry = {
             },
             criteria: {
                 runConditionInSameSession: false,
-                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Build.log must exists and the last several lines shows there is no error."],
+                condition: ["$simpleCondition", "$buildSucceededFragment."],
                 failureAction: retryFailedCondition()
             }
         },
@@ -311,7 +324,7 @@ const entryInput: Entry = {
             },
             criteria: {
                 runConditionInSameSession: false,
-                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Build.log must exists and the last several lines shows there is no error."],
+                condition: ["$simpleCondition", "$buildSucceededFragment."],
                 failureAction: retryFailedCondition()
             }
         },
@@ -324,7 +337,7 @@ const entryInput: Entry = {
             },
             criteria: {
                 runConditionInSameSession: false,
-                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Execute.log must exists and the last several lines shows how many test files and test cases passed."],
+                condition: ["$simpleCondition", "$testPassedFragment."],
                 failureAction: retryFailedCondition()
             }
         },
@@ -337,7 +350,7 @@ const entryInput: Entry = {
             },
             criteria: {
                 runConditionInSameSession: false,
-                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Execute.log must exists and the last several lines shows how many test files and test cases passed."],
+                condition: ["$simpleCondition", "$testPassedFragment."],
                 failureAction: retryFailedCondition()
             }
         },
@@ -415,6 +428,19 @@ const entryInput: Entry = {
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$simpleCondition", "Every REPO-ROOT/.github/TaskLogs/Copilot_Review*.md must have been deleted."],
+                failureAction: retryFailedCondition()
+            }
+        },
+        "ask-task": {
+            model: "planning",
+            prompt: ["$cppjob", "$ask"]
+        },
+        "code-task": {
+            model: "planning",
+            prompt: ["$cppjob", "$code"],
+            criteria: {
+                runConditionInSameSession: true,
+                condition: ["$simpleCondition", "Both condition satisfies: 1) $buildSucceededFragment; 2) $testPassedFragment."],
                 failureAction: retryFailedCondition()
             }
         }
