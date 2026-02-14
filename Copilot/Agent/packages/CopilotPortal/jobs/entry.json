@@ -37,16 +37,24 @@
         ],
         "review": [
             "Execute the instruction in REPO-ROOT/.github/prompts/review.prompt.md immediately."
+        ],
+        "reportDocument": [
+            "YOU MUST call the job_prepare_document with an argument: an absolute path of the document you are about to create or update."
+        ],
+        "reportBoolean": [
+            "YOU MUST call either job_boolean_true or job_boolean_false to answer an yes/no question, with the reason in the argument."
         ]
     },
     "grid": [{
         "keyword": "scrum",
+        "automate": false,
         "jobs": [
             {"name": "problem", "id": "scrum-problem" },
             {"name": "update", "id": "scrum-update" }
         ]
     }, {
         "keyword": "design",
+        "automate": true,
         "jobs": [
             {"name": "problem next", "id": "design-problem-next" },
             {"name": "update", "id": "design-update" },
@@ -54,32 +62,125 @@
         ]
     }, {
         "keyword": "plan",
+        "automate": true,
         "jobs": [
             {"name": "problem", "id": "plan-problem" },
             {"name": "update", "id": "plan-update" }
         ]
     }, {
         "keyword": "summary",
+        "automate": true,
         "jobs": [
             {"name": "problem", "id": "summary-problem" },
             {"name": "update", "id": "summary-update" }
         ]
     }, {
         "keyword": "execute",
+        "automate": true,
         "jobs": [
             {"name": "start", "id": "execute-start" },
             {"name": "update", "id": "execute-update" }
         ]
     }, {
         "keyword": "verify",
+        "automate": true,
         "jobs": [
             {"name": "start", "id": "verify-start" },
             {"name": "update", "id": "verify-update" }
         ]
     }, {
         "keyword": "scrum",
+        "automate": true,
         "jobs": [
             {"name": "learn", "id": "scrum-learn" }
         ]
-    }]
+    }, {
+        "keyword": "refine",
+        "automate": false,
+        "jobs": [
+            {"name": "start", "id": "refine" }
+        ]
+    }],
+    "tasks": {
+        "scrum-problem-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$scrum", "$reportDocument", "#Problem", "$user-input"]
+        },
+        "scrum-update-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$scrum", "$reportDocument", "#Update", "$user-input"]
+        },
+        "design-problem-next-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$design", "$reportDocument", "#Problem", "Next"]
+        },
+        "design-update-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$design", "$reportDocument", "#Update", "$user-input"]
+        },
+        "design-problem-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$design", "$reportDocument", "#Problem", "$user-input"]
+        },
+        "plan-problem-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$plan", "$reportDocument", "#Problem"]
+        },
+        "plan-update-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$plan", "$reportDocument", "#Update", "$user-input"]
+        },
+        "summary-problem-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$summary", "$reportDocument", "#Problem"]
+        },
+        "summary-update-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$summary", "$reportDocument", "#Update", "$user-input"]
+        },
+        "execute-task": {
+            "model": "coding",
+            "prompt": ["$cppjob", "$execute"]
+        },
+        "execute-update-task": {
+            "model": "coding",
+            "prompt": ["$cppjob", "$execute", "#Update", "$user-input"]
+        },
+        "verify-task": {
+            "model": "coding",
+            "prompt": ["$cppjob", "$verify"]
+        },
+        "verify-update-task": {
+            "model": "coding",
+            "prompt": ["$cppjob", "$verify", "#Update", "$user-input"]
+        },
+        "scrum-learn-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$scrum", "#Learn"]
+        },
+        "refine-task": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$refine"]
+        },
+        "review-scrum": {
+            "prompt": ["$cppjob", "$review", "$reportDocument", "#Scrum"]
+        },
+        "review-design": {
+            "prompt": ["$cppjob", "$review", "$reportDocument", "#Design"]
+        },
+        "review-plan": {
+            "prompt": ["$cppjob", "$review", "$reportDocument", "#Plan"]
+        },
+        "review-summary": {
+            "prompt": ["$cppjob", "$review", "$reportDocument", "#Summary"]
+        },
+        "review-final": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$review", "$reportDocument", "#Final"]
+        },
+        "review-apply": {
+            "model": "planning",
+            "prompt": ["$cppjob", "$review", "#Apply"]
+        }
+    }
 }

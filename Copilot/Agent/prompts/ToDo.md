@@ -34,7 +34,8 @@ Lists as a table, when automate is clicked, it executes all third-column jobs fr
 | summary | automate | problem | update |
 | execute | automate | start | update |
 | verify | automate | start | update |
-| scrum | | learn |
+| scrum | automate | learn |
+| refine | | start |
 
 conditions:
 - scrum ready: when Copilot_Scrum.md is not just an title
