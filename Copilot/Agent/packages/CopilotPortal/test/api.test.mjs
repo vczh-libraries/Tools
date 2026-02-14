@@ -48,17 +48,17 @@ describe("API: /api/copilot/models", () => {
 
 describe("API: session not found errors", () => {
     it("live returns SessionNotFound for invalid session", async () => {
-        const data = await fetchJson("/api/copilot/session/live/nonexistent");
+        const data = await fetchJson("/api/copilot/session/nonexistent/live");
         assert.deepStrictEqual(data, { error: "SessionNotFound" });
     });
 
     it("stop returns SessionNotFound for invalid session", async () => {
-        const data = await fetchJson("/api/copilot/session/stop/nonexistent");
+        const data = await fetchJson("/api/copilot/session/nonexistent/stop");
         assert.deepStrictEqual(data, { error: "SessionNotFound" });
     });
 
     it("query returns SessionNotFound for invalid session", async () => {
-        const data = await fetchJson("/api/copilot/session/query/nonexistent", {
+        const data = await fetchJson("/api/copilot/session/nonexistent/query", {
             method: "POST",
             body: "test",
         });
@@ -82,7 +82,7 @@ describe("API: full session lifecycle", () => {
         // Clean up session if still open
         if (sessionId) {
             try {
-                await fetchJson(`/api/copilot/session/stop/${sessionId}`);
+                await fetchJson(`/api/copilot/session/${sessionId}/stop`);
             } catch {
                 // ignore
             }
@@ -100,7 +100,7 @@ describe("API: full session lifecycle", () => {
 
     it("live returns HttpRequestTimeout when idle", async () => {
         assert.ok(sessionId, "session must be started");
-        const data = await fetchJson(`/api/copilot/session/live/${sessionId}`);
+        const data = await fetchJson(`/api/copilot/session/${sessionId}/live`);
         assert.strictEqual(data.error, "HttpRequestTimeout");
     });
 
@@ -109,10 +109,10 @@ describe("API: full session lifecycle", () => {
         // Fire two live calls in parallel; the first will block (5s timeout),
         // the second should get ParallelCallNotSupported immediately.
         const [first, second] = await Promise.all([
-            fetchJson(`/api/copilot/session/live/${sessionId}`),
+            fetchJson(`/api/copilot/session/${sessionId}/live`),
             // Small delay to ensure the first call registers its waitingResolve
             new Promise((r) => setTimeout(r, 100)).then(() =>
-                fetchJson(`/api/copilot/session/live/${sessionId}`)
+                fetchJson(`/api/copilot/session/${sessionId}/live`)
             ),
         ]);
         assert.strictEqual(second.error, "ParallelCallNotSupported",
@@ -123,7 +123,7 @@ describe("API: full session lifecycle", () => {
 
     it("query sends request and returns empty object (no error)", async () => {
         assert.ok(sessionId, "session must be started");
-        const data = await fetchJson(`/api/copilot/session/query/${sessionId}`, {
+        const data = await fetchJson(`/api/copilot/session/${sessionId}/query`, {
             method: "POST",
             body: "What is 2+2? Reply with a single number only.",
         });
@@ -138,7 +138,7 @@ describe("API: full session lifecycle", () => {
         // Drain responses until onAgentEnd (max 60 seconds)
         const timeout = Date.now() + 60000;
         while (!gotAgentEnd && Date.now() < timeout) {
-            const data = await fetchJson(`/api/copilot/session/live/${sessionId}`);
+            const data = await fetchJson(`/api/copilot/session/${sessionId}/live`);
             if (data.error === "HttpRequestTimeout") continue;
             if (data.error) break;
             callbacks.push(data);
@@ -159,13 +159,13 @@ describe("API: full session lifecycle", () => {
 
     it("stops the session and returns Closed", async () => {
         assert.ok(sessionId, "session must be started");
-        const data = await fetchJson(`/api/copilot/session/stop/${sessionId}`);
+        const data = await fetchJson(`/api/copilot/session/${sessionId}/stop`);
         assert.deepStrictEqual(data, { result: "Closed" });
         sessionId = null;
     });
 
     it("stopping again returns SessionNotFound", async () => {
-        const data = await fetchJson("/api/copilot/session/stop/session-that-was-just-stopped");
+        const data = await fetchJson("/api/copilot/session/session-that-was-just-stopped/stop");
         assert.deepStrictEqual(data, { error: "SessionNotFound" });
     });
 });

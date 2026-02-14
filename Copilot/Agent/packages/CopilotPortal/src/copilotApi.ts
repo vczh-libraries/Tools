@@ -45,6 +45,15 @@ export async function apiConfig(req: http.IncomingMessage, res: http.ServerRespo
 export async function apiStop(req: http.IncomingMessage, res: http.ServerResponse, server: http.Server): Promise<void> {
     jsonResponse(res, 200, {});
     console.log("Shutting down...");
+    // Stop any running sessions
+    for (const [sessionId, state] of sessions) {
+        if (state.waitingResolve) {
+            const resolve = state.waitingResolve;
+            state.waitingResolve = null;
+            resolve({ error: "SessionNotFound" });
+        }
+    }
+    sessions.clear();
     if (copilotClient) {
         await copilotClient.stop();
         copilotClient = null;

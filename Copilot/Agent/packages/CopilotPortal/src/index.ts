@@ -101,22 +101,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
         return;
     }
 
-    // api/copilot/session/stop/{session-id}
-    const stopMatch = apiPath.match(/^copilot\/session\/stop\/(.+)$/);
+    // api/copilot/session/{session-id}/stop
+    const stopMatch = apiPath.match(/^copilot\/session\/([^\/]+)\/stop$/);
     if (stopMatch) {
         await apiCopilotSessionStop(req, res, stopMatch[1]);
         return;
     }
 
-    // api/copilot/session/query/{session-id}
-    const queryMatch = apiPath.match(/^copilot\/session\/query\/(.+)$/);
+    // api/copilot/session/{session-id}/query
+    const queryMatch = apiPath.match(/^copilot\/session\/([^\/]+)\/query$/);
     if (queryMatch) {
         await apiCopilotSessionQuery(req, res, queryMatch[1]);
         return;
     }
 
-    // api/copilot/session/live/{session-id}
-    const liveMatch = apiPath.match(/^copilot\/session\/live\/(.+)$/);
+    // api/copilot/session/{session-id}/live
+    const liveMatch = apiPath.match(/^copilot\/session\/([^\/]+)\/live$/);
     if (liveMatch) {
         await apiCopilotSessionLive(req, res, liveMatch[1]);
         return;

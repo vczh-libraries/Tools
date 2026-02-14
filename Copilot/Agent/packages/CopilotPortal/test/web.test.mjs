@@ -147,13 +147,13 @@ describe("Web: index.html session interaction", () => {
         if (page) {
             try {
                 await page.evaluate(() => {
-                    return fetch("/api/copilot/session/stop/session-1").catch(() => {});
+                    return fetch("/api/copilot/session/session-1/stop").catch(() => {});
                 });
                 await page.evaluate(() => {
-                    return fetch("/api/copilot/session/stop/session-2").catch(() => {});
+                    return fetch("/api/copilot/session/session-2/stop").catch(() => {});
                 });
                 await page.evaluate(() => {
-                    return fetch("/api/copilot/session/stop/session-3").catch(() => {});
+                    return fetch("/api/copilot/session/session-3/stop").catch(() => {});
                 });
             } catch {
                 // ignore

@@ -5,6 +5,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 
 ## Related Files
 
+- `src/sharedApi.ts`
 - `src/copilotApi.ts`
 - `src/index.ts`
 
@@ -48,6 +49,7 @@ Returns `{"message":"Hello, world!"}`
 
 ### stop
 
+Stop any running sessions.
 Returns `{}` and stops.
 
 ### copilot/models
@@ -78,7 +80,7 @@ Start a new copilot session and return in this schema
 
 Multiple sessions could be running parallelly, start a `CopilotClient` if it is not started yet, it shares between all sessions.
 
-### copilot/session/stop/{session-id}
+### copilot/session/{session-id}/stop
 
 Stop the session and return in this schema
 
@@ -88,7 +90,7 @@ Stop the session and return in this schema
 
 If all session is closed, close the `CopilotClient` as well.
 
-### copilot/session/query/{session-id}
+### copilot/session/{session-id}/query
 
 The body will be the query prompt string.
 
@@ -102,7 +104,7 @@ Returns in this schema
 }
 ```
 
-### copilot/session/live/{session-id}
+### copilot/session/{session-id}/live
 
 This is a query to wait for one response back for this session.
 Each session generates many responses, storing in a queue.

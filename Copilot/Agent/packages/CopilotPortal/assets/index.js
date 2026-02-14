@@ -106,7 +106,7 @@ function startLivePolling() {
 async function pollLive() {
     while (livePollingActive) {
         try {
-            const res = await fetch(`/api/copilot/session/live/${encodeURIComponent(sessionId)}`);
+            const res = await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/live`);
             if (!livePollingActive) break;
             const data = await res.json();
             if (!livePollingActive) break;
@@ -163,7 +163,7 @@ async function sendRequest() {
     sessionRenderer.addUserMessage(text);
 
     try {
-        await fetch(`/api/copilot/session/query/${encodeURIComponent(sessionId)}`, {
+        await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/query`, {
             method: "POST",
             body: text,
         });
@@ -198,7 +198,7 @@ function closeWindow() {
 async function closeSession() {
     livePollingActive = false;
     try {
-        await fetch(`/api/copilot/session/stop/${encodeURIComponent(sessionId)}`);
+        await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/stop`);
     } catch (err) {
         // Ignore errors during shutdown
     }
@@ -210,7 +210,7 @@ closeSessionButton.addEventListener("click", closeSession);
 stopServerButton.addEventListener("click", async () => {
     livePollingActive = false;
     try {
-        await fetch(`/api/copilot/session/stop/${encodeURIComponent(sessionId)}`);
+        await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/stop`);
         await fetch("/api/stop");
     } catch (err) {
         // Ignore errors during shutdown
