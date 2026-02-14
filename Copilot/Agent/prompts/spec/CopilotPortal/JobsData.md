@@ -39,13 +39,17 @@ Perform all verifications, verify and update all prompts with `expandPromptStati
 - entry.tasks[name].availability.condition
 - entry.tasks[name].criteria.condition
 
-- entry.models.anything or entry.models.reviewers[index]:
+Here are all checks that `validateEntry` needs to do:
 - entry.grid[rowIndex].jobs[columnIndex].id:
   - Skip right now.
 - entry.tasks[name].model;
-- entry.tasks[name].availability.previousJobKeywords[index];
-- entry.tasks[name].availability.previousTasks[index];
-- entry.tasks[name].criteria.toolExecuted[index];
+  - Must be in fields of `entry.models` but not `reviewers`.
+- entry.tasks[name].availability.previousJobKeywords[index]:
+  - Must be in any `entry.grid[index].keyword`.
+- entry.tasks[name].availability.previousTasks[index]:
+  - Must be in keys of `entry.tasks`.
+- entry.tasks[name].criteria.toolExecuted[index]:
+  - Must be in `availableTools`.
 
 ## Definition
 

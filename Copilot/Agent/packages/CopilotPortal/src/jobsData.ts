@@ -37,6 +37,12 @@ export interface Entry {
     tasks: {[key in string]: Task};
 }
 
+export const availableTools: string[] = [
+    "job_prepare_document",
+    "job_boolean_true",
+    "job_boolean_false"
+];
+
 export const runtimeVariables: string[] = [
     "$user-input",
     "$reported-document"
