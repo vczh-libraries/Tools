@@ -15,6 +15,7 @@ export interface Task {
     model?: string;
     prompt: Prompt;
     availability?: {
+        previousJobKeywords?: string[];
         condition: Prompt;
     };
     criteria?: {
@@ -35,7 +36,7 @@ export interface Entry {
     tasks: {[key in string]: Task};
 }
 
-export const entry: Entry = {
+const entryInput: Entry = {
     models: {
         driving: "gpt-5-mini",
         planning: "gpt-5.2",
@@ -94,6 +95,9 @@ export const entry: Entry = {
         ],
         execDocReady: [
             "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its content should not be just a title."
+        ],
+        execDocVerified: [
+            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its has a `# !!!VERIFIED!!!`."
         ]
     },
     grid: [{
@@ -163,15 +167,24 @@ export const entry: Entry = {
         },
         "scrum-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$scrum", "$reportDocument", "#Update", "$user-input"]
+            prompt: ["$mandatory", "$cppjob", "$scrum", "$reportDocument", "#Update", "$user-input"],
+            availability: {
+                condition: ["$mandatory", "$scrumDocReady"]
+            }
         },
         "design-problem-next-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Problem", "Next"]
+            prompt: ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Problem", "Next"],
+            availability: {
+                condition: ["$mandatory", "$scrumDocReady"]
+            }
         },
         "design-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Update", "$user-input"]
+            prompt: ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Update", "$user-input"],
+            availability: {
+                condition: ["$mandatory", "$designDocReady"]
+            }
         },
         "design-problem-task": {
             model: "planning",
@@ -179,39 +192,69 @@ export const entry: Entry = {
         },
         "plan-problem-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Problem"]
+            prompt: ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Problem"],
+            availability: {
+                condition: ["$mandatory", "$designDocReady"]
+            }
         },
         "plan-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Update", "$user-input"]
+            prompt: ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Update", "$user-input"],
+            availability: {
+                condition: ["$mandatory", "$planDocReady"]
+            }
         },
         "summary-problem-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Problem"]
+            prompt: ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Problem"],
+            availability: {
+                condition: ["$mandatory", "$planDocReady"]
+            }
         },
         "summary-update-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Update", "$user-input"]
+            prompt: ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Update", "$user-input"],
+            availability: {
+                condition: ["$mandatory", "$execDocReady"]
+            }
         },
         "execute-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$execute"]
+            prompt: ["$mandatory", "$cppjob", "$execute"],
+            availability: {
+                condition: ["$mandatory", "$execDocReady"]
+            }
         },
         "execute-update-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$execute", "#Update", "$user-input"]
+            prompt: ["$mandatory", "$cppjob", "$execute", "#Update", "$user-input"],
+            availability: {
+                previousJobKeywords: ["execute", "verify"],
+                condition: ["$mandatory", "$execDocReady"]
+            }
         },
         "verify-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$verify"]
+            prompt: ["$mandatory", "$cppjob", "$verify"],
+            availability: {
+                previousJobKeywords: ["execute", "verify"],
+                condition: ["$mandatory", "$execDocReady"]
+            }
         },
         "verify-update-task": {
             model: "coding",
-            prompt: ["$mandatory", "$cppjob", "$verify", "#Update", "$user-input"]
+            prompt: ["$mandatory", "$cppjob", "$verify", "#Update", "$user-input"],
+            availability: {
+                previousJobKeywords: ["execute", "verify"],
+                condition: ["$mandatory", "$execDocReady"]
+            }
         },
         "scrum-learn-task": {
             model: "planning",
-            prompt: ["$mandatory", "$cppjob", "$scrum", "#Learn"]
+            prompt: ["$mandatory", "$cppjob", "$scrum", "#Learn"],
+            availability: {
+                condition: ["$mandatory", "$execDocVerified"]
+            }
         },
         "refine-task": {
             model: "planning",
@@ -239,3 +282,9 @@ export const entry: Entry = {
         }
     }
 }
+
+function validateEntry(entry: Entry): Entry {
+    return entry;
+}
+
+export const entry = validateEntry(entryInput);
