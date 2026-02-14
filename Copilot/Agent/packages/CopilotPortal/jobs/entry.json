@@ -10,8 +10,10 @@
         ]
     },
     "promptPrefix": {
+        "mandatory": [
+            "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)"
+        ],
         "cppjob": [
-            "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)",
             "YOU MUST FOLLOW REPO-ROOT/.github/copilot-instructions.md as a general guideline for all your tasks."
         ],
         "scrum": [
@@ -43,6 +45,18 @@
         ],
         "reportBoolean": [
             "YOU MUST call either job_boolean_true or job_boolean_false to answer an yes/no question, with the reason in the argument."
+        ],
+        "scrumDocReady": [
+            "REPO-ROOT/.github/TaskLogs/Copilot_Scrum.md should exist and its content should not be just a title."
+        ],
+        "designDocReady": [
+            "REPO-ROOT/.github/TaskLogs/Copilot_Task.md should exist and its content should not be just a title."
+        ],
+        "planDocReady": [
+            "REPO-ROOT/.github/TaskLogs/Copilot_Planning.md should exist and its content should not be just a title."
+        ],
+        "execDocReady": [
+            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its content should not be just a title."
         ]
     },
     "grid": [{
@@ -104,83 +118,87 @@
     "tasks": {
         "scrum-problem-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$scrum", "$reportDocument", "#Problem", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$scrum", "$reportDocument", "#Problem", "$user-input"],
+            "criteria": {
+                "toolExecuted": ["job_prepare_document"],
+                "condition": ["$mandatory", "$scrumDocReady"]
+            }
         },
         "scrum-update-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$scrum", "$reportDocument", "#Update", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$scrum", "$reportDocument", "#Update", "$user-input"]
         },
         "design-problem-next-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$design", "$reportDocument", "#Problem", "Next"]
+            "prompt": ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Problem", "Next"]
         },
         "design-update-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$design", "$reportDocument", "#Update", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Update", "$user-input"]
         },
         "design-problem-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$design", "$reportDocument", "#Problem", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$design", "$reportDocument", "#Problem", "$user-input"]
         },
         "plan-problem-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$plan", "$reportDocument", "#Problem"]
+            "prompt": ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Problem"]
         },
         "plan-update-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$plan", "$reportDocument", "#Update", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$plan", "$reportDocument", "#Update", "$user-input"]
         },
         "summary-problem-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$summary", "$reportDocument", "#Problem"]
+            "prompt": ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Problem"]
         },
         "summary-update-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$summary", "$reportDocument", "#Update", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$summary", "$reportDocument", "#Update", "$user-input"]
         },
         "execute-task": {
             "model": "coding",
-            "prompt": ["$cppjob", "$execute"]
+            "prompt": ["$mandatory", "$cppjob", "$execute"]
         },
         "execute-update-task": {
             "model": "coding",
-            "prompt": ["$cppjob", "$execute", "#Update", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$execute", "#Update", "$user-input"]
         },
         "verify-task": {
             "model": "coding",
-            "prompt": ["$cppjob", "$verify"]
+            "prompt": ["$mandatory", "$cppjob", "$verify"]
         },
         "verify-update-task": {
             "model": "coding",
-            "prompt": ["$cppjob", "$verify", "#Update", "$user-input"]
+            "prompt": ["$mandatory", "$cppjob", "$verify", "#Update", "$user-input"]
         },
         "scrum-learn-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$scrum", "#Learn"]
+            "prompt": ["$mandatory", "$cppjob", "$scrum", "#Learn"]
         },
         "refine-task": {
             "model": "planning",
-            "prompt": ["$cppjob", "$refine"]
+            "prompt": ["$mandatory", "$cppjob", "$refine"]
         },
         "review-scrum": {
-            "prompt": ["$cppjob", "$review", "$reportDocument", "#Scrum"]
+            "prompt": ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Scrum"]
         },
         "review-design": {
-            "prompt": ["$cppjob", "$review", "$reportDocument", "#Design"]
+            "prompt": ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Design"]
         },
         "review-plan": {
-            "prompt": ["$cppjob", "$review", "$reportDocument", "#Plan"]
+            "prompt": ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Plan"]
         },
         "review-summary": {
-            "prompt": ["$cppjob", "$review", "$reportDocument", "#Summary"]
+            "prompt": ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Summary"]
         },
         "review-final": {
             "model": "planning",
-            "prompt": ["$cppjob", "$review", "$reportDocument", "#Final"]
+            "prompt": ["$mandatory", "$cppjob", "$review", "$reportDocument", "#Final"]
         },
         "review-apply": {
             "model": "planning",
-            "prompt": ["$cppjob", "$review", "#Apply"]
+            "prompt": ["$mandatory", "$cppjob", "$review", "#Apply"]
         }
     }
 }
