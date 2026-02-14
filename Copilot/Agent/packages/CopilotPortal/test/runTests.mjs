@@ -14,7 +14,7 @@ const testFiles = [
 
 async function runTests() {
     return new Promise((resolve) => {
-        const child = spawn("node", ["--test", ...testFiles], {
+        const child = spawn("node", ["--test", "--test-concurrency=1", ...testFiles], {
             stdio: "inherit",
             cwd: packageDir,
         });
