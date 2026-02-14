@@ -45,7 +45,8 @@ export const availableTools: string[] = [
 
 export const runtimeVariables: string[] = [
     "$user-input",
-    "$reported-document"
+    "$reported-document",
+    "$review-final"
 ];
 
 const entryInput: Entry = {
@@ -338,14 +339,100 @@ const entryInput: Entry = {
 }
 
 export function expandPromptStatic(entry: Entry, codePath: string, prompt: Prompt): Prompt {
-    throw new Error("Not implemented");
+    if (prompt.length === 0) {
+        throw new Error(`${codePath}: Prompt is empty.`);
+    }
+    const joined = prompt.join("\n");
+    const resolved = resolveVariablesStatic(entry, codePath, joined);
+    return [resolved];
+}
+
+function resolveVariablesStatic(entry: Entry, codePath: string, text: string): string {
+    return text.replace(/\$[a-zA-Z]+(?:-[a-zA-Z]+)*/g, (match) => {
+        const variableName = match;
+        if (runtimeVariables.includes(variableName)) {
+            return variableName;
+        }
+        const key = variableName.slice(1); // remove leading $
+        if (key in entry.promptVariables) {
+            const childCodePath = `${codePath}/${variableName}`;
+            const childPrompt = entry.promptVariables[key];
+            const expanded = expandPromptStatic(entry, childCodePath, childPrompt);
+            return expanded[0];
+        }
+        throw new Error(`${codePath}: Cannot find prompt variable: ${variableName}.`);
+    });
 }
 
 export function expandPromptDynamic(entry: Entry, prompt: Prompt, values: Record<string, string>): Prompt {
-    throw new Error("Not implemented");
+    if (prompt.length !== 1) {
+        throw new Error(`expandPromptDynamic: Prompt must have exactly one item, got ${prompt.length}.`);
+    }
+    const text = prompt[0];
+    const resolved = text.replace(/\$[a-zA-Z]+(?:-[a-zA-Z]+)*/g, (match) => {
+        const variableName = match;
+        const key = variableName.slice(1);
+        if (key in values) {
+            return values[key];
+        }
+        throw new Error(`expandPromptDynamic: Cannot find runtime variable: ${variableName}.`);
+    });
+    return [resolved];
 }
 
 function validateEntry(entry: Entry, codePath: string): Entry {
+    const modelKeys = Object.keys(entry.models).filter(k => k !== "reviewers");
+    const gridKeywords = entry.grid.map(row => row.keyword);
+
+    for (const [taskName, task] of Object.entries(entry.tasks)) {
+        const taskPath = `${codePath}/tasks/${taskName}`;
+
+        // Validate model
+        if (task.model !== undefined) {
+            if (!modelKeys.includes(task.model)) {
+                throw new Error(`${taskPath}: Model "${task.model}" is not a valid model key.`);
+            }
+        }
+
+        // Expand and validate prompt
+        task.prompt = expandPromptStatic(entry, `${taskPath}/prompt`, task.prompt);
+
+        // Validate availability
+        if (task.availability) {
+            if (task.availability.previousJobKeywords) {
+                for (const kw of task.availability.previousJobKeywords) {
+                    if (!gridKeywords.includes(kw)) {
+                        throw new Error(`${taskPath}: previousJobKeywords "${kw}" is not a valid grid keyword.`);
+                    }
+                }
+            }
+            if (task.availability.previousTasks) {
+                for (const pt of task.availability.previousTasks) {
+                    if (!(pt in entry.tasks)) {
+                        throw new Error(`${taskPath}: previousTasks "${pt}" is not a valid task name.`);
+                    }
+                }
+            }
+            if (task.availability.condition) {
+                task.availability.condition = expandPromptStatic(entry, `${taskPath}/availability/condition`, task.availability.condition);
+            }
+        }
+
+        // Validate criteria
+        if (task.criteria) {
+            if (task.criteria.toolExecuted) {
+                for (const tool of task.criteria.toolExecuted) {
+                    if (!availableTools.includes(tool)) {
+                        throw new Error(`${taskPath}: toolExecuted "${tool}" is not an available tool.`);
+                    }
+                }
+            }
+            if (task.criteria.condition) {
+                task.criteria.condition = expandPromptStatic(entry, `${taskPath}/criteria/condition`, task.criteria.condition);
+            }
+        }
+    }
+
     return entry;
 }
 

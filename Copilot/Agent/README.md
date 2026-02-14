@@ -102,6 +102,7 @@ Copilot/Agent/
 │   │   ├── test/             # Test files
 │   │   │   ├── startServer.mjs       # Starts server for testing
 │   │   │   ├── runTests.mjs          # Test runner (always stops server)
+│   │   │   ├── jobsData.test.mjs     # Jobs data validation tests
 │   │   │   ├── api.test.mjs          # RESTful API tests
 │   │   │   └── web.test.mjs          # Playwright UI tests
 │   │   └── package.json
