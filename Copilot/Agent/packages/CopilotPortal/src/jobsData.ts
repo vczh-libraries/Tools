@@ -435,4 +435,4 @@ function validateEntry(entry: Entry, codePath: string): Entry {
     return entry;
 }
 
-export const entry = validateEntry(entryInput, "jobsData.ts:entry");
+export const entry = validateEntry(entryInput, "jobsData.ts:");
