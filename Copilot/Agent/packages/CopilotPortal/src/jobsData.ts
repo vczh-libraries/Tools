@@ -516,6 +516,9 @@ function validateEntry(entry: Entry, codePath: string): Entry {
             if (task.criteria.condition) {
                 task.criteria.condition = expandPromptStatic(entry, `${taskBase}.criteria.condition`, task.criteria.condition);
             }
+            if (task.criteria.failureAction && task.criteria.failureAction.length === 3) {
+                task.criteria.failureAction[2] = expandPromptStatic(entry, `${taskBase}.criteria.failureAction[2]`, task.criteria.failureAction[2]);
+            }
         }
     }
 

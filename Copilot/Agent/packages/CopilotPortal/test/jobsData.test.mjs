@@ -124,6 +124,18 @@ describe("validateEntry (entry export)", () => {
         }
     });
 
+    it("all criteria failureAction prompts are expanded to single item", () => {
+        for (const [name, task] of Object.entries(entry.tasks)) {
+            if (task.criteria?.failureAction && task.criteria.failureAction.length === 3) {
+                const prompt = task.criteria.failureAction[2];
+                assert.strictEqual(
+                    prompt.length, 1,
+                    `task ${name} criteria.failureAction[2] should be single item`
+                );
+            }
+        }
+    });
+
     it("expanded prompts do not contain resolvable variables (only runtime ones)", () => {
         for (const [name, task] of Object.entries(entry.tasks)) {
             const text = task.prompt[0];
