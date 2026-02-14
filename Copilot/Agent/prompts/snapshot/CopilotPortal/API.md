@@ -5,6 +5,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 
 ## Related Files
 
+- `src/copilotApi.ts`
 - `src/index.ts`
 
 ## Starting the HTTP Server
