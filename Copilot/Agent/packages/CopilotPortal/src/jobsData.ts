@@ -458,50 +458,53 @@ function validateEntry(entry: Entry, codePath: string): Entry {
     const gridKeywords = entry.grid.map(row => row.keyword);
 
     for (const [taskName, task] of Object.entries(entry.tasks)) {
-        const taskPath = `${codePath}/tasks/${taskName}`;
+        const taskBase = `${codePath}entry.tasks["${taskName}"]`;
 
         // Validate model
         if (task.model !== undefined) {
             if (!modelKeys.includes(task.model)) {
-                throw new Error(`${taskPath}: Model "${task.model}" is not a valid model key.`);
+                throw new Error(`${taskBase}.model: "${task.model}" is not a valid model key.`);
             }
         }
 
         // Expand and validate prompt
-        task.prompt = expandPromptStatic(entry, `${taskPath}/prompt`, task.prompt);
+        task.prompt = expandPromptStatic(entry, `${taskBase}.prompt`, task.prompt);
 
         // Validate availability
         if (task.availability) {
             if (task.availability.previousJobKeywords) {
-                for (const kw of task.availability.previousJobKeywords) {
+                for (let i = 0; i < task.availability.previousJobKeywords.length; i++) {
+                    const kw = task.availability.previousJobKeywords[i];
                     if (!gridKeywords.includes(kw)) {
-                        throw new Error(`${taskPath}: previousJobKeywords "${kw}" is not a valid grid keyword.`);
+                        throw new Error(`${taskBase}.availability.previousJobKeywords[${i}]: "${kw}" is not a valid grid keyword.`);
                     }
                 }
             }
             if (task.availability.previousTasks) {
-                for (const pt of task.availability.previousTasks) {
+                for (let i = 0; i < task.availability.previousTasks.length; i++) {
+                    const pt = task.availability.previousTasks[i];
                     if (!(pt in entry.tasks)) {
-                        throw new Error(`${taskPath}: previousTasks "${pt}" is not a valid task name.`);
+                        throw new Error(`${taskBase}.availability.previousTasks[${i}]: "${pt}" is not a valid task name.`);
                     }
                 }
             }
             if (task.availability.condition) {
-                task.availability.condition = expandPromptStatic(entry, `${taskPath}/availability/condition`, task.availability.condition);
+                task.availability.condition = expandPromptStatic(entry, `${taskBase}.availability.condition`, task.availability.condition);
             }
         }
 
         // Validate criteria
         if (task.criteria) {
             if (task.criteria.toolExecuted) {
-                for (const tool of task.criteria.toolExecuted) {
+                for (let i = 0; i < task.criteria.toolExecuted.length; i++) {
+                    const tool = task.criteria.toolExecuted[i];
                     if (!availableTools.includes(tool)) {
-                        throw new Error(`${taskPath}: toolExecuted "${tool}" is not an available tool.`);
+                        throw new Error(`${taskBase}.criteria.toolExecuted[${i}]: "${tool}" is not an available tool.`);
                     }
                 }
             }
             if (task.criteria.condition) {
-                task.criteria.condition = expandPromptStatic(entry, `${taskPath}/criteria/condition`, task.criteria.condition);
+                task.criteria.condition = expandPromptStatic(entry, `${taskBase}.criteria.condition`, task.criteria.condition);
             }
         }
     }
