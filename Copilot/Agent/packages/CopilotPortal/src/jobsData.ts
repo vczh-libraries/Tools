@@ -12,8 +12,9 @@ export interface GridRow {
 export type Prompt = string[];
 
 export type FailureAction =
-    | "CallJobFail"
+    // retry X times with a new session, but if job_prerequisite_failed is called, fails directly.
     | ["RetryWithNewSession", number]
+    // retry X times within the same session with an additional prompt, but if job_prerequisite_failed is called, fails directly.
     | ["RetryWithUserPrompt", number, Prompt]
     ;
 
@@ -49,7 +50,7 @@ export const availableTools: string[] = [
     "job_prepare_document",
     "job_boolean_true",
     "job_boolean_false",
-    "job_fail"
+    "job_prerequisite_failed"
 ];
 
 export const runtimeVariables: string[] = [
@@ -58,6 +59,10 @@ export const runtimeVariables: string[] = [
     "$reported-true-reason",
     "$reported-false-reason"
 ];
+
+function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
+    return ["RetryWithNewSession", retryTimes];
+}
 
 function retryFailedCondition(retryTimes: number = 3): FailureAction {
     return ["RetryWithUserPrompt", 3, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
@@ -360,7 +365,7 @@ const entryInput: Entry = {
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
-                failureAction: retryFailedCondition()
+                failureAction: retryWithNewSessionCondition()
             }
         },
         "review-design": {
@@ -368,7 +373,7 @@ const entryInput: Entry = {
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
-                failureAction: retryFailedCondition()
+                failureAction: retryWithNewSessionCondition()
             }
         },
         "review-plan": {
@@ -376,7 +381,7 @@ const entryInput: Entry = {
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
-                failureAction: retryFailedCondition()
+                failureAction: retryWithNewSessionCondition()
             }
         },
         "review-summary": {
@@ -384,12 +389,17 @@ const entryInput: Entry = {
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
-                failureAction: retryFailedCondition()
+                failureAction: retryWithNewSessionCondition()
             }
         },
         "review-final": {
             model: "planning",
-            prompt: ["$cppjob", "$review", "#Final"],
+            prompt: [
+                "$cppjob",
+                "$review",
+                "YOU MUST call job_prerequisite_failed if 1) in the last round not all models created their review document or 2) not all replies in all review documents from the last round are agree.",
+                "#Final"
+            ],
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$reviewDocReady"],

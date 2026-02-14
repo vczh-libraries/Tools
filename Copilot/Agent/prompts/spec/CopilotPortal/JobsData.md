@@ -38,6 +38,7 @@ Perform all verifications, verify and update all prompts with `expandPromptStati
 - entry.tasks[name].prompt
 - entry.tasks[name].availability.condition
 - entry.tasks[name].criteria.condition
+- entry.tasks[name].criteria.failureAction[2]
 
 Here are all checks that `validateEntry` needs to do:
 - `entry.grid[rowIndex].jobs[columnIndex].id`:
