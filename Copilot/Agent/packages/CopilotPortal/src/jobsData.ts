@@ -45,8 +45,7 @@ export const availableTools: string[] = [
 
 export const runtimeVariables: string[] = [
     "$user-input",
-    "$reported-document",
-    "$review-final"
+    "$reported-document"
 ];
 
 const entryInput: Entry = {
@@ -332,7 +331,7 @@ const entryInput: Entry = {
             model: "planning",
             prompt: ["$cppjob", "$review", "#Apply"],
             availability: {
-                condition: ["$review-final"]
+                previousTasks: ["review-final"]
             }
         }
     }
