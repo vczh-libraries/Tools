@@ -11,6 +11,12 @@ export interface GridRow {
 
 export type Prompt = string[];
 
+export type FailureAction =
+    | "CallJobFail"
+    | ["RetryWithNewSession", number]
+    | ["RetryWithUserPrompt", number, Prompt]
+    ;
+
 export interface Task {
     model?: string;
     prompt: Prompt;
@@ -22,6 +28,8 @@ export interface Task {
     criteria?: {
         toolExecuted?: string[];
         condition?: Prompt;
+        runConditionInSameSession?: boolean;
+        failureAction: FailureAction;
     };
 }
 
@@ -40,13 +48,20 @@ export interface Entry {
 export const availableTools: string[] = [
     "job_prepare_document",
     "job_boolean_true",
-    "job_boolean_false"
+    "job_boolean_false",
+    "job_fail"
 ];
 
 export const runtimeVariables: string[] = [
     "$user-input",
-    "$reported-document"
+    "$reported-document",
+    "$reported-true-reason",
+    "$reported-false-reason"
 ];
+
+function retryFailedCondition(retryTimes: number = 3): FailureAction {
+    return ["RetryWithUserPrompt", 3, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
+}
 
 const entryInput: Entry = {
     models: {
@@ -103,32 +118,26 @@ const entryInput: Entry = {
             "Call job_boolean_true if the below condition satisfies, or call job_boolean_false if it does not satisfy."
         ],
         scrumDocReady: [
-            "$defineRepoRoot",
             "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Scrum.md should exist and its content should not be just a title."
         ],
         designDocReady: [
-            "$defineRepoRoot",
             "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Task.md should exist and its content should not be just a title."
         ],
         planDocReady: [
-            "$defineRepoRoot",
             "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Planning.md should exist and its content should not be just a title."
         ],
         execDocReady: [
-            "$defineRepoRoot",
             "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its content should not be just a title."
         ],
         execDocVerified: [
-            "$defineRepoRoot",
             "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its has a `# !!!VERIFIED!!!`."
         ],
         reviewDocReady: [
-            "$defineRepoRoot",
             "$simpleCondition",
             "REPO-ROOT/.github/TaskLogs/Copilot_Review.md should exist and its content should not be just a title."
         ],
@@ -198,7 +207,9 @@ const entryInput: Entry = {
             model: "planning",
             prompt: ["$cppjob", "$scrum", "#Problem", "$user-input"],
             criteria: {
-                condition: ["$scrumDocReady"]
+                runConditionInSameSession: false,
+                condition: ["$scrumDocReady"],
+                failureAction: retryFailedCondition()
             }
         },
         "scrum-update-task": {
@@ -215,7 +226,9 @@ const entryInput: Entry = {
                 condition: ["$scrumDocReady"]
             },
             criteria: {
-                condition: ["$designDocReady"]
+                runConditionInSameSession: false,
+                condition: ["$designDocReady"],
+                failureAction: retryFailedCondition()
             }
         },
         "design-update-task": {
@@ -229,7 +242,9 @@ const entryInput: Entry = {
             model: "planning",
             prompt: ["$cppjob", "$design", "#Problem", "$user-input"],
             criteria: {
-                condition: ["$designDocReady"]
+                runConditionInSameSession: false,
+                condition: ["$designDocReady"],
+                failureAction: retryFailedCondition()
             }
         },
         "plan-problem-task": {
@@ -239,7 +254,9 @@ const entryInput: Entry = {
                 condition: ["$designDocReady"]
             },
             criteria: {
-                condition: ["$planDocReady"]
+                runConditionInSameSession: false,
+                condition: ["$planDocReady"],
+                failureAction: retryFailedCondition()
             }
         },
         "plan-update-task": {
@@ -256,7 +273,9 @@ const entryInput: Entry = {
                 condition: ["$planDocReady"]
             },
             criteria: {
-                condition: ["$execDocReady"]
+                runConditionInSameSession: false,
+                condition: ["$execDocReady"],
+                failureAction: retryFailedCondition()
             }
         },
         "summary-update-task": {
@@ -271,6 +290,11 @@ const entryInput: Entry = {
             prompt: ["$cppjob", "$execute"],
             availability: {
                 condition: ["$execDocReady"]
+            },
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Build.log must exists and the last several lines shows there is no error."],
+                failureAction: retryFailedCondition()
             }
         },
         "execute-update-task": {
@@ -279,6 +303,11 @@ const entryInput: Entry = {
             availability: {
                 previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady"]
+            },
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Build.log must exists and the last several lines shows there is no error."],
+                failureAction: retryFailedCondition()
             }
         },
         "verify-task": {
@@ -287,6 +316,11 @@ const entryInput: Entry = {
             availability: {
                 previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady"]
+            },
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Execute.log must exists and the last several lines shows how many test files and test cases passed."],
+                failureAction: retryFailedCondition()
             }
         },
         "verify-update-task": {
@@ -295,6 +329,11 @@ const entryInput: Entry = {
             availability: {
                 previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady"]
+            },
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$simpleCondition", "REPO-ROOT/.github/Scripts/Execute.log must exists and the last several lines shows how many test files and test cases passed."],
+                failureAction: retryFailedCondition()
             }
         },
         "scrum-learn-task": {
@@ -302,6 +341,11 @@ const entryInput: Entry = {
             prompt: ["$cppjob", "$scrum", "#Learn"],
             availability: {
                 condition: ["$execDocVerified"]
+            },
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$simpleCondition", "All REPO-ROOT/.github/TaskLogs/Copilot_(Task|Planning|Execution).md must have been deleted."],
+                failureAction: retryFailedCondition()
             }
         },
         "refine-task": {
@@ -312,26 +356,56 @@ const entryInput: Entry = {
             }
         },
         "review-scrum": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum"],
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$reportedDocReady"],
+                failureAction: retryFailedCondition()
+            }
         },
         "review-design": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Design"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Design"],
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$reportedDocReady"],
+                failureAction: retryFailedCondition()
+            }
         },
         "review-plan": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Plan"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Plan"],
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$reportedDocReady"],
+                failureAction: retryFailedCondition()
+            }
         },
         "review-summary": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Summary"]
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Summary"],
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$reportedDocReady"],
+                failureAction: retryFailedCondition()
+            }
         },
         "review-final": {
             model: "planning",
-            prompt: ["$cppjob", "$review", "#Final"]
+            prompt: ["$cppjob", "$review", "#Final"],
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$reviewDocReady"],
+                failureAction: retryFailedCondition()
+            }
         },
         "review-apply": {
             model: "planning",
             prompt: ["$cppjob", "$review", "#Apply"],
             availability: {
                 previousTasks: ["review-final"]
+            },
+            criteria: {
+                runConditionInSameSession: false,
+                condition: ["$simpleCondition", "Every REPO-ROOT/.github/TaskLogs/Copilot_Review*.md must have been deleted."],
+                failureAction: retryFailedCondition()
             }
         }
     }
