@@ -32,7 +32,7 @@ export interface Entry {
         coding: string;
         reviewers: string[];
     };
-    promptPrefix: {[key in string]: string[]};
+    promptVariables: {[key in string]: string[]};
     grid: GridRow[];
     tasks: {[key in string]: Task};
 }
@@ -53,7 +53,7 @@ const entryInput: Entry = {
             "gemini-3-pro-preview"
         ]
     },
-    promptPrefix: {
+    promptVariables: {
         defineRepoRoot: [
             "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)"
         ],
@@ -331,8 +331,16 @@ const entryInput: Entry = {
     }
 }
 
-function validateEntry(entry: Entry): Entry {
+export function expandPromptStatic(entry: Entry, codePath: string, prompt: Prompt): Prompt {
+    throw new Error("Not implemented");
+}
+
+export function expandPromptDynamic(entry: Entry, prompt: Prompt, values: Record<string, string>): Prompt {
+    throw new Error("Not implemented");
+}
+
+function validateEntry(entry: Entry, codePath: string): Entry {
     return entry;
 }
 
-export const entry = validateEntry(entryInput);
+export const entry = validateEntry(entryInput, "jobsData.ts:entry");
