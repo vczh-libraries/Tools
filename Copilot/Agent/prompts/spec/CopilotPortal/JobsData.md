@@ -7,7 +7,45 @@ Read `README.md` to understand the whole picture of the project as well as speci
 
 - `src/jobsData.ts`
 
-## Verification
+## Functions
+
+### expandPromptStatic
+
+A function convert from `Prompt` to `Prompt` with only one string.
+`Prompt` is a string array, the function should join them with LF character.
+In each string there might be variables.
+An variable is $ followed by one or multiple words connected with hypens.
+When an variable is in `entry.promptVariables`, replace the variable with its values.
+When an variable is in `runtimeVariables`, keep them.
+When it fails to look up the value, report an error `${codePath}: Cannot find prompt variable: ${variableName}.`.
+Be aware of that, the value is still a `Prompt`, so it is recursive.
+
+When calls `expandPromptStatic` recursively for a resolved prompt variable,
+the `codePath` becomes `${codePath}/$${variableName}`.
+
+Report an error if `prompt` is empty.
+
+### expandPromptDynamic
+
+It works like `expandPromptStatic`, but assert `prompt` has exactly one item.
+Look up all `runtimeVariables` in `values` argument.
+Be aware of that, not all variable has an value assigned.
+When it fails to look up the value, report an error.
+
+### validateEntry
+
+Perform all verifications, verify and update all prompts with `expandPromptStatic`:
+- entry.tasks[name].prompt
+- entry.tasks[name].availability.condition
+- entry.tasks[name].criteria.condition
+
+- entry.models.anything or entry.models.reviewers[index]:
+- entry.grid[rowIndex].jobs[columnIndex].id:
+  - Skip right now.
+- entry.tasks[name].model;
+- entry.tasks[name].availability.previousJobKeywords[index];
+- entry.tasks[name].availability.previousTasks[index];
+- entry.tasks[name].criteria.toolExecuted[index];
 
 ## Definition
 
