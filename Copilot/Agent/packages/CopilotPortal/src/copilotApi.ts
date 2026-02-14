@@ -1,33 +1,14 @@
 import * as http from "node:http";
 import { CopilotClient } from "@github/copilot-sdk";
 import { startSession } from "copilot-api";
+import { readBody, jsonResponse, pushResponse, waitForResponse, type LiveState, type LiveResponse } from "./sharedApi.js";
 
-// ---- Helpers ----
-
-export function readBody(req: http.IncomingMessage): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const chunks: Buffer[] = [];
-        req.on("data", (chunk: Buffer) => chunks.push(chunk));
-        req.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
-        req.on("error", reject);
-    });
-}
-
-export function jsonResponse(res: http.ServerResponse, statusCode: number, data: unknown): void {
-    res.writeHead(statusCode, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(data));
-}
+export { jsonResponse };
 
 // ---- Types ----
 
-interface SessionResponse {
-    [key: string]: unknown;
-}
-
-interface SessionState {
+interface SessionState extends LiveState {
     session: Awaited<ReturnType<typeof startSession>>;
-    responseQueue: SessionResponse[];
-    waitingResolve: ((response: SessionResponse) => void) | null;
     sessionError: string | null;
 }
 
@@ -54,34 +35,6 @@ async function closeCopilotClientIfNoSessions(): Promise<void> {
 
 const sessions = new Map<string, SessionState>();
 let nextSessionId = 1;
-
-// ---- Internal Helpers ----
-
-function pushResponse(state: SessionState, response: SessionResponse): void {
-    if (state.waitingResolve) {
-        const resolve = state.waitingResolve;
-        state.waitingResolve = null;
-        resolve(response);
-    } else {
-        state.responseQueue.push(response);
-    }
-}
-
-function waitForResponse(state: SessionState, timeoutMs: number): Promise<SessionResponse | null> {
-    return new Promise((resolve) => {
-        if (state.responseQueue.length > 0) {
-            resolve(state.responseQueue.shift()!);
-            return;
-        }
-        state.waitingResolve = resolve as (response: SessionResponse) => void;
-        setTimeout(() => {
-            if (state.waitingResolve === resolve) {
-                state.waitingResolve = null;
-                resolve(null);
-            }
-        }, timeoutMs);
-    });
-}
 
 // ---- API Functions ----
 

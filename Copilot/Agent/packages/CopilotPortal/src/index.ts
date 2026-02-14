@@ -4,6 +4,8 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
     jsonResponse,
+} from "./sharedApi.js";
+import {
     apiConfig,
     apiStop,
     apiCopilotModels,
