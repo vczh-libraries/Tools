@@ -50,6 +50,8 @@ Here are all checks that `validateEntry` needs to do:
   - Skip right now.
 - `entry.tasks[name].model`;
   - Must be in fields of `entry.models` but not `reviewers`.
+- `entry.tasks[name].requireUserInput`:
+  - If it is true, its evaluated `prompt` should use `$user-input`, otherwise should not use.
 - `entry.tasks[name].availability.previousJobKeywords[index]`:
   - Must be in any `entry.grid[index].keyword`.
 - `entry.tasks[name].availability.previousTasks[index]`:
@@ -66,6 +68,8 @@ If any validation runs directly in this function fails:
 ## Running Tasks
 
 A task is represented by type `Task`.
+
+If any session crashes, the task stops immediately and marked failed.
 
 There will be two options to run the task:
 - The driving session and the task session is the same session.

@@ -21,6 +21,7 @@ export type FailureAction =
 export interface Task {
     model?: string;
     prompt: Prompt;
+    requireUserInput: boolean;
     availability?: {
         previousJobKeywords?: string[];
         previousTasks?: string[];
@@ -223,6 +224,7 @@ const entryInput: Entry = {
     tasks: {
         "scrum-problem-task": {
             model: "planning",
+            requireUserInput: false,
             prompt: ["$cppjob", "$scrum", "#Problem", "$user-input"],
             criteria: {
                 runConditionInSameSession: false,
@@ -232,6 +234,7 @@ const entryInput: Entry = {
         },
         "scrum-update-task": {
             model: "planning",
+            requireUserInput: true,
             prompt: ["$cppjob", "$scrum", "#Update", "$user-input"],
             availability: {
                 condition: ["$scrumDocReady"]
@@ -239,6 +242,7 @@ const entryInput: Entry = {
         },
         "design-problem-next-task": {
             model: "planning",
+            requireUserInput: false,
             prompt: ["$cppjob", "$design", "#Problem", "Next"],
             availability: {
                 condition: ["$scrumDocReady"]
@@ -251,6 +255,7 @@ const entryInput: Entry = {
         },
         "design-update-task": {
             model: "planning",
+            requireUserInput: true,
             prompt: ["$cppjob", "$design", "#Update", "$user-input"],
             availability: {
                 condition: ["$designDocReady"]
@@ -258,6 +263,7 @@ const entryInput: Entry = {
         },
         "design-problem-task": {
             model: "planning",
+            requireUserInput: true,
             prompt: ["$cppjob", "$design", "#Problem", "$user-input"],
             criteria: {
                 runConditionInSameSession: false,
@@ -267,6 +273,7 @@ const entryInput: Entry = {
         },
         "plan-problem-task": {
             model: "planning",
+            requireUserInput: false,
             prompt: ["$cppjob", "$plan", "#Problem"],
             availability: {
                 condition: ["$designDocReady"]
@@ -279,6 +286,7 @@ const entryInput: Entry = {
         },
         "plan-update-task": {
             model: "planning",
+            requireUserInput: true,
             prompt: ["$cppjob", "$plan", "#Update", "$user-input"],
             availability: {
                 condition: ["$planDocReady"]
@@ -286,6 +294,7 @@ const entryInput: Entry = {
         },
         "summary-problem-task": {
             model: "planning",
+            requireUserInput: false,
             prompt: ["$cppjob", "$summary", "#Problem"],
             availability: {
                 condition: ["$planDocReady"]
@@ -298,6 +307,7 @@ const entryInput: Entry = {
         },
         "summary-update-task": {
             model: "planning",
+            requireUserInput: true,
             prompt: ["$cppjob", "$summary", "#Update", "$user-input"],
             availability: {
                 condition: ["$execDocReady"]
@@ -305,6 +315,7 @@ const entryInput: Entry = {
         },
         "execute-task": {
             model: "coding",
+            requireUserInput: false,
             prompt: ["$cppjob", "$execute"],
             availability: {
                 condition: ["$execDocReady"]
@@ -317,6 +328,7 @@ const entryInput: Entry = {
         },
         "execute-update-task": {
             model: "coding",
+            requireUserInput: true,
             prompt: ["$cppjob", "$execute", "#Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
@@ -330,6 +342,7 @@ const entryInput: Entry = {
         },
         "verify-task": {
             model: "coding",
+            requireUserInput: false,
             prompt: ["$cppjob", "$verify"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
@@ -343,6 +356,7 @@ const entryInput: Entry = {
         },
         "verify-update-task": {
             model: "coding",
+            requireUserInput: true,
             prompt: ["$cppjob", "$verify", "#Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
@@ -356,6 +370,7 @@ const entryInput: Entry = {
         },
         "scrum-learn-task": {
             model: "planning",
+            requireUserInput: false,
             prompt: ["$cppjob", "$scrum", "#Learn"],
             availability: {
                 condition: ["$execDocVerified"]
@@ -368,6 +383,7 @@ const entryInput: Entry = {
         },
         "refine-task": {
             model: "planning",
+            requireUserInput: false,
             prompt: ["$cppjob", "$refine"],
             availability: {
                 previousTasks: ["scrum-learn-task"]
@@ -375,6 +391,7 @@ const entryInput: Entry = {
         },
         "review-scrum": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum"],
+            requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
@@ -384,6 +401,7 @@ const entryInput: Entry = {
         },
         "review-design": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Design"],
+            requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
@@ -393,6 +411,7 @@ const entryInput: Entry = {
         },
         "review-plan": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Plan"],
+            requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
@@ -402,6 +421,7 @@ const entryInput: Entry = {
         },
         "review-summary": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Summary"],
+            requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
@@ -411,6 +431,7 @@ const entryInput: Entry = {
         },
         "review-final": {
             model: "planning",
+            requireUserInput: false,
             prompt: [
                 "$cppjob",
                 "$review",
@@ -425,6 +446,7 @@ const entryInput: Entry = {
         },
         "review-apply": {
             model: "planning",
+            requireUserInput: false,
             prompt: ["$cppjob", "$review", "#Apply"],
             availability: {
                 previousTasks: ["review-final"]
@@ -437,11 +459,13 @@ const entryInput: Entry = {
         },
         "ask-task": {
             model: "planning",
-            prompt: ["$cppjob", "$ask"]
+            requireUserInput: true,
+            prompt: ["$cppjob", "$ask", "$user-input"]
         },
         "code-task": {
             model: "planning",
-            prompt: ["$cppjob", "$code"],
+            requireUserInput: true,
+            prompt: ["$cppjob", "$code", "$user-input"],
             criteria: {
                 runConditionInSameSession: true,
                 condition: ["$simpleCondition", "Both condition satisfies: 1) $buildSucceededFragment; 2) $testPassedFragment."],
@@ -493,7 +517,7 @@ export function expandPromptDynamic(entry: Entry, prompt: Prompt, values: Record
     return [resolved];
 }
 
-function validateEntry(entry: Entry, codePath: string): Entry {
+export function validateEntry(entry: Entry, codePath: string): Entry {
     const modelKeys = Object.keys(entry.models).filter(k => k !== "reviewers");
     const gridKeywords = entry.grid.map(row => row.keyword);
 
