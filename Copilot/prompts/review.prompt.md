@@ -14,13 +14,20 @@
 - Each round of review should consider knowledges from the knowledge base.
 - Each round of review should consider learnings from `KnowledgeBase/Learning.md`, `KnowledgeBase/Learning.md`, `Learning/Learning_Coding.md`, and `Learning/Learning_Testing.md` if they exist.
 
-## Identify Yourself
+## Identify the Review Board Team
 
-- You are one of the models in the review panel. Identify yourself:
-  - If you are GPT, your file name fragment is `GPT`.
-  - If you are Claude (Opus), your file name fragment is `Opus`.
-  - If you are Gemini, your file name fragment is `Gemini`.
-- Use your file name fragment in all file operations below.
+- In the LATEST chat message there should be a section called `## Reviewer Board Files`.
+- Model and their file name fragment is bullet-listed in this format:
+  - `{ModelName} -> Copilot_Review_{RoundIndex}_{FileNameFragment}.md`.
+- If you cannot find this section, stops immediately.
+
+## Copilot_Review_*_*.md Structure
+
+- `# Review Target: {TargetDocumentName}`
+- `## Opinion`: Your opinion to the target document.
+- `## Replies`
+  - `### AGREE with {ModelName}` without content.
+  - `### DISAGREE with {ModelName}`: your opinion to other models' opinion or replying to you in the PREVIOUS ROUND.
 
 ## Step 1. Identify the Target Document to Review
 
@@ -35,34 +42,33 @@
 
 ## Step 2. Determine the Current Round Index
 
+- You are one of the models in the review board. `YourFileNameFragment` is your own file name fragment in all file operations below.
 - Look for your own `Copilot_Review_PREVIOUSINDEX_{YourFileNameFragment}.md` file.
   - If it exists, the current round index is biggest `PREVIOUSINDEX` + 1.
   - If none exists, the current round index is `1`.
-- If the current round index is greater that 1, here are a list of review files from the previous round:
-  - `Copilot_Review_PREVIOUSINDEX_GPT.md`
-  - `Copilot_Review_PREVIOUSINDEX_Opus.md`
-  - `Copilot_Review_PREVIOUSINDEX_Gemini.md`
 
 ## Step 3. Read Context
 
 - Read the target document identified in Step 1.
   - For `Copilot_Scrum.md`, focus only on unfinished tasks.
-- If the current round index is greater than `1`, read all review files from the previous round to collect other models' opinions.
+- If the current round index is greater than `1`, read all `Reviewer Board Files` except yours from the PREVIOUS ROUND to collect other models' opinions:
   - Their opinion of the review.
   - Their replies to you.
 
 ## Step 4. Write Your Review
 
-- Create file: `Copilot_Review_{RoundIndex}_{YourFileNameFragment}.md`
+- Create a new file: `Copilot_Review_{RoundIndex}_{YourFileNameFragment}.md`
 - You need to consolidate all information from Step 3.
 - Find what inspires you, what you agree with, and what you disagree with.
 - Complete the document following the format:
   - `# Review Target: {TargetDocumentName}`: the name of the document you are reviewing.
   - `## Opinion`:
     - Your complete summarized feedback and suggestions for the target document.
-    - You should not omit anything what is in any documents in the previous round, this is what complete means.
+    - You should not omit anything what is in any documents in the PREVIOUS ROUND, this is what "complete" means.
   - `## Replies`: this section exists only when the current round index is greater than `1`.
-    - Find `## Opinion` in every `Copilot_Review_{RoundIndex-1}_{ModelName}.md` except yours.
+    - In every `Copilot_Review_{RoundIndex-1}_{FileNameFragment}.md` except yours.
+      - Find `## Opinion`.
+      - Find `## Replies` to you.
     - If you totally agree with a model, add this section: `### AGREE with {ModelName}` with no content. If you have anything to add, put them in your own `## Opinion`.
     - If you partially or totally disagree with a model, add this section: `### DISAGREE with {ModelName}` and explain why you disagree and what you think is correct.
 - The following sections are about what you need to pay attention to when reviewing the target document.
@@ -130,17 +136,19 @@ Ignore this section if there is no `# Final` in the LATEST chat message.
 
 ### Step F1. Verify Convergence
 
-- Find the latest round of review files.
-- Check that in the latest round, every models agree with each other.
-  - If any reply is not agree, report that the review has not converged and stop.
+- Find the LATEST ROUND of `Review Board Files`.
+- Ensure all conditions below are satisfied, otherwise report the problem and stop:
+  - All models in the review board have submitted their review file in the LATEST ROUND.
+  - All models in the review board have the same target document in the LATEST ROUND.
+  - All models in the review board have no disagreement in the LATEST ROUND.
 
 ### Step F2. Identify the Target Document
 
-- Identify all review files from the last round. Read their `# Review Target`, they should be the same.
+- Identify all `Review Board Files` from the LATEST ROUND. Read their `# Review Target`, they should be the same.
 
 ### Step F3. Create the Summary
 
-- Read the `## Opinion` section from each review file from the last round.
+- Read the `## Opinion` section from each review file from the LATEST ROUND.
 - Consolidate all options into a single review opinion.
 - Write the review opinion to `Copilot_Review.md` as a cohesive set of actionable feedback.
   - The only title in this file should be `# Review Target: {TargetDocumentName}`.

@@ -82,6 +82,12 @@ const entryInput: Entry = {
         ]
     },
     promptVariables: {
+        reviewerBoardFiles: [
+            "## Reviewer Board Files",
+            "- gpt -> Copilot_Review_*_GPT.md",
+            "- claude opus -> Copilot_Review_*_OPUS.md",
+            "- gemini -> Copilot_Review_*_GEMINI.md",
+        ],
         defineRepoRoot: [
             "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)"
         ],
@@ -390,7 +396,7 @@ const entryInput: Entry = {
             }
         },
         "review-scrum": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -400,7 +406,7 @@ const entryInput: Entry = {
             }
         },
         "review-design": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Design"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Design", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -410,7 +416,7 @@ const entryInput: Entry = {
             }
         },
         "review-plan": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Plan"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Plan", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -420,7 +426,7 @@ const entryInput: Entry = {
             }
         },
         "review-summary": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Summary"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "#Summary", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -435,8 +441,9 @@ const entryInput: Entry = {
             prompt: [
                 "$cppjob",
                 "$review",
-                "YOU MUST call job_prerequisite_failed if 1) in the last round not all models created their review document or 2) not all replies in all review documents from the last round are agree.",
-                "#Final"
+                "YOU MUST call job_prerequisite_failed if 1) in the LATEST ROUND not all models created their review document or 2) not all replies in all review documents from the LATEST ROUND are agree.",
+                "#Final",
+                "$reviewerBoardFiles"
             ],
             criteria: {
                 runConditionInSameSession: false,
@@ -447,7 +454,7 @@ const entryInput: Entry = {
         "review-apply": {
             model: "planning",
             requireUserInput: false,
-            prompt: ["$cppjob", "$review", "#Apply"],
+            prompt: ["$cppjob", "$review", "#Apply", "$reviewerBoardFiles"],
             availability: {
                 previousTasks: ["review-final"]
             },
