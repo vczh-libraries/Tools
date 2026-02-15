@@ -1,11 +1,11 @@
 import { CopilotClient, type CopilotSession } from "@github/copilot-sdk";
 
-interface ICopilotSession {
+export interface ICopilotSession {
   get rawSection(): CopilotSession;
   sendRequest(message: string, timeout?: number): Promise<void>;
 }
 
-interface ICopilotSessionCallbacks {
+export interface ICopilotSessionCallbacks {
   // assistant.reasoning_delta with a new id
   onStartReasoning(reasoningId: string): void;
   // assistant.reasoning_delta with an existing id

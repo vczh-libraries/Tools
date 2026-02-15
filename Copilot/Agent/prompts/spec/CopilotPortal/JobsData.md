@@ -6,6 +6,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 ## Related Files
 
 - `src/jobsData.ts`
+- `src/jobsApi.ts`
 
 ## Functions
 
@@ -100,16 +101,40 @@ Single model option will be enabled when one of the following conditions satisfi
 
 ### Task.availability
 
-If `Task.availability` is defined and it is required to use,
-all conditions must satisfy at the same time to run the task:
+If `Task.availability` is not defined,
+there will be no prerequisite checking,
+the task just run.
+
+All conditions must satisfy at the same time to run the task:
 - When `Task.availability.previousJobKeywords` is defined, the previous job's keyword must be in the list.
 - When `Task.availability.previousTasks` is defined, the previous task's name must be in the list.
 - When `Task.availability.condition` is defined, the condition must satisfy.
   - The driving session will run the prompt.
-  - The condition satisfies when the `job_boolean_true` is called in this round of response.
+  - The condition satisfies when the `job_boolean_true` is called in this round of driving session response.
 
 otherwise the `job_prerequisite_failed` tool will be called in the driving session,
 indicating the task fails.
+
+### Task.criteria
+
+If `Task.criteria` is not defined,
+there will be no criteria checking,
+the task is treat as succeeded.
+
+All conditions must be satisfy to indicate that the task succeeded:
+- When `Task.criteria.toolExecuted` is defined, all tools in the list should have been executed in the last round of task session response.
+- When `Task.criteria.condition` is defined:
+  - The driving session will run the prompt.
+  - The condition satisfies when the `job_boolean_true` is called in this round of driving session response.
+
+If `Task.criteria.condition` and `Task.criteria.runConditionInSameSession` both defined,
+the driving session should react to `runConditionInSameSession` when task execution does not satisfy the condition:
+- The first element is `RetryWithNewSession`:
+  - Retry at most "the second element" times. Each time a new task session should be used. DO NOT reuse the previous task session.
+  - If all task executions did not satisfy the condition, the task failed.
+- The first element is `RetryWithUserPrompt`:
+  - Retry at most "the second element" times. ALWAYS reuse the previous task session.
+  - Send the prompt described by the third element to the task session, the task session should react to the prompt and retry.
 
 ## Running Jobs
 

@@ -28,6 +28,19 @@ It starts both Website and RESTful API. Awaits for api/stop to stops.
 - In the assets folder there stores all files for the website.
 - Requesting for http://localhost:port/index.html returns assets/index.html.
 
+## Helper Functions
+
+All helper functions are exported and API implementations should use them.
+
+`async helperGetModels(): Promise<ModelInfo[]>`
+- List all models.
+
+`async helperSessionStart(modelId: string): Promise<[ICopilotSession, string]>`
+- Start a session, return the session object and its id.
+
+`async helperSessionStop(session: ICopilotSession): Promise<void>`
+- Stop a session.
+
 ## API
 
 All restful read arguments from the path and returns a JSON document.

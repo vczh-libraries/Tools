@@ -1,5 +1,5 @@
 import * as http from "node:http";
-import { startSession } from "copilot-api";
+import { startSession, type ICopilotSession } from "copilot-api";
 import {
     ensureCopilotClient,
     stopCoplilotClient,
@@ -15,7 +15,8 @@ export { jsonResponse };
 // ---- Types ----
 
 interface SessionState extends LiveState {
-    session: Awaited<ReturnType<typeof startSession>>;
+    sessionId: string;
+    session: ICopilotSession;
     sessionError: string | null;
 }
 
@@ -78,7 +79,8 @@ export async function apiCopilotSessionStart(req: http.IncomingMessage, res: htt
         const client = await ensureCopilotClient();
         const sessionId = `session-${nextSessionId++}`;
         const state: SessionState = {
-            session: null as unknown as SessionState["session"],
+            sessionId,
+            session: null as unknown as ICopilotSession,
             responseQueue: [],
             waitingResolve: null,
             sessionError: null,

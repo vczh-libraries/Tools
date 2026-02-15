@@ -1,1 +1,1 @@
-export { startSession } from "./copilotSession.js";
+export * from "./copilotSession.js";
