@@ -224,7 +224,7 @@ const entryInput: Entry = {
     tasks: {
         "scrum-problem-task": {
             model: "planning",
-            requireUserInput: false,
+            requireUserInput: true,
             prompt: ["$cppjob", "$scrum", "#Problem", "$user-input"],
             criteria: {
                 runConditionInSameSession: false,
@@ -475,12 +475,17 @@ const entryInput: Entry = {
     }
 }
 
-export function expandPromptStatic(entry: Entry, codePath: string, prompt: Prompt): Prompt {
+export function expandPromptStatic(entry: Entry, codePath: string, prompt: Prompt, requiresBooleanTool?: boolean): Prompt {
     if (prompt.length === 0) {
         throw new Error(`${codePath}: Prompt is empty.`);
     }
     const joined = prompt.join("\n");
     const resolved = resolveVariablesStatic(entry, codePath, joined);
+    if (requiresBooleanTool) {
+        if (!resolved.includes("job_boolean_true") && !resolved.includes("job_boolean_false")) {
+            throw new Error(`${codePath}: Boolean tool (job_boolean_true or job_boolean_false) must be mentioned.`);
+        }
+    }
     return [resolved];
 }
 
@@ -534,6 +539,18 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
         // Expand and validate prompt
         task.prompt = expandPromptStatic(entry, `${taskBase}.prompt`, task.prompt);
 
+        // Validate requireUserInput
+        const expandedPromptText = task.prompt[0];
+        if (task.requireUserInput) {
+            if (!expandedPromptText.includes("$user-input")) {
+                throw new Error(`${taskBase}.requireUserInput: Prompt should use $user-input when requireUserInput is true.`);
+            }
+        } else {
+            if (expandedPromptText.includes("$user-input")) {
+                throw new Error(`${taskBase}.requireUserInput: Prompt should not use $user-input when requireUserInput is false.`);
+            }
+        }
+
         // Validate availability
         if (task.availability) {
             if (task.availability.previousJobKeywords) {
@@ -553,7 +570,7 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
                 }
             }
             if (task.availability.condition) {
-                task.availability.condition = expandPromptStatic(entry, `${taskBase}.availability.condition`, task.availability.condition);
+                task.availability.condition = expandPromptStatic(entry, `${taskBase}.availability.condition`, task.availability.condition, true);
             }
         }
 
@@ -568,7 +585,7 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
                 }
             }
             if (task.criteria.condition) {
-                task.criteria.condition = expandPromptStatic(entry, `${taskBase}.criteria.condition`, task.criteria.condition);
+                task.criteria.condition = expandPromptStatic(entry, `${taskBase}.criteria.condition`, task.criteria.condition, true);
             }
             if (task.criteria.failureAction && task.criteria.failureAction.length === 3) {
                 task.criteria.failureAction[2] = expandPromptStatic(entry, `${taskBase}.criteria.failureAction[2]`, task.criteria.failureAction[2]);
