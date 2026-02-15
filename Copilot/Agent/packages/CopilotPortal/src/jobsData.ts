@@ -67,7 +67,7 @@ function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
 }
 
 function retryFailedCondition(retryTimes: number = 3): FailureAction {
-    return ["RetryWithUserPrompt", 3, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
+    return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
 }
 
 const entryInput: Entry = {
@@ -154,7 +154,7 @@ const entryInput: Entry = {
         ],
         execDocVerified: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its has a `# !!!VERIFIED!!!`."
+            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and it has a `# !!!VERIFIED!!!`."
         ],
         reviewDocReady: [
             "$simpleCondition",
@@ -165,10 +165,10 @@ const entryInput: Entry = {
             "$reported-document should exist and its content should not be just a title."
         ],
         buildSucceededFragment: [
-            "REPO-ROOT/.github/Scripts/Build.log must exists and the last several lines shows there is no error"
+            "REPO-ROOT/.github/Scripts/Build.log must exist and the last several lines shows there is no error"
         ],
         testPassedFragment: [
-            "REPO-ROOT/.github/Scripts/Execute.log must exists and the last several lines shows how many test files and test cases passed"
+            "REPO-ROOT/.github/Scripts/Execute.log must exist and the last several lines shows how many test files and test cases passed"
         ]
     },
     grid: [{
@@ -231,7 +231,7 @@ const entryInput: Entry = {
         "scrum-problem-task": {
             model: "planning",
             requireUserInput: true,
-            prompt: ["$cppjob", "$scrum", "#Problem", "$user-input"],
+            prompt: ["$cppjob", "$scrum", "# Problem", "$user-input"],
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$scrumDocReady"],
@@ -241,7 +241,7 @@ const entryInput: Entry = {
         "scrum-update-task": {
             model: "planning",
             requireUserInput: true,
-            prompt: ["$cppjob", "$scrum", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$scrum", "# Update", "$user-input"],
             availability: {
                 condition: ["$scrumDocReady"]
             }
@@ -249,7 +249,7 @@ const entryInput: Entry = {
         "design-problem-next-task": {
             model: "planning",
             requireUserInput: false,
-            prompt: ["$cppjob", "$design", "#Problem", "Next"],
+            prompt: ["$cppjob", "$design", "# Problem", "Next"],
             availability: {
                 condition: ["$scrumDocReady"]
             },
@@ -262,7 +262,7 @@ const entryInput: Entry = {
         "design-update-task": {
             model: "planning",
             requireUserInput: true,
-            prompt: ["$cppjob", "$design", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$design", "# Update", "$user-input"],
             availability: {
                 condition: ["$designDocReady"]
             }
@@ -270,7 +270,7 @@ const entryInput: Entry = {
         "design-problem-task": {
             model: "planning",
             requireUserInput: true,
-            prompt: ["$cppjob", "$design", "#Problem", "$user-input"],
+            prompt: ["$cppjob", "$design", "# Problem", "$user-input"],
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$designDocReady"],
@@ -280,7 +280,7 @@ const entryInput: Entry = {
         "plan-problem-task": {
             model: "planning",
             requireUserInput: false,
-            prompt: ["$cppjob", "$plan", "#Problem"],
+            prompt: ["$cppjob", "$plan", "# Problem"],
             availability: {
                 condition: ["$designDocReady"]
             },
@@ -293,7 +293,7 @@ const entryInput: Entry = {
         "plan-update-task": {
             model: "planning",
             requireUserInput: true,
-            prompt: ["$cppjob", "$plan", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$plan", "# Update", "$user-input"],
             availability: {
                 condition: ["$planDocReady"]
             }
@@ -301,7 +301,7 @@ const entryInput: Entry = {
         "summary-problem-task": {
             model: "planning",
             requireUserInput: false,
-            prompt: ["$cppjob", "$summary", "#Problem"],
+            prompt: ["$cppjob", "$summary", "# Problem"],
             availability: {
                 condition: ["$planDocReady"]
             },
@@ -314,7 +314,7 @@ const entryInput: Entry = {
         "summary-update-task": {
             model: "planning",
             requireUserInput: true,
-            prompt: ["$cppjob", "$summary", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$summary", "# Update", "$user-input"],
             availability: {
                 condition: ["$execDocReady"]
             }
@@ -335,7 +335,7 @@ const entryInput: Entry = {
         "execute-update-task": {
             model: "coding",
             requireUserInput: true,
-            prompt: ["$cppjob", "$execute", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$execute", "# Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady"]
@@ -363,7 +363,7 @@ const entryInput: Entry = {
         "verify-update-task": {
             model: "coding",
             requireUserInput: true,
-            prompt: ["$cppjob", "$verify", "#Update", "$user-input"],
+            prompt: ["$cppjob", "$verify", "# Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady"]
@@ -377,7 +377,7 @@ const entryInput: Entry = {
         "scrum-learn-task": {
             model: "planning",
             requireUserInput: false,
-            prompt: ["$cppjob", "$scrum", "#Learn"],
+            prompt: ["$cppjob", "$scrum", "# Learn"],
             availability: {
                 condition: ["$execDocVerified"]
             },
@@ -396,7 +396,7 @@ const entryInput: Entry = {
             }
         },
         "review-scrum": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum", "$reviewerBoardFiles"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "# Scrum", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -406,7 +406,7 @@ const entryInput: Entry = {
             }
         },
         "review-design": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Design", "$reviewerBoardFiles"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "# Design", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -416,7 +416,7 @@ const entryInput: Entry = {
             }
         },
         "review-plan": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Plan", "$reviewerBoardFiles"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "# Plan", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -426,7 +426,7 @@ const entryInput: Entry = {
             }
         },
         "review-summary": {
-            prompt: ["$cppjob", "$review", "$reportDocument", "#Summary", "$reviewerBoardFiles"],
+            prompt: ["$cppjob", "$review", "$reportDocument", "# Summary", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
                 toolExecuted: ["job_prepare_document"],
@@ -441,8 +441,8 @@ const entryInput: Entry = {
             prompt: [
                 "$cppjob",
                 "$review",
-                "YOU MUST call job_prerequisite_failed if 1) in the LATEST ROUND not all models created their review document or 2) not all replies in all review documents from the LATEST ROUND are agree.",
-                "#Final",
+                "YOU MUST call job_prerequisite_failed if 1) in the LATEST ROUND not all models created their review document or 2) not all replies in all review documents from the LATEST ROUND agree.",
+                "# Final",
                 "$reviewerBoardFiles"
             ],
             criteria: {
@@ -454,7 +454,7 @@ const entryInput: Entry = {
         "review-apply": {
             model: "planning",
             requireUserInput: false,
-            prompt: ["$cppjob", "$review", "#Apply", "$reviewerBoardFiles"],
+            prompt: ["$cppjob", "$review", "# Apply", "$reviewerBoardFiles"],
             availability: {
                 previousTasks: ["review-final"]
             },
@@ -475,7 +475,7 @@ const entryInput: Entry = {
             prompt: ["$cppjob", "$code", "$user-input"],
             criteria: {
                 runConditionInSameSession: true,
-                condition: ["$simpleCondition", "Both condition satisfies: 1) $buildSucceededFragment; 2) $testPassedFragment."],
+                condition: ["$simpleCondition", "Both conditions satisfy: 1) $buildSucceededFragment; 2) $testPassedFragment."],
                 failureAction: retryFailedCondition()
             }
         }
