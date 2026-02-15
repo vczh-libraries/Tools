@@ -42,7 +42,3 @@ api:
 /jobs/live/`job-id`: receiving progress updates, session start/stop (including the driving session), call copilot/session/live/`session-id` for session responses
 
 Consider inject condition_satisfied and condition_dissatisfied tool for deterministic answer.
-
-# jobs.prompt.md
-
-Verify jobsData.ts against prompts and find errors.

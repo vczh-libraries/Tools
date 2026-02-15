@@ -1,4 +1,3 @@
-
 # Spec Driven Development
 
 The root of this project `REPO-ROOT/Copilot/Agent` is not the workspace root,
