@@ -107,9 +107,13 @@ export class SessionResponseRenderer {
     /**
      * Add a user message block. Appends data and immediately completes it.
      * @param {string} text - The user request text.
+     * @param {string} [title] - Optional title for the message block.
      */
-    addUserMessage(text) {
+    addUserMessage(text, title) {
         const userBlock = new MessageBlock("User");
+        if (title) {
+            userBlock.title = title;
+        }
         const userKey = `User-request-${Date.now()}`;
         this.#messageBlocks.set(userKey, userBlock);
         this.#containerDiv.insertBefore(userBlock.divElement, this.#awaitingStatus);

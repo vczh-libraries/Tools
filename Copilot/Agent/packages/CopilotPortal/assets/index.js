@@ -140,7 +140,7 @@ async function pollLive() {
 function processCallback(data) {
     const cb = data.callback;
     if (cb === "onGeneratedUserPrompt") {
-        sessionRenderer.addUserMessage(data.prompt);
+        sessionRenderer.addUserMessage(data.prompt, "Task");
         return cb;
     }
     const result = sessionRenderer.processCallback(data);
@@ -170,7 +170,6 @@ async function sendRequest() {
 
     if (selectedTask) {
         // Start a task with the selected task name
-        sessionRenderer.addUserMessage(text);
         try {
             await fetch(`/api/copilot/task/start/${encodeURIComponent(selectedTask)}/session/${encodeURIComponent(sessionId)}`, {
                 method: "POST",

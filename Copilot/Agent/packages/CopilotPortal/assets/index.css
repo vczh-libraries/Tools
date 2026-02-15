@@ -84,6 +84,25 @@ html, body {
     padding: 8px;
 }
 
+#task-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+#task-row label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#task-row select {
+    flex: 1;
+    padding: 4px 8px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 #request-textarea {
     flex: 1;
     resize: none;
