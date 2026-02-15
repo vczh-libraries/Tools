@@ -86,10 +86,12 @@ interface ToolMonitor {
 function monitorSessionTools(session: ICopilotSession, runtimeValues: Record<string, string>): ToolMonitor {
     const toolsCalled = new Set<string>();
     let booleanResult: boolean | null = null;
+    let active = true;
 
     const raw = session.rawSection;
 
     const onToolStart = (event: { data: { toolName: string; arguments?: unknown } }) => {
+        if (!active) return;
         const toolName = event.data.toolName;
         toolsCalled.add(toolName);
 
@@ -127,7 +129,7 @@ function monitorSessionTools(session: ICopilotSession, runtimeValues: Record<str
         get booleanResult() { return booleanResult; },
         set booleanResult(v: boolean | null) { booleanResult = v; },
         cleanup() {
-            raw.removeListener("tool.execution_start", onToolStart);
+            active = false;
         },
     } as ToolMonitor;
 }

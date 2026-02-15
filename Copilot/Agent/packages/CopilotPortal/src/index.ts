@@ -14,6 +14,11 @@ import {
     apiCopilotSessionQuery,
     apiCopilotSessionLive,
 } from "./copilotApi.js";
+import {
+    apiTaskStart,
+    apiTaskStop,
+    apiTaskLive,
+} from "./jobsApi.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -119,6 +124,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
     const liveMatch = apiPath.match(/^copilot\/session\/([^\/]+)\/live$/);
     if (liveMatch) {
         await apiCopilotSessionLive(req, res, liveMatch[1]);
+        return;
+    }
+
+    // api/copilot/task/start/{task-name}/session/{session-id}
+    const taskStartMatch = apiPath.match(/^copilot\/task\/start\/([^\/]+)\/session\/([^\/]+)$/);
+    if (taskStartMatch) {
+        await apiTaskStart(req, res, taskStartMatch[1], taskStartMatch[2]);
+        return;
+    }
+
+    // api/copilot/task/{task-id}/stop
+    const taskStopMatch = apiPath.match(/^copilot\/task\/([^\/]+)\/stop$/);
+    if (taskStopMatch) {
+        await apiTaskStop(req, res, taskStopMatch[1]);
+        return;
+    }
+
+    // api/copilot/task/{task-id}/live
+    const taskLiveMatch = apiPath.match(/^copilot\/task\/([^\/]+)\/live$/);
+    if (taskLiveMatch) {
+        await apiTaskLive(req, res, taskLiveMatch[1]);
         return;
     }
 

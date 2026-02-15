@@ -89,7 +89,11 @@ Copilot/Agent/
 │   │   └── package.json
 │   ├── CopilotPortal/        # Web UI + RESTful API server
 │   │   ├── src/
-│   │   │   └── index.ts      # HTTP server, API routes, session management
+│   │   │   ├── copilotApi.ts  # Copilot session API routes and helpers
+│   │   │   ├── jobsApi.ts     # Task management API routes and helpers
+│   │   │   ├── jobsData.ts    # Jobs/tasks data definitions and validation
+│   │   │   ├── sharedApi.ts   # Shared HTTP/live-polling utilities
+│   │   │   └── index.ts       # HTTP server, API routing, static files
 │   │   ├── assets/           # Static website files
 │   │   │   ├── index.html    # Main portal page
 │   │   │   ├── index.js      # Portal JS (session interaction, live polling)
@@ -132,3 +136,5 @@ Copilot/Agent/
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
 - **CLI Chat**: Terminal-based interactive chat with model selection and streaming
 - **Live Polling**: Sequential long-polling for real-time session callbacks
+- **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
+- **Jobs API**: RESTful API for starting, stopping, and monitoring tasks via live polling

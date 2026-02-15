@@ -170,4 +170,56 @@ describe("API: full session lifecycle", () => {
     });
 });
 
+describe("API: session start errors", () => {
+    it("returns ModelIdNotFound for invalid model id", async () => {
+        const data = await fetchJson("/api/copilot/session/start/nonexistent-model-xyz", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools",
+        });
+        assert.deepStrictEqual(data, { error: "ModelIdNotFound" });
+    });
+
+    it("returns WorkingDirectoryNotAbsolutePath for relative path", async () => {
+        const modelsData = await fetchJson("/api/copilot/models");
+        const freeModel = modelsData.models.find((m) => m.multiplier === 0);
+        assert.ok(freeModel, "need a free model");
+        const data = await fetchJson(`/api/copilot/session/start/${freeModel.id}`, {
+            method: "POST",
+            body: "relative/path/here",
+        });
+        assert.deepStrictEqual(data, { error: "WorkingDirectoryNotAbsolutePath" });
+    });
+
+    it("returns WorkingDirectoryNotExists for non-existent path", async () => {
+        const modelsData = await fetchJson("/api/copilot/models");
+        const freeModel = modelsData.models.find((m) => m.multiplier === 0);
+        assert.ok(freeModel, "need a free model");
+        const data = await fetchJson(`/api/copilot/session/start/${freeModel.id}`, {
+            method: "POST",
+            body: "C:\\NonExistentPath\\ThatDoesNotExist12345",
+        });
+        assert.deepStrictEqual(data, { error: "WorkingDirectoryNotExists" });
+    });
+});
+
+describe("API: task not found errors", () => {
+    it("task stop returns TaskNotFound for invalid task id", async () => {
+        const data = await fetchJson("/api/copilot/task/nonexistent/stop");
+        assert.deepStrictEqual(data, { error: "TaskNotFound" });
+    });
+
+    it("task live returns TaskNotFound for invalid task id", async () => {
+        const data = await fetchJson("/api/copilot/task/nonexistent/live");
+        assert.deepStrictEqual(data, { error: "TaskNotFound" });
+    });
+
+    it("task start returns SessionNotFound for invalid session id", async () => {
+        const data = await fetchJson("/api/copilot/task/start/some-task/session/nonexistent", {
+            method: "POST",
+            body: "test input",
+        });
+        assert.deepStrictEqual(data, { error: "SessionNotFound" });
+    });
+});
+
 
