@@ -87,8 +87,6 @@ because runtime variables could change.
 ### Tools and Runtime Variables
 
 `$user-input` will be passed from the user directly.
-**TASK**: Check if tools are registered during createSession. Register them if not.
-**TASK**: In `jobsData.test.mjs` there is some `// We need to call validateEntry, but it's not exported`. The function has already exported, fix them if necessary.
 
 The following tools could be called in the driving or task session.
 - When `job_prepare_document` is called, its argument becomes `$reported-document`. If there is multiple line, only keep the first line and trim and space characters before and after it.

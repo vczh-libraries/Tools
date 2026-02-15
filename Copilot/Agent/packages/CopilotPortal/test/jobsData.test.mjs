@@ -161,13 +161,10 @@ describe("validateEntry (entry export)", () => {
         };
         assert.throws(
             () => {
-                // We need to call validateEntry, but it's not exported.
-                // Instead, re-import the module's internal validation by constructing a known bad state.
-                // The entry export already proved validation works. We test error format via expandPromptStatic codePath.
-                expandPromptStatic(badEntry, 'root:entry.tasks["test-task"].prompt', []);
+                validateEntry(badEntry, "root:");
             },
             (err) => {
-                return err.message.includes('root:entry.tasks["test-task"].prompt');
+                return err.message.includes('root:entry.tasks["test-task"].model');
             }
         );
     });

@@ -6,6 +6,7 @@ import {
     helperSessionStart,
     helperSessionStop,
     helperGetSession,
+    helperPushSessionResponse,
     jsonResponse,
 } from "./copilotApi.js";
 import {
@@ -140,6 +141,7 @@ export async function startTask(
     taskName: string,
     drivingSession: ICopilotSession,
     forceSingleSessionMode: boolean,
+    ignorePrerequisiteCheck: boolean,
     callback: ICopilotTaskCallback,
     userInput?: string
 ): Promise<ICopilotTask> {
@@ -212,7 +214,7 @@ export async function startTask(
             if (stopped) return;
 
             // Check availability
-            if (task.availability) {
+            if (task.availability && !ignorePrerequisiteCheck) {
                 const available = await checkAvailability(entry, task, drivingSession, runtimeValues);
                 if (!available) {
                     status = "Failed";
@@ -236,6 +238,7 @@ export async function startTask(
             const monitor = monitorSessionTools(taskSessionObj, runtimeValues);
             let sessionCrashed = false;
             try {
+                helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: taskPromptText });
                 await taskSessionObj.sendRequest(taskPromptText);
             } catch (err) {
                 sessionCrashed = true;
@@ -321,6 +324,7 @@ async function checkAvailability(
         const conditionPrompt = expandPrompt(entry, availability.condition, runtimeValues);
         const monitor = monitorSessionTools(drivingSession, runtimeValues);
         try {
+            helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: conditionPrompt });
             await drivingSession.sendRequest(conditionPrompt);
         } catch {
             monitor.cleanup();
@@ -363,6 +367,7 @@ async function checkCriteria(
         const conditionPrompt = expandPrompt(entry, criteria.condition, runtimeValues);
         const monitor = monitorSessionTools(drivingSession, runtimeValues);
         try {
+            helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: conditionPrompt });
             await drivingSession.sendRequest(conditionPrompt);
         } catch {
             monitor.cleanup();
@@ -407,6 +412,7 @@ async function checkCriteria(
                     const taskPromptText = expandPrompt(entry, task.prompt, runtimeValues);
                     const retryMonitor = monitorSessionTools(taskSessionObj, runtimeValues);
                     try {
+                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: taskPromptText });
                         await taskSessionObj.sendRequest(taskPromptText);
                     } catch {
                         retryMonitor.cleanup();
@@ -418,6 +424,7 @@ async function checkCriteria(
                     const condMonitor = monitorSessionTools(drivingSession, runtimeValues);
                     const retryCondPrompt = expandPrompt(entry, criteria.condition!, runtimeValues);
                     try {
+                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryCondPrompt });
                         await drivingSession.sendRequest(retryCondPrompt);
                     } catch {
                         condMonitor.cleanup();
@@ -438,6 +445,7 @@ async function checkCriteria(
                     const retryPromptText = expandPrompt(entry, retryPromptTemplate, runtimeValues);
                     const retryMonitor = monitorSessionTools(taskSessionObj, runtimeValues);
                     try {
+                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryPromptText });
                         await taskSessionObj.sendRequest(retryPromptText);
                     } catch {
                         retryMonitor.cleanup();
@@ -449,6 +457,7 @@ async function checkCriteria(
                     const condMonitor = monitorSessionTools(drivingSession, runtimeValues);
                     const retryCondPrompt = expandPrompt(entry, criteria.condition!, runtimeValues);
                     try {
+                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryCondPrompt });
                         await drivingSession.sendRequest(retryCondPrompt);
                     } catch {
                         condMonitor.cleanup();
@@ -471,6 +480,21 @@ async function checkCriteria(
 }
 
 // ---- API Handlers ----
+
+export async function apiTaskList(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+): Promise<void> {
+    if (!installedEntry) {
+        jsonResponse(res, 200, { tasks: [] });
+        return;
+    }
+    const taskList = Object.entries(installedEntry.tasks).map(([name, task]) => ({
+        name,
+        requireUserInput: task.requireUserInput,
+    }));
+    jsonResponse(res, 200, { tasks: taskList });
+}
 
 export async function apiTaskStart(
     req: http.IncomingMessage,
@@ -525,7 +549,7 @@ export async function apiTaskStart(
             },
         };
 
-        const copilotTask = await startTask(taskName, session, true, taskCallback, userInput);
+        const copilotTask = await startTask(taskName, session, true, true, taskCallback, userInput);
         state.task = copilotTask;
         tasks.set(taskId, state);
         jsonResponse(res, 200, { taskId });

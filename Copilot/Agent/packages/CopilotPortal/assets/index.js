@@ -18,6 +18,7 @@ const stopServerButton = document.getElementById("stop-server-button");
 const closeSessionButton = document.getElementById("close-session-button");
 const resizeBar = document.getElementById("resize-bar");
 const requestPart = document.getElementById("request-part");
+const taskSelect = document.getElementById("task-select");
 
 // ---- Session Response Renderer ----
 const sessionRenderer = new SessionResponseRenderer(sessionPart);
@@ -137,10 +138,16 @@ async function pollLive() {
 // ---- Process Callbacks ----
 
 function processCallback(data) {
-    const cb = sessionRenderer.processCallback(data);
-    if (cb === "onIdle") {
+    const cb = data.callback;
+    if (cb === "onGeneratedUserPrompt") {
+        sessionRenderer.addUserMessage(data.prompt);
+        return cb;
+    }
+    const result = sessionRenderer.processCallback(data);
+    if (result === "onIdle") {
         setSendEnabled(true);
     }
+    return result;
 }
 
 // ---- Send / Request ----
@@ -159,17 +166,32 @@ async function sendRequest() {
     setSendEnabled(false);
     requestTextarea.value = "";
 
-    // Create a "User" message block via the renderer
-    sessionRenderer.addUserMessage(text);
+    const selectedTask = taskSelect.value;
 
-    try {
-        await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/query`, {
-            method: "POST",
-            body: text,
-        });
-    } catch (err) {
-        console.error("Failed to send query:", err);
-        setSendEnabled(true);
+    if (selectedTask) {
+        // Start a task with the selected task name
+        sessionRenderer.addUserMessage(text);
+        try {
+            await fetch(`/api/copilot/task/start/${encodeURIComponent(selectedTask)}/session/${encodeURIComponent(sessionId)}`, {
+                method: "POST",
+                body: text,
+            });
+        } catch (err) {
+            console.error("Failed to start task:", err);
+            setSendEnabled(true);
+        }
+    } else {
+        // Talk to the session directly
+        sessionRenderer.addUserMessage(text);
+        try {
+            await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/query`, {
+                method: "POST",
+                body: text,
+            });
+        } catch (err) {
+            console.error("Failed to send query:", err);
+            setSendEnabled(true);
+        }
     }
 }
 
@@ -241,5 +263,22 @@ document.addEventListener("mouseup", () => {
 
 // ---- Init ----
 
+async function loadTasks() {
+    try {
+        const res = await fetch("/api/copilot/task");
+        const data = await res.json();
+        // Keep the (none) option; add tasks
+        for (const t of data.tasks) {
+            const option = document.createElement("option");
+            option.value = t.name;
+            option.textContent = t.name;
+            taskSelect.appendChild(option);
+        }
+    } catch (err) {
+        console.error("Failed to load tasks:", err);
+    }
+}
+
 loadModels();
 initWorkingDir();
+loadTasks();

@@ -222,4 +222,19 @@ describe("API: task not found errors", () => {
     });
 });
 
+describe("API: /api/copilot/task", () => {
+    it("returns a list of tasks", async () => {
+        const data = await fetchJson("/api/copilot/task");
+        assert.ok(Array.isArray(data.tasks), "tasks should be an array");
+        assert.ok(data.tasks.length > 0, "should have at least one task");
+    });
+
+    it("each task has name and requireUserInput", async () => {
+        const data = await fetchJson("/api/copilot/task");
+        for (const t of data.tasks) {
+            assert.ok(typeof t.name === "string", `task name should be string: ${JSON.stringify(t)}`);
+            assert.ok(typeof t.requireUserInput === "boolean", `task requireUserInput should be boolean: ${JSON.stringify(t)}`);
+        }
+    });
+});
 

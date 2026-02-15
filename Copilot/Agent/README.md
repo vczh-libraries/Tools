@@ -137,4 +137,6 @@ Copilot/Agent/
 - **CLI Chat**: Terminal-based interactive chat with model selection and streaming
 - **Live Polling**: Sequential long-polling for real-time session callbacks
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
-- **Jobs API**: RESTful API for starting, stopping, and monitoring tasks via live polling
+- **Jobs API**: RESTful API for listing, starting, stopping, and monitoring tasks via live polling
+- **Task Selection UI**: Combo box in the portal to select and run tasks within an active session
+- **Tool Registration**: Custom job tools (e.g. `job_boolean_true`, `job_prepare_document`) are automatically registered with Copilot sessions

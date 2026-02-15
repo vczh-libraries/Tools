@@ -197,6 +197,19 @@ describe("Web: index.html session interaction", () => {
         assert.ok(!disabled, "send button should be enabled");
     });
 
+    it("task select combo box exists with (none) default and tasks loaded", async () => {
+        const taskSelect = page.locator("#task-select");
+        const visible = await taskSelect.isVisible();
+        assert.ok(visible, "task select should be visible");
+
+        const options = await taskSelect.locator("option").allTextContents();
+        assert.ok(options.length > 1, "should have (none) plus task options");
+        assert.strictEqual(options[0], "(none)", "first option should be (none)");
+
+        const selectedValue = await taskSelect.inputValue();
+        assert.strictEqual(selectedValue, "", "(none) should be selected by default");
+    });
+
     it("sends a request and creates User message block", async () => {
         await page.locator("#request-textarea").fill("What is 2+2? Just the number.");
         await page.locator("#send-button").click();

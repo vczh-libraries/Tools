@@ -9,7 +9,8 @@ import {
     jsonResponse,
     pushResponse,
     waitForResponse,
-    type LiveState
+    type LiveState,
+    type LiveResponse
 } from "./sharedApi.js";
 
 export { jsonResponse };
@@ -134,6 +135,15 @@ export async function helperSessionStop(session: ICopilotSession): Promise<void>
 export function helperGetSession(sessionId: string): ICopilotSession | undefined {
     const state = sessions.get(sessionId);
     return state?.session;
+}
+
+export function helperPushSessionResponse(session: ICopilotSession, response: LiveResponse): void {
+    for (const [, state] of sessions) {
+        if (state.session === session) {
+            pushResponse(state, response);
+            return;
+        }
+    }
 }
 
 // ---- API Functions ----

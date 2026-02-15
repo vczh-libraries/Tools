@@ -15,9 +15,12 @@ import {
     apiCopilotSessionLive,
 } from "./copilotApi.js";
 import {
+    apiTaskList,
     apiTaskStart,
     apiTaskStop,
     apiTaskLive,
+    installJobsEntry,
+    entry,
 } from "./jobsApi.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -127,6 +130,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
         return;
     }
 
+    // api/copilot/task (list all tasks)
+    if (apiPath === "copilot/task") {
+        await apiTaskList(req, res);
+        return;
+    }
+
     // api/copilot/task/start/{task-name}/session/{session-id}
     const taskStartMatch = apiPath.match(/^copilot\/task\/start\/([^\/]+)\/session\/([^\/]+)$/);
     if (taskStartMatch) {
@@ -173,6 +182,9 @@ const server = http.createServer((req, res) => {
     const filePath = path.join(assetsDir, pathname);
     serveStaticFile(res, filePath);
 });
+
+// Install the jobs entry
+installJobsEntry(entry);
 
 server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
