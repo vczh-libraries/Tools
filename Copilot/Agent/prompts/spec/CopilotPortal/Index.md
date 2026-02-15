@@ -51,7 +51,7 @@ When it returns any response, process it and still keep sending the api.
 Whenever `ICopilotSessionCallbacks::METHOD` is mentioned, it means a response from this api.
 
 There are additional callbacks:
-- `onGeneratedUserPrompt`: Create a "User" message block, pretending that the user is talking.
+- `onGeneratedUserPrompt`: Create a "User" message block with `title` set to `Task`, pretending that the user is talking.
 
 After "Stop Server" or "Close Session" is pressed, responses from this api will be ignored and no more such api is sending.
 
@@ -63,12 +63,13 @@ See `Shared.md` for `SessionResponseRenderer` specification.
 Live polling callbacks are forwarded to `sessionRenderer.processCallback(data)`.
 When its return value is `onIdle`, the send button is re-enabled.
 
-User requests should call `sessionRenderer.addUserMessage(text)` to create a "User" message block.
+When not to run a task, any user request should call `sessionRenderer.addUserMessage(text)` to create a "User" message block.
 Call `sessionRenderer.setAwaiting(true)` when waiting for responses, and `sessionRenderer.setAwaiting(false)` when done (sync with "Send" button's enability).
 
 #### Request Part
 
-At the very top there is a combo box listing all tasks.
+At the very top there is a label "Choose a Task: " followed by a combo box in a proper weight, listing all tasks.
+Keep the visual looks similar and good margin between controls.
 The first item is "(none)". When it is selected, "Send" will talk to the session directly instead of starting a task.
 If a task is selected, the same session will be reused to start a task.
 
