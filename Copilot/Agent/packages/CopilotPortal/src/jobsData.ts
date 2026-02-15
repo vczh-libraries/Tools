@@ -376,6 +376,7 @@ const entryInput: Entry = {
         "review-scrum": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Scrum"],
             criteria: {
+                toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
                 failureAction: retryWithNewSessionCondition()
@@ -384,6 +385,7 @@ const entryInput: Entry = {
         "review-design": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Design"],
             criteria: {
+                toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
                 failureAction: retryWithNewSessionCondition()
@@ -392,6 +394,7 @@ const entryInput: Entry = {
         "review-plan": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Plan"],
             criteria: {
+                toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
                 failureAction: retryWithNewSessionCondition()
@@ -400,6 +403,7 @@ const entryInput: Entry = {
         "review-summary": {
             prompt: ["$cppjob", "$review", "$reportDocument", "#Summary"],
             criteria: {
+                toolExecuted: ["job_prepare_document"],
                 runConditionInSameSession: false,
                 condition: ["$reportedDocReady"],
                 failureAction: retryWithNewSessionCondition()
