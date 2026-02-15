@@ -80,6 +80,7 @@ async startTask(
   drivingSession:
   ICopilotSession,
   forceSingleSessionMode: boolean,
+  ignorePrerequisiteCheck: boolean,
   callback: ICopilotTaskCallback
 ): Promise<ICopilotTask>
 ```
@@ -225,11 +226,32 @@ For example, when `onReasoning(reasoningId: string, delta: string): void;` is ca
 }
 ```
 
+When running a task, any driving session generated prompts will be reported in this schema
+
+```typescript
+{
+  callback: "onGeneratedUserPrompt",
+  prompt: string
+}
+```
+
 ## API (jobsApi.ts)
 
 TEST-NOTE: DO NOT use the exported `entry` in unit testing because all required files do not present in this repo. Make up your own `Entry` value.
 You can make up a test specific entry which loads an entry from a JSON file in `test`.
 `validateEntry` must be called before passing it to `installJobsEntry`.
+
+### copilot/task
+
+List all tasks passed to `installJobsEntry` in this schema:
+```
+{
+  tasks: {
+    name: string;
+    requireUserInput: boolean;
+  }[]
+}
+```
 
 ### copilot/task/start/{model-id}/session/{session-id}
 
@@ -237,6 +259,7 @@ The body will be user input.
 
 Start a new task and return in this schema.
 Single session mode is forced with an existing session id.
+Prerequisite checking is skipped.
 
 After the task finishes, it stops automatically, the task id will be unavailable immediately.
 Keep the session alive.
