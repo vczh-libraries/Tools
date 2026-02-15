@@ -36,9 +36,13 @@ When it fails to look up the value, report an error.
 
 Perform all verifications, verify and update all prompts with `expandPromptStatic`:
 - entry.tasks[name].prompt
-- entry.tasks[name].availability.condition
-- entry.tasks[name].criteria.condition
+- entry.tasks[name].availability.condition (run extra verification)
+- entry.tasks[name].criteria.condition (run extra verification)
 - entry.tasks[name].criteria.failureAction[2]
+
+When extra verification is needed,
+`expandPromptStatic`'s `requiresBooleanTool` will be set to true,
+it verifies that `job_boolean_true` or `job_boolean_false` must be mentioned in the expanded prompt.
 
 Here are all checks that `validateEntry` needs to do:
 - `entry.grid[rowIndex].jobs[columnIndex].id`:
@@ -58,6 +62,55 @@ If any validation runs directly in this function fails:
 - It must throws an error like "${errorCodePath}: REASON".
 - The functions must also use the error code path for any `Prompt` expression to call `expandPromptStatic`.
 
-## Definition
+## Running Tasks
 
-(to be editing...)
+A task is represented by type `Task`.
+
+There will be two options to run the task:
+- The driving session and the task session is the same session.
+- Double model option: The driving session uses `Entry.models.driving`. The task session uses the task model.
+- Task model: `Entry.models[Task.model]` will be used. When `Task.model` does not exist, the model id should be assigned
+
+Both driving session and task session shares the same runtime variables.
+Names of runtime variables are defined in `runtimeVariables`.
+
+Before sending any prompt to the driving or task session,
+`expandPromptDynamic` will be called to apply runtime variables.
+This function must be called every time a prompt is sent to the session,
+because runtime variables could change.
+
+### Tools and Runtime Variables
+
+`$user-input` will be passed from the user directly.
+
+The following tools could be called in the driving or task session.
+- When `job_prepare_document` is called, its argument becomes `$reported-document`. If there is multiple line, only keep the first line and trim and space characters before and after it.
+- When the `job_boolean_true` tool is called, the condition satisfies.
+  - The argument will be assigned to the `$reported-true-reason` runtime variable.
+  - `$reported-false-reason` will be deleted.
+- When the `job_boolean_false` tool is called, the condition fails.
+  - The argument will be assigned to the `$reported-false-reason` runtime variable.
+  - `$reported-true-reason` will be deleted.
+
+### Determine the Model Option
+
+Single model option will be enabled when one of the following conditions satisfies:
+- `Task.criteria.runConditionInSameSession` is undefined or it is true.
+- Single model option is explicitly required.
+
+### Task.availability
+
+If `Task.availability` is defined and it is required to use,
+all conditions must satisfy at the same time to run the task:
+- When `Task.availability.previousJobKeywords` is defined, the previous job's keyword must be in the list.
+- When `Task.availability.previousTasks` is defined, the previous task's name must be in the list.
+- When `Task.availability.condition` is defined, the condition must satisfy.
+  - The driving session will run the prompt.
+  - The condition satisfies when the `job_boolean_true` is called in this round of response.
+
+otherwise the `job_prerequisite_failed` tool will be called in the driving session,
+indicating the task fails.
+
+## Running Jobs
+
+(to be editing ...)

@@ -9,6 +9,9 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `src/copilotApi.ts`
 - `src/index.ts`
 
+Data structures about jobs and tasks are in `src/jobsData.ts`.
+It's spec is in `JobsData.md`.
+
 ## Starting the HTTP Server
 
 - This package starts an http server, serving a website as well as a set of RESTful API.
