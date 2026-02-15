@@ -1,4 +1,5 @@
 import * as http from "node:http";
+import { CopilotClient } from "@github/copilot-sdk";
 
 // ---- Helpers ----
 
@@ -51,4 +52,23 @@ export function waitForResponse(state: LiveState, timeoutMs: number): Promise<Li
             }
         }, timeoutMs);
     });
+}
+
+// ---- Copilot Client ----
+
+let copilotClient: CopilotClient | null = null;
+
+export async function ensureCopilotClient(): Promise<CopilotClient> {
+    if (!copilotClient) {
+        copilotClient = new CopilotClient();
+        await copilotClient.start();
+    }
+    return copilotClient;
+}
+
+export function stopCoplilotClient(): void {
+    if (copilotClient) {
+        copilotClient.stop();
+        copilotClient = null;
+    }
 }

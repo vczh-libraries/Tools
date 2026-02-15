@@ -1,7 +1,14 @@
 import * as http from "node:http";
-import { CopilotClient } from "@github/copilot-sdk";
 import { startSession } from "copilot-api";
-import { readBody, jsonResponse, pushResponse, waitForResponse, type LiveState, type LiveResponse } from "./sharedApi.js";
+import {
+    ensureCopilotClient,
+    stopCoplilotClient,
+    readBody,
+    jsonResponse,
+    pushResponse,
+    waitForResponse,
+    type LiveState
+} from "./sharedApi.js";
 
 export { jsonResponse };
 
@@ -14,20 +21,9 @@ interface SessionState extends LiveState {
 
 // ---- Copilot Client ----
 
-let copilotClient: CopilotClient | null = null;
-
-async function ensureCopilotClient(): Promise<CopilotClient> {
-    if (!copilotClient) {
-        copilotClient = new CopilotClient();
-        await copilotClient.start();
-    }
-    return copilotClient;
-}
-
 async function closeCopilotClientIfNoSessions(): Promise<void> {
-    if (sessions.size === 0 && copilotClient) {
-        await copilotClient.stop();
-        copilotClient = null;
+    if (sessions.size === 0) {
+        stopCoplilotClient();
     }
 }
 
@@ -54,10 +50,7 @@ export async function apiStop(req: http.IncomingMessage, res: http.ServerRespons
         }
     }
     sessions.clear();
-    if (copilotClient) {
-        await copilotClient.stop();
-        copilotClient = null;
-    }
+    stopCoplilotClient();
     server.close(() => {
         process.exit(0);
     });
