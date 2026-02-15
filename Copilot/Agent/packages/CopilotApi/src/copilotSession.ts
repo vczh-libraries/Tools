@@ -56,25 +56,25 @@ export async function startSession(
   const jobTools = [
     {
       name: "job_prepare_document",
-      description: "Report a document path that you are about to create or update.",
+      description: "Only when explicitly directed, use this tool to report a document path that you are about to create or update.",
       parameters: { type: "object" as const, properties: { argument: { type: "string", description: "An absolute path of the document" } }, required: ["argument"] },
       handler: async (args: { argument?: string }) => args.argument ?? "",
     },
     {
       name: "job_boolean_true",
-      description: "Report that a boolean condition is true, with the reason.",
+      description: "Only when explicitly directed, use this tool to report that a boolean condition is true, with the reason.",
       parameters: { type: "object" as const, properties: { argument: { type: "string", description: "The reason" } }, required: ["argument"] },
       handler: async (args: { argument?: string }) => args.argument ?? "",
     },
     {
       name: "job_boolean_false",
-      description: "Report that a boolean condition is false, with the reason.",
+      description: "Only when explicitly directed, use this tool to report that a boolean condition is false, with the reason.",
       parameters: { type: "object" as const, properties: { argument: { type: "string", description: "The reason" } }, required: ["argument"] },
       handler: async (args: { argument?: string }) => args.argument ?? "",
     },
     {
       name: "job_prerequisite_failed",
-      description: "Report that a prerequisite check has failed.",
+      description: "Only when explicitly directed, use this tool to report that a prerequisite check has failed.",
       parameters: { type: "object" as const, properties: { argument: { type: "string", description: "The reason" } }, required: ["argument"] },
       handler: async (args: { argument?: string }) => args.argument ?? "",
     },
