@@ -43,8 +43,6 @@ api:
 
 Consider inject condition_satisfied and condition_dissatisfied tool for deterministic answer.
 
-# /index.html
+# jobs.prompt.md
 
-Offer to run tasks from `jobsData.ts` but everything will be in the same session.
-Generated user prompt will also be pushed to the webpage.
-A session could report a generated prompt and it renders as user prompt.
+Verify jobsData.ts against prompts and find errors.
