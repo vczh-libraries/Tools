@@ -62,7 +62,10 @@ It starts a copilot session so it could be hard to predict what the response wil
 But try your best to design and maintain a set of unit test files in the `test` folder of any working package.
 Cover as much as you can against RESTful API and website features.
 
-If anything cannot be covered in the unit test, a `TEST-NODE: REASON` is required in the spec.
+There will be **TEST-NOTE** or **TEST-NOTE-BEGIN** to **TEST-NOTE-END** blocks in the spec.
+They applies to the limited context surrounding them.
+They offer ideas of how to perform testing for a certain feature that is complex and not easy to do, or to skip something that is really not able to be tested.
+Having a test note doesn't mean it is enough to only cover what a test note says. You must always do complete testing. When testing against a feature with a test note, follow the note to organize your test cases.
 
 ## Post Implementation
 

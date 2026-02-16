@@ -240,7 +240,7 @@ Returns in this schema if any error happens
 Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
 It requires the underlying copilot agent to not generate any response for 5 seconds,
 which is almost impossible.
-**TEST-NODE-END**
+**TEST-NOTE-END**
 
 Returns in this schema if an exception it thrown from inside the session
 
@@ -323,7 +323,7 @@ List all tasks passed to `installJobsEntry` in this schema:
 
 ### copilot/task/start/{task-name}/session/{session-id}
 
-**TEST-NODE-BEGIN**
+**TEST-NOTE-BEGIN**
 Besides of testing API failures, it is important to make sure task running works.
 
 Create test cases for running a task, focused on the `criteria` stuff.
@@ -334,12 +334,14 @@ Test every fields in `criteria` and ensure:
 - Whenever the task succeeded or failed, the live api responses correctly.
 - Retrying should be observable from the live api.
 
+Skip testing against session crashes scenarios because it is difficult to make it crash.
+
 It is able to make up a failed test by:
 - Does nothing
 - In `criteria` specify `toolExecuted`, since the task does nothing, this will never satisfies.
 - Set a retry budget limit to 0 so no retrying should happen.
 - Therefore it fails because of not being able to pass the criteria check.
-**TEST-NODE_END**
+**TEST-NOTE-END**
 
 The body will be user input.
 
@@ -428,7 +430,7 @@ List all jobs passed to `installJobsEntry` in this schema:
 
 ### copilot/job/start/{job-name}
 
-**TEST-NODE-BEGIN**
+**TEST-NOTE-BEGIN**
 Besides of testing API failures, it is important to make sure job running works.
 
 Create test cases for running a job, focused on different types of `Work`s.
@@ -437,7 +439,9 @@ Test every kinds of `Work` and ensure:
 - If fails properly.
 - Whenever the job succeeded or failed, the live api responses correctly.
 - Execution of tasks in `Work` should be observable from the live api.
-**TEST-NODE_END**
+
+Skip testing against task crashes scenarios because it is difficult to make it crash.
+**TEST-NOTE-END**
 
 The first line will be an absolute path for working directory
 The rest of the body will be user input.
