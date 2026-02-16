@@ -1,6 +1,6 @@
 export interface GridColumn {
     name: string;
-    id: string;
+    jobName: string;
 }
 
 export interface GridRow {
@@ -253,56 +253,56 @@ const entryInput: Entry = {
         keyword: "scrum",
         automate: false,
         jobs: [
-            { name: "problem", id: "scrum-problem" },
-            { name: "update", id: "scrum-update" }
+            { name: "problem", jobName: "scrum-problem" },
+            { name: "update", jobName: "scrum-update" }
         ]
     }, {
         keyword: "design",
         automate: true,
         jobs: [
-            { name: "problem next", id: "design-problem-next" },
-            { name: "update", id: "design-update" },
-            { name: "problem", id: "design-problem" }
+            { name: "problem next", jobName: "design-problem-next" },
+            { name: "update", jobName: "design-update" },
+            { name: "problem", jobName: "design-problem" }
         ]
     }, {
         keyword: "plan",
         automate: true,
         jobs: [
-            { name: "problem", id: "plan-problem" },
-            { name: "update", id: "plan-update" }
+            { name: "problem", jobName: "plan-problem" },
+            { name: "update", jobName: "plan-update" }
         ]
     }, {
         keyword: "summary",
         automate: true,
         jobs: [
-            { name: "problem", id: "summary-problem" },
-            { name: "update", id: "summary-update" }
+            { name: "problem", jobName: "summary-problem" },
+            { name: "update", jobName: "summary-update" }
         ]
     }, {
         keyword: "execute",
         automate: true,
         jobs: [
-            { name: "start", id: "execute-start" },
-            { name: "update", id: "execute-update" }
+            { name: "start", jobName: "execute-start" },
+            { name: "update", jobName: "execute-update" }
         ]
     }, {
         keyword: "verify",
         automate: true,
         jobs: [
-            { name: "start", id: "verify-start" },
-            { name: "update", id: "verify-update" }
+            { name: "start", jobName: "verify-start" },
+            { name: "update", jobName: "verify-update" }
         ]
     }, {
         keyword: "scrum",
         automate: true,
         jobs: [
-            { name: "learn", id: "scrum-learn" }
+            { name: "learn", jobName: "scrum-learn" }
         ]
     }, {
         keyword: "refine",
         automate: false,
         jobs: [
-            { name: "start", id: "refine" }
+            { name: "start", jobName: "refine" }
         ]
     }],
     tasks: {
