@@ -16,10 +16,13 @@ It's spec is in `JobsData.md`.
 ## Starting the HTTP Server
 
 - This package starts an http server, serving a website as well as a set of RESTful API.
-- In src/index.ts it accepts an optional argument (default 8888) for the http port.
+- In src/index.ts it accepts command line options like this:
+  - `--port 8888`: Specify the http server port. `8888` by default.
+  - `--test`: `installJobsEntry` is not called, an extra API `copilot/test/installJobsEntry` is available only in this mode.
 - Website entry is http://localhost:port
 - API entry is http://localhost:port/api/...
 - "yarn portal" to run src/index.ts.
+- "yarn portal-for-test" to run src/index.ts in test model
 
 It starts both Website and RESTful API. Awaits for api/stop to stops.
 
@@ -64,7 +67,7 @@ All helper functions and types are exported and API implementations should use t
 
 `async installJobsEntry(entry: Entry): Promise<void>;`
 - Use the entry. It could be `entry` from `jobsData.ts` or whatever.
-- This function should only be called once. Otherwise throw an error.
+- This function can only be called when no session is running, otherwise throws.
 
 ```typescript
 interface ICopilotTask {
@@ -233,9 +236,11 @@ Returns in this schema if any error happens
 }
 ```
 
-TEST-NOTE: Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
+**TEST-NOTE-BEGIN**
+Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
 It requires the underlying copilot agent to not generate any response for 5 seconds,
 which is almost impossible.
+**TEST-NODE-END**
 
 Returns in this schema if an exception it thrown from inside the session
 
@@ -276,9 +281,33 @@ When running a task, any driving session generated prompts will be reported in t
 
 ## API (jobsApi.ts)
 
-TEST-NOTE: DO NOT use the exported `entry` in unit testing because all required files do not present in this repo. Make up your own `Entry` value.
-You can make up a test specific entry which loads an entry from a JSON file in `test`.
-`validateEntry` must be called before passing it to `installJobsEntry`.
+**TEST-NOTE-BEGIN**
+`yarn launch-for-test` will be used for unit testing therefore you have a chance to specify your own entry file.
+DO NOT use the default entry for testing.
+
+The free model "gpt-5.1-mini" must be used in every `Entry.models`.
+If the model is no longer available, choose a new one and update both spec and custom entry JSON files.
+**TEST-NOTE-END**
+
+### copilot/test/installJobsEntry
+
+Only available when `src/index.ts` is launched with `--test`.
+The body will be an absolute path of a custom JSON file for entry.
+The API will first check if the JSON file is in the `test` folder.
+It reads the JSON file, called `validateEntry` followed by `installJobsEntry`.
+
+Return in this schema:
+```typescript
+{
+  result: "OK" | "InvalidatePath" | "InvalidateEntry" | "Rejected",
+  error?: string
+}
+```
+
+Return "InvalidatePath" when the file is not in the `test` folder.
+Return "InvalidateEntry" when `validateEntry` throws.
+Return "Rejected" when `installJobsEntry` throws.
+"error" stores the exception message.
 
 ### copilot/task
 
@@ -293,6 +322,24 @@ List all tasks passed to `installJobsEntry` in this schema:
 ```
 
 ### copilot/task/start/{task-name}/session/{session-id}
+
+**TEST-NODE-BEGIN**
+Besides of testing API failures, it is important to make sure task running works.
+
+Create test cases for running a task, focused on the `criteria` stuff.
+Test every fields in `criteria` and ensure:
+- If the test succeeded, retry won't happen.
+- If the task failed, retry happens.
+- Retry has a budget limit.
+- Whenever the task succeeded or failed, the live api responses correctly.
+- Retrying should be observable from the live api.
+
+It is able to make up a failed test by:
+- Does nothing
+- In `criteria` specify `toolExecuted`, since the task does nothing, this will never satisfies.
+- Set a retry budget limit to 0 so no retrying should happen.
+- Therefore it fails because of not being able to pass the criteria check.
+**TEST-NODE_END**
 
 The body will be user input.
 
@@ -354,9 +401,11 @@ Returns in this schema if any error happens
 }
 ```
 
-TEST-NOTE: Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
+**TEST-NOTE-BEGIN**
+Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
 It requires the underlying copilot agent to not generate any response for 5 seconds,
 which is almost impossible.
+**TEST-NOTE-END**
 
 Returns in this schema if an exception it thrown from inside the session
 
@@ -378,6 +427,17 @@ List all jobs passed to `installJobsEntry` in this schema:
 ```
 
 ### copilot/job/start/{job-name}
+
+**TEST-NODE-BEGIN**
+Besides of testing API failures, it is important to make sure job running works.
+
+Create test cases for running a job, focused on different types of `Work`s.
+Test every kinds of `Work` and ensure:
+- It succeeds when all involved tasks succeed.
+- If fails properly.
+- Whenever the job succeeded or failed, the live api responses correctly.
+- Execution of tasks in `Work` should be observable from the live api.
+**TEST-NODE_END**
 
 The first line will be an absolute path for working directory
 The rest of the body will be user input.
@@ -432,9 +492,11 @@ Returns in this schema if any error happens
 }
 ```
 
-TEST-NOTE: Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
+**TEST-NOTE-BEGIN**
+Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
 It requires the underlying copilot agent to not generate any response for 5 seconds,
 which is almost impossible.
+**TEST-NOTE-END**
 
 Returns in this schema if an exception it thrown from inside the session
 
