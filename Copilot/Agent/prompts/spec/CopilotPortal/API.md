@@ -244,7 +244,7 @@ You can make up a test specific entry which loads an entry from a JSON file in `
 ### copilot/task
 
 List all tasks passed to `installJobsEntry` in this schema:
-```
+```typescript
 {
   tasks: {
     name: string;

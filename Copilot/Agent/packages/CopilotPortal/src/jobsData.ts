@@ -58,12 +58,20 @@ export interface ParallelWork {
 }
 
 export interface LoopWork {
-    preCondition?: Work;
-    postCondition?: Work;
+    kind: "Loop";
+    preCondition?: [boolean, Work];
+    postCondition?: [boolean, Work];
     body: Work;
 }
 
-export type Work = TaskWork | SequentialWork | ParallelWork | LoopWork;
+export interface AltWork {
+    kind: "Alt";
+    condition: Work;
+    trueWork?: Work;
+    falseWork?: Work;
+}
+
+export type Work = TaskWork | SequentialWork | ParallelWork | LoopWork | AltWork;
 
 export interface Job {
     name: string;
