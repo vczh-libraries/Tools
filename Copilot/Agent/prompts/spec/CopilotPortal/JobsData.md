@@ -46,6 +46,8 @@ When extra verification is needed,
 it verifies that `job_boolean_true` or `job_boolean_false` must be mentioned in the expanded prompt.
 
 Here are all checks that `validateEntry` needs to do:
+- `entry.models.driving`:
+  - Should exist.
 - `entry.grid[rowIndex].jobs[columnIndex].jobName`:
   - Must be in keys of `entry.jobs`.
 - `entry.tasks[name].model.category`;
