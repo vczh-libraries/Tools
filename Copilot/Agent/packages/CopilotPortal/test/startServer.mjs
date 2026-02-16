@@ -5,8 +5,8 @@ import path from "node:path";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverScript = path.resolve(__dirname, "..", "dist", "index.js");
 
-// Spawn server as detached process so it runs independently of this script
-const child = spawn("node", [serverScript], {
+// Spawn server as detached process in test mode so it runs independently of this script
+const child = spawn("node", [serverScript, "--test"], {
     detached: true,
     stdio: "ignore",
     cwd: path.resolve(__dirname, ".."),

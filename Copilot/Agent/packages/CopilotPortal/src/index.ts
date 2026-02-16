@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
     jsonResponse,
+    readBody,
 } from "./sharedApi.js";
 import {
     apiConfig,
@@ -26,11 +27,23 @@ import {
     installJobsEntry,
     entry,
 } from "./jobsApi.js";
+import { validateEntry } from "./jobsData.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const port = parseInt(process.argv[2] ?? "8888", 10);
+// Parse command-line options
+let port = 8888;
+let testMode = false;
+const args = process.argv.slice(2);
+for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--port" && i + 1 < args.length) {
+        port = parseInt(args[i + 1], 10);
+        i++;
+    } else if (args[i] === "--test") {
+        testMode = true;
+    }
+}
 
 const mimeTypes: Record<string, string> = {
     ".html": "text/html",
@@ -103,6 +116,39 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
     // api/copilot/models
     if (apiPath === "copilot/models") {
         await apiCopilotModels(req, res);
+        return;
+    }
+
+    // api/copilot/test/installJobsEntry (only in test mode)
+    if (apiPath === "copilot/test/installJobsEntry" && testMode) {
+        const body = await readBody(req);
+        const entryFilePath = body.trim();
+
+        // Check if file is in the test folder
+        const testFolder = path.resolve(__dirname, "..", "test");
+        const resolvedPath = path.resolve(entryFilePath);
+        if (!resolvedPath.startsWith(testFolder + path.sep) && resolvedPath !== testFolder) {
+            jsonResponse(res, 200, { result: "InvalidatePath", error: `File is not in the test folder: ${resolvedPath}` });
+            return;
+        }
+
+        try {
+            const fileContent = fs.readFileSync(resolvedPath, "utf-8");
+            const entryData = JSON.parse(fileContent);
+            try {
+                const validatedEntry = validateEntry(entryData, "testEntry");
+                try {
+                    await installJobsEntry(validatedEntry);
+                    jsonResponse(res, 200, { result: "OK" });
+                } catch (err) {
+                    jsonResponse(res, 200, { result: "Rejected", error: String(err instanceof Error ? err.message : err) });
+                }
+            } catch (err) {
+                jsonResponse(res, 200, { result: "InvalidateEntry", error: String(err instanceof Error ? err.message : err) });
+            }
+        } catch (err) {
+            jsonResponse(res, 200, { result: "InvalidatePath", error: String(err instanceof Error ? err.message : err) });
+        }
         return;
     }
 
@@ -214,8 +260,10 @@ const server = http.createServer((req, res) => {
     serveStaticFile(res, filePath);
 });
 
-// Install the jobs entry
-installJobsEntry(entry);
+// Install the jobs entry (only if not in test mode)
+if (!testMode) {
+    installJobsEntry(entry);
+}
 
 server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

@@ -13,7 +13,8 @@
     "testExecute": "yarn workspace copilot-portal testExecute",
     "build": "yarn compile && yarn testStart && yarn testExecute",
     "chat": "yarn workspace copilot-test start",
-    "portal": "yarn workspace copilot-portal start"
+    "portal": "yarn workspace copilot-portal start",
+    "portal-for-test": "yarn workspace copilot-portal launch-for-test"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",

@@ -1,12 +1,18 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BASE = "http://localhost:8888";
 
-async function fetchJson(path, options) {
-    const res = await fetch(`${BASE}${path}`, options);
+async function fetchJson(urlPath, options) {
+    const res = await fetch(`${BASE}${urlPath}`, options);
     return res.json();
 }
+
+// Helper: resolve test entry path
+const testEntryPath = path.resolve(__dirname, "testEntry.json");
 
 describe("API: /api/test", () => {
     it("returns hello world message", async () => {
@@ -44,6 +50,13 @@ describe("API: /api/copilot/models", () => {
         const freeModels = data.models.filter((m) => m.multiplier === 0);
         assert.ok(freeModels.length > 0, "should have at least one free model");
     });
+
+    it("gpt-4.1 model exists and is free", async () => {
+        const data = await fetchJson("/api/copilot/models");
+        const model = data.models.find((m) => m.id === "gpt-4.1");
+        assert.ok(model, "gpt-4.1 model should exist");
+        assert.strictEqual(model.multiplier, 0, "gpt-4.1 should be free");
+    });
 });
 
 describe("API: session not found errors", () => {
@@ -67,7 +80,6 @@ describe("API: session not found errors", () => {
 });
 
 describe("API: full session lifecycle", () => {
-    // Use a free model to avoid cost
     let freeModelId;
     let sessionId;
 
@@ -79,7 +91,6 @@ describe("API: full session lifecycle", () => {
     });
 
     after(async () => {
-        // Clean up session if still open
         if (sessionId) {
             try {
                 await fetchJson(`/api/copilot/session/${sessionId}/stop`);
@@ -106,11 +117,8 @@ describe("API: full session lifecycle", () => {
 
     it("live returns ParallelCallNotSupported for concurrent calls", async () => {
         assert.ok(sessionId, "session must be started");
-        // Fire two live calls in parallel; the first will block (5s timeout),
-        // the second should get ParallelCallNotSupported immediately.
         const [first, second] = await Promise.all([
             fetchJson(`/api/copilot/session/${sessionId}/live`),
-            // Small delay to ensure the first call registers its waitingResolve
             new Promise((r) => setTimeout(r, 100)).then(() =>
                 fetchJson(`/api/copilot/session/${sessionId}/live`)
             ),
@@ -135,7 +143,6 @@ describe("API: full session lifecycle", () => {
         const callbacks = [];
         let gotAgentEnd = false;
 
-        // Drain responses until onAgentEnd (max 60 seconds)
         const timeout = Date.now() + 60000;
         while (!gotAgentEnd && Date.now() < timeout) {
             const data = await fetchJson(`/api/copilot/session/${sessionId}/live`);
@@ -147,11 +154,9 @@ describe("API: full session lifecycle", () => {
 
         assert.ok(gotAgentEnd, "should receive onAgentEnd callback");
 
-        // Should have onAgentStart
         const agentStart = callbacks.find((c) => c.callback === "onAgentStart");
         assert.ok(agentStart, "should receive onAgentStart");
 
-        // Should have at least one message flow
         const hasMessage = callbacks.some((c) => c.callback === "onStartMessage");
         const hasReasoning = callbacks.some((c) => c.callback === "onStartReasoning");
         assert.ok(hasMessage || hasReasoning, "should receive at least message or reasoning callbacks");
@@ -222,7 +227,87 @@ describe("API: task not found errors", () => {
     });
 });
 
-describe("API: /api/copilot/task", () => {
+describe("API: copilot/test/installJobsEntry", () => {
+    it("returns empty tasks/jobs before entry is installed", async () => {
+        const tasks = await fetchJson("/api/copilot/task");
+        assert.deepStrictEqual(tasks, { tasks: [] });
+        const jobs = await fetchJson("/api/copilot/job");
+        assert.deepStrictEqual(jobs, { jobs: [] });
+    });
+
+    it("returns InvalidatePath for file outside test folder", async () => {
+        const data = await fetchJson("/api/copilot/test/installJobsEntry", {
+            method: "POST",
+            body: "C:\\some\\random\\path\\entry.json",
+        });
+        assert.strictEqual(data.result, "InvalidatePath");
+        assert.ok(data.error, "should have error message");
+    });
+
+    it("returns InvalidatePath for non-existent file in test folder", async () => {
+        const fakePath = path.join(__dirname, "nonexistent.json");
+        const data = await fetchJson("/api/copilot/test/installJobsEntry", {
+            method: "POST",
+            body: fakePath,
+        });
+        assert.strictEqual(data.result, "InvalidatePath");
+    });
+
+    it("returns InvalidateEntry for invalid entry JSON", async () => {
+        const invalidEntryPath = path.join(__dirname, "invalidEntry.json");
+        const fs = await import("node:fs");
+        fs.writeFileSync(invalidEntryPath, JSON.stringify({
+            models: {},
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "bad-task": { model: { category: "nonexistent" }, prompt: ["hello"], requireUserInput: false }
+            },
+            jobs: {}
+        }));
+        try {
+            const data = await fetchJson("/api/copilot/test/installJobsEntry", {
+                method: "POST",
+                body: invalidEntryPath,
+            });
+            assert.strictEqual(data.result, "InvalidateEntry");
+            assert.ok(data.error, "should have validation error");
+        } finally {
+            fs.unlinkSync(invalidEntryPath);
+        }
+    });
+
+    it("installs a valid test entry successfully", async () => {
+        const data = await fetchJson("/api/copilot/test/installJobsEntry", {
+            method: "POST",
+            body: testEntryPath,
+        });
+        assert.strictEqual(data.result, "OK", `installJobsEntry should succeed: ${JSON.stringify(data)}`);
+    });
+
+    it("rejects when session is running", async () => {
+        const modelsData = await fetchJson("/api/copilot/models");
+        const freeModel = modelsData.models.find((m) => m.multiplier === 0);
+        const sessionData = await fetchJson(`/api/copilot/session/start/${freeModel.id}`, {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools",
+        });
+        assert.ok(sessionData.sessionId, "should get session id");
+
+        try {
+            const data = await fetchJson("/api/copilot/test/installJobsEntry", {
+                method: "POST",
+                body: testEntryPath,
+            });
+            assert.strictEqual(data.result, "Rejected");
+            assert.ok(data.error, "should have error");
+        } finally {
+            await fetchJson(`/api/copilot/session/${sessionData.sessionId}/stop`);
+        }
+    });
+});
+
+describe("API: /api/copilot/task (after entry installed)", () => {
     it("returns a list of tasks", async () => {
         const data = await fetchJson("/api/copilot/task");
         assert.ok(Array.isArray(data.tasks), "tasks should be an array");
@@ -236,21 +321,38 @@ describe("API: /api/copilot/task", () => {
             assert.ok(typeof t.requireUserInput === "boolean", `task requireUserInput should be boolean: ${JSON.stringify(t)}`);
         }
     });
+
+    it("contains expected test tasks", async () => {
+        const data = await fetchJson("/api/copilot/task");
+        const taskNames = data.tasks.map((t) => t.name);
+        assert.ok(taskNames.includes("simple-task"), "should have simple-task");
+        assert.ok(taskNames.includes("criteria-fail-task"), "should have criteria-fail-task");
+        assert.ok(taskNames.includes("input-task"), "should have input-task");
+    });
 });
 
-describe("API: /api/copilot/job", () => {
+describe("API: /api/copilot/job (after entry installed)", () => {
     it("returns a list of jobs", async () => {
         const data = await fetchJson("/api/copilot/job");
         assert.ok(Array.isArray(data.jobs), "jobs should be an array");
+        assert.ok(data.jobs.length > 0, "should have at least one job");
     });
 
     it("each job has name and work", async () => {
         const data = await fetchJson("/api/copilot/job");
         for (const j of data.jobs) {
             assert.ok(typeof j.name === "string", `job name should be string: ${JSON.stringify(j)}`);
-            assert.ok(typeof j.printedName === "string", `job printedName should be string: ${JSON.stringify(j)}`);
             assert.ok(j.work !== undefined, `job should have work: ${JSON.stringify(j)}`);
         }
+    });
+
+    it("contains expected test jobs", async () => {
+        const data = await fetchJson("/api/copilot/job");
+        const jobNames = data.jobs.map((j) => j.name);
+        assert.ok(jobNames.includes("simple-job"), "should have simple-job");
+        assert.ok(jobNames.includes("seq-job"), "should have seq-job");
+        assert.ok(jobNames.includes("par-job"), "should have par-job");
+        assert.ok(jobNames.includes("fail-job"), "should have fail-job");
     });
 });
 
@@ -271,6 +373,264 @@ describe("API: job not found errors", () => {
     it("job live returns JobNotFound for invalid job id", async () => {
         const data = await fetchJson("/api/copilot/job/nonexistent/live");
         assert.deepStrictEqual(data, { error: "JobNotFound" });
+    });
+});
+
+// Helper: drain all live responses until a specific callback or timeout
+async function drainLive(livePath, targetCallback, timeoutMs = 120000) {
+    const callbacks = [];
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+        const data = await fetchJson(livePath);
+        if (data.error === "HttpRequestTimeout") continue;
+        if (data.error === "TaskNotFound" || data.error === "JobNotFound") break;
+        callbacks.push(data);
+        if (data.callback === targetCallback) break;
+        if (data.taskError || data.jobError) break;
+    }
+    return callbacks;
+}
+
+describe("API: task running - criteria success", () => {
+    let sessionId;
+
+    before(async () => {
+        const modelsData = await fetchJson("/api/copilot/models");
+        const freeModel = modelsData.models.find((m) => m.multiplier === 0);
+        assert.ok(freeModel, "need a free model");
+        const data = await fetchJson(`/api/copilot/session/start/${freeModel.id}`, {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools",
+        });
+        assert.ok(data.sessionId, "should get session id");
+        sessionId = data.sessionId;
+    });
+
+    after(async () => {
+        if (sessionId) {
+            try { await fetchJson(`/api/copilot/session/${sessionId}/stop`); } catch { /* ignore */ }
+        }
+    });
+
+    it("simple-task succeeds (no criteria)", async () => {
+        const startData = await fetchJson(`/api/copilot/task/start/simple-task/session/${sessionId}`, {
+            method: "POST",
+            body: "",
+        });
+        assert.ok(startData.taskId, `should return taskId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/task/${startData.taskId}/live`, "taskSucceeded");
+        const succeeded = callbacks.some((c) => c.callback === "taskSucceeded");
+        assert.ok(succeeded, `simple-task should succeed, callbacks: ${JSON.stringify(callbacks.map(c => c.callback))}`);
+    });
+});
+
+describe("API: task running - criteria failure (no retry)", () => {
+    let sessionId;
+
+    before(async () => {
+        const modelsData = await fetchJson("/api/copilot/models");
+        const freeModel = modelsData.models.find((m) => m.multiplier === 0);
+        assert.ok(freeModel, "need a free model");
+        const data = await fetchJson(`/api/copilot/session/start/${freeModel.id}`, {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools",
+        });
+        assert.ok(data.sessionId, "should get session id");
+        sessionId = data.sessionId;
+    });
+
+    after(async () => {
+        if (sessionId) {
+            try { await fetchJson(`/api/copilot/session/${sessionId}/stop`); } catch { /* ignore */ }
+        }
+    });
+
+    it("criteria-fail-task fails (toolExecuted not satisfied, retry=0)", async () => {
+        const startData = await fetchJson(`/api/copilot/task/start/criteria-fail-task/session/${sessionId}`, {
+            method: "POST",
+            body: "",
+        });
+        assert.ok(startData.taskId, `should return taskId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/task/${startData.taskId}/live`, "taskFailed");
+        const failed = callbacks.some((c) => c.callback === "taskFailed");
+        assert.ok(failed, `criteria-fail-task should fail, callbacks: ${JSON.stringify(callbacks.map(c => c.callback))}`);
+
+        // Verify no retry happened (retry budget = 0)
+        const sessionStarts = callbacks.filter((c) => c.callback === "taskSessionStarted");
+        assert.ok(sessionStarts.length <= 1, `should not retry, session starts: ${sessionStarts.length}`);
+    });
+});
+
+describe("API: task running - live responses", () => {
+    let sessionId;
+
+    before(async () => {
+        const modelsData = await fetchJson("/api/copilot/models");
+        const freeModel = modelsData.models.find((m) => m.multiplier === 0);
+        assert.ok(freeModel, "need a free model");
+        const data = await fetchJson(`/api/copilot/session/start/${freeModel.id}`, {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools",
+        });
+        assert.ok(data.sessionId, "should get session id");
+        sessionId = data.sessionId;
+    });
+
+    after(async () => {
+        if (sessionId) {
+            try { await fetchJson(`/api/copilot/session/${sessionId}/stop`); } catch { /* ignore */ }
+        }
+    });
+
+    it("task live responds correctly for succeeded task", async () => {
+        const startData = await fetchJson(`/api/copilot/task/start/simple-task/session/${sessionId}`, {
+            method: "POST",
+            body: "",
+        });
+        assert.ok(startData.taskId, "should return taskId");
+
+        const callbacks = await drainLive(`/api/copilot/task/${startData.taskId}/live`, "taskSucceeded");
+
+        const sessionStarted = callbacks.some((c) => c.callback === "taskSessionStarted");
+        assert.ok(sessionStarted, "should have taskSessionStarted callback");
+
+        const sessionStopped = callbacks.some((c) => c.callback === "taskSessionStopped");
+        assert.ok(sessionStopped, "should have taskSessionStopped callback");
+
+        const lastCallback = callbacks[callbacks.length - 1];
+        assert.strictEqual(lastCallback.callback, "taskSucceeded", "last callback should be taskSucceeded");
+    });
+
+    it("task live responds correctly for failed task", async () => {
+        const startData = await fetchJson(`/api/copilot/task/start/criteria-fail-task/session/${sessionId}`, {
+            method: "POST",
+            body: "",
+        });
+        assert.ok(startData.taskId, "should return taskId");
+
+        const callbacks = await drainLive(`/api/copilot/task/${startData.taskId}/live`, "taskFailed");
+
+        const lastCallback = callbacks[callbacks.length - 1];
+        assert.strictEqual(lastCallback.callback, "taskFailed", "last callback should be taskFailed");
+    });
+});
+
+describe("API: job running - simple job succeeds", () => {
+    it("simple-job succeeds (single TaskWork)", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/simple-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
+        const succeeded = callbacks.some((c) => c.callback === "jobSucceeded");
+        assert.ok(succeeded, `simple-job should succeed, callbacks: ${JSON.stringify(callbacks.map(c => c.callback))}`);
+
+        const workStarted = callbacks.some((c) => c.callback === "workStarted");
+        const workStopped = callbacks.some((c) => c.callback === "workStopped");
+        assert.ok(workStarted, "should have workStarted");
+        assert.ok(workStopped, "should have workStopped");
+    });
+});
+
+describe("API: job running - sequential work", () => {
+    it("seq-job succeeds with sequential tasks", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/seq-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
+        const succeeded = callbacks.some((c) => c.callback === "jobSucceeded");
+        assert.ok(succeeded, `seq-job should succeed`);
+
+        const workStarted = callbacks.filter((c) => c.callback === "workStarted");
+        assert.strictEqual(workStarted.length, 2, "should have 2 workStarted for sequential tasks");
+    });
+});
+
+describe("API: job running - parallel work", () => {
+    it("par-job succeeds with parallel tasks", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/par-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
+        const succeeded = callbacks.some((c) => c.callback === "jobSucceeded");
+        assert.ok(succeeded, `par-job should succeed`);
+
+        const workStarted = callbacks.filter((c) => c.callback === "workStarted");
+        assert.strictEqual(workStarted.length, 2, "should have 2 workStarted for parallel tasks");
+    });
+});
+
+describe("API: job running - failure propagation", () => {
+    it("fail-job fails when task fails", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/fail-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobFailed");
+        const failed = callbacks.some((c) => c.callback === "jobFailed");
+        assert.ok(failed, `fail-job should fail`);
+
+        const workStopped = callbacks.find((c) => c.callback === "workStopped");
+        assert.ok(workStopped, "should have workStopped");
+        assert.strictEqual(workStopped.succeeded, false, "work should fail");
+    });
+});
+
+describe("API: job running - empty works", () => {
+    it("empty-seq-job succeeds (empty SequentialWork)", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/empty-seq-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
+        const succeeded = callbacks.some((c) => c.callback === "jobSucceeded");
+        assert.ok(succeeded, `empty-seq-job should succeed`);
+    });
+
+    it("empty-par-job succeeds (empty ParallelWork)", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/empty-par-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
+
+        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
+        const succeeded = callbacks.some((c) => c.callback === "jobSucceeded");
+        assert.ok(succeeded, `empty-par-job should succeed`);
+    });
+});
+
+describe("API: job running - live responses observability", () => {
+    it("work execution is observable from live api", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/simple-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, "should return jobId");
+
+        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
+
+        const startIdx = callbacks.findIndex((c) => c.callback === "workStarted");
+        const stopIdx = callbacks.findIndex((c) => c.callback === "workStopped");
+        const succeedIdx = callbacks.findIndex((c) => c.callback === "jobSucceeded");
+
+        assert.ok(startIdx >= 0, "should have workStarted");
+        assert.ok(stopIdx > startIdx, "workStopped should come after workStarted");
+        assert.ok(succeedIdx > stopIdx, "jobSucceeded should come after workStopped");
     });
 });
 

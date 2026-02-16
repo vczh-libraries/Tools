@@ -73,7 +73,12 @@ If any validation runs directly in this function fails:
 
 A task is represented by type `Task`.
 
-If any session crashes:
+If any session crashes after the task submitting a promot to the session:
+- resend the prompt until 3 consecutive crashes.
+- Add `SESSION_CRASH_PREFIX` (exported const from `jobsApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
+- The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`, used by both task execution and condition evaluation.
+
+If resending promot can't solve crashing:
 - The task stops immediately and marked failed.
 - The exception cannot be consumed silently.
 

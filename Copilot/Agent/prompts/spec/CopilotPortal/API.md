@@ -61,9 +61,26 @@ All helper functions and types are exported and API implementations should use t
 `helperPushSessionResponse(session: ICopilotSession, response: LiveResponse): void;`
 - Push a response to a session's response queue.
 
+### hasRunningSessions
+
+`hasRunningSessions(): boolean;`
+- Returns true if any sessions are currently running.
+
 ## Helpers (jobsApi.ts)
 
 All helper functions and types are exported and API implementations should use them.
+
+### SESSION_CRASH_PREFIX
+
+`export const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";`
+- Prefix added to prompts when resending after a session crash.
+
+### sendPromptWithCrashRetry
+
+A shared function used by both task execution and condition evaluation.
+Sends a prompt to a session, retrying up to 3 consecutive crashes.
+On retry, prepends `SESSION_CRASH_PREFIX` to the prompt.
+Also pushes `onGeneratedUserPrompt` to the driving session's response queue.
 
 `async installJobsEntry(entry: Entry): Promise<void>;`
 - Use the entry. It could be `entry` from `jobsData.ts` or whatever.

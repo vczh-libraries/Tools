@@ -146,6 +146,10 @@ export function helperPushSessionResponse(session: ICopilotSession, response: Li
     }
 }
 
+export function hasRunningSessions(): boolean {
+    return sessions.size > 0;
+}
+
 // ---- API Functions ----
 
 export async function apiConfig(req: http.IncomingMessage, res: http.ServerResponse, repoRoot: string): Promise<void> {

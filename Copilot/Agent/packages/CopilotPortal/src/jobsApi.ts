@@ -9,6 +9,7 @@ import {
     helperSessionStop,
     helperGetSession,
     helperPushSessionResponse,
+    hasRunningSessions,
     jsonResponse,
 } from "./copilotApi.js";
 import {
@@ -51,11 +52,11 @@ export interface ICopilotJobCallback {
 
 let installedEntry: Entry | null = null;
 
-export async function installJobsEntry(entry: Entry): Promise<void> {
-    if (installedEntry !== null) {
-        throw new Error("installJobsEntry has already been called.");
+export async function installJobsEntry(entryValue: Entry): Promise<void> {
+    if (hasRunningSessions()) {
+        throw new Error("Cannot call installJobsEntry while sessions are running.");
     }
-    installedEntry = entry;
+    installedEntry = entryValue;
 }
 
 // For testing: reset the installed entry
@@ -89,6 +90,39 @@ function buildRuntimeValues(runtimeValues: Record<string, string>): Record<strin
 function expandPrompt(entry: Entry, prompt: Prompt, runtimeValues: Record<string, string>): string {
     const result = expandPromptDynamic(entry, prompt, runtimeValues);
     return result[0];
+}
+
+// ---- Session Crash Retry ----
+
+export const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";
+
+const MAX_CRASH_RETRIES = 3;
+
+/**
+ * Sends a prompt to a session with crash retry logic.
+ * If the session crashes after submitting the prompt, resend up to MAX_CRASH_RETRIES consecutive times.
+ * On resend, prefix the prompt with SESSION_CRASH_PREFIX.
+ * If all retries fail, throws the last error.
+ * Also pushes onGeneratedUserPrompt to the driving session's response queue.
+ */
+async function sendPromptWithCrashRetry(
+    session: ICopilotSession,
+    prompt: string,
+    drivingSession: ICopilotSession
+): Promise<void> {
+    let lastError: unknown;
+    for (let attempt = 0; attempt < MAX_CRASH_RETRIES; attempt++) {
+        const actualPrompt = attempt === 0 ? prompt : SESSION_CRASH_PREFIX + prompt;
+        try {
+            helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
+            await session.sendRequest(actualPrompt);
+            return; // Success
+        } catch (err) {
+            lastError = err;
+            // Will retry on next iteration
+        }
+    }
+    throw lastError; // All retries exhausted
 }
 
 // ---- Tool Monitoring ----
@@ -255,10 +289,8 @@ export async function startTask(
 
             // Monitor tools during task execution
             const monitor = monitorSessionTools(taskSessionObj, runtimeValues);
-            let sessionCrashed = false;
             try {
-                helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: taskPromptText });
-                await taskSessionObj.sendRequest(taskPromptText);
+                await sendPromptWithCrashRetry(taskSessionObj, taskPromptText, drivingSession);
             } catch (err) {
                 monitor.cleanup();
                 throw err; // Session crashed - let outer catch handle
@@ -341,8 +373,7 @@ async function checkAvailability(
         const conditionPrompt = expandPrompt(entry, availability.condition, runtimeValues);
         const monitor = monitorSessionTools(drivingSession, runtimeValues);
         try {
-            helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: conditionPrompt });
-            await drivingSession.sendRequest(conditionPrompt);
+            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, drivingSession);
         } catch (err) {
             monitor.cleanup();
             throw err; // Session crashed - don't consume silently
@@ -384,8 +415,7 @@ async function checkCriteria(
         const conditionPrompt = expandPrompt(entry, criteria.condition, runtimeValues);
         const monitor = monitorSessionTools(drivingSession, runtimeValues);
         try {
-            helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: conditionPrompt });
-            await drivingSession.sendRequest(conditionPrompt);
+            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, drivingSession);
         } catch (err) {
             monitor.cleanup();
             throw err; // Session crashed - don't consume silently
@@ -429,8 +459,7 @@ async function checkCriteria(
                     const taskPromptText = expandPrompt(entry, task.prompt, runtimeValues);
                     const retryMonitor = monitorSessionTools(taskSessionObj, runtimeValues);
                     try {
-                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: taskPromptText });
-                        await taskSessionObj.sendRequest(taskPromptText);
+                        await sendPromptWithCrashRetry(taskSessionObj, taskPromptText, drivingSession);
                     } catch (err) {
                         retryMonitor.cleanup();
                         throw err; // Session crashed - don't consume silently
@@ -441,8 +470,7 @@ async function checkCriteria(
                     const condMonitor = monitorSessionTools(drivingSession, runtimeValues);
                     const retryCondPrompt = expandPrompt(entry, criteria.condition!, runtimeValues);
                     try {
-                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryCondPrompt });
-                        await drivingSession.sendRequest(retryCondPrompt);
+                        await sendPromptWithCrashRetry(drivingSession, retryCondPrompt, drivingSession);
                     } catch (err) {
                         condMonitor.cleanup();
                         throw err; // Session crashed - don't consume silently
@@ -462,8 +490,7 @@ async function checkCriteria(
                     const retryPromptText = expandPrompt(entry, retryPromptTemplate, runtimeValues);
                     const retryMonitor = monitorSessionTools(taskSessionObj, runtimeValues);
                     try {
-                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryPromptText });
-                        await taskSessionObj.sendRequest(retryPromptText);
+                        await sendPromptWithCrashRetry(taskSessionObj, retryPromptText, drivingSession);
                     } catch (err) {
                         retryMonitor.cleanup();
                         throw err; // Session crashed - don't consume silently
@@ -474,8 +501,7 @@ async function checkCriteria(
                     const condMonitor = monitorSessionTools(drivingSession, runtimeValues);
                     const retryCondPrompt = expandPrompt(entry, criteria.condition!, runtimeValues);
                     try {
-                        helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryCondPrompt });
-                        await drivingSession.sendRequest(retryCondPrompt);
+                        await sendPromptWithCrashRetry(drivingSession, retryCondPrompt, drivingSession);
                     } catch (err) {
                         condMonitor.cleanup();
                         throw err; // Session crashed - don't consume silently
@@ -542,13 +568,13 @@ export async function apiTaskStart(
         const taskCallback: ICopilotTaskCallback = {
             taskSucceeded() {
                 pushResponse(state, { callback: "taskSucceeded" });
-                // Auto-cleanup after task finishes
-                tasks.delete(taskId);
+                // Deferred cleanup so live API can serve the final callback
+                setTimeout(() => tasks.delete(taskId), 10000);
             },
             taskFailed() {
                 pushResponse(state, { callback: "taskFailed" });
-                // Auto-cleanup after task finishes
-                tasks.delete(taskId);
+                // Deferred cleanup so live API can serve the final callback
+                setTimeout(() => tasks.delete(taskId), 10000);
             },
             taskSessionStarted(taskSession: [ICopilotSession, string] | undefined) {
                 if (taskSession) {
@@ -902,11 +928,13 @@ export async function apiJobStart(
         const jobCallback: ICopilotJobCallback = {
             jobSucceeded() {
                 pushResponse(state, { callback: "jobSucceeded" });
-                jobs.delete(jobId);
+                // Deferred cleanup so live API can serve the final callback
+                setTimeout(() => jobs.delete(jobId), 10000);
             },
             jobFailed() {
                 pushResponse(state, { callback: "jobFailed" });
-                jobs.delete(jobId);
+                // Deferred cleanup so live API can serve the final callback
+                setTimeout(() => jobs.delete(jobId), 10000);
             },
             workStarted(workId: number) {
                 pushResponse(state, { callback: "workStarted", workId });

@@ -62,6 +62,19 @@ Starts an HTTP server at `http://localhost:8888` serving a web UI and RESTful AP
 - Use `http://localhost:8888/index.html?project=XXX` to default working directory to the sibling folder `XXX` next to the repo root.
 - Without `project` parameter, working directory defaults to the repo root.
 
+#### CLI Options
+
+- `--port <number>` — Set the HTTP server port (default: `8888`)
+- `--test` — Start in test mode (entry is not pre-installed; enables `copilot/test/installJobsEntry` API for test-driven entry loading)
+
+### Portal for Test
+
+```bash
+yarn portal-for-test
+```
+
+Starts the portal in test mode (`--test` flag). In test mode, the jobs entry is not installed at startup, and the `copilot/test/installJobsEntry` API is available for tests to install entries dynamically.
+
 ## Specification Structure
 
 There are two folders storing specification:
@@ -104,10 +117,11 @@ Copilot/Agent/
 │   │   │   ├── sessionResponse.css   # SessionResponseRenderer styles
 │   │   │   └── test.html     # Simple API test page
 │   │   ├── test/             # Test files
-│   │   │   ├── startServer.mjs       # Starts server for testing
+│   │   │   ├── startServer.mjs       # Starts server in test mode for testing
 │   │   │   ├── runTests.mjs          # Test runner (always stops server)
+│   │   │   ├── testEntry.json        # Test entry with simple tasks/jobs for API tests
 │   │   │   ├── jobsData.test.mjs     # Jobs data validation tests
-│   │   │   ├── api.test.mjs          # RESTful API tests
+│   │   │   ├── api.test.mjs          # RESTful API tests (incl. task/job execution)
 │   │   │   └── web.test.mjs          # Playwright UI tests
 │   │   └── package.json
 │   └── CopilotTest/          # CLI chat application
@@ -121,8 +135,9 @@ Copilot/Agent/
 - **Build**: `yarn build` compiles all packages and runs tests.
 - **Compile only**: `yarn compile` compiles all packages via TypeScript.
 - **Run portal**: `yarn portal` starts the web server (default port 8888).
+- **Run portal in test mode**: `yarn portal-for-test` starts in test mode.
 - **Run chat**: `yarn chat` starts the CLI chat.
-- **Run tests only**: `yarn testStart && yarn testExecute` starts server and runs tests.
+- **Run tests only**: `yarn testStart && yarn testExecute` starts server in test mode and runs tests.
 - **Playwright**: Install with `npx playwright install chromium`. Used for testing the portal UI.
 - **Spec-driven**: Portal features are defined in `packages/CopilotPortal/Spec.md`.
 
@@ -137,7 +152,9 @@ Copilot/Agent/
 - **CLI Chat**: Terminal-based interactive chat with model selection and streaming
 - **Live Polling**: Sequential long-polling for real-time session callbacks
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
+- **Session Crash Retry**: `sendPromptWithCrashRetry` automatically retries up to 3 times if a Copilot session crashes during prompt execution
 - **Jobs API**: RESTful API for listing, starting, stopping, and monitoring tasks and jobs via live polling
+- **Test Mode API**: `copilot/test/installJobsEntry` endpoint (test mode only) for dynamically installing job entries during testing
 - **Job Workflow Engine**: Composable work tree execution supporting sequential, parallel, loop, and conditional (alt) work patterns
 - **Task Selection UI**: Combo box in the portal to select and run tasks within an active session
 - **Tool Registration**: Custom job tools (e.g. `job_boolean_true`, `job_prepare_document`) are automatically registered with Copilot sessions

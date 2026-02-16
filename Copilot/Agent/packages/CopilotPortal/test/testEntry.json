@@ -1,0 +1,75 @@
+{
+  "models": {
+    "driving": "gpt-4.1",
+    "planning": "gpt-4.1"
+  },
+  "promptVariables": {},
+  "grid": [],
+  "tasks": {
+    "simple-task": {
+      "model": { "category": "planning" },
+      "prompt": ["Say hello and nothing else."],
+      "requireUserInput": false
+    },
+    "criteria-fail-task": {
+      "model": { "category": "planning" },
+      "prompt": ["Say hello and nothing else."],
+      "requireUserInput": false,
+      "criteria": {
+        "toolExecuted": ["job_prepare_document"],
+        "failureAction": ["RetryWithNewSession", 0]
+      }
+    },
+    "input-task": {
+      "model": { "category": "planning" },
+      "prompt": ["Process this: $user-input"],
+      "requireUserInput": true
+    }
+  },
+  "jobs": {
+    "simple-job": {
+      "work": {
+        "kind": "Ref",
+        "workIdInJob": 0,
+        "taskId": "simple-task"
+      }
+    },
+    "seq-job": {
+      "work": {
+        "kind": "Seq",
+        "works": [
+          { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+          { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+        ]
+      }
+    },
+    "par-job": {
+      "work": {
+        "kind": "Par",
+        "works": [
+          { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+          { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+        ]
+      }
+    },
+    "fail-job": {
+      "work": {
+        "kind": "Ref",
+        "workIdInJob": 0,
+        "taskId": "criteria-fail-task"
+      }
+    },
+    "empty-seq-job": {
+      "work": {
+        "kind": "Seq",
+        "works": []
+      }
+    },
+    "empty-par-job": {
+      "work": {
+        "kind": "Par",
+        "works": []
+      }
+    }
+  }
+}
