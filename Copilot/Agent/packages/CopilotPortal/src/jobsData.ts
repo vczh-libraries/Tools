@@ -108,7 +108,6 @@ export function assignWorkId(work: Work<never>): Work<number> {
 }
 
 export interface Job {
-    printedName: string;
     work: Work<number>;
 }
 
@@ -148,6 +147,40 @@ function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
 
 function retryFailedCondition(retryTimes: number = 3): FailureAction {
     return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
+}
+
+function makeRefWork(taskId: string, modelOverride?: Model): TaskWork<never> {
+    return {
+        kind: "Ref",
+        workIdInJob: undefined as never,
+        taskId,
+        modelOverride
+    };
+}
+
+function makeReviewWork(keyword: "scrum" | "design" | "plan" | "summary"): Work<never> {
+    return {
+        kind: "Seq",
+        works: [{
+            kind: "Loop",
+            postCondition: [true, makeRefWork("review-final-task")],
+            body: {
+                kind: "Par",
+                works: ["reviewers1", "reviewers2", "reviewers3"].map(reviewerKey => makeRefWork(`review-${keyword}`, { category: reviewerKey }))
+            }
+        },
+        makeRefWork(`review-apply`)]
+    }
+}
+
+function makeDocumentWork(jobName: string): Work<never> {
+    return {
+        kind: "Seq",
+        works: [
+            makeRefWork(`${jobName}-task`),
+            makeReviewWork("scrum")
+        ]
+    };
 }
 
 const entryInput: Entry = {
@@ -473,7 +506,7 @@ const entryInput: Entry = {
                 previousTasks: ["scrum-learn-task"]
             }
         },
-        "review-scrum": {
+        "review-scrum-task": {
             prompt: ["$cppjob", "$review", "$reportDocument", "# Scrum", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
@@ -483,7 +516,7 @@ const entryInput: Entry = {
                 failureAction: retryWithNewSessionCondition()
             }
         },
-        "review-design": {
+        "review-design-task": {
             prompt: ["$cppjob", "$review", "$reportDocument", "# Design", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
@@ -493,7 +526,7 @@ const entryInput: Entry = {
                 failureAction: retryWithNewSessionCondition()
             }
         },
-        "review-plan": {
+        "review-plan-task": {
             prompt: ["$cppjob", "$review", "$reportDocument", "# Plan", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
@@ -503,7 +536,7 @@ const entryInput: Entry = {
                 failureAction: retryWithNewSessionCondition()
             }
         },
-        "review-summary": {
+        "review-summary-task": {
             prompt: ["$cppjob", "$review", "$reportDocument", "# Summary", "$reviewerBoardFiles"],
             requireUserInput: false,
             criteria: {
@@ -513,7 +546,7 @@ const entryInput: Entry = {
                 failureAction: retryWithNewSessionCondition()
             }
         },
-        "review-final": {
+        "review-final-task": {
             model: { category: "planning" },
             requireUserInput: false,
             prompt: [
@@ -529,7 +562,7 @@ const entryInput: Entry = {
                 failureAction: retryFailedCondition()
             }
         },
-        "review-apply": {
+        "review-apply-task": {
             model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$review", "# Apply", "$reviewerBoardFiles"],
@@ -559,6 +592,21 @@ const entryInput: Entry = {
         }
     },
     jobs: {
+        "scrum-problem": { work: makeDocumentWork("scrum-problem") },
+        "scrum-update": { work: makeDocumentWork("scrum-update") },
+        "design-problem-next": { work: makeDocumentWork("design-problem-next") },
+        "design-update": { work: makeDocumentWork("design-update") },
+        "design-problem": { work: makeDocumentWork("design-problem") },
+        "plan-problem": { work: makeDocumentWork("plan-problem") },
+        "plan-update": { work: makeDocumentWork("plan-update") },
+        "summary-problem": { work: makeDocumentWork("summary-problem") },
+        "summary-update": { work: makeDocumentWork("summary-update") },
+        "execute-start": { work: makeRefWork("execute-task") },
+        "execute-update": { work: makeRefWork("execute-update-task") },
+        "verify-start": { work: makeRefWork("verify-task") },
+        "verify-update": { work: makeRefWork("verify-update-task") },
+        "scrum-learn": { work: makeRefWork("scrum-learn-task") },
+        "refine": { work: makeRefWork("refine-task") },
     }
 }
 
