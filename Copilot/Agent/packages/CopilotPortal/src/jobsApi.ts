@@ -1,7 +1,7 @@
 import * as http from "node:http";
 import * as path from "node:path";
 import * as fs from "node:fs";
-import type { ICopilotSession } from "copilot-api";
+import type { ICopilotSession } from "./copilotSession.js";
 import type { Entry, Task, Prompt, Job, Work, TaskWork, SequentialWork, ParallelWork, LoopWork, AltWork } from "./jobsData.js";
 import { expandPromptDynamic, getModelId } from "./jobsData.js";
 import {

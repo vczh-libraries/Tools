@@ -1,6 +1,6 @@
 # Copilot Agent
 
-A TypeScript-based application for interacting with GitHub Copilot models, featuring both a CLI chat interface and a web-based portal.
+A TypeScript-based application for interacting with GitHub Copilot models, featuring a web-based portal.
 
 ## Prerequisites
 
@@ -37,14 +37,6 @@ yarn compile
 ```
 
 ## Usage
-
-### Chat (CLI)
-
-```bash
-yarn chat
-```
-
-Interactive CLI session: lists models, lets you pick one, then streams responses in a persistent conversation.
 
 ### Portal (Web UI)
 
@@ -96,12 +88,9 @@ Copilot/Agent/
 ├── package.json              # Workspace configuration (yarn workspaces)
 ├── tsconfig.json             # Base TypeScript configuration
 ├── packages/
-│   ├── CopilotApi/           # Copilot SDK session wrapper library
-│   │   ├── src/
-│   │   │   └── copilotSession.ts
-│   │   └── package.json
 │   ├── CopilotPortal/        # Web UI + RESTful API server
 │   │   ├── src/
+│   │   │   ├── copilotSession.ts # Copilot SDK session wrapper
 │   │   │   ├── copilotApi.ts  # Copilot session API routes and helpers
 │   │   │   ├── jobsApi.ts     # Task management API routes and helpers
 │   │   │   ├── jobsData.ts    # Jobs/tasks data definitions and validation
@@ -124,10 +113,6 @@ Copilot/Agent/
 │   │   │   ├── api.test.mjs          # RESTful API tests (incl. task/job execution)
 │   │   │   └── web.test.mjs          # Playwright UI tests
 │   │   └── package.json
-│   └── CopilotTest/          # CLI chat application
-│       ├── src/
-│       │   └── index.ts      # Interactive terminal chat
-│       └── package.json
 ```
 
 ## Maintaining the Project
@@ -136,7 +121,6 @@ Copilot/Agent/
 - **Compile only**: `yarn compile` compiles all packages via TypeScript.
 - **Run portal**: `yarn portal` starts the web server (default port 8888).
 - **Run portal in test mode**: `yarn portal-for-test` starts in test mode.
-- **Run chat**: `yarn chat` starts the CLI chat.
 - **Run tests only**: `yarn testStart && yarn testExecute` starts server in test mode and runs tests.
 - **Playwright**: Install with `npx playwright install chromium`. Used for testing the portal UI.
 - **Spec-driven**: Portal features are defined in `packages/CopilotPortal/Spec.md`.
@@ -149,7 +133,6 @@ Copilot/Agent/
 - **Awaiting Status**: "Awaits responses ..." indicator shown in the session part while the agent is working
 - **Lazy CopilotClient**: Client starts on demand and stops when all sessions close
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
-- **CLI Chat**: Terminal-based interactive chat with model selection and streaming
 - **Live Polling**: Sequential long-polling for real-time session callbacks
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
 - **Session Crash Retry**: `sendPromptWithCrashRetry` automatically retries up to 3 times if a Copilot session crashes during prompt execution

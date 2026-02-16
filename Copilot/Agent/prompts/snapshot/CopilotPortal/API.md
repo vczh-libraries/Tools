@@ -5,6 +5,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 
 ## Related Files
 
+- `src/copilotSession.ts`
 - `src/sharedApi.ts`
 - `src/copilotApi.ts`
 - `src/jobsApi.ts`
@@ -65,6 +66,45 @@ All helper functions and types are exported and API implementations should use t
 
 `hasRunningSessions(): boolean;`
 - Returns true if any sessions are currently running.
+
+## Helpers (copilotSession.ts)
+
+Wraps `@github/copilot-sdk` to provide a simplified session interface with event callbacks.
+
+### ICopilotSession
+
+```typescript
+interface ICopilotSession {
+  get rawSection(): CopilotSession;
+  sendRequest(message: string, timeout?: number): Promise<void>;
+}
+```
+- Interface for interacting with a Copilot session.
+
+### ICopilotSessionCallbacks
+
+```typescript
+interface ICopilotSessionCallbacks {
+  onStartReasoning(reasoningId: string): void;
+  onReasoning(reasoningId: string, delta: string): void;
+  onEndReasoning(reasoningId: string, completeContent: string): void;
+  onStartMessage(messageId: string): void;
+  onMessage(messageId: string, delta: string): void;
+  onEndMessage(messageId: string, completeContent: string): void;
+  onStartToolExecution(toolCallId: string, parentToolCallId: string | undefined, toolName: string, toolArguments: string): void;
+  onToolExecution(toolCallId: string, delta: string): void;
+  onEndToolExecution(toolCallId: string, result: { content: string; detailedContent?: string } | undefined, error: { message: string; code?: string } | undefined): void;
+  onAgentStart(turnId: string): void;
+  onAgentEnd(turnId: string): void;
+  onIdle(): void;
+}
+```
+- Callback interface for all session events.
+
+### startSession
+
+`async startSession(client: CopilotClient, modelId: string, callback: ICopilotSessionCallbacks, workingDirectory?: string): Promise<ICopilotSession>;`
+- Create a session with the given model, register job tools, wire up all event handlers, and return an `ICopilotSession`.
 
 ## Helpers (jobsApi.ts)
 
@@ -152,7 +192,7 @@ All restful read arguments from the path and returns a JSON document.
 
 All title names below represents http://localhost:port/api/TITLE
 
-Copilot hosting is implemented by "@github/copilot-sdk" and the CopilotApi (copilot-api) package
+Copilot hosting is implemented by `@github/copilot-sdk` and `src/copilotSession.ts`.
 
 ### config
 
@@ -267,7 +307,7 @@ Returns in this schema if an exception it thrown from inside the session
 }
 ```
 
-Other response maps to all methods in `ICopilotSessionCallbacks` in `CopilotApi/src/copilotSession.ts` in this schema
+Other response maps to all methods in `ICopilotSessionCallbacks` in `src/copilotSession.ts` in this schema
 
 ```typescript
 {
