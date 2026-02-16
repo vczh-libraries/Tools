@@ -67,6 +67,8 @@ They applies to the limited context surrounding them.
 They offer ideas of how to perform testing for a certain feature that is complex and not easy to do, or to skip something that is really not able to be tested.
 Having a test note doesn't mean it is enough to only cover what a test note says. You must always do complete testing. When testing against a feature with a test note, follow the note to organize your test cases.
 
+When any feature is changed, update the unit test as well.
+
 ## Post Implementation
 
 Remember to update `README.md` to describe:
