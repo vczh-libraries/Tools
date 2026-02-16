@@ -45,7 +45,7 @@ The session part and the request part should always fill the whole webpage.
 Between two parts there is a bar to drag vertically to adjust the height of the request part which defaults to 300px.
 
 After the UI is loaded,
-the page must keep sending `api/copilot/session/live/{session-id}` to the server sequentially (aka not parallelly).
+the page must keep sending `api/copilot/session/{session-id}/live` to the server sequentially (aka not parallelly).
 When a timeout happens, resend the api.
 When it returns any response, process it and still keep sending the api.
 Whenever `ICopilotSessionCallbacks::METHOD` is mentioned, it means a response from this api.
@@ -78,7 +78,7 @@ It is a multiline text box. I can type any text, and press CTRL+ENTER to send th
 There is a "Send" button at the right bottom corner of the text box.
 It does the same thing as pressing CTRL+ENTER.
 When the button is disabled, pressing CTRL+ENTER should also does nothing.
-`api/copilot/session/query/{session-id}` is used here.
+`api/copilot/session/{session-id}/query` is used here.
 
 User request should generate a "User" message block, append the request and immediatelly complete it.
 
@@ -87,7 +87,7 @@ When `ICopilotSessionCallbacks::onIdle` triggers, it is enabled again.
 
 There is a "Stop Server" and "Close Session" button (in the mentioning order) at the left bottom corner of the text box.
 When "Close Session" is clicked:
-- Ends the session with `api/copilot/session/stop/{session-id}`.
+- Ends the session with `api/copilot/session/{session-id}/stop`.
 - Do whatever needs for finishing.
 - Try to close the current webpage window or tab. If the browser blocks it (e.g. Chrome blocks `window.close()` for tabs not opened by script), replace the page content with a message indicating the session has ended and the tab may be closed manually.
 When "Stop Server" is clicked:

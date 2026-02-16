@@ -308,3 +308,143 @@ describe("validateEntry requireUserInput", () => {
         }
     });
 });
+
+const { assignWorkId } = await import("../dist/jobsData.js");
+
+describe("assignWorkId", () => {
+    it("assigns sequential ids to TaskWork nodes", () => {
+        const work = {
+            kind: "Seq",
+            works: [
+                { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "a" },
+                { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "b" },
+            ],
+        };
+        const result = assignWorkId(work);
+        assert.strictEqual(result.works[0].workIdInJob, 0);
+        assert.strictEqual(result.works[1].workIdInJob, 1);
+    });
+
+    it("assigns ids across nested structures", () => {
+        const work = {
+            kind: "Par",
+            works: [
+                { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "a" },
+                {
+                    kind: "Seq",
+                    works: [
+                        { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "b" },
+                        { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "c" },
+                    ],
+                },
+            ],
+        };
+        const result = assignWorkId(work);
+        assert.strictEqual(result.works[0].workIdInJob, 0);
+        assert.strictEqual(result.works[1].works[0].workIdInJob, 1);
+        assert.strictEqual(result.works[1].works[1].workIdInJob, 2);
+    });
+});
+
+describe("validateEntry jobs", () => {
+    it("validates TaskWork.taskId must be in entry.tasks", () => {
+        const badEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "real-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    printedName: "Test Job",
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "nonexistent-task" }),
+                },
+            },
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /taskId.*nonexistent-task.*not a valid task name/
+        );
+    });
+
+    it("validates TaskWork.modelOverride.category must be in entry.models", () => {
+        const badEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "real-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    printedName: "Test Job",
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "real-task", modelOverride: { category: "nonexistent-model" } }),
+                },
+            },
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /modelOverride.category.*nonexistent-model.*not a valid model key/
+        );
+    });
+
+    it("validates TaskWork.modelOverride must be defined if task has no model", () => {
+        const badEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "no-model-task": { requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    printedName: "Test Job",
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "no-model-task" }),
+                },
+            },
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /modelOverride.*must be defined/
+        );
+    });
+
+    it("passes validation for valid job with TaskWork", () => {
+        const goodEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "real-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    printedName: "Test Job",
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "real-task" }),
+                },
+            },
+        };
+        const result = validateEntry(goodEntry, "test:");
+        assert.ok(result);
+    });
+
+    it("passes validation for valid job with modelOverride on task without model", () => {
+        const goodEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "no-model-task": { requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    printedName: "Test Job",
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "no-model-task", modelOverride: { category: "planning" } }),
+                },
+            },
+        };
+        const result = validateEntry(goodEntry, "test:");
+        assert.ok(result);
+    });
+});

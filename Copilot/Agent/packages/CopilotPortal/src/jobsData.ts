@@ -680,7 +680,77 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
         }
     }
 
+    // Validate jobs
+    if (entry.jobs) {
+        const allModelKeys = Object.keys(entry.models);
+        for (const [jobName, job] of Object.entries(entry.jobs)) {
+            const jobBase = `${codePath}entry.jobs["${jobName}"]`;
+            validateWork(entry, job.work, jobBase + ".work", allModelKeys);
+        }
+    }
+
     return entry;
+}
+
+function validateWork(entry: Entry, work: Work<unknown>, codePath: string, modelKeys: string[]): void {
+    switch (work.kind) {
+        case "Ref": {
+            const tw = work as TaskWork<unknown>;
+            if (!(tw.taskId in entry.tasks)) {
+                throw new Error(`${codePath}.taskId: "${tw.taskId}" is not a valid task name.`);
+            }
+            if (tw.modelOverride) {
+                if ("category" in tw.modelOverride) {
+                    if (!modelKeys.includes(tw.modelOverride.category)) {
+                        throw new Error(`${codePath}.modelOverride.category: "${tw.modelOverride.category}" is not a valid model key.`);
+                    }
+                }
+            } else {
+                // modelOverride must be defined if the task has no specified model
+                const task = entry.tasks[tw.taskId];
+                if (!task.model) {
+                    throw new Error(`${codePath}.modelOverride: must be defined because task "${tw.taskId}" has no specified model.`);
+                }
+            }
+            break;
+        }
+        case "Seq": {
+            const sw = work as SequentialWork<unknown>;
+            for (let i = 0; i < sw.works.length; i++) {
+                validateWork(entry, sw.works[i], `${codePath}.works[${i}]`, modelKeys);
+            }
+            break;
+        }
+        case "Par": {
+            const pw = work as ParallelWork<unknown>;
+            for (let i = 0; i < pw.works.length; i++) {
+                validateWork(entry, pw.works[i], `${codePath}.works[${i}]`, modelKeys);
+            }
+            break;
+        }
+        case "Loop": {
+            const lw = work as LoopWork<unknown>;
+            if (lw.preCondition) {
+                validateWork(entry, lw.preCondition[1], `${codePath}.preCondition[1]`, modelKeys);
+            }
+            if (lw.postCondition) {
+                validateWork(entry, lw.postCondition[1], `${codePath}.postCondition[1]`, modelKeys);
+            }
+            validateWork(entry, lw.body, `${codePath}.body`, modelKeys);
+            break;
+        }
+        case "Alt": {
+            const aw = work as AltWork<unknown>;
+            validateWork(entry, aw.condition, `${codePath}.condition`, modelKeys);
+            if (aw.trueWork) {
+                validateWork(entry, aw.trueWork, `${codePath}.trueWork`, modelKeys);
+            }
+            if (aw.falseWork) {
+                validateWork(entry, aw.falseWork, `${codePath}.falseWork`, modelKeys);
+            }
+            break;
+        }
+    }
 }
 
 export const entry = validateEntry(entryInput, "jobsData.ts:");

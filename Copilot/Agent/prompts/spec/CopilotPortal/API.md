@@ -91,7 +91,9 @@ async function startTask(
   drivingSession: ICopilotSession,
   forceSingleSessionMode: boolean,
   ignorePrerequisiteCheck: boolean,
-  callback: ICopilotTaskCallback
+  callback: ICopilotTaskCallback,
+  taskModelIdOverride?: string,
+  workingDirectory?: string
 ): Promise<ICopilotTask>
 ```
 - Start a task.
@@ -119,6 +121,7 @@ interface ICopilotJobCallback {
 async function startJob(
   jobName: string,
   userInput: string,
+  workingDirectory: string,
   callback: ICopilotJobCallback
 ): Promise<ICopilotJob>
 ```
@@ -374,7 +377,7 @@ List all jobs passed to `installJobsEntry` in this schema:
 }
 ```
 
-### copilot/job/start{job-name}
+### copilot/job/start/{job-name}
 
 The first line will be an absolute path for working directory
 The rest of the body will be user input.

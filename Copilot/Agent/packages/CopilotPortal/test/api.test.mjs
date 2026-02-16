@@ -238,3 +238,39 @@ describe("API: /api/copilot/task", () => {
     });
 });
 
+describe("API: /api/copilot/job", () => {
+    it("returns a list of jobs", async () => {
+        const data = await fetchJson("/api/copilot/job");
+        assert.ok(Array.isArray(data.jobs), "jobs should be an array");
+    });
+
+    it("each job has name and work", async () => {
+        const data = await fetchJson("/api/copilot/job");
+        for (const j of data.jobs) {
+            assert.ok(typeof j.name === "string", `job name should be string: ${JSON.stringify(j)}`);
+            assert.ok(typeof j.printedName === "string", `job printedName should be string: ${JSON.stringify(j)}`);
+            assert.ok(j.work !== undefined, `job should have work: ${JSON.stringify(j)}`);
+        }
+    });
+});
+
+describe("API: job not found errors", () => {
+    it("job start returns JobNotFound for invalid job name", async () => {
+        const data = await fetchJson("/api/copilot/job/start/nonexistent-job-xyz", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest input",
+        });
+        assert.deepStrictEqual(data, { error: "JobNotFound" });
+    });
+
+    it("job stop returns JobNotFound for invalid job id", async () => {
+        const data = await fetchJson("/api/copilot/job/nonexistent/stop");
+        assert.deepStrictEqual(data, { error: "JobNotFound" });
+    });
+
+    it("job live returns JobNotFound for invalid job id", async () => {
+        const data = await fetchJson("/api/copilot/job/nonexistent/live");
+        assert.deepStrictEqual(data, { error: "JobNotFound" });
+    });
+});
+

@@ -58,6 +58,10 @@ Here are all checks that `validateEntry` needs to do:
   - Must be in keys of `entry.tasks`.
 - `entry.tasks[name].criteria.toolExecuted[index]`:
   - Must be in `availableTools`.
+- Any `TaskWork` in `entry.jobs[name]`, needs to inspect recursively:
+  - `TaskWork.taskId` must be in `entry.tasks`.
+  - `TaskWork.modelOverride.category` must be in fields of `entry.models`.
+  - `TaskWork.modelOverride` must be defined if that task has no specified model.
 
 If any validation runs directly in this function fails:
 - The error code path will be `codePath` appended by the javascript expression without any variable.
@@ -69,7 +73,9 @@ If any validation runs directly in this function fails:
 
 A task is represented by type `Task`.
 
-If any session crashes, the task stops immediately and marked failed.
+If any session crashes:
+- The task stops immediately and marked failed.
+- The exception cannot be consumed silently.
 
 There will be two options to run the task:
 - The driving session and the task session is the same session.
@@ -142,4 +148,42 @@ the driving session should react to `runConditionInSameSession` when task execut
 
 ## Running Jobs
 
-(to be editing ...)
+A `Job` is workflow of multiple `Task`. If its work fails, the job fails.
+
+### Work
+
+- `TaskWork`: run the task, if `modelOverride` is defined that model is used.
+  - If `category` is defined, the model id is `entry.models[category]`.
+  - Otherwise `id` is the model id.
+- `SequentialWork`, run each work sequentially, any failing work immediately fails the `SequentialWork` without continuation.
+  - Empty `works` makes `SequentialWork` succeeds.
+- `ParallelWork`, run all works parallelly, any failing work fails the `ParallelWork`, but it needs to wait until all works finishes.
+  - Empty `works` makes `ParallelWork` succeeds.
+- `LoopWork`:
+  - Before running `body`, if `preCondition` succeeds (first element is true) or fails (first element is false), run `body`, otherwise `LoopWork` finishes as succeeded.
+  - After running `body`, if `postCondition` succeeds (first element is true) or fails (first element is false), redo `LoopWork`, otherwise `LoopWork` finishes as succeeded.
+  - If `body` fails, `LoopWork` finishes and fail.
+- `AltWork`:
+  - If `condition` succeeds, choose `trueWork`, otherwise choose `falseWork`.
+  - If the chosen work is undefined, `AltWork` finishes as succeeded.
+  - If the chosen work succeeds, `AltWork` finishes as succeeded.
+
+### TaskWork
+
+When a task is executed by a `TaskWork`, it is in double session model.
+The job has to start all sessions.
+`TaskWork` fails if the last retry:
+- Does not pass `Task.availability` checking. Undefined means successful.
+- Does not pass `Task.criteria` checking. Undefined means successful.
+
+### Determine TaskWork.workId
+
+Any `TaskWork` must have an unique `workIdInJob` in a Job.
+The `assignWorkId` function converts a `Work<never>` to `Work<number>` with property `workIdInJob` assigned.
+When creating a `Work` AST, you can create one in `Work<never>` without worrying about `workIdInJob`, and call `assignWorkId` to fix that for you.
+
+### Exception Handling
+
+If any task crashes:
+- The job stops immediately and marked failed.
+- The exception cannot be consumed silently.

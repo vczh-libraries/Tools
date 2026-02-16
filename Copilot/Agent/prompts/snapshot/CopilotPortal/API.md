@@ -40,7 +40,7 @@ All helper functions and types are exported and API implementations should use t
 
 ### helperSessionStart
 
-`async helperSessionStart(modelId: string): Promise<[ICopilotSession, string]>;`
+`async helperSessionStart(modelId: string, workingDirectory?: string): Promise<[ICopilotSession, string]>;`
 - Start a session, return the session object and its id.
 
 ### helperSessionStop
@@ -48,20 +48,30 @@ All helper functions and types are exported and API implementations should use t
 `async helperSessionStop(session: ICopilotSession): Promise<void>;`
 - Stop a session.
 
+### helperGetSession
+
+`helperGetSession(sessionId: string): ICopilotSession | undefined;`
+- Get a session by its id.
+
+### helperPushSessionResponse
+
+`helperPushSessionResponse(session: ICopilotSession, response: LiveResponse): void;`
+- Push a response to a session's response queue.
+
 ## Helpers (jobsApi.ts)
 
 All helper functions and types are exported and API implementations should use them.
 
-`async installJobsEntry(entry: Entry): void;`
+`async installJobsEntry(entry: Entry): Promise<void>;`
 - Use the entry. It could be `entry` from `jobsData.ts` or whatever.
 - This function should only be called once. Otherwise throw an error.
 
 ```typescript
 interface ICopilotTask {
-  get drivingSession(): ICopilotSession;
-  get status(): "Executing" | "Succeeded" | "Failed";
-  // stop all running session, no further callback issues.
-  get stop();
+  readonly drivingSession: ICopilotSession;
+  readonly status: "Executing" | "Succeeded" | "Failed";
+  // stop all running sessions, no further callback issues.
+  stop(): void;
 }
 
 interface ICopilotTaskCallback {
@@ -71,21 +81,50 @@ interface ICopilotTaskCallback {
   void taskFailed();
   // Called when a task session started. If the task session is the driving session, taskSession is undefined.
   void taskSessionStarted(taskSession: [ICopilotSession, string] | undefined);
-  // Called when a task session started. If the task session is the driving session, taskSession is undefined.
-  void taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, bool succeeded);
+  // Called when a task session stopped. If the task session is the driving session, taskSession is undefined.
+  void taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean);
 }
 
-async startTask(
+async function startTask(
   taskName: string,
-  drivingSession:
-  ICopilotSession,
+  userInput: string,
+  drivingSession: ICopilotSession,
   forceSingleSessionMode: boolean,
   ignorePrerequisiteCheck: boolean,
-  callback: ICopilotTaskCallback
+  callback: ICopilotTaskCallback,
+  taskModelIdOverride?: string,
+  workingDirectory?: string
 ): Promise<ICopilotTask>
 ```
 - Start a task.
 - Throw an error if `installJobsEntry` has not been called.
+
+```typescript
+interface ICopilotJob {
+  get runningWorkIds(): number[];
+  get status(): "Executing" | "Succeeded" | "Failed";
+  // stop all running tasks, no further callback issues.
+  get stop();
+}
+
+interface ICopilotJobCallback {
+  // Called when this job succeeded
+  void jobSucceeded();
+  // Called when this job failed
+  void jobFailed();
+  // Called when a TaskWork started
+  void workStarted(workId: number);
+  // Calledn when a TaskWork stopped
+  void workStopped(workId: number, succeeded: boolean);
+}
+
+async function startJob(
+  jobName: string,
+  userInput: string,
+  workingDirectory: string,
+  callback: ICopilotJobCallback
+): Promise<ICopilotJob>
+```
 
 ## API (copilotApi.ts)
 
@@ -244,7 +283,7 @@ You can make up a test specific entry which loads an entry from a JSON file in `
 ### copilot/task
 
 List all tasks passed to `installJobsEntry` in this schema:
-```
+```typescript
 {
   tasks: {
     name: string;
@@ -253,7 +292,7 @@ List all tasks passed to `installJobsEntry` in this schema:
 }
 ```
 
-### copilot/task/start/{model-id}/session/{session-id}
+### copilot/task/start/{task-name}/session/{session-id}
 
 The body will be user input.
 
@@ -328,3 +367,81 @@ Returns in this schema if an exception it thrown from inside the session
 ```
 
 Other response maps to all methods in `ICopilotTaskCallback` in `src/jobsApi.ts`.
+
+### copilot/job
+
+List all jobs passed to `installJobsEntry` in this schema:
+```typescript
+{
+  jobs: ({name: string} & Job)[]
+}
+```
+
+### copilot/job/start/{job-name}
+
+The first line will be an absolute path for working directory
+The rest of the body will be user input.
+
+Start a new job and return in this schema.
+
+```typescript
+{
+  jobId: string;
+}
+```
+
+or when error happens:
+
+```typescript
+{
+  error: "JobNotFound"
+}
+```
+
+### copilot/job/{job-id}/stop
+
+A job will automatically stops when finishes,
+this api forced the job to stop.
+
+Stop the job and return in this schema.
+
+```typescript
+{
+  result: "Closed"
+}
+```
+
+or when error happens:
+
+```typescript
+{
+  error: "JobNotFound"
+}
+```
+
+### copilot/job/{job-id}/live
+
+It works likes `copilot/session/{session-id}/live` but it reacts to `ICopilotJobCallback`.
+They should be implemented in the same way, but only response in schemas mentioned below.
+
+Returns in this schema if any error happens
+
+```typescript
+{
+  error: "JobNotFound" | "HttpRequestTimeout" | "ParallelCallNotSupported"
+}
+```
+
+TEST-NOTE: Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
+It requires the underlying copilot agent to not generate any response for 5 seconds,
+which is almost impossible.
+
+Returns in this schema if an exception it thrown from inside the session
+
+```typescript
+{
+  jobError: string
+}
+```
+
+Other response maps to all methods in `ICopilotJobCallback` in `src/jobsApi.ts`.

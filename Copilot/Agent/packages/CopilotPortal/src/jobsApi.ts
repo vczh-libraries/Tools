@@ -1,6 +1,8 @@
 import * as http from "node:http";
+import * as path from "node:path";
+import * as fs from "node:fs";
 import type { ICopilotSession } from "copilot-api";
-import type { Entry, Task, Prompt } from "./jobsData.js";
+import type { Entry, Task, Prompt, Job, Work, TaskWork, SequentialWork, ParallelWork, LoopWork, AltWork } from "./jobsData.js";
 import { expandPromptDynamic, getModelId } from "./jobsData.js";
 import {
     helperSessionStart,
@@ -30,6 +32,19 @@ export interface ICopilotTaskCallback {
     taskFailed(): void;
     taskSessionStarted(taskSession: [ICopilotSession, string] | undefined): void;
     taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean): void;
+}
+
+export interface ICopilotJob {
+    get runningWorkIds(): number[];
+    get status(): "Executing" | "Succeeded" | "Failed";
+    stop(): void;
+}
+
+export interface ICopilotJobCallback {
+    jobSucceeded(): void;
+    jobFailed(): void;
+    workStarted(workId: number): void;
+    workStopped(workId: number, succeeded: boolean): void;
 }
 
 // ---- Entry Management ----
@@ -139,11 +154,13 @@ function monitorSessionTools(session: ICopilotSession, runtimeValues: Record<str
 
 export async function startTask(
     taskName: string,
+    userInput: string,
     drivingSession: ICopilotSession,
     forceSingleSessionMode: boolean,
     ignorePrerequisiteCheck: boolean,
     callback: ICopilotTaskCallback,
-    userInput?: string
+    taskModelIdOverride?: string,
+    workingDirectory?: string
 ): Promise<ICopilotTask> {
     if (!installedEntry) {
         throw new Error("installJobsEntry has not been called.");
@@ -164,7 +181,7 @@ export async function startTask(
 
     // Initialize runtime variables
     const runtimeValues: Record<string, string> = {};
-    if (userInput !== undefined) {
+    if (userInput) {
         runtimeValues["user-input"] = userInput;
     }
 
@@ -187,11 +204,13 @@ export async function startTask(
     };
 
     // Start task execution in background
-    (async () => {
+    const executionPromise = (async () => {
         try {
             // Determine task model
             let taskModelId: string | undefined;
-            if (task.model) {
+            if (taskModelIdOverride) {
+                taskModelId = taskModelIdOverride;
+            } else if (task.model) {
                 taskModelId = getModelId(task.model, entry);
             }
 
@@ -205,7 +224,7 @@ export async function startTask(
                 if (!taskModelId) {
                     taskModelId = drivingModelId;
                 }
-                const [session, sessionId] = await helperSessionStart(taskModelId);
+                const [session, sessionId] = await helperSessionStart(taskModelId, workingDirectory);
                 taskSession = [session, sessionId];
                 taskSessionObj = session;
                 callback.taskSessionStarted(taskSession);
@@ -241,17 +260,8 @@ export async function startTask(
                 helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: taskPromptText });
                 await taskSessionObj.sendRequest(taskPromptText);
             } catch (err) {
-                sessionCrashed = true;
                 monitor.cleanup();
-                status = "Failed";
-                if (taskSession) {
-                    await helperSessionStop(taskSession[0]).catch(() => {});
-                    callback.taskSessionStopped(taskSession, false);
-                } else {
-                    callback.taskSessionStopped(undefined, false);
-                }
-                callback.taskFailed();
-                return;
+                throw err; // Session crashed - let outer catch handle
             }
             monitor.cleanup();
 
@@ -294,7 +304,10 @@ export async function startTask(
                 callback.taskSucceeded();
             }
         } catch (err) {
-            status = "Failed";
+            if (status === "Executing") {
+                status = "Failed";
+            }
+            (copilotTask as any)._crashError = err;
             if (taskSession) {
                 helperSessionStop(taskSession[0]).catch(() => {});
                 callback.taskSessionStopped(taskSession, false);
@@ -302,8 +315,12 @@ export async function startTask(
                 callback.taskSessionStopped(undefined, false);
             }
             callback.taskFailed();
+            throw err; // Don't consume silently
         }
     })();
+
+    (copilotTask as any)._executionPromise = executionPromise;
+    executionPromise.catch(() => {}); // Prevent unhandled rejection; callers should handle
 
     return copilotTask;
 }
@@ -326,9 +343,9 @@ async function checkAvailability(
         try {
             helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: conditionPrompt });
             await drivingSession.sendRequest(conditionPrompt);
-        } catch {
+        } catch (err) {
             monitor.cleanup();
-            return false;
+            throw err; // Session crashed - don't consume silently
         }
         monitor.cleanup();
         if (monitor.booleanResult !== true) {
@@ -369,9 +386,9 @@ async function checkCriteria(
         try {
             helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: conditionPrompt });
             await drivingSession.sendRequest(conditionPrompt);
-        } catch {
+        } catch (err) {
             monitor.cleanup();
-            return false;
+            throw err; // Session crashed - don't consume silently
         }
         monitor.cleanup();
 
@@ -414,9 +431,9 @@ async function checkCriteria(
                     try {
                         helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: taskPromptText });
                         await taskSessionObj.sendRequest(taskPromptText);
-                    } catch {
+                    } catch (err) {
                         retryMonitor.cleanup();
-                        continue;
+                        throw err; // Session crashed - don't consume silently
                     }
                     retryMonitor.cleanup();
 
@@ -426,9 +443,9 @@ async function checkCriteria(
                     try {
                         helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryCondPrompt });
                         await drivingSession.sendRequest(retryCondPrompt);
-                    } catch {
+                    } catch (err) {
                         condMonitor.cleanup();
-                        continue;
+                        throw err; // Session crashed - don't consume silently
                     }
                     condMonitor.cleanup();
 
@@ -447,9 +464,9 @@ async function checkCriteria(
                     try {
                         helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryPromptText });
                         await taskSessionObj.sendRequest(retryPromptText);
-                    } catch {
+                    } catch (err) {
                         retryMonitor.cleanup();
-                        continue;
+                        throw err; // Session crashed - don't consume silently
                     }
                     retryMonitor.cleanup();
 
@@ -459,9 +476,9 @@ async function checkCriteria(
                     try {
                         helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: retryCondPrompt });
                         await drivingSession.sendRequest(retryCondPrompt);
-                    } catch {
+                    } catch (err) {
                         condMonitor.cleanup();
-                        continue;
+                        throw err; // Session crashed - don't consume silently
                     }
                     condMonitor.cleanup();
 
@@ -549,9 +566,19 @@ export async function apiTaskStart(
             },
         };
 
-        const copilotTask = await startTask(taskName, session, true, true, taskCallback, userInput);
+        const copilotTask = await startTask(taskName, userInput, session, true, true, taskCallback);
         state.task = copilotTask;
         tasks.set(taskId, state);
+
+        // Catch execution crashes
+        const execPromise = (copilotTask as any)._executionPromise as Promise<void> | undefined;
+        if (execPromise) {
+            execPromise.catch((err: unknown) => {
+                state.taskError = String(err);
+                pushResponse(state, { taskError: String(err) });
+            });
+        }
+
         jsonResponse(res, 200, { taskId });
     } catch (err) {
         jsonResponse(res, 200, { taskError: String(err) });
@@ -601,6 +628,352 @@ export async function apiTaskLive(
         jsonResponse(res, 200, { error: "HttpRequestTimeout" });
     } else if (state.taskError) {
         jsonResponse(res, 200, { taskError: state.taskError });
+    } else {
+        jsonResponse(res, 200, response);
+    }
+}
+
+// ---- Job State ----
+
+interface JobState extends LiveState {
+    jobId: string;
+    job: ICopilotJob;
+    jobError: string | null;
+}
+
+const jobs = new Map<string, JobState>();
+let nextJobId = 1;
+
+// ---- executeWork ----
+
+async function executeWork(
+    entry: Entry,
+    work: Work<number>,
+    userInput: string,
+    workingDirectory: string,
+    runningIds: Set<number>,
+    stopped: { readonly value: boolean },
+    activeTasks: ICopilotTask[],
+    callback: ICopilotJobCallback
+): Promise<boolean> {
+    if (stopped.value) return false;
+
+    switch (work.kind) {
+        case "Ref": {
+            const taskWork = work as TaskWork<number>;
+            const taskName = taskWork.taskId;
+            const task = entry.tasks[taskName];
+
+            // Determine model override
+            let taskModelId: string | undefined;
+            if (taskWork.modelOverride) {
+                taskModelId = getModelId(taskWork.modelOverride, entry);
+            }
+
+            // Start driving session
+            const drivingModelId = entry.models.driving;
+            const [drivingSession] = await helperSessionStart(drivingModelId, workingDirectory);
+
+            runningIds.add(taskWork.workIdInJob);
+            callback.workStarted(taskWork.workIdInJob);
+
+            try {
+                const result = await new Promise<boolean>((resolve, reject) => {
+                    const taskCallback: ICopilotTaskCallback = {
+                        taskSucceeded() {
+                            const crashErr = (startedTask as any)?._crashError;
+                            if (crashErr) { reject(crashErr); } else { resolve(true); }
+                        },
+                        taskFailed() {
+                            const crashErr = (startedTask as any)?._crashError;
+                            if (crashErr) { reject(crashErr); } else { resolve(false); }
+                        },
+                        taskSessionStarted() {},
+                        taskSessionStopped() {},
+                    };
+
+                    let startedTask: ICopilotTask | null = null;
+                    startTask(
+                        taskName,
+                        userInput,
+                        drivingSession,
+                        false, // not forced single session (double session mode for jobs)
+                        false, // not ignoring prerequisites
+                        taskCallback,
+                        taskModelId,
+                        workingDirectory
+                    ).then(t => {
+                        startedTask = t;
+                        activeTasks.push(t);
+                    }).catch(err => reject(err));
+                });
+
+                runningIds.delete(taskWork.workIdInJob);
+                callback.workStopped(taskWork.workIdInJob, result);
+
+                // Clean up driving session
+                await helperSessionStop(drivingSession).catch(() => {});
+                return result;
+            } catch (err) {
+                runningIds.delete(taskWork.workIdInJob);
+                callback.workStopped(taskWork.workIdInJob, false);
+                await helperSessionStop(drivingSession).catch(() => {});
+                throw err; // Propagate crash to job level
+            }
+        }
+        case "Seq": {
+            const seqWork = work as SequentialWork<number>;
+            for (const w of seqWork.works) {
+                if (stopped.value) return false;
+                const result = await executeWork(entry, w, userInput, workingDirectory, runningIds, stopped, activeTasks, callback);
+                if (!result) return false;
+            }
+            return true;
+        }
+        case "Par": {
+            const parWork = work as ParallelWork<number>;
+            if (parWork.works.length === 0) return true;
+            const results = await Promise.all(
+                parWork.works.map(w => executeWork(entry, w, userInput, workingDirectory, runningIds, stopped, activeTasks, callback))
+            );
+            return results.every(r => r);
+        }
+        case "Loop": {
+            const loopWork = work as LoopWork<number>;
+            while (true) {
+                if (stopped.value) return false;
+
+                // Check pre-condition
+                if (loopWork.preCondition) {
+                    const [expected, condWork] = loopWork.preCondition;
+                    const condResult = await executeWork(entry, condWork, userInput, workingDirectory, runningIds, stopped, activeTasks, callback);
+                    if (condResult !== expected) {
+                        return true; // LoopWork finishes as succeeded
+                    }
+                }
+
+                // Run body
+                const bodyResult = await executeWork(entry, loopWork.body, userInput, workingDirectory, runningIds, stopped, activeTasks, callback);
+                if (!bodyResult) return false; // body fails → LoopWork fails
+
+                // Check post-condition
+                if (loopWork.postCondition) {
+                    const [expected, condWork] = loopWork.postCondition;
+                    const condResult = await executeWork(entry, condWork, userInput, workingDirectory, runningIds, stopped, activeTasks, callback);
+                    if (condResult !== expected) {
+                        return true; // LoopWork finishes as succeeded
+                    }
+                    // condition matches expected → redo loop
+                } else {
+                    return true; // No post-condition, loop body ran once successfully
+                }
+            }
+        }
+        case "Alt": {
+            const altWork = work as AltWork<number>;
+            const condResult = await executeWork(entry, altWork.condition, userInput, workingDirectory, runningIds, stopped, activeTasks, callback);
+            const chosen = condResult ? altWork.trueWork : altWork.falseWork;
+            if (!chosen) return true; // No chosen work = success
+            return executeWork(entry, chosen, userInput, workingDirectory, runningIds, stopped, activeTasks, callback);
+        }
+    }
+}
+
+// ---- startJob ----
+
+export async function startJob(
+    jobName: string,
+    userInput: string,
+    workingDirectory: string,
+    callback: ICopilotJobCallback
+): Promise<ICopilotJob> {
+    if (!installedEntry) {
+        throw new Error("installJobsEntry has not been called.");
+    }
+
+    const entry = installedEntry;
+    const job = entry.jobs[jobName];
+    if (!job) {
+        throw new Error(`Job "${jobName}" not found.`);
+    }
+
+    let status: "Executing" | "Succeeded" | "Failed" = "Executing";
+    let stopped = false;
+    const runningIds = new Set<number>();
+    const activeTasks: ICopilotTask[] = [];
+
+    const copilotJob: ICopilotJob = {
+        get runningWorkIds() { return Array.from(runningIds); },
+        get status() { return status; },
+        stop() {
+            if (stopped) return;
+            stopped = true;
+            status = "Failed";
+            for (const task of activeTasks) {
+                task.stop();
+            }
+        },
+    };
+
+    const executionPromise = (async () => {
+        try {
+            const result = await executeWork(
+                entry, job.work, userInput, workingDirectory,
+                runningIds, { get value() { return stopped; } },
+                activeTasks, callback
+            );
+            if (result) {
+                status = "Succeeded";
+                callback.jobSucceeded();
+            } else {
+                status = "Failed";
+                callback.jobFailed();
+            }
+        } catch (err) {
+            if (status === "Executing") {
+                status = "Failed";
+            }
+            // Stop all running tasks
+            for (const task of activeTasks) {
+                task.stop();
+            }
+            callback.jobFailed();
+            throw err; // Don't consume silently
+        }
+    })();
+
+    (copilotJob as any)._executionPromise = executionPromise;
+    executionPromise.catch(() => {}); // Prevent unhandled rejection; callers should handle
+
+    return copilotJob;
+}
+
+// ---- Job API Handlers ----
+
+export async function apiJobList(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+): Promise<void> {
+    if (!installedEntry) {
+        jsonResponse(res, 200, { jobs: [] });
+        return;
+    }
+    const jobList = Object.entries(installedEntry.jobs).map(([name, job]) => ({
+        name,
+        ...job,
+    }));
+    jsonResponse(res, 200, { jobs: jobList });
+}
+
+export async function apiJobStart(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    jobName: string,
+): Promise<void> {
+    if (!installedEntry || !(jobName in installedEntry.jobs)) {
+        jsonResponse(res, 200, { error: "JobNotFound" });
+        return;
+    }
+
+    const body = await readBody(req);
+    const lines = body.split("\n");
+    const workingDirectory = lines[0].trim();
+    const userInput = lines.slice(1).join("\n");
+
+    if (!workingDirectory || !path.isAbsolute(workingDirectory)) {
+        jsonResponse(res, 200, { error: "JobNotFound" });
+        return;
+    }
+    if (!fs.existsSync(workingDirectory)) {
+        jsonResponse(res, 200, { error: "JobNotFound" });
+        return;
+    }
+
+    try {
+        const jobId = `job-${nextJobId++}`;
+        const state: JobState = {
+            jobId,
+            job: null as unknown as ICopilotJob,
+            responseQueue: [],
+            waitingResolve: null,
+            jobError: null,
+        };
+
+        const jobCallback: ICopilotJobCallback = {
+            jobSucceeded() {
+                pushResponse(state, { callback: "jobSucceeded" });
+                jobs.delete(jobId);
+            },
+            jobFailed() {
+                pushResponse(state, { callback: "jobFailed" });
+                jobs.delete(jobId);
+            },
+            workStarted(workId: number) {
+                pushResponse(state, { callback: "workStarted", workId });
+            },
+            workStopped(workId: number, succeeded: boolean) {
+                pushResponse(state, { callback: "workStopped", workId, succeeded });
+            },
+        };
+
+        const copilotJob = await startJob(jobName, userInput, workingDirectory, jobCallback);
+        state.job = copilotJob;
+        jobs.set(jobId, state);
+
+        // Catch execution crashes
+        const execPromise = (copilotJob as any)._executionPromise as Promise<void> | undefined;
+        if (execPromise) {
+            execPromise.catch((err: unknown) => {
+                state.jobError = String(err);
+                pushResponse(state, { jobError: String(err) });
+            });
+        }
+
+        jsonResponse(res, 200, { jobId });
+    } catch (err) {
+        jsonResponse(res, 200, { jobError: String(err) });
+    }
+}
+
+export async function apiJobStop(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    jobId: string,
+): Promise<void> {
+    const state = jobs.get(jobId);
+    if (!state) {
+        jsonResponse(res, 200, { error: "JobNotFound" });
+        return;
+    }
+    state.job.stop();
+    jobs.delete(jobId);
+    if (state.waitingResolve) {
+        const resolve = state.waitingResolve;
+        state.waitingResolve = null;
+        resolve({ error: "JobNotFound" });
+    }
+    jsonResponse(res, 200, { result: "Closed" });
+}
+
+export async function apiJobLive(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    jobId: string,
+): Promise<void> {
+    const state = jobs.get(jobId);
+    if (!state) {
+        jsonResponse(res, 200, { error: "JobNotFound" });
+        return;
+    }
+    if (state.waitingResolve) {
+        jsonResponse(res, 200, { error: "ParallelCallNotSupported" });
+        return;
+    }
+    const response = await waitForResponse(state, 5000);
+    if (response === null) {
+        jsonResponse(res, 200, { error: "HttpRequestTimeout" });
+    } else if (state.jobError) {
+        jsonResponse(res, 200, { jobError: state.jobError });
     } else {
         jsonResponse(res, 200, response);
     }

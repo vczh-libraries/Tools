@@ -68,7 +68,7 @@ It exposes a `SessionResponseRenderer` class in this schema:
 export class SessionResponseRenderer {
   constructor(div: HTMLDivElement);
   processCallback(data: object): string;
-  addUserMessage(text: string): void;
+  addUserMessage(text: string, title?: string): void;
   setAwaiting(awaiting: boolean): void;
   scrollToBottom(): void;
 }

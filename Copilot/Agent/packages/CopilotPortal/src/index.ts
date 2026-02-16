@@ -19,6 +19,10 @@ import {
     apiTaskStart,
     apiTaskStop,
     apiTaskLive,
+    apiJobList,
+    apiJobStart,
+    apiJobStop,
+    apiJobLive,
     installJobsEntry,
     entry,
 } from "./jobsApi.js";
@@ -154,6 +158,33 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
     const taskLiveMatch = apiPath.match(/^copilot\/task\/([^\/]+)\/live$/);
     if (taskLiveMatch) {
         await apiTaskLive(req, res, taskLiveMatch[1]);
+        return;
+    }
+
+    // api/copilot/job (list all jobs)
+    if (apiPath === "copilot/job") {
+        await apiJobList(req, res);
+        return;
+    }
+
+    // api/copilot/job/start/{job-name}
+    const jobStartMatch = apiPath.match(/^copilot\/job\/start\/([^\/]+)$/);
+    if (jobStartMatch) {
+        await apiJobStart(req, res, jobStartMatch[1]);
+        return;
+    }
+
+    // api/copilot/job/{job-id}/stop
+    const jobStopMatch = apiPath.match(/^copilot\/job\/([^\/]+)\/stop$/);
+    if (jobStopMatch) {
+        await apiJobStop(req, res, jobStopMatch[1]);
+        return;
+    }
+
+    // api/copilot/job/{job-id}/live
+    const jobLiveMatch = apiPath.match(/^copilot\/job\/([^\/]+)\/live$/);
+    if (jobLiveMatch) {
+        await apiJobLive(req, res, jobLiveMatch[1]);
         return;
     }
 
