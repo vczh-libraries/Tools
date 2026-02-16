@@ -73,7 +73,12 @@ If any validation runs directly in this function fails:
 
 A task is represented by type `Task`.
 
-If any session crashes:
+If any session crashes after the task submitting a promot to the session:
+- resend the prompt until 3 consecutive crashes.
+- Add "The session crashed, please redo and here is the last request:\n" before the prompt when resend.
+- **TASK**: The above promot must be stored in an exported const variable. Update related spec files. Consider making a function so that running task or evaluating condition use the same logic.
+
+If resending promot can't solve crashing:
 - The task stops immediately and marked failed.
 - The exception cannot be consumed silently.
 
