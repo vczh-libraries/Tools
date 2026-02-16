@@ -4,12 +4,18 @@ import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverScript = path.resolve(__dirname, "..", "dist", "index.js");
+const windowsHidePatch = path.resolve(__dirname, "windowsHide.cjs");
 
-// Spawn server as detached process in test mode so it runs independently of this script
-const child = spawn("node", [serverScript, "--test"], {
+// Spawn server as detached process in test mode so it runs independently of this script.
+// On Windows, the Copilot SDK internally spawns node.exe to run its bundled CLI server.
+// Without windowsHide, each spawn creates a visible console window that steals keyboard focus.
+// We use --require to preload a CJS patch (windowsHide.cjs) that adds windowsHide: true
+// to all child_process.spawn calls before any ESM modules (including the SDK) are loaded.
+const child = spawn("node", ["--require", windowsHidePatch, serverScript, "--test"], {
     detached: true,
     stdio: "ignore",
     cwd: path.resolve(__dirname, ".."),
+    windowsHide: true,
 });
 child.unref();
 
