@@ -41,11 +41,41 @@ export interface Task {
     } | never);
 }
 
+export interface TaskWork {
+    kind: "Ref";
+    taskId: string;
+    modelOverride?: Model;
+}
+
+export interface SequentialWork {
+    kind: "Seq";
+    works: Work[];
+}
+
+export interface ParallelWork {
+    kind: "Par";
+    works: Work[];
+}
+
+export interface LoopWork {
+    preCondition?: Work;
+    postCondition?: Work;
+    body: Work;
+}
+
+export type Work = TaskWork | SequentialWork | ParallelWork | LoopWork;
+
+export interface Job {
+    name: string;
+    work: Work;
+}
+
 export interface Entry {
     models: { [key in string]: string };
-    promptVariables: {[key in string]: string[]};
+    promptVariables: { [key in string]: string[] };
     grid: GridRow[];
-    tasks: {[key in string]: Task};
+    tasks: { [key in string]: Task };
+    jobs: { [key in string]: Job };
 }
 
 export const availableTools: string[] = [
@@ -181,56 +211,56 @@ const entryInput: Entry = {
         keyword: "scrum",
         automate: false,
         jobs: [
-            {name: "problem", id: "scrum-problem" },
-            {name: "update", id: "scrum-update" }
+            { name: "problem", id: "scrum-problem" },
+            { name: "update", id: "scrum-update" }
         ]
     }, {
         keyword: "design",
         automate: true,
         jobs: [
-            {name: "problem next", id: "design-problem-next" },
-            {name: "update", id: "design-update" },
-            {name: "problem", id: "design-problem" }
+            { name: "problem next", id: "design-problem-next" },
+            { name: "update", id: "design-update" },
+            { name: "problem", id: "design-problem" }
         ]
     }, {
         keyword: "plan",
         automate: true,
         jobs: [
-            {name: "problem", id: "plan-problem" },
-            {name: "update", id: "plan-update" }
+            { name: "problem", id: "plan-problem" },
+            { name: "update", id: "plan-update" }
         ]
     }, {
         keyword: "summary",
         automate: true,
         jobs: [
-            {name: "problem", id: "summary-problem" },
-            {name: "update", id: "summary-update" }
+            { name: "problem", id: "summary-problem" },
+            { name: "update", id: "summary-update" }
         ]
     }, {
         keyword: "execute",
         automate: true,
         jobs: [
-            {name: "start", id: "execute-start" },
-            {name: "update", id: "execute-update" }
+            { name: "start", id: "execute-start" },
+            { name: "update", id: "execute-update" }
         ]
     }, {
         keyword: "verify",
         automate: true,
         jobs: [
-            {name: "start", id: "verify-start" },
-            {name: "update", id: "verify-update" }
+            { name: "start", id: "verify-start" },
+            { name: "update", id: "verify-update" }
         ]
     }, {
         keyword: "scrum",
         automate: true,
         jobs: [
-            {name: "learn", id: "scrum-learn" }
+            { name: "learn", id: "scrum-learn" }
         ]
     }, {
         keyword: "refine",
         automate: false,
         jobs: [
-            {name: "start", id: "refine" }
+            { name: "start", id: "refine" }
         ]
     }],
     tasks: {
@@ -485,6 +515,8 @@ const entryInput: Entry = {
                 failureAction: retryFailedCondition()
             }
         }
+    },
+    jobs: {
     }
 }
 
