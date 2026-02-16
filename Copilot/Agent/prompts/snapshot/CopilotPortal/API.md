@@ -492,8 +492,8 @@ Besides of testing API failures, it is important to make sure job running works.
 
 Create test cases for running a job, focused on different types of `Work`s.
 Test every kinds of `Work` and ensure:
-- It succeeds when all involved tasks succeed.
-- If fails properly.
+- It succeeds when all involved tasks succeed. Should test against every type of `Work`.
+- If fails properly. Should test against every type of `Work`, in each possible failure opsition.
 - Whenever the job succeeded or failed, the live api responses correctly.
 - Execution of tasks in `Work` should be observable from the live api.
 

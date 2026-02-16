@@ -346,6 +346,34 @@ describe("assignWorkId", () => {
     });
 });
 
+describe("validateEntry models.driving", () => {
+    it("throws when models.driving is missing", () => {
+        const badEntry = {
+            models: { planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {},
+            jobs: {},
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /entry\.models\.driving.*Should exist/
+        );
+    });
+
+    it("passes when models.driving exists", () => {
+        const goodEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {},
+            jobs: {},
+        };
+        const result = validateEntry(goodEntry, "test:");
+        assert.ok(result);
+    });
+});
+
 describe("validateEntry jobs", () => {
     it("validates TaskWork.taskId must be in entry.tasks", () => {
         const badEntry = {

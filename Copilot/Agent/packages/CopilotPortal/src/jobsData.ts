@@ -665,6 +665,11 @@ export function expandPromptDynamic(entry: Entry, prompt: Prompt, values: Record
 }
 
 export function validateEntry(entry: Entry, codePath: string): Entry {
+    // Validate models.driving exists
+    if (!("driving" in entry.models)) {
+        throw new Error(`${codePath}entry.models.driving: Should exist.`);
+    }
+
     const modelKeys = Object.keys(entry.models).filter(k => k !== "reviewers");
     const gridKeywords = entry.grid.map(row => row.keyword);
     const jobKeys = entry.jobs ? Object.keys(entry.jobs) : [];
