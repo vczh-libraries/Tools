@@ -145,6 +145,10 @@ function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
     return ["RetryWithNewSession", retryTimes];
 }
 
+function retryFailed(retryTimes: number = 3): FailureAction {
+    return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped."]];
+}
+
 function retryFailedCondition(retryTimes: number = 3): FailureAction {
     return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
 }
@@ -274,6 +278,9 @@ const entryInput: Entry = {
         reportedDocReady: [
             "$simpleCondition",
             "$reported-document should exist and its content should not be just a title."
+        ],
+        clearBuildTestLog: [
+            "In REPO-ROOT/.github/Scripts, delete both Build.log and Execute.log."
         ],
         buildSucceededFragment: [
             "REPO-ROOT/.github/Scripts/Build.log must exist and the last several lines shows there is no error"
@@ -435,7 +442,7 @@ const entryInput: Entry = {
             requireUserInput: false,
             prompt: ["$cppjob", "$execute"],
             availability: {
-                condition: ["$execDocReady"]
+                condition: ["$execDocReady", "$clearBuildTestLog"]
             },
             criteria: {
                 runConditionInSameSession: false,
@@ -449,7 +456,7 @@ const entryInput: Entry = {
             prompt: ["$cppjob", "$execute", "# Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
-                condition: ["$execDocReady"]
+                condition: ["$execDocReady", "$clearBuildTestLog"]
             },
             criteria: {
                 runConditionInSameSession: false,
@@ -463,7 +470,7 @@ const entryInput: Entry = {
             prompt: ["$cppjob", "$verify"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
-                condition: ["$execDocReady"]
+                condition: ["$execDocReady", "$clearBuildTestLog"]
             },
             criteria: {
                 runConditionInSameSession: false,
@@ -477,7 +484,7 @@ const entryInput: Entry = {
             prompt: ["$cppjob", "$verify", "# Update", "$user-input"],
             availability: {
                 previousJobKeywords: ["execute", "verify"],
-                condition: ["$execDocReady"]
+                condition: ["$execDocReady", "$clearBuildTestLog"]
             },
             criteria: {
                 runConditionInSameSession: false,
