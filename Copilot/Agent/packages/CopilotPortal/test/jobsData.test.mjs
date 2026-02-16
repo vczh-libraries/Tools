@@ -448,3 +448,59 @@ describe("validateEntry jobs", () => {
         assert.ok(result);
     });
 });
+
+describe("validateEntry grid jobName", () => {
+    it("throws when grid jobName is not in entry.jobs", () => {
+        const badEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [{
+                keyword: "test",
+                automate: false,
+                jobs: [{ name: "col", jobName: "nonexistent-job" }]
+            }],
+            tasks: {},
+            jobs: {},
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /entry\.grid\[0\]\.jobs\[0\]\.jobName.*nonexistent-job.*not a valid job name/
+        );
+    });
+
+    it("passes when grid jobName exists in entry.jobs", () => {
+        const goodEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [{
+                keyword: "test",
+                automate: false,
+                jobs: [{ name: "col", jobName: "real-job" }]
+            }],
+            tasks: {
+                "real-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "real-job": {
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "real-task" }),
+                },
+            },
+        };
+        const result = validateEntry(goodEntry, "test:");
+        assert.ok(result);
+    });
+
+    it("all grid jobNames in entry are valid", () => {
+        const jobKeys = Object.keys(entry.jobs);
+        for (let rowIndex = 0; rowIndex < entry.grid.length; rowIndex++) {
+            const row = entry.grid[rowIndex];
+            for (let colIndex = 0; colIndex < row.jobs.length; colIndex++) {
+                const col = row.jobs[colIndex];
+                assert.ok(
+                    jobKeys.includes(col.jobName),
+                    `grid[${rowIndex}].jobs[${colIndex}].jobName "${col.jobName}" should be a valid job name`
+                );
+            }
+        }
+    });
+});

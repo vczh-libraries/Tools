@@ -166,10 +166,10 @@ function makeReviewWork(keyword: "scrum" | "design" | "plan" | "summary"): Work<
             postCondition: [true, makeRefWork("review-final-task")],
             body: {
                 kind: "Par",
-                works: ["reviewers1", "reviewers2", "reviewers3"].map(reviewerKey => makeRefWork(`review-${keyword}`, { category: reviewerKey }))
+                works: ["reviewers1", "reviewers2", "reviewers3"].map(reviewerKey => makeRefWork(`review-${keyword}-task`, { category: reviewerKey }))
             }
         },
-        makeRefWork(`review-apply`)]
+        makeRefWork(`review-apply-task`)]
     }
 }
 
@@ -567,7 +567,7 @@ const entryInput: Entry = {
             requireUserInput: false,
             prompt: ["$cppjob", "$review", "# Apply", "$reviewerBoardFiles"],
             availability: {
-                previousTasks: ["review-final"]
+                previousTasks: ["review-final-task"]
             },
             criteria: {
                 runConditionInSameSession: false,
@@ -660,6 +660,18 @@ export function expandPromptDynamic(entry: Entry, prompt: Prompt, values: Record
 export function validateEntry(entry: Entry, codePath: string): Entry {
     const modelKeys = Object.keys(entry.models).filter(k => k !== "reviewers");
     const gridKeywords = entry.grid.map(row => row.keyword);
+    const jobKeys = entry.jobs ? Object.keys(entry.jobs) : [];
+
+    // Validate grid jobNames
+    for (let rowIndex = 0; rowIndex < entry.grid.length; rowIndex++) {
+        const row = entry.grid[rowIndex];
+        for (let columnIndex = 0; columnIndex < row.jobs.length; columnIndex++) {
+            const col = row.jobs[columnIndex];
+            if (!jobKeys.includes(col.jobName)) {
+                throw new Error(`${codePath}entry.grid[${rowIndex}].jobs[${columnIndex}].jobName: "${col.jobName}" is not a valid job name.`);
+            }
+        }
+    }
 
     for (const [taskName, task] of Object.entries(entry.tasks)) {
         const taskBase = `${codePath}entry.tasks["${taskName}"]`;
