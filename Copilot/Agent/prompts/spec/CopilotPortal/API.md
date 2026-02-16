@@ -40,7 +40,7 @@ All helper functions and types are exported and API implementations should use t
 
 ### helperSessionStart
 
-`async helperSessionStart(modelId: string): Promise<[ICopilotSession, string]>;`
+`async helperSessionStart(modelId: string, workingDirectory?: string): Promise<[ICopilotSession, string]>;`
 - Start a session, return the session object and its id.
 
 ### helperSessionStop
@@ -48,20 +48,30 @@ All helper functions and types are exported and API implementations should use t
 `async helperSessionStop(session: ICopilotSession): Promise<void>;`
 - Stop a session.
 
+### helperGetSession
+
+`helperGetSession(sessionId: string): ICopilotSession | undefined;`
+- Get a session by its id.
+
+### helperPushSessionResponse
+
+`helperPushSessionResponse(session: ICopilotSession, response: LiveResponse): void;`
+- Push a response to a session's response queue.
+
 ## Helpers (jobsApi.ts)
 
 All helper functions and types are exported and API implementations should use them.
 
-`async installJobsEntry(entry: Entry): void;`
+`async installJobsEntry(entry: Entry): Promise<void>;`
 - Use the entry. It could be `entry` from `jobsData.ts` or whatever.
 - This function should only be called once. Otherwise throw an error.
 
 ```typescript
 interface ICopilotTask {
-  get drivingSession(): ICopilotSession;
-  get status(): "Executing" | "Succeeded" | "Failed";
+  readonly drivingSession: ICopilotSession;
+  readonly status: "Executing" | "Succeeded" | "Failed";
   // stop all running sessions, no further callback issues.
-  get stop();
+  stop(): void;
 }
 
 interface ICopilotTaskCallback {
