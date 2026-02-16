@@ -176,6 +176,12 @@ The job has to start all sessions.
 - Does not pass `Task.availability` checking. Undefined means successful.
 - Does not pass `Task.criteria` checking. Undefined means successful.
 
+### Determine TaskWork.workId
+
+Any `TaskWork` must have an unique `workId` in a Job.
+The `assignWorkId` workId converts a `Work<never>` to `Work<number>` with propert `workId` assigned.
+When creating a `Work` AST, you can create one in `Work<never>` without worrying about `workId`, and call `assignWorkId` to fix that for you.
+
 ### Exception Handling
 
 If any task crashes:

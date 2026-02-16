@@ -14,6 +14,8 @@ When this file is tagged, find out new changes in the spec:
 - You are recommended to read all spec files to understand dependencies and relationships between each component.
 - Implement all changes.
 
+**IMPORTANT**: If you find any mistake in the spec causing you not being able to strictly follow, fix the spec.
+
 ## Changing the Spec
 
 You are allowed to change the spec. And you must change the spec when you decide to:

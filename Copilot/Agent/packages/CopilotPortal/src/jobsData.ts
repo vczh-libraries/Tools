@@ -41,41 +41,75 @@ export interface Task {
     } | never);
 }
 
-export interface TaskWork {
+export interface TaskWork<T> {
     kind: "Ref";
+    workIdInJob: T;
     taskId: string;
     modelOverride?: Model;
 }
 
-export interface SequentialWork {
+export interface SequentialWork<T> {
     kind: "Seq";
-    works: Work[];
+    works: Work<T>[];
 }
 
-export interface ParallelWork {
+export interface ParallelWork<T> {
     kind: "Par";
-    works: Work[];
+    works: Work<T>[];
 }
 
-export interface LoopWork {
+export interface LoopWork<T> {
     kind: "Loop";
-    preCondition?: [boolean, Work];
-    postCondition?: [boolean, Work];
-    body: Work;
+    preCondition?: [boolean, Work<T>];
+    postCondition?: [boolean, Work<T>];
+    body: Work<T>;
 }
 
-export interface AltWork {
+export interface AltWork<T> {
     kind: "Alt";
-    condition: Work;
-    trueWork?: Work;
-    falseWork?: Work;
+    condition: Work<T>;
+    trueWork?: Work<T>;
+    falseWork?: Work<T>;
 }
 
-export type Work = TaskWork | SequentialWork | ParallelWork | LoopWork | AltWork;
+export type Work<T> = TaskWork<T> | SequentialWork<T> | ParallelWork<T> | LoopWork<T> | AltWork<T>;
+
+export function assignWorkId(work: Work<never>): Work<number> {
+    function helper(w: Work<never>, nextId: number[]): Work<number> {
+        switch (w.kind) {
+            case "Ref": {
+                return { ...w, workIdInJob: nextId[0]++ };
+            }
+            case "Seq": {
+                return { ...w, works: w.works.map(work => helper(work, nextId)) };
+            }
+            case "Par": {
+                return { ...w, works: w.works.map(work => helper(work, nextId)) };
+            }
+            case "Loop": {
+                return {
+                    ...w,
+                    preCondition: w.preCondition ? [w.preCondition[0], helper(w.preCondition[1], nextId)] : undefined,
+                    postCondition: w.postCondition ? [w.postCondition[0], helper(w.postCondition[1], nextId)] : undefined,
+                    body: helper(w.body, nextId)
+                };
+            }
+            case "Alt": {
+                return {
+                    ...w,
+                    condition: helper(w.condition, nextId),
+                    trueWork: w.trueWork ? helper(w.trueWork, nextId) : undefined,
+                    falseWork: w.falseWork ? helper(w.falseWork, nextId) : undefined
+                };
+            }
+        }   
+    }
+    return helper(work, [0]);
+}
 
 export interface Job {
-    name: string;
-    work: Work;
+    printedName: string;
+    work: Work<number>;
 }
 
 export interface Entry {
