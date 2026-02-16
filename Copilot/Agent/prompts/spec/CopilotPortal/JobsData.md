@@ -48,8 +48,8 @@ it verifies that `job_boolean_true` or `job_boolean_false` must be mentioned in 
 Here are all checks that `validateEntry` needs to do:
 - `entry.grid[rowIndex].jobs[columnIndex].id`:
   - Skip right now.
-- `entry.tasks[name].model`;
-  - Must be in fields of `entry.models` but not `reviewers`.
+- `entry.tasks[name].model.category`;
+  - Must be in fields of `entry.models`.
 - `entry.tasks[name].requireUserInput`:
   - If it is true, its evaluated `prompt` should use `$user-input`, otherwise should not use.
 - `entry.tasks[name].availability.previousJobKeywords[index]`:

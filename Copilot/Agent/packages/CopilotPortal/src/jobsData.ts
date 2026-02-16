@@ -18,8 +18,13 @@ export type FailureAction =
     | ["RetryWithUserPrompt", number, Prompt]
     ;
 
+export type Model =
+    | { category: string; }
+    | { id: string; }
+    ;
+
 export interface Task {
-    model?: string;
+    model?: Model;
     prompt: Prompt;
     requireUserInput: boolean;
     availability?: {
@@ -37,12 +42,7 @@ export interface Task {
 }
 
 export interface Entry {
-    models: {
-        driving: string;
-        planning: string;
-        coding: string;
-        reviewers: string[];
-    };
+    models: { [key in string]: string };
     promptVariables: {[key in string]: string[]};
     grid: GridRow[];
     tasks: {[key in string]: Task};
@@ -62,6 +62,14 @@ export const runtimeVariables: string[] = [
     "$reported-false-reason"
 ];
 
+export function getModelId(model: Model, entry: Entry): string {
+    if ("category" in model) {
+        return entry.models[model.category];
+    } else {
+        return model.id;
+    }
+}
+
 function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
     return ["RetryWithNewSession", retryTimes];
 }
@@ -75,11 +83,9 @@ const entryInput: Entry = {
         driving: "gpt-5-mini",
         planning: "gpt-5.2",
         coding: "gpt-5.2-codex",
-        reviewers: [
-            "gpt-5.2-codex",
-            "claude-opus-4.5",
-            "gemini-3-pro-preview"
-        ]
+        reviewers1: "gpt-5.2-codex",
+        reviewers2: "claude-opus-4.5",
+        reviewers3: "gemini-3-pro-preview"
     },
     promptVariables: {
         reviewerBoardFiles: [
@@ -229,7 +235,7 @@ const entryInput: Entry = {
     }],
     tasks: {
         "scrum-problem-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$scrum", "# Problem", "$user-input"],
             criteria: {
@@ -239,7 +245,7 @@ const entryInput: Entry = {
             }
         },
         "scrum-update-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$scrum", "# Update", "$user-input"],
             availability: {
@@ -247,7 +253,7 @@ const entryInput: Entry = {
             }
         },
         "design-problem-next-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$design", "# Problem", "Next"],
             availability: {
@@ -260,7 +266,7 @@ const entryInput: Entry = {
             }
         },
         "design-update-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$design", "# Update", "$user-input"],
             availability: {
@@ -268,7 +274,7 @@ const entryInput: Entry = {
             }
         },
         "design-problem-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$design", "# Problem", "$user-input"],
             criteria: {
@@ -278,7 +284,7 @@ const entryInput: Entry = {
             }
         },
         "plan-problem-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$plan", "# Problem"],
             availability: {
@@ -291,7 +297,7 @@ const entryInput: Entry = {
             }
         },
         "plan-update-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$plan", "# Update", "$user-input"],
             availability: {
@@ -299,7 +305,7 @@ const entryInput: Entry = {
             }
         },
         "summary-problem-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$summary", "# Problem"],
             availability: {
@@ -312,7 +318,7 @@ const entryInput: Entry = {
             }
         },
         "summary-update-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$summary", "# Update", "$user-input"],
             availability: {
@@ -320,7 +326,7 @@ const entryInput: Entry = {
             }
         },
         "execute-task": {
-            model: "coding",
+            model: { category: "coding" },
             requireUserInput: false,
             prompt: ["$cppjob", "$execute"],
             availability: {
@@ -333,7 +339,7 @@ const entryInput: Entry = {
             }
         },
         "execute-update-task": {
-            model: "coding",
+            model: { category: "coding" },
             requireUserInput: true,
             prompt: ["$cppjob", "$execute", "# Update", "$user-input"],
             availability: {
@@ -347,7 +353,7 @@ const entryInput: Entry = {
             }
         },
         "verify-task": {
-            model: "coding",
+            model: { category: "coding" },
             requireUserInput: false,
             prompt: ["$cppjob", "$verify"],
             availability: {
@@ -361,7 +367,7 @@ const entryInput: Entry = {
             }
         },
         "verify-update-task": {
-            model: "coding",
+            model: { category: "coding" },
             requireUserInput: true,
             prompt: ["$cppjob", "$verify", "# Update", "$user-input"],
             availability: {
@@ -375,7 +381,7 @@ const entryInput: Entry = {
             }
         },
         "scrum-learn-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$scrum", "# Learn"],
             availability: {
@@ -388,7 +394,7 @@ const entryInput: Entry = {
             }
         },
         "refine-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$refine"],
             availability: {
@@ -436,7 +442,7 @@ const entryInput: Entry = {
             }
         },
         "review-final": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: false,
             prompt: [
                 "$cppjob",
@@ -452,7 +458,7 @@ const entryInput: Entry = {
             }
         },
         "review-apply": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$review", "# Apply", "$reviewerBoardFiles"],
             availability: {
@@ -465,12 +471,12 @@ const entryInput: Entry = {
             }
         },
         "ask-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$ask", "$user-input"]
         },
         "code-task": {
-            model: "planning",
+            model: { category: "planning" },
             requireUserInput: true,
             prompt: ["$cppjob", "$code", "$user-input"],
             criteria: {
@@ -537,9 +543,9 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
         const taskBase = `${codePath}entry.tasks["${taskName}"]`;
 
         // Validate model
-        if (task.model !== undefined) {
-            if (!modelKeys.includes(task.model)) {
-                throw new Error(`${taskBase}.model: "${task.model}" is not a valid model key.`);
+        if (task?.model && "category" in task.model) {
+            if (!modelKeys.includes(task.model.category)) {
+                throw new Error(`${taskBase}.model.category: "${task.model.category}" is not a valid model key.`);
             }
         }
 

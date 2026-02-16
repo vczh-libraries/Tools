@@ -1,7 +1,7 @@
 import * as http from "node:http";
 import type { ICopilotSession } from "copilot-api";
 import type { Entry, Task, Prompt } from "./jobsData.js";
-import { expandPromptDynamic, runtimeVariables } from "./jobsData.js";
+import { expandPromptDynamic, getModelId } from "./jobsData.js";
 import {
     helperSessionStart,
     helperSessionStop,
@@ -192,7 +192,7 @@ export async function startTask(
             // Determine task model
             let taskModelId: string | undefined;
             if (task.model) {
-                taskModelId = (entry.models as Record<string, unknown>)[task.model] as string;
+                taskModelId = getModelId(task.model, entry);
             }
 
             // Create task session if double model mode
@@ -397,7 +397,7 @@ async function checkCriteria(
 
                     let taskModelId: string | undefined;
                     if (task.model) {
-                        taskModelId = (entry.models as Record<string, unknown>)[task.model] as string;
+                        taskModelId = getModelId(task.model, entry);
                     }
                     if (!taskModelId) {
                         taskModelId = entry.models.driving;

@@ -156,7 +156,7 @@ describe("validateEntry (entry export)", () => {
             promptVariables: {},
             grid: [],
             tasks: {
-                "test-task": { model: "nonexistent", prompt: ["hello"] }
+                "test-task": { model: { category: "nonexistent" }, prompt: ["hello"] }
             }
         };
         assert.throws(
@@ -259,7 +259,7 @@ describe("validateEntry requireUserInput", () => {
             promptVariables: {},
             grid: [],
             tasks: {
-                "test-task": { model: "planning", requireUserInput: true, prompt: ["hello world"] }
+                "test-task": { model: { category: "planning" }, requireUserInput: true, prompt: ["hello world"] }
             }
         };
         assert.throws(
@@ -274,7 +274,7 @@ describe("validateEntry requireUserInput", () => {
             promptVariables: {},
             grid: [],
             tasks: {
-                "test-task": { model: "planning", requireUserInput: false, prompt: ["hello $user-input"] }
+                "test-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello $user-input"] }
             }
         };
         assert.throws(
@@ -289,8 +289,8 @@ describe("validateEntry requireUserInput", () => {
             promptVariables: {},
             grid: [],
             tasks: {
-                "task-with-input": { model: "planning", requireUserInput: true, prompt: ["do $user-input"] },
-                "task-without-input": { model: "planning", requireUserInput: false, prompt: ["do something"] }
+                "task-with-input": { model: { category: "planning" }, requireUserInput: true, prompt: ["do $user-input"] },
+                "task-without-input": { model: { category: "planning" }, requireUserInput: false, prompt: ["do something"] }
             }
         };
         const result = validateEntry(goodEntry, "test:");
