@@ -270,6 +270,8 @@ async function renderFlowChart(chart) {
             "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
             "elk.layered.crossingMinimization.forceNodeModelOrder": "true",
             "elk.layered.cycleBreaking.strategy": "MODEL_ORDER",
+            "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
+            "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
         },
         children: elkNodes,
         edges: elkEdges,
