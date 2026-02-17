@@ -51,9 +51,10 @@ function workToElk(work, nodes, edges) {
     switch (work.kind) {
         case "Ref": {
             const id = `task-${work.workIdInJob}`;
+            const textWidth = Math.max(120, work.taskId.length * 8 + 20);
             nodes.push({
                 id,
-                width: 120,
+                width: textWidth,
                 height: 40,
                 labels: [{ text: work.taskId }],
                 _type: "task",

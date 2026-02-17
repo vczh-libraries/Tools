@@ -146,7 +146,7 @@ startJobButton.addEventListener("click", () => {
     if (!selectedJobName) return;
     const userInput = userInputTextarea.value;
     const url = `/jobTracking.html?jobId=${encodeURIComponent(selectedJobName)}&wb=${encodeURIComponent(workingDir)}&userInput=${encodeURIComponent(userInput)}`;
-    window.location.href = url;
+    window.open(url, "_blank");
 });
 
 // ---- Resize bar (horizontal) ----

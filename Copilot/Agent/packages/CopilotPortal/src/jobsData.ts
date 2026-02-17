@@ -762,6 +762,9 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
             // Simplify work tree: flatten nested Seq/Par
             job.work = simplifyWork(job.work);
 
+            // Assign unique workIdInJob to each Ref node
+            job.work = assignWorkId(job.work as unknown as Work<never>);
+
             validateWork(entry, job.work, jobBase + ".work", allModelKeys);
 
             // Compute requireUserInput for the job
