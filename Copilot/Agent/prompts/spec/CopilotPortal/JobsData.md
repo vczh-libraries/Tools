@@ -5,8 +5,11 @@ Read `README.md` to understand the whole picture of the project as well as speci
 
 ## Related Files
 
+- `src/jobsDef.ts`
 - `src/jobsData.ts`
 - `src/jobsApi.ts`
+
+**TASK**: I copied something from jobsData.ts to jobsDef.ts and leave an import statement in jobsData.ts. Please delete everything in jobsData.ts that is copied to jobsDef.ts, and replace all references in jobsData.ts to use the import.
 
 ## Functions
 

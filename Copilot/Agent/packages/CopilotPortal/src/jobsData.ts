@@ -1,3 +1,5 @@
+import * as JD from "./jobsDef.js";
+
 export interface GridColumn {
     name: string;
     jobName: string;
@@ -244,6 +246,30 @@ function testGraph_Loop(): Work<never> {
     }
 }
 
+function testGraph_Loop2(): Work<never> {
+    return {
+        kind: "Seq",
+        works: [
+            {
+                kind: "Loop",
+                preCondition: [false, makeRefWork("ask-task")],
+                body: makeRefWork(`review-apply-task`)
+            },
+            {
+                kind: "Loop",
+                postCondition: [false, makeRefWork("code-task")],
+                body: makeRefWork(`review-apply-task`)
+            },
+            {
+                kind: "Loop",
+                preCondition: [true, makeRefWork("ask-task")],
+                postCondition: [true, makeRefWork("code-task")],
+                body: makeRefWork(`review-apply-task`)
+            }
+        ]
+    }
+}
+
 function testGraph_Alt(): Work<never> {
     return {
         kind: "Par",
@@ -375,7 +401,8 @@ const entryInput: Entry = {
         automate: false,
         jobs: [
             { name: "loops", jobName: "test-loops" },
-            { name: "alts", jobName: "test-alts" }
+            { name: "alts", jobName: "test-alts" },
+            { name: "loop-seq", jobName: "test-loop-seq" }
         ]
     }, {
         keyword: "scrum",
@@ -689,6 +716,7 @@ const entryInput: Entry = {
     jobs: {
         "test-loops": { work: testGraph_Loop() },
         "test-alts": { work: testGraph_Alt() },
+        "test-loop-seq": { work: testGraph_Loop2() },
         "scrum-problem": { work: makeDocumentWork("scrum-problem") },
         "scrum-update": { work: makeDocumentWork("scrum-update") },
         "design-problem-next": { work: makeDocumentWork("design-problem-next") },

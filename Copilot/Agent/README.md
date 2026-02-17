@@ -94,7 +94,8 @@ Copilot/Agent/
 │   │   │   ├── copilotSession.ts # Copilot SDK session wrapper
 │   │   │   ├── copilotApi.ts  # Copilot session API routes and helpers
 │   │   │   ├── jobsApi.ts     # Task management API routes and helpers
-│   │   │   ├── jobsData.ts    # Jobs/tasks data definitions and validation
+│   │   │   ├── jobsDef.ts     # Jobs/tasks data definitions and validation
+│   │   │   ├── jobsData.ts    # Preloaded jobs/tasks data
 │   │   │   ├── sharedApi.ts   # Shared HTTP/live-polling utilities
 │   │   │   └── index.ts       # HTTP server, API routing, static files
 │   │   ├── assets/           # Static website files

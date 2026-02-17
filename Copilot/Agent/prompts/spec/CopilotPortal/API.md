@@ -11,7 +11,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `src/jobsApi.ts`
 - `src/index.ts`
 
-Data structures about jobs and tasks are in `src/jobsData.ts`.
+Data structures about jobs and tasks are in `src/jobsDef.ts`.
 It's spec is in `JobsData.md`.
 
 ## Starting the HTTP Server
