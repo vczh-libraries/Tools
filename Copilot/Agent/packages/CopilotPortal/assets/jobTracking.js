@@ -1,7 +1,6 @@
 // ---- Redirect if no jobId ----
 const params = new URLSearchParams(window.location.search);
 const jobId = params.get("jobId");
-const renderer = params.get("renderer") || "mermaid";
 if (!jobId) {
     window.location.href = "/index.html";
 }
@@ -33,14 +32,8 @@ async function loadJobData() {
         pre.textContent = JSON.stringify({job: jobDefinition, chart}, undefined, 4);
         sessionResponsePart.appendChild(pre);
 
-        // Dispatch to selected renderer
-        if (renderer === "mermaid" && typeof renderFlowChartMermaid === "function") {
-            await renderFlowChartMermaid(chart, jobPart);
-        } else if (typeof renderFlowChartELK === "function") {
-            await renderFlowChartELK(chart, jobPart);
-        } else {
-            jobPart.textContent = "No renderer available.";
-        }
+        // Render with Mermaid
+        await renderFlowChartMermaid(chart, jobPart);
     } catch (err) {
         console.error("Failed to load job data:", err);
         jobPart.textContent = "Failed to load job data.";

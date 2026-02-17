@@ -273,13 +273,6 @@ describe("Web: jobTracking.html layout", () => {
         assert.ok(links.includes("jobTracking.css"), "should include jobTracking.css");
     });
 
-    it("loads flowChartELK.css stylesheet", async () => {
-        const links = await page.evaluate(() =>
-            Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.getAttribute("href"))
-        );
-        assert.ok(links.includes("flowChartELK.css"), "should include flowChartELK.css");
-    });
-
     it("has left-part and right-part", async () => {
         const leftVisible = await page.locator("#left-part").isVisible();
         const rightVisible = await page.locator("#right-part").isVisible();
@@ -344,70 +337,6 @@ describe("Web: jobs.html Start Job opens new window", () => {
     });
 });
 
-describe("Web: jobTracking.html ELK renderer", () => {
-    let browser;
-    let page;
-
-    before(async () => {
-        await verifyEntryInstalled();
-        browser = await chromium.launch({ headless: true });
-        page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=elk`);
-        await page.waitForTimeout(3000);
-    });
-
-    after(async () => {
-        await browser?.close();
-    });
-
-    it("renders SVG in job-part with ELK renderer", async () => {
-        const svgCount = await page.locator("#job-part svg").count();
-        assert.ok(svgCount > 0, "should render an SVG element in job-part");
-    });
-
-    it("renders TaskNode with correct CSS class", async () => {
-        const taskNodes = await page.locator("#job-part .elk-node-TaskNode").count();
-        assert.ok(taskNodes > 0, "should have at least one TaskNode group");
-    });
-
-    it("TaskNode has label text", async () => {
-        const textContent = await page.locator("#job-part .elk-node-TaskNode text").first().textContent();
-        assert.ok(textContent && textContent.length > 0, "TaskNode should have label text");
-    });
-
-    it("has chart nodes with hint-based CSS classes", async () => {
-        // simple-job should at least have TaskNode
-        const hasTaskNode = await page.locator("#job-part .elk-node-TaskNode").count();
-        assert.ok(hasTaskNode > 0, "should have TaskNode elements");
-    });
-});
-
-describe("Web: jobTracking.html Mermaid default renderer", () => {
-    let browser;
-    let page;
-
-    before(async () => {
-        await verifyEntryInstalled();
-        browser = await chromium.launch({ headless: true });
-        page = await browser.newPage();
-        // No renderer param should default to Mermaid
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
-        await page.waitForTimeout(3000);
-    });
-
-    after(async () => {
-        await browser?.close();
-    });
-
-    it("defaults to Mermaid renderer when no renderer param", async () => {
-        const svgCount = await page.locator("#job-part svg").count();
-        assert.ok(svgCount > 0, "should render Mermaid SVG by default");
-        // Mermaid SVG should NOT have ELK-specific CSS classes
-        const elkNodes = await page.locator("#job-part .elk-node-TaskNode").count();
-        assert.strictEqual(elkNodes, 0, "should not have ELK TaskNode CSS classes");
-    });
-});
-
 describe("Web: jobTracking.html Mermaid renderer", () => {
     let browser;
     let page;
@@ -416,7 +345,7 @@ describe("Web: jobTracking.html Mermaid renderer", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=mermaid`);
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
         await page.waitForTimeout(3000);
     });
 
@@ -426,7 +355,7 @@ describe("Web: jobTracking.html Mermaid renderer", () => {
 
     it("renders SVG in job-part with Mermaid renderer", async () => {
         const svgCount = await page.locator("#job-part svg").count();
-        assert.ok(svgCount > 0, "should render an SVG element in job-part with Mermaid");
+        assert.ok(svgCount > 0, "should render an SVG element in job-part");
     });
 
     it("session-response-part shows chart JSON with mermaid renderer", async () => {
@@ -434,50 +363,6 @@ describe("Web: jobTracking.html Mermaid renderer", () => {
         const parsed = JSON.parse(text);
         assert.ok(parsed.job, "should have job definition");
         assert.ok(parsed.chart, "should have chart data");
-    });
-});
-
-describe("Web: jobTracking.html TaskNode click interaction (ELK)", () => {
-    let browser;
-    let page;
-
-    before(async () => {
-        await verifyEntryInstalled();
-        browser = await chromium.launch({ headless: true });
-        page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=elk`);
-        await page.waitForTimeout(3000);
-    });
-
-    after(async () => {
-        await browser?.close();
-    });
-
-    it("clicking a TaskNode bolds its text", async () => {
-        const taskNode = page.locator("#job-part .elk-node-TaskNode").first();
-        await taskNode.click();
-        const hasBold = await page.locator("#job-part .elk-node-TaskNode text.bold").count();
-        assert.ok(hasBold > 0, "should have a bolded TaskNode text after click");
-    });
-
-    it("clicking the same TaskNode again unbolds its text", async () => {
-        const taskNode = page.locator("#job-part .elk-node-TaskNode").first();
-        await taskNode.click(); // unbold
-        const hasBold = await page.locator("#job-part .elk-node-TaskNode text.bold").count();
-        assert.strictEqual(hasBold, 0, "should have no bolded TaskNode text after second click");
-    });
-
-    it("clicking a different TaskNode exclusively bolds the new one", async () => {
-        const taskNodes = page.locator("#job-part .elk-node-TaskNode");
-        const count = await taskNodes.count();
-        if (count < 2) {
-            // skip if only one task node
-            return;
-        }
-        await taskNodes.nth(0).click(); // bold first
-        await taskNodes.nth(1).click(); // bold second (unbolds first)
-        const boldTexts = await page.locator("#job-part .elk-node-TaskNode text.bold").count();
-        assert.strictEqual(boldTexts, 1, "should have exactly one bolded TaskNode text");
     });
 });
 
@@ -489,7 +374,7 @@ describe("Web: jobTracking.html TaskNode click interaction (Mermaid)", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=mermaid`);
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
         await page.waitForTimeout(3000);
     });
 

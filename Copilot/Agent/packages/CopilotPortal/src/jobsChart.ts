@@ -70,10 +70,15 @@ function buildConditionNode(condition: Work<number>, nodeId: number[], nodes: Ch
 function buildChart(work: Work<number>, nodeId: number[], nodes: ChartNode[]): [ChartNode, ChartNode] {
     switch (work.kind) {
         case "Ref": {
+            let label = work.taskId;
+            if (work.modelOverride) {
+                const modelName = "category" in work.modelOverride ? work.modelOverride.category : work.modelOverride.id;
+                label = `${label} (${modelName})`;
+            }
             const node: ChartNode = {
                 id: nodeId[0]++,
                 hint: ["TaskNode", work.workIdInJob],
-                label: work.taskId,
+                label,
             }
             nodes.push(node);
             return [node, node];

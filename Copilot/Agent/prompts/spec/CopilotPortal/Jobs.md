@@ -12,8 +12,6 @@ Read `README.md` to understand the whole picture of the project as well as speci
   - `jobTracking.css`
   - `jobTracking.js`
   - `jobTracking.html`
-  - `flowChartELK.css`
-  - `flowChartELK.js`
   - `flowChartMermaid.js`
 
 ### jobs.css
@@ -146,27 +144,6 @@ There will be multiple arrows connecting between nodes:
 
 Arrows would be gray.
 
-#### Rendering with ELK
-
-**TASK**: Remove everything about ELK from the source code and the spec. I prefer mermaid and will not use elk anymore. Therefore the renderer argument is not needed.
-
-Implementation stores in:
-- `flowChartELK.css`
-- `flowChartELK.js`
-
-Activate this renderer by using URL argument `renderer=elk`.
-
-Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.js`) for automatic graph layout:
-- Build an ELK graph with `children` (nodes) and `edges` from the `ChartGraph`.
-- Use `elk.algorithm: "layered"` with `elk.direction: "DOWN"` for top-to-bottom flow.
-- Use `elk.edgeRouting: "SPLINES"` for less turning routing.
-- Use `elk.layered.considerModelOrder.strategy: "NODES_AND_EDGES"` and `elk.layered.crossingMinimization.forceNodeModelOrder: "true"` to respect the node ordering from the chart data.
-- Use `elk.layered.cycleBreaking.strategy: "MODEL_ORDER"` so ELK uses node model order (sequential IDs) to identify back-edges—any edge from a higher-order node to a lower-order node is reversed.
-- Use `elk.layered.nodePlacement.strategy: "NETWORK_SIMPLEX"` for better node centering.
-- Each `ChartNode` becomes an ELK node; each `ChartArrow` becomes an ELK edge.
-- After `elk.layout(graph)`, render the positioned nodes and routed edges into an SVG.
-- Node visual styles (colors, borders) are defined in `flowChartELK.css` using CSS classes per hint type.
-
 #### Rendering with Mermaid
 
 Implementation stores in:
@@ -179,7 +156,7 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 - Build a Mermaid `graph TD` definition string from the `ChartGraph`.
 - Each `ChartNode` becomes a Mermaid node with shape syntax matching its hint (rectangles, hexagons `{{}}`, circles `(())`).
 - Each `ChartArrow` becomes a Mermaid edge with optional label.
-- Per-node inline `style` directives set fill, stroke, and text color matching the same palette as ELK.
+- Per-node inline `style` directives set fill, stroke, and text color.
 - Call `mermaid.render("mermaid-chart", definition)` to produce an SVG, then insert it into the container.
 
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
