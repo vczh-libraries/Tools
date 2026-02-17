@@ -134,9 +134,9 @@ function buildChart(work: Work<number>, nodeId: number[], nodes: ChartNode[]): [
             return [beginPair[0], endNode];
         }
         case "Alt": {
-            const conditionPair = buildChart(work.condition, nodeId, nodes);
-            const truePair = (work.trueWork ? buildConditionNode(work.trueWork, nodeId, nodes) : undefined) as [ChartNode, ChartNode];
-            const falsePair = (work.falseWork ? buildConditionNode(work.falseWork, nodeId, nodes) : undefined) as [ChartNode, ChartNode];
+            const conditionPair = buildConditionNode(work.condition, nodeId, nodes);
+            const truePair = (work.trueWork ? buildChart(work.trueWork, nodeId, nodes) : undefined) as [ChartNode, ChartNode];
+            const falsePair = (work.falseWork ? buildChart(work.falseWork, nodeId, nodes) : undefined) as [ChartNode, ChartNode];
             const endNode: ChartNode = {
                 id: nodeId[0]++,
                 hint: "AltEnd",
