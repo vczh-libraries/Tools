@@ -208,7 +208,7 @@ async function loadJobData() {
         }
 
         const pre = document.createElement("pre");
-        pre.textContent = JSON.stringify(chart, undefined, 4);
+        pre.textContent = JSON.stringify({job: jobDefinition, chart}, undefined, 4);
         sessionResponsePart.appendChild(pre);
         await renderFlowChart(chart);
     } catch (err) {

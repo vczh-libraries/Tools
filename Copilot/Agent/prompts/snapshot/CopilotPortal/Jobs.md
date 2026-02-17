@@ -147,4 +147,4 @@ Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.j
 
 ### Session Response Part
 
-Print `JSON.stringify(chartToRender, undefined, 4)` inside a `<pre>` element.
+Print `JSON.stringify(jobToRender and chartToRender, undefined, 4)` inside a `<pre>` element.

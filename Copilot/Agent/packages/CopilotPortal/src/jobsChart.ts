@@ -73,7 +73,7 @@ function buildChart(work: Work<number>, nodeId: number[], nodes: ChartNode[]): [
         }
         case "Seq": {
             const nodePairs = work.works.map(w => buildChart(w, nodeId, nodes));
-            for (let i = 0; i < nodePairs.length - 2; i++) {
+            for (let i = 0; i < nodePairs.length - 1; i++) {
                 const fromNode = nodePairs[i][1];
                 const toNode = nodePairs[i + 1][0];
                 connectNodes(fromNode, toNode);
