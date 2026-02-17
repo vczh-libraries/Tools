@@ -481,9 +481,12 @@ Other response maps to all methods in `ICopilotTaskCallback` in `src/jobsApi.ts`
 List all jobs passed to `installJobsEntry` in this schema:
 ```typescript
 {
-  jobs: ({name: string} & Job)[]
+  grid: GridRow[];
+  jobs: { [key in string]: Job };
 }
 ```
+
+Basically means it only keeps `grid` and `jobs` and drops all other fields.
 
 ### copilot/job/start/{job-name}
 
