@@ -108,7 +108,14 @@ The look-and-feel must be similar to `/index.html`, but DO NOT share any css fil
 
 You can find the `Job` definition in `jobsDef.ts`.
 `Job.work` is a simple control flow AST.
-Render it like a flow chart expanding to fill the whole `job part`.
+Render it like a flow chart expanding to fill the whole `job part`.#### Flow Chart Rendering Note
+
+#### Flow Chart Rendering
+
+**TEST-NOTE-BEGIN**
+No need to create unit test to assert the chart is in a correct layout.
+Ensure every `TaskWork` as a node in the flow chart.
+**TEST-NOTE-END**
 
 ### Session Response Part
 
