@@ -119,6 +119,13 @@ Read `JobsData.md` to find definitions of `Work` and draw a flow chart:
 
 #### Flow Chart Rendering Note
 
+**TEST-NOTE-BEGIN**
+No need to create unit test to assert the chart is in a correct layout.
+Ensure every `TaskWork` as a node in the flow chart.
+**TEST-NOTE-END**
+
+**TASK**: After implementing the rendering, clean this section up leaving only important information. Implementation details could be read from source code so they are not needed, but if there is any critical implementation decision, the decision still stay.
+
 Use **ELK.js** (`elkjs` npm package, loaded via CDN `elk.bundled.js`) for automatic graph layout, combined with **DOM `<div>` nodes** for rendering and **SVG `<path>` edges** for connections.
 
 ##### Why ELK.js + DOM
