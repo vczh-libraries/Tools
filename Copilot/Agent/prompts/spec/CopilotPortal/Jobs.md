@@ -126,12 +126,16 @@ It is already a generated flow chart but has no layout information.
 
 Each `ChartNode` is a node in the flow chart, and each hint maps to a graph:
 - `TaskNode`: A blue rectangle with the task id, the text would be the `TaskWork` with that `workIdInJob`.
-- `CondNode`: A yellow hexagon with the task id, the text would be the `TaskWork` with that `workIdInJob`. In ELK it is rendered as a diamond; in Mermaid as a hexagon `{{}}` for correct arrow attachment.
+- `CondNode`: A yellow hexagon with the task id, the text would be the `TaskWork` with that `workIdInJob`.
 - `ParBegin`, `ParEnd`: A small black rectangle bar.
 - `AltEnd`: A small pink rectangle bar.
 - `CondBegin`: A small yellow rectangle bar.
 - `CondEnd`: A small yellow diamind.
 - `LoopEnd`: A small gray circle.
+
+For `TaskNode` and `CondNode`:
+  - The text would be the `TaskWork` with that `workIdInJob`.
+  - If `modelOverride` is specified, render it like `task (model)`.
 
 Each graph must have a border, and the background color would be lighter, except the black rectangle bar which has the same border and background color.
 
@@ -143,6 +147,8 @@ There will be multiple arrows connecting between nodes:
 Arrows would be gray.
 
 #### Rendering with ELK
+
+**TASK**: Remove everything about ELK from the source code and the spec. I prefer mermaid and will not use elk anymore. Therefore the renderer argument is not needed.
 
 Implementation stores in:
 - `flowChartELK.css`
@@ -167,8 +173,6 @@ Implementation stores in:
 - `flowChartMermaid.js`
 
 No separate CSS file is needed; node styles are embedded as inline Mermaid `style` directives in the generated definition.
-
-Activate this renderer by using URL argument `renderer=mermaid` or not setting `renderer`.
 
 Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flowchart rendering:
 - Initialize Mermaid with `startOnLoad: false` so rendering is controlled programmatically.
