@@ -6,6 +6,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 ## Related Files
 
 - `src/jobsDef.ts`
+- `src/jobsChart.ts`
 - `src/jobsData.ts`
 - `src/jobsApi.ts`
 
@@ -74,6 +75,8 @@ Here are all checks that `validateEntry` needs to do:
   - `TaskWork.taskId` must be in `entry.tasks`.
   - `TaskWork.modelOverride.category` must be in fields of `entry.models`.
   - `TaskWork.modelOverride` must be defined if that task has no specified model.
+- Any `SequencialWork` and `ParallelWork`:
+  - `works` should have at least one element.
 - `entry.jobs[name].requireUserInput`.
   - Find out if a job requires user input by inspecting all `Task` record referenced by any `TaskWork` in this job.
   - If any task `requireUserInput`, then the job `requireUserInput`, otherwise the job does not `requireUserInput`.
