@@ -116,7 +116,6 @@ Read `JobsData.md` to find definitions of `Work` and draw a flow chart:
 - `ParallelWork`: Draw a parallel flow chart, showing these works are executed at the same time.
   - The flow chart begins and ends with a black bar.
   - Between two blac bars tasks are connected parallelly.
-  - **TASK**: Just want to document more details, This is already done.
 - `LoopWork`: Draw a looping flow chart, but each condition should be drawn like a `AltWork`.
   - Draw a circleA indicating the beginning of the loop chart. The "repeat the loop" arrow connects here.
   - If `preCondition` is not defined, circleA connects to the `body`, otherwise:
@@ -137,7 +136,6 @@ Read `JobsData.md` to find definitions of `Work` and draw a flow chart:
   - The arrow to the `falseWork` should labeled `false`.
   - Both `trueWork` and `falseWork` connects to the black bar. If one is not defined, the `true` or `false` arrow connects to the black bar.
   - There is a black bar at the end.
-    - **BUG**: The ending is currently bugged with a 45 degree rotated gray rectangle, `ParallelWork` has the black bar, do the same graph.
 
 #### Flow Chart Rendering Note
 
@@ -152,10 +150,10 @@ Use **ELK.js** (`elkjs` npm package, loaded via CDN `elk.bundled.js`) for automa
 
 - **TaskWork nodes**: Rounded rectangle displaying `taskId`.
 - **Condition/decision nodes** (in `AltWork`, `LoopWork`): Diamond shape.
-- **Fork/join nodes** (`ParallelWork`): Small horizontal bar.
-- **Merge nodes** (`AltWork`): Small diamond.
+- **Circle nodes** (`LoopWork`): Small filled circle.
+- **Fork/join nodes** (`ParallelWork`, `AltWork`): Small horizontal bar.
 - **Pass nodes** (empty `Seq`/`Par`): Indicate immediate success.
-- **Edge labels**: `"true"`/`"false"` for branches; `"enter"`/`"skip"`/`"repeat"`/`"exit"` for loops.
+- **Edge labels**: `"true"`/`"false"` for branches and loop conditions.
 - **Back-edges** (loops): Dashed line style.
 
 ##### Node Click Expand/Collapse

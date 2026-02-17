@@ -75,7 +75,7 @@ At the bottom there are buttons aligned to the right:
 
 #### Clicking Start Job Button
 
-When I hit the "Start Job" button, it jumpts to `/jobTracking.html`.
+When I hit the "Start Job" button, it jumpts to `/jobTracking.html` in a new window.
 The selected job and the working directory should be brought to `/jobTracking.html`.
 
 (to be editing...)
@@ -113,9 +113,29 @@ Render it like a flow chart expanding to fill the whole `job part`.
 Read `JobsData.md` to find definitions of `Work` and draw a flow chart:
 - `TaskWork`: Display the task id.
 - `SequentialWork`: Draw a sequencial flow chart, showing these works are executed one after another.
-- `ParallelWork`: Draw a parallel flow chart, showing these works are executed at the same timne.
+- `ParallelWork`: Draw a parallel flow chart, showing these works are executed at the same time.
+  - The flow chart begins and ends with a black bar.
+  - Between two blac bars tasks are connected parallelly.
 - `LoopWork`: Draw a looping flow chart, but each condition should be drawn like a `AltWork`.
+  - Draw a circleA indicating the beginning of the loop chart. The "repeat the loop" arrow connects here.
+  - If `preCondition` is not defined, circleA connects to the `body`, otherwise:
+    - circleA connects to the `preCondition` work.
+    - The `preCondition` task connects to diamondA.
+    - diamondA connects to `body` labeled the first element of `preCondition`.
+    - diamondA connects to the circleC labeled the boolean opposite of the first element of `preCondition`.
+  - Draw the `body`.
+  - If `postCondition` is not defined, `body` connects to circleB which connects circleA, otherwise:
+    - `body` connects to the `postCondition` work.
+    - The `postCondition` task connects to diamondB.
+    - diamondB connects to circleA labeled the first element of `postCondition`.
+    - diamondB connects to circleC lablbed the boolean opposite of the first element of `postCondition`.
+  - Draw circleC indicating the ending of the loop chart.
+  - circle and diamond mentioned here will be a small graph without text.
 - `AltWork`: Draw a branching flow chart, the condition will be a node as well.
+  - The arrow to the `trueWork` should labeled `true`.
+  - The arrow to the `falseWork` should labeled `false`.
+  - Both `trueWork` and `falseWork` connects to the black bar. If one is not defined, the `true` or `false` arrow connects to the black bar.
+  - There is a black bar at the end.
 
 #### Flow Chart Rendering Note
 
@@ -130,10 +150,10 @@ Use **ELK.js** (`elkjs` npm package, loaded via CDN `elk.bundled.js`) for automa
 
 - **TaskWork nodes**: Rounded rectangle displaying `taskId`.
 - **Condition/decision nodes** (in `AltWork`, `LoopWork`): Diamond shape.
-- **Fork/join nodes** (`ParallelWork`): Small horizontal bar.
-- **Merge nodes** (`AltWork`): Small diamond.
+- **Circle nodes** (`LoopWork`): Small filled circle.
+- **Fork/join nodes** (`ParallelWork`, `AltWork`): Small horizontal bar.
 - **Pass nodes** (empty `Seq`/`Par`): Indicate immediate success.
-- **Edge labels**: `"true"`/`"false"` for branches; `"enter"`/`"skip"`/`"repeat"`/`"exit"` for loops.
+- **Edge labels**: `"true"`/`"false"` for branches and loop conditions.
 - **Back-edges** (loops): Dashed line style.
 
 ##### Node Click Expand/Collapse

@@ -119,16 +119,26 @@ html, body {
 .flow-node.condition-node {
     border: none;
     background: transparent;
-    min-width: 60px;
-    min-height: 60px;
+    min-width: 30px;
+    min-height: 30px;
 }
 
 .flow-node.condition-node .diamond-inner {
-    width: 40px;
-    height: 40px;
+    width: 20px;
+    height: 20px;
     background: #fef3c7;
     border: 2px solid #d97706;
     transform: rotate(45deg);
+}
+
+/* Circle nodes (LoopWork): small filled circle */
+.flow-node.circle-node {
+    border-radius: 50%;
+    background: #555;
+    min-width: 16px;
+    min-height: 16px;
+    padding: 0;
+    border: none;
 }
 
 /* Fork/join nodes: small bar */
@@ -140,22 +150,6 @@ html, body {
     min-height: 8px;
     padding: 0;
     border: none;
-}
-
-/* Merge nodes: small diamond */
-.flow-node.merge-node {
-    border: none;
-    background: transparent;
-    min-width: 30px;
-    min-height: 30px;
-}
-
-.flow-node.merge-node .diamond-inner {
-    width: 20px;
-    height: 20px;
-    background: #d1d5db;
-    border: 2px solid #6b7280;
-    transform: rotate(45deg);
 }
 
 /* Pass node */

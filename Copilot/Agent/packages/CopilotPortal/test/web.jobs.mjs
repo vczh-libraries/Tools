@@ -301,3 +301,130 @@ describe("Web: jobTracking.html layout", () => {
     });
 });
 
+describe("Web: jobTracking.html Alt flow chart", () => {
+    let browser;
+    let page;
+
+    before(async () => {
+        await verifyEntryInstalled();
+        browser = await chromium.launch({ headless: true });
+        page = await browser.newPage();
+        await page.goto(`${BASE}/jobTracking.html?jobId=alt-true-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.waitForTimeout(3000);
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("renders task nodes for AltWork", async () => {
+        const taskNodes = await page.locator(".task-node").count();
+        assert.ok(taskNodes > 0, "should have task nodes in Alt flow chart");
+    });
+
+    it("renders join-node (black bar) at end of AltWork, not merge-node", async () => {
+        const joinNodes = await page.locator(".join-node").count();
+        assert.ok(joinNodes > 0, "should have a join-node (black bar) at end of AltWork");
+        const mergeNodes = await page.locator(".merge-node").count();
+        assert.strictEqual(mergeNodes, 0, "should have no merge-node (diamond) in AltWork");
+    });
+});
+
+describe("Web: jobTracking.html Loop flow chart", () => {
+    let browser;
+    let page;
+
+    before(async () => {
+        await verifyEntryInstalled();
+        browser = await chromium.launch({ headless: true });
+        page = await browser.newPage();
+        await page.goto(`${BASE}/jobTracking.html?jobId=loop-pre-exit-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.waitForTimeout(3000);
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("renders task nodes for LoopWork", async () => {
+        const taskNodes = await page.locator(".task-node").count();
+        assert.ok(taskNodes > 0, "should have task nodes in Loop flow chart");
+    });
+
+    it("renders circle-node elements for LoopWork", async () => {
+        const circleNodes = await page.locator(".circle-node").count();
+        assert.ok(circleNodes >= 2, "should have at least 2 circle nodes (circleA and circleC)");
+    });
+
+    it("renders condition-node (diamond) for LoopWork with preCondition", async () => {
+        const condNodes = await page.locator(".condition-node").count();
+        assert.ok(condNodes > 0, "should have condition-node diamond for preCondition");
+    });
+});
+
+describe("Web: jobTracking.html Par flow chart", () => {
+    let browser;
+    let page;
+
+    before(async () => {
+        await verifyEntryInstalled();
+        browser = await chromium.launch({ headless: true });
+        page = await browser.newPage();
+        await page.goto(`${BASE}/jobTracking.html?jobId=par-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.waitForTimeout(3000);
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("renders task nodes for ParallelWork", async () => {
+        const taskNodes = await page.locator(".task-node").count();
+        assert.ok(taskNodes > 0, "should have task nodes in Par flow chart");
+    });
+
+    it("renders fork-node and join-node (black bars) for ParallelWork", async () => {
+        const forkNodes = await page.locator(".fork-node").count();
+        const joinNodes = await page.locator(".join-node").count();
+        assert.ok(forkNodes > 0, "should have fork-node in Par flow chart");
+        assert.ok(joinNodes > 0, "should have join-node in Par flow chart");
+    });
+});
+
+describe("Web: jobs.html Start Job opens new window", () => {
+    let browser;
+    let page;
+
+    before(async () => {
+        await verifyEntryInstalled();
+        browser = await chromium.launch({ headless: true });
+        const context = await browser.newContext();
+        page = await context.newPage();
+        await page.goto(`${BASE}/jobs.html?wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.waitForTimeout(2000);
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("Start Job button opens jobTracking.html in a new window/tab", async () => {
+        // Select a job
+        const btn = page.locator('.matrix-job-btn[data-job-name="simple-job"]');
+        await btn.click();
+        await page.waitForTimeout(500);
+
+        // Listen for new page (popup/tab)
+        const context = page.context();
+        const [newPage] = await Promise.all([
+            context.waitForEvent("page"),
+            page.locator("#start-job-button").click()
+        ]);
+        await newPage.waitForLoadState("domcontentloaded");
+        const url = new URL(newPage.url());
+        assert.strictEqual(url.pathname, "/jobTracking.html", "should open jobTracking.html");
+        assert.strictEqual(url.searchParams.get("jobId"), "simple-job", "should pass jobId");
+        assert.ok(url.searchParams.has("wb"), "should pass working directory");
+        await newPage.close();
+    });
+});

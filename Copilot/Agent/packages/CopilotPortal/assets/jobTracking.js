@@ -116,122 +116,109 @@ function workToElk(work, nodes, edges) {
             return { entryId: forkId, exitId: joinId };
         }
         case "Loop": {
-            let entryId = null;
-            let bodyResult;
-            let preCondResult = null;
+            // circleA: beginning of the loop
+            const circleAId = genId("circle");
+            nodes.push({ id: circleAId, width: 16, height: 16, labels: [], _type: "circle" });
 
-            // preCondition
+            // circleC: ending of the loop
+            const circleCId = genId("circle");
+            nodes.push({ id: circleCId, width: 16, height: 16, labels: [], _type: "circle" });
+
+            // Pre-condition
+            let bodyEntrySourceId;
+            let bodyEntryLabel = undefined;
             if (work.preCondition) {
                 const [expectedBool, condWork] = work.preCondition;
-                const condId = genId("cond");
-                nodes.push({
-                    id: condId,
-                    width: 60,
-                    height: 60,
-                    labels: [{ text: "?" }],
-                    _type: "condition",
-                    _condWork: condWork,
-                });
-                // Render the condition's sub-work
+                // circleA -> preCondition work
                 const condSub = workToElk(condWork, nodes, edges);
-                edges.push({ id: genId("edge"), sources: [condId], targets: [condSub.entryId] });
-                // Use condSub.exitId -> condId feedback for the decision
-                // Actually the condition node IS the decision point
-                // Let me simplify: the condition work is evaluated, its exit leads to the decision
-                // Re-approach: condition work is the evaluation, its exit is the decision
-                // For ELK, represent pre-condition as: condSub -> decision diamond
-                // Actually, let me use the condSub directly as the entry
-                preCondResult = condSub;
-                entryId = condSub.entryId;
+                edges.push({ id: genId("edge"), sources: [circleAId], targets: [condSub.entryId] });
 
-                const skipId = genId("skip");
-                nodes.push({
-                    id: skipId, width: 1, height: 1, labels: [],
-                    _type: "invisible",
-                });
+                // preCondition work -> diamondA
+                const diamondAId = genId("diamond");
+                nodes.push({ id: diamondAId, width: 30, height: 30, labels: [], _type: "condition" });
+                edges.push({ id: genId("edge"), sources: [condSub.exitId], targets: [diamondAId] });
 
-                const enterLabel = expectedBool ? "enter" : "skip";
-                const skipLabel = expectedBool ? "skip" : "enter";
-
-                // Body
-                bodyResult = workToElk(work.body, nodes, edges);
+                // diamondA -> circleC (labeled boolean opposite)
                 edges.push({
                     id: genId("edge"),
-                    sources: [condSub.exitId],
-                    targets: [bodyResult.entryId],
-                    labels: [{ text: enterLabel }],
-                });
-                edges.push({
-                    id: genId("edge"),
-                    sources: [condSub.exitId],
-                    targets: [skipId],
-                    labels: [{ text: skipLabel }],
+                    sources: [diamondAId],
+                    targets: [circleCId],
+                    labels: [{ text: String(!expectedBool) }],
                 });
 
-                // postCondition
-                if (work.postCondition) {
-                    const [postExpBool, postCondWork] = work.postCondition;
-                    const postSub = workToElk(postCondWork, nodes, edges);
-                    edges.push({
-                        id: genId("edge"),
-                        sources: [bodyResult.exitId],
-                        targets: [postSub.entryId],
-                    });
-                    edges.push({
-                        id: genId("edge"),
-                        sources: [postSub.exitId],
-                        targets: [entryId],
-                        labels: [{ text: postExpBool ? "repeat" : "exit" }],
-                        _backEdge: true,
-                    });
-                    edges.push({
-                        id: genId("edge"),
-                        sources: [postSub.exitId],
-                        targets: [skipId],
-                        labels: [{ text: postExpBool ? "exit" : "repeat" }],
-                    });
-                    return { entryId, exitId: skipId };
-                }
-
-                return { entryId, exitId: skipId };
+                bodyEntrySourceId = diamondAId;
+                bodyEntryLabel = String(expectedBool);
             } else {
-                // No preCondition
-                bodyResult = workToElk(work.body, nodes, edges);
-                entryId = bodyResult.entryId;
-
-                if (work.postCondition) {
-                    const [postExpBool, postCondWork] = work.postCondition;
-                    const postSub = workToElk(postCondWork, nodes, edges);
-                    edges.push({
-                        id: genId("edge"),
-                        sources: [bodyResult.exitId],
-                        targets: [postSub.entryId],
-                    });
-
-                    edges.push({
-                        id: genId("edge"),
-                        sources: [postSub.exitId],
-                        targets: [entryId],
-                        labels: [{ text: postExpBool ? "repeat" : "exit" }],
-                        _backEdge: true,
-                    });
-                    return { entryId, exitId: postSub.exitId };
-                }
-
-                return { entryId: bodyResult.entryId, exitId: bodyResult.exitId };
+                bodyEntrySourceId = circleAId;
             }
+
+            // Body
+            const bodyResult = workToElk(work.body, nodes, edges);
+            const bodyEdge = {
+                id: genId("edge"),
+                sources: [bodyEntrySourceId],
+                targets: [bodyResult.entryId],
+            };
+            if (bodyEntryLabel !== undefined) {
+                bodyEdge.labels = [{ text: bodyEntryLabel }];
+            }
+            edges.push(bodyEdge);
+
+            // Post-condition
+            if (work.postCondition) {
+                const [postExpBool, postCondWork] = work.postCondition;
+                // body -> postCondition work
+                const postSub = workToElk(postCondWork, nodes, edges);
+                edges.push({ id: genId("edge"), sources: [bodyResult.exitId], targets: [postSub.entryId] });
+
+                // postCondition work -> diamondB
+                const diamondBId = genId("diamond");
+                nodes.push({ id: diamondBId, width: 30, height: 30, labels: [], _type: "condition" });
+                edges.push({ id: genId("edge"), sources: [postSub.exitId], targets: [diamondBId] });
+
+                // diamondB -> circleA (labeled postExpBool, back-edge)
+                edges.push({
+                    id: genId("edge"),
+                    sources: [diamondBId],
+                    targets: [circleAId],
+                    labels: [{ text: String(postExpBool) }],
+                    _backEdge: true,
+                });
+
+                // diamondB -> circleC (labeled boolean opposite)
+                edges.push({
+                    id: genId("edge"),
+                    sources: [diamondBId],
+                    targets: [circleCId],
+                    labels: [{ text: String(!postExpBool) }],
+                });
+            } else {
+                // body -> circleB -> circleA (back-edge)
+                const circleBId = genId("circle");
+                nodes.push({ id: circleBId, width: 16, height: 16, labels: [], _type: "circle" });
+                edges.push({ id: genId("edge"), sources: [bodyResult.exitId], targets: [circleBId] });
+                edges.push({
+                    id: genId("edge"),
+                    sources: [circleBId],
+                    targets: [circleAId],
+                    _backEdge: true,
+                });
+            }
+
+            return { entryId: circleAId, exitId: circleCId };
         }
         case "Alt": {
-            // Condition as decision diamond
+            // Condition as decision node
             const condSub = workToElk(work.condition, nodes, edges);
 
-            const mergeId = genId("merge");
+            // Black bar at the end (same as ParallelWork fork/join)
+            const mergeId = genId("join");
             nodes.push({
                 id: mergeId,
-                width: 20,
-                height: 20,
+                width: 40,
+                height: 8,
                 labels: [],
-                _type: "merge",
+                _type: "join",
             });
 
             if (work.trueWork) {
@@ -357,17 +344,14 @@ function drawLayout(layout, nodesMeta, edgesMeta) {
                 diamondInner.className = "diamond-inner";
                 div.appendChild(diamondInner);
                 break;
+            case "circle":
+                div.classList.add("circle-node");
+                break;
             case "fork":
                 div.classList.add("fork-node");
                 break;
             case "join":
                 div.classList.add("join-node");
-                break;
-            case "merge":
-                div.classList.add("merge-node");
-                const mergeInner = document.createElement("div");
-                mergeInner.className = "diamond-inner";
-                div.appendChild(mergeInner);
                 break;
             case "pass":
                 div.classList.add("pass-node");
