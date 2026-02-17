@@ -220,6 +220,54 @@ function makeDocumentWork(jobName: string): Work<never> {
     };
 }
 
+function testGraph_Loop(): Work<never> {
+    return {
+        kind: "Par",
+        works: [
+            {
+                kind: "Loop",
+                preCondition: [false, makeRefWork("ask-task")],
+                body: makeRefWork(`review-apply-task`)
+            },
+            {
+                kind: "Loop",
+                postCondition: [false, makeRefWork("code-task")],
+                body: makeRefWork(`review-apply-task`)
+            },
+            {
+                kind: "Loop",
+                preCondition: [true, makeRefWork("ask-task")],
+                postCondition: [true, makeRefWork("code-task")],
+                body: makeRefWork(`review-apply-task`)
+            }
+        ]
+    }
+}
+
+function testGraph_Alt(): Work<never> {
+    return {
+        kind: "Par",
+        works: [
+            {
+                kind: "Alt",
+                condition: makeRefWork("review-final-task"),
+                trueWork: makeRefWork(`ask-task`),
+                falseWork: makeRefWork(`code-task`)
+            },
+            {
+                kind: "Alt",
+                condition: makeRefWork("review-final-task"),
+                trueWork: makeRefWork(`ask-task`)
+            },
+            {
+                kind: "Alt",
+                condition: makeRefWork("review-final-task"),
+                falseWork: makeRefWork(`code-task`)
+            }
+        ]
+    }
+}
+
 const entryInput: Entry = {
     models: {
         driving: "gpt-5-mini",
@@ -323,6 +371,13 @@ const entryInput: Entry = {
         ]
     },
     grid: [{
+        keyword: "test",
+        automate: false,
+        jobs: [
+            { name: "loops", jobName: "test-loops" },
+            { name: "alts", jobName: "test-alts" }
+        ]
+    }, {
         keyword: "scrum",
         automate: false,
         jobs: [
@@ -632,6 +687,8 @@ const entryInput: Entry = {
         }
     },
     jobs: {
+        "test-loops": { work: testGraph_Loop() },
+        "test-alts": { work: testGraph_Alt() },
         "scrum-problem": { work: makeDocumentWork("scrum-problem") },
         "scrum-update": { work: makeDocumentWork("scrum-update") },
         "design-problem-next": { work: makeDocumentWork("design-problem-next") },
