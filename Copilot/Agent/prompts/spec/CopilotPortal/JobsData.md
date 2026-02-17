@@ -73,6 +73,16 @@ Here are all checks that `validateEntry` needs to do:
   - `TaskWork.taskId` must be in `entry.tasks`.
   - `TaskWork.modelOverride.category` must be in fields of `entry.models`.
   - `TaskWork.modelOverride` must be defined if that task has no specified model.
+- `entry.jobs[name].requireUserInput`.
+  - Find out if a job requires user input by inspecting all `Task` record referenced by any `TaskWork` in this job.
+  - If any task `requireUserInput`, then the job `requireUserInput`, otherwise the job does not `requireUserInput`.
+  - If `Job.requireUserInput` is defined, it should reflect the correct value.
+  - If `requireUserInput` is undefined, fill it.
+  - After `validateEntry` finishes, all `Job.requireUserInput` should be filled.
+- `entry.jobs[name].work`:
+  - Simplies the `work` tree:
+    - Expand nested `SequencialWork`, that a `SequencialWork` directly in another `SequencialWork` should be flattened. They could be multiple level.
+    - Expand nested `ParallelWork`, that a `ParallelWork` directly in another `ParallelWork` should be flattened. They could be multiple level.
 
 If any validation runs directly in this function fails:
 - The error code path will be `codePath` appended by the javascript expression without any variable.

@@ -54,8 +54,13 @@ The table is also rendered with light color lines.
 Font size should be large enough to reduce blanks, prepare to fill about 1000x1000 or a even larger space. The complete content can be read in `jobsData.ts`, it helps to guess a font size as it will but rarely changes.
 
 Besides automate buttons, other buttons renders as buttons but it works like radio buttons:
-- Clicking a job button renders an exclusive selected state and its `jobName` (not the `name` in the button text) becomes `selectedJobName`. The "Start Job" button is enabled.
-- Clicking a selected job button unselect it, the "Start Job" button is disabled.
+- Clicking a job button renders an exclusive selected state.
+  - Its `jobName` (not the `name` in the button text) becomes `selectedJobName`.
+  - The "Start Job" button is enabled.
+  - Only when `requireUserInput` is true, the text box is enabled
+- Clicking a selected job button unselect it
+  - The "Start Job" button is disabled.
+  - The text box is disabled.
 
 #### Actions of Automate Button
 
@@ -63,7 +68,9 @@ Besides automate buttons, other buttons renders as buttons but it works like rad
 
 ### User Input Part
 
-There is a text box fills the page, and at the bottom there are buttons aligned to the right:
+There is a text box fills the page. Disabled by default.
+
+At the bottom there are buttons aligned to the right:
 - "Start Job: ${selectedJobName}" or "Job Not Selected". Disabled by default.
 
 #### Clicking Start Job Button
@@ -99,7 +106,16 @@ The look-and-feel must be similar to `/index.html`, but DO NOT share any css fil
 
 ### Job Part
 
-(to be editing...)
+You can find the `Job` definition in `jobsData.ts`.
+`Job.work` is a simple control flow AST.
+Render it like a flow chart expanding to fill the whole `job part`.
+
+Read `JobsData.md` to find definitions of `Work` and draw a flow chart:
+- `TaskWork`: Display the task id.
+- `SequentialWork`: Draw a sequencial flow chart, showing these works are executed one after another.
+- `ParallelWork`: Draw a parallel flow chart, showing these works are executed at the same timne.
+- `LoopWork`: Draw a looping flow chart, but each condition should be drawn like a `AltWork`.
+- `AltWork`: Draw a branching flow chart, the condition will be a node as well.
 
 ### Session Response Part
 

@@ -108,6 +108,7 @@ export function assignWorkId(work: Work<never>): Work<number> {
 }
 
 export interface Job {
+    requireUserInput?: boolean;
     work: Work<number>;
 }
 
