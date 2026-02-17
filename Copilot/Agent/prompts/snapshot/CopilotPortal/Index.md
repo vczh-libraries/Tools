@@ -22,6 +22,9 @@ Put index.html specific javascript file in index.js.
 
 #### Starting an Copilot Session
 
+**Referenced by**:
+- Jobs.md: `### jobs.html`
+
 When the webpage is loaded, it renders a UI in the middle to let me input:
 - Model. A combo box with contents retrieved from `api/copilot/models`.
   - Items must be sorted.
@@ -44,6 +47,9 @@ Send `api/copilot/session/start/{model-id}` to get the session id.
 Only after the model list is loaded, "Start" is enabled.
 
 ##### Jobs Button
+
+**Referenced by**:
+- Jobs.md: `### jobs.html`
 
 When I hit the "Jobs" button, it jumpts to `/jobs.html`.
 The selected model is ignored, but the working directory should be brought to `/jobs.html`.
@@ -80,6 +86,9 @@ When not to run a task, any user request should call `sessionRenderer.addUserMes
 Call `sessionRenderer.setAwaiting(true)` when waiting for responses, and `sessionRenderer.setAwaiting(false)` when done (sync with "Send" button's enability).
 
 #### Request Part
+
+**Referenced by**:
+- Jobs.md: `### Matrix Part`
 
 At the very top there is a label "Choose a Task: " followed by a combo box in a proper weight, listing all tasks.
 Keep the visual looks similar and good margin between controls.

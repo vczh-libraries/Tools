@@ -17,6 +17,9 @@ Put messageBlock.js specific css file in messageBlock.css.
 
 ### messageBlock.js
 
+**Referenced by**:
+- Shared.md: `### sessionResponse.js`
+
 It exposes some APIs in this schema
 
 ```typescript
@@ -61,6 +64,9 @@ And it should also put itself in the element (e.g. in a field with a unique name
 Put sessionResponse.js specific css file in sessionResponse.css.
 
 ### sessionResponse.js
+
+**Referenced by**:
+- Index.md: `#### Session Part`, `#### Session Interaction`, `#### Request Part`
 
 It exposes a `SessionResponseRenderer` class in this schema:
 

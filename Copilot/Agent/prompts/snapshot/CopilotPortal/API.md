@@ -16,6 +16,9 @@ It's spec is in `JobsData.md`.
 
 ## Starting the HTTP Server
 
+**Referenced by**:
+- API.md: `### copilot/test/installJobsEntry`
+
 - This package starts an http server, serving a website as well as a set of RESTful API.
 - In src/index.ts it accepts command line options like this:
   - `--port 8888`: Specify the http server port. `8888` by default.
@@ -39,30 +42,48 @@ All helper functions and types are exported and API implementations should use t
 
 ### helperGetModels
 
+**Referenced by**:
+- API.md: `### copilot/models`
+
 `async helperGetModels(): Promise<ModelInfo[]>;`
 - List all models.
 
 ### helperSessionStart
+
+**Referenced by**:
+- API.md: `### copilot/session/start/{model-id}`
 
 `async helperSessionStart(modelId: string, workingDirectory?: string): Promise<[ICopilotSession, string]>;`
 - Start a session, return the session object and its id.
 
 ### helperSessionStop
 
+**Referenced by**:
+- API.md: `### copilot/session/{session-id}/stop`, `### stop`
+
 `async helperSessionStop(session: ICopilotSession): Promise<void>;`
 - Stop a session.
 
 ### helperGetSession
+
+**Referenced by**:
+- API.md: `### copilot/session/{session-id}/stop`, `### copilot/session/{session-id}/query`, `### copilot/session/{session-id}/live`
 
 `helperGetSession(sessionId: string): ICopilotSession | undefined;`
 - Get a session by its id.
 
 ### helperPushSessionResponse
 
+**Referenced by**:
+- API.md: `### copilot/session/{session-id}/live`, `### sendPromptWithCrashRetry`
+
 `helperPushSessionResponse(session: ICopilotSession, response: LiveResponse): void;`
 - Push a response to a session's response queue.
 
 ### hasRunningSessions
+
+**Referenced by**:
+- API.md: `### stop`
 
 `hasRunningSessions(): boolean;`
 - Returns true if any sessions are currently running.
@@ -73,6 +94,9 @@ Wraps `@github/copilot-sdk` to provide a simplified session interface with event
 
 ### ICopilotSession
 
+**Referenced by**:
+- API.md: `### helperSessionStart`, `### helperSessionStop`, `### helperGetSession`, `### helperPushSessionResponse`, `### startSession`, `### sendPromptWithCrashRetry`
+
 ```typescript
 interface ICopilotSession {
   get rawSection(): CopilotSession;
@@ -82,6 +106,11 @@ interface ICopilotSession {
 - Interface for interacting with a Copilot session.
 
 ### ICopilotSessionCallbacks
+
+**Referenced by**:
+- API.md: `### copilot/session/{session-id}/live`, `### startSession`
+- Index.md: `#### Session Interaction`, `#### Request Part`
+- Shared.md: `#### Session Response Rendering`
 
 ```typescript
 interface ICopilotSessionCallbacks {
@@ -103,6 +132,9 @@ interface ICopilotSessionCallbacks {
 
 ### startSession
 
+**Referenced by**:
+- API.md: `### copilot/session/start/{model-id}`
+
 `async startSession(client: CopilotClient, modelId: string, callback: ICopilotSessionCallbacks, workingDirectory?: string): Promise<ICopilotSession>;`
 - Create a session with the given model, register job tools, wire up all event handlers, and return an `ICopilotSession`.
 
@@ -112,10 +144,18 @@ All helper functions and types are exported and API implementations should use t
 
 ### SESSION_CRASH_PREFIX
 
+**Referenced by**:
+- API.md: `### sendPromptWithCrashRetry`
+- JobsData.md: `## Running Tasks`
+
 `export const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";`
 - Prefix added to prompts when resending after a session crash.
 
 ### sendPromptWithCrashRetry
+
+**Referenced by**:
+- API.md: `### copilot/test/installJobsEntry`, `### copilot/task/start/{task-name}/session/{session-id}`, `### copilot/task/{task-id}/stop`, `### copilot/task/{task-id}/live`, `### copilot/job/start/{job-name}`, `### copilot/job/{job-id}/stop`, `### copilot/job/{job-id}/live`
+- JobsData.md: `## Running Tasks`, `## Running Jobs`, `### Task.availability`, `### Task.criteria`
 
 A shared function used by both task execution and condition evaluation.
 Sends a prompt to a session, retrying up to 3 consecutive crashes.
@@ -196,6 +236,9 @@ Copilot hosting is implemented by `@github/copilot-sdk` and `src/copilotSession.
 
 ### config
 
+**Referenced by**:
+- Index.md: `#### Starting an Copilot Session`
+
 Returns the repo root path (detected by walking up from the server's directory until a `.git` folder is found).
 
 ```typescript
@@ -206,14 +249,24 @@ Returns the repo root path (detected by walking up from the server's directory u
 
 ### test
 
+**Referenced by**:
+- Test.md: `### test.html`
+
 Returns `{"message":"Hello, world!"}`
 
 ### stop
+
+**Referenced by**:
+- Index.md: `#### Request Part`
+- Jobs.md: `### Matrix Part`
 
 Stop any running sessions.
 Returns `{}` and stops.
 
 ### copilot/models
+
+**Referenced by**:
+- Index.md: `#### Starting an Copilot Session`
 
 Returns all copilot sdk supported models in this schema
 
@@ -228,6 +281,9 @@ Returns all copilot sdk supported models in this schema
 ```
 
 ### copilot/session/start/{model-id}
+
+**Referenced by**:
+- Index.md: `##### Start Button`
 
 The body will be an absolute path for working directory
 
@@ -251,6 +307,9 @@ Multiple sessions could be running parallelly, start a `CopilotClient` if it is 
 
 ### copilot/session/{session-id}/stop
 
+**Referenced by**:
+- Index.md: `#### Request Part`
+
 Stop the session and return in this schema
 
 ```typescript
@@ -260,6 +319,9 @@ Stop the session and return in this schema
 If all session is closed, close the `CopilotClient` as well.
 
 ### copilot/session/{session-id}/query
+
+**Referenced by**:
+- Index.md: `#### Request Part`
 
 The body will be the query prompt string.
 
@@ -274,6 +336,11 @@ Returns in this schema
 ```
 
 ### copilot/session/{session-id}/live
+
+**Referenced by**:
+- Index.md: `#### Session Interaction`
+- Shared.md: `#### Session Response Rendering`
+- API.md: `### copilot/task/{task-id}/live`, `### copilot/job/{job-id}/live`
 
 This is a query to wait for one response back for this session.
 Each session generates many responses, storing in a queue.
@@ -368,6 +435,9 @@ Return "Rejected" when `installJobsEntry` throws.
 
 ### copilot/task
 
+**Referenced by**:
+- Index.md: `#### Request Part`
+
 List all tasks passed to `installJobsEntry` in this schema:
 ```typescript
 {
@@ -379,6 +449,9 @@ List all tasks passed to `installJobsEntry` in this schema:
 ```
 
 ### copilot/task/start/{task-name}/session/{session-id}
+
+**Referenced by**:
+- Index.md: `#### Request Part`
 
 **TEST-NOTE-BEGIN**
 Besides of testing API failures, it is important to make sure task running works.
@@ -478,6 +551,9 @@ Other response maps to all methods in `ICopilotTaskCallback` in `src/jobsApi.ts`
 
 ### copilot/job
 
+**Referenced by**:
+- Jobs.md: `### jobs.html`, `### Matrix Part`
+
 List all jobs passed to `installJobsEntry` in this schema:
 ```typescript
 {
@@ -489,6 +565,9 @@ List all jobs passed to `installJobsEntry` in this schema:
 Basically means it only keeps `grid` and `jobs` and drops all other fields.
 
 ### copilot/job/start/{job-name}
+
+**Referenced by**:
+- Jobs.md: `#### Clicking Start Job Button`
 
 **TEST-NOTE-BEGIN**
 Besides of testing API failures, it is important to make sure job running works.
@@ -524,6 +603,9 @@ or when error happens:
 
 ### copilot/job/{job-id}/stop
 
+**Referenced by**:
+- Jobs.md: `### Job Part`
+
 A job will automatically stops when finishes,
 this api forced the job to stop.
 
@@ -544,6 +626,9 @@ or when error happens:
 ```
 
 ### copilot/job/{job-id}/live
+
+**Referenced by**:
+- Jobs.md: `### Job Part`, `### Session Response Part`
 
 It works likes `copilot/session/{session-id}/live` but it reacts to `ICopilotJobCallback`.
 They should be implemented in the same way, but only response in schemas mentioned below.

@@ -12,6 +12,9 @@ Read `README.md` to understand the whole picture of the project as well as speci
 
 ### expandPromptStatic
 
+**Referenced by**:
+- JobsData.md: `### expandPromptDynamic`, `### validateEntry`
+
 A function convert from `Prompt` to `Prompt` with only one string.
 `Prompt` is a string array, the function should join them with LF character.
 In each string there might be variables.
@@ -28,12 +31,18 @@ Report an error if `prompt` is empty.
 
 ### expandPromptDynamic
 
+**Referenced by**:
+- JobsData.md: `## Running Tasks`
+
 It works like `expandPromptStatic`, but assert `prompt` has exactly one item.
 Look up all `runtimeVariables` in `values` argument.
 Be aware of that, not all variable has an value assigned.
 When it fails to look up the value, report an error.
 
 ### validateEntry
+
+**Referenced by**:
+- API.md: `### copilot/test/installJobsEntry`, `### sendPromptWithCrashRetry`
 
 Perform all verifications, verify and update all prompts with `expandPromptStatic`:
 - entry.tasks[name].prompt
@@ -73,6 +82,10 @@ If any validation runs directly in this function fails:
 
 ## Running Tasks
 
+**Referenced by**:
+- API.md: `### sendPromptWithCrashRetry`
+- JobsData.md: `### TaskWork`
+
 A task is represented by type `Task`.
 
 If any session crashes after the task submitting a promot to the session:
@@ -99,6 +112,9 @@ because runtime variables could change.
 
 ### Tools and Runtime Variables
 
+**Referenced by**:
+- JobsData.md: `### expandPromptDynamic`, `### Task.availability`, `### Task.criteria`, `### validateEntry`
+
 `$user-input` will be passed from the user directly.
 
 The following tools could be called in the driving or task session.
@@ -112,11 +128,18 @@ The following tools could be called in the driving or task session.
 
 ### Determine the Model Option
 
+**Referenced by**:
+- JobsData.md: `### TaskWork`
+
 Single model option will be enabled when one of the following conditions satisfies:
 - `Task.criteria.runConditionInSameSession` is undefined or it is true.
 - Single model option is explicitly required.
 
 ### Task.availability
+
+**Referenced by**:
+- JobsData.md: `### TaskWork`, `### validateEntry`
+- API.md: `### copilot/task/start/{task-name}/session/{session-id}`
 
 If `Task.availability` is not defined,
 there will be no prerequisite checking,
@@ -133,6 +156,10 @@ otherwise the `job_prerequisite_failed` tool will be called in the driving sessi
 indicating the task fails.
 
 ### Task.criteria
+
+**Referenced by**:
+- JobsData.md: `### TaskWork`, `### validateEntry`
+- API.md: `### copilot/task/start/{task-name}/session/{session-id}`
 
 If `Task.criteria` is not defined,
 there will be no criteria checking,
@@ -155,9 +182,16 @@ the driving session should react to `runConditionInSameSession` when task execut
 
 ## Running Jobs
 
+**Referenced by**:
+- API.md: `### sendPromptWithCrashRetry`
+
 A `Job` is workflow of multiple `Task`. If its work fails, the job fails.
 
 ### Work
+
+**Referenced by**:
+- JobsData.md: `### TaskWork`, `### Determine TaskWork.workId`
+- API.md: `### copilot/job/start/{job-name}`
 
 - `TaskWork`: run the task, if `modelOverride` is defined that model is used.
   - If `category` is defined, the model id is `entry.models[category]`.
@@ -195,6 +229,9 @@ More details for api and additional test notes could be found in `API.md`.
 
 ### TaskWork
 
+**Referenced by**:
+- JobsData.md: `### Determine TaskWork.workId`
+
 When a task is executed by a `TaskWork`, it is in double session model.
 The job has to start all sessions.
 `TaskWork` fails if the last retry:
@@ -203,11 +240,17 @@ The job has to start all sessions.
 
 ### Determine TaskWork.workId
 
+**Referenced by**:
+- API.md: `### copilot/job`
+
 Any `TaskWork` must have an unique `workIdInJob` in a Job.
 The `assignWorkId` function converts a `Work<never>` to `Work<number>` with property `workIdInJob` assigned.
 When creating a `Work` AST, you can create one in `Work<never>` without worrying about `workIdInJob`, and call `assignWorkId` to fix that for you.
 
 ### Exception Handling
+
+**Referenced by**:
+- API.md: `### sendPromptWithCrashRetry`
 
 If any task crashes:
 - The job stops immediately and marked failed.

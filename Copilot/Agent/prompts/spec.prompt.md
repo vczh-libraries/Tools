@@ -39,6 +39,21 @@ You might find some lines begins with `**TASK**:` in the spec, or `**TASK-BEGIN*
 It means you need to complete the task described in the surrounding context.
 Delete the task from the spec after you complete it, keep `prompts/snapshot` and `prompts/spec` sync.
 
+### Maintaining "Referenced By"
+
+Right below each title of sections in all spec files,
+there will be a "referenced by" list showing that,
+changing the content in this section could affect how many other places.
+
+### Interface Changes
+
+It is very often that you need to change the interface because of the spec changes, but they are not mentioned.
+You need to update the spec with your interface changes too.
+
+**IMPORTANT**:
+- The list coule be incomplete, it is just a hint.
+- You should maintain this list automatically.
+
 ## Testing with a Free Model
 
 There are some models whose multiplier is 0.
