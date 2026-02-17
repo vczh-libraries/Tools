@@ -207,6 +207,7 @@ async function loadJobData() {
             return;
         }
 
+        sessionResponsePart.textContent = JSON.stringify(chart, undefined, 4);
         await renderFlowChart(chart);
     } catch (err) {
         console.error("Failed to load job data:", err);

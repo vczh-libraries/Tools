@@ -289,6 +289,14 @@ describe("Web: jobTracking.html layout", () => {
         const visible = await page.locator("#job-part").isVisible();
         assert.ok(visible, "job part should be visible");
     });
+
+    it("session-response-part shows chart JSON", async () => {
+        const text = await page.locator("#session-response-part").textContent();
+        const parsed = JSON.parse(text);
+        assert.ok(parsed.nodes, "chart JSON should have nodes");
+        assert.ok(Array.isArray(parsed.nodes), "nodes should be an array");
+        assert.ok(parsed.nodes.length > 0, "nodes should not be empty");
+    });
 });
 
 describe("Web: jobs.html Start Job opens new window", () => {
