@@ -293,9 +293,10 @@ describe("Web: jobTracking.html layout", () => {
     it("session-response-part shows chart JSON", async () => {
         const text = await page.locator("#session-response-part").textContent();
         const parsed = JSON.parse(text);
-        assert.ok(parsed.nodes, "chart JSON should have nodes");
-        assert.ok(Array.isArray(parsed.nodes), "nodes should be an array");
-        assert.ok(parsed.nodes.length > 0, "nodes should not be empty");
+        assert.ok(parsed.job, "should have job definition");
+        assert.ok(parsed.chart, "should have chart data");
+        assert.ok(Array.isArray(parsed.chart.nodes), "chart nodes should be an array");
+        assert.ok(parsed.chart.nodes.length > 0, "chart nodes should not be empty");
     });
 });
 

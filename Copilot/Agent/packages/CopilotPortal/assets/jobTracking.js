@@ -253,6 +253,11 @@ async function renderFlowChart(chart) {
                 if (arrow.label) {
                     edge.labels = [{ text: arrow.label, width: arrow.label.length * 7 + 4, height: 14 }];
                 }
+                if (arrow.loopBack) {
+                    edge.layoutOptions = {
+                        "elk.layered.priority.direction": "0",
+                    };
+                }
                 elkEdges.push(edge);
             }
         }
@@ -267,6 +272,8 @@ async function renderFlowChart(chart) {
             "elk.layered.spacing.nodeNodeBetweenLayers": "40",
             "elk.edgeRouting": "ORTHOGONAL",
             "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+            "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
+            "elk.layered.crossingMinimization.forceNodeModelOrder": "true",
         },
         children: elkNodes,
         edges: elkEdges,
