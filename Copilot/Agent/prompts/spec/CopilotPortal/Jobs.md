@@ -9,6 +9,9 @@ Read `README.md` to understand the whole picture of the project as well as speci
   - `jobs.css`
   - `jobs.js`
   - `jobs.html`
+  - `jobTracking.css`
+  - `jobTracking.js`
+  - `jobTracking.html`
 
 ### jobs.css
 
@@ -22,20 +25,17 @@ Put jobs.html specific javascript file in jobs.js.
 
 This page should only be opened by `/index.html`'s "Jobs" button in order to obtain the working directory.
 If it is directly loaded, it should redirect itself to `/index.html`.
+To tell this, find the `wb` argument in the url passing from `/index.html`.
 
 Call `api/copilot/job` to obtain jobs definition.
 - `grid` defines the `matrix part` of the UI.
 - `jobs` offers details for each job in order to render the tracking UI.
 
 The webpage is splitted to two part:
-- The left part is `matrix part` or `job part`.
-  - Only one renders.
-- The right part is `user input part` or `session response part`.
-  - Only one renders.
+- The left part is `matrix part`.
+- The right part is `user input part`.
 - The left and right part should always fill the whole webpage.
 - Between two parts there is a bar to drag vertically to adjust the width of the right part which defaults to 800.
-
-At the beginning, `matrix part` and `user input part` renders.
 
 The look-and-feel must be similar to `/index.html`, but DO NOT share any css file.
 
@@ -68,7 +68,34 @@ There is a text box fills the page, and at the bottom there are buttons aligned 
 
 #### Clicking Start Job Button
 
+When I hit the "Start Job" button, it jumpts to `/jobTracking.html`.
+The selected job should be brought to `/jobs.html`.
+
 (to be editing...)
+
+### jobTracking.css
+
+Put jobTracking.html specific css file in jobTracking.css.
+
+### jobTracking.js
+
+Put jobTracking.html specific javascript file in jobTracking.js.
+
+### jobTracking.html
+
+This page should only be opened by `/jobs.html`'s "Jobs" button in order to obtain the working directory.
+If it is directly loaded, it should redirect itself to `/index.html`.
+To tell this, find the `jobId` argument in the url passing from `/jobs.html`.
+
+Call `api/copilot/job` to obtain the specified job's definition.
+
+The webpage is splitted to two part:
+- The left part is `job part`.
+- The right part is `session response part`.
+- The left and right part should always fill the whole webpage.
+- Between two parts there is a bar to drag vertically to adjust the width of the right part which defaults to 800.
+
+The look-and-feel must be similar to `/index.html`, but DO NOT share any css file.
 
 ### Job Part
 

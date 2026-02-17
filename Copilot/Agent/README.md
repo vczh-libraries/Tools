@@ -78,7 +78,7 @@ File organization in these two folders are identical:
   - `JobsData.md`: Definitions of jobs data.
   - `API.md`: RESTful API, and how to start the project.
   - `Index.md`: index.html page.
-  - `Jobs.md`: jobs.html page.
+  - `Jobs.md`: jobs.html and jobTracking.html pages.
   - `Test.md`: test.html page.
   - `Shared.md`: Shared components between multiple web pages.
 
