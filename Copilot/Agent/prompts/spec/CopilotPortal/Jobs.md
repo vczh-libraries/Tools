@@ -148,6 +148,8 @@ Implementation stores in:
 - `flowChartELK.css`
 - `flowChartELK.js`
 
+Activate this renderer by using URL argument `renderer=elk` or not setting `renderer`.
+
 Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.js`) for automatic graph layout:
 - Build an ELK graph with `children` (nodes) and `edges` from the `ChartGraph`.
 - Use `elk.algorithm: "layered"` with `elk.direction: "DOWN"` for top-to-bottom flow.
@@ -157,6 +159,21 @@ Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.j
 - Use `elk.layered.nodePlacement.strategy: "LINEAR_SEGMENTS"` for better node centering.
 - Each `ChartNode` becomes an ELK node; each `ChartArrow` becomes an ELK edge.
 - After `elk.layout(graph)`, render the positioned nodes and routed edges into an SVG.
+
+#### Rendering with Mermaid
+
+Implementation stores in:
+- `flowChartMermaid.css`
+- `flowChartMermaid.js`
+
+Activate this renderer by using URL argument `renderer=mermaid` or not setting `renderer`.
+
+**TASK**: After implementing it, write brief information about how mermaid is used here like ELK above.
+**TASK**: If `flowChartMermaid.css` and `flowChartELK.css` could just share, then use `flowChart.css` for both renderer.
+
+#### Interaction with `ChartNode` which has a `TaskNode` hint
+
+Clicking it bold (exclusive) or unbold the text.
 
 ### Session Response Part
 
