@@ -61,25 +61,23 @@ function testGraph_Loop(): Work<never> {
 
 function testGraph_Loop2(): Work<never> {
     return {
-        kind: "Seq",
-        works: [
-            {
-                kind: "Loop",
-                preCondition: [false, makeRefWork("ask-task")],
-                body: makeRefWork(`review-apply-task`)
-            },
-            {
-                kind: "Loop",
-                postCondition: [false, makeRefWork("code-task")],
-                body: makeRefWork(`review-apply-task`)
-            },
-            {
-                kind: "Loop",
-                preCondition: [true, makeRefWork("ask-task")],
-                postCondition: [true, makeRefWork("code-task")],
-                body: makeRefWork(`review-apply-task`)
-            }
-        ]
+        kind: "Loop",
+        preCondition: [false, {
+            kind: "Loop",
+            preCondition: [false, makeRefWork("ask-task")],
+            body: makeRefWork(`review-apply-task`)
+        }],
+        postCondition: [false, {
+            kind: "Loop",
+            postCondition: [false, makeRefWork("code-task")],
+            body: makeRefWork(`review-apply-task`)
+        }],
+        body: {
+            kind: "Loop",
+            preCondition: [true, makeRefWork("ask-task")],
+            postCondition: [true, makeRefWork("code-task")],
+            body: makeRefWork(`review-apply-task`)
+        }
     }
 }
 
