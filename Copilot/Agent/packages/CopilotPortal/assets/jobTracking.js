@@ -208,12 +208,6 @@ function workToElk(work, nodes, edges) {
                         targets: [postSub.entryId],
                     });
 
-                    const exitId = genId("loop-exit");
-                    nodes.push({
-                        id: exitId, width: 1, height: 1, labels: [],
-                        _type: "invisible",
-                    });
-
                     edges.push({
                         id: genId("edge"),
                         sources: [postSub.exitId],
@@ -221,13 +215,7 @@ function workToElk(work, nodes, edges) {
                         labels: [{ text: postExpBool ? "repeat" : "exit" }],
                         _backEdge: true,
                     });
-                    edges.push({
-                        id: genId("edge"),
-                        sources: [postSub.exitId],
-                        targets: [exitId],
-                        labels: [{ text: postExpBool ? "exit" : "repeat" }],
-                    });
-                    return { entryId, exitId };
+                    return { entryId, exitId: postSub.exitId };
                 }
 
                 return { entryId: bodyResult.entryId, exitId: bodyResult.exitId };
