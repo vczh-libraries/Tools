@@ -39,6 +39,23 @@
     stroke-width: 2;
 }
 
+/* CondNode */
+.elk-node-CondNode polygon {
+    fill: #fef9c3;
+    stroke: #eab308;
+    stroke-width: 2;
+}
+
+.elk-node-CondNode text {
+    fill: #92400e;
+    font-size: 13px;
+    font-family: sans-serif;
+}
+
+.elk-node-CondNode text.bold {
+    font-weight: bold;
+}
+
 /* CondEnd */
 .elk-node-CondEnd polygon {
     fill: #fef9c3;

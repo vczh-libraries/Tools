@@ -382,7 +382,7 @@ describe("API: /api/copilot/job (after entry installed)", () => {
         }
     });
 
-    it("every TaskWork has a ChartNode with TaskNode hint", async () => {
+    it("every TaskWork has a ChartNode with TaskNode or CondNode hint", async () => {
         const data = await fetchJson("/api/copilot/job");
         for (const [jobName, job] of Object.entries(data.jobs)) {
             const taskWorkIds = [];
@@ -402,8 +402,8 @@ describe("API: /api/copilot/job (after entry installed)", () => {
             collectTaskWorkIds(job.work);
             const chart = data.chart[jobName];
             for (const wid of taskWorkIds) {
-                const node = chart.nodes.find(n => Array.isArray(n.hint) && n.hint[0] === "TaskNode" && n.hint[1] === wid);
-                assert.ok(node, `job ${jobName}: TaskWork workIdInJob=${wid} should have a ChartNode with TaskNode hint`);
+                const node = chart.nodes.find(n => Array.isArray(n.hint) && (n.hint[0] === "TaskNode" || n.hint[0] === "CondNode") && n.hint[1] === wid);
+                assert.ok(node, `job ${jobName}: TaskWork workIdInJob=${wid} should have a ChartNode with TaskNode or CondNode hint`);
             }
         }
     });

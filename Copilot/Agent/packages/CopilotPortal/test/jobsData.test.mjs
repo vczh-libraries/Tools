@@ -952,7 +952,7 @@ describe("generateChartNodes", () => {
         assert.ok(chart.nodes.some(n => n.hint === "AltEnd"), "should have AltEnd");
     });
 
-    it("every TaskWork in test entry jobs has a ChartNode with TaskNode hint", () => {
+    it("every TaskWork in test entry jobs has a ChartNode with TaskNode or CondNode hint", () => {
         function collectTaskWorkIds(work) {
             const ids = [];
             if (work.kind === "Ref") ids.push(work.workIdInJob);
@@ -972,8 +972,8 @@ describe("generateChartNodes", () => {
             const workIds = collectTaskWorkIds(job.work);
             const chart = generateChartNodes(job.work);
             for (const wid of workIds) {
-                const node = chart.nodes.find(n => Array.isArray(n.hint) && n.hint[0] === "TaskNode" && n.hint[1] === wid);
-                assert.ok(node, `job ${jobName}: TaskWork workIdInJob=${wid} should have a ChartNode with TaskNode hint`);
+                const node = chart.nodes.find(n => Array.isArray(n.hint) && (n.hint[0] === "TaskNode" || n.hint[0] === "CondNode") && n.hint[1] === wid);
+                assert.ok(node, `job ${jobName}: TaskWork workIdInJob=${wid} should have a ChartNode with TaskNode or CondNode hint`);
             }
         }
     });

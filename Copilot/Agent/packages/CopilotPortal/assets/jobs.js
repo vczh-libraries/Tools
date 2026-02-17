@@ -144,8 +144,7 @@ function onJobButtonClick(btn, jobName) {
 // ---- Start Job ----
 startJobButton.addEventListener("click", () => {
     if (!selectedJobName) return;
-    const userInput = userInputTextarea.value;
-    const url = `/jobTracking.html?jobId=${encodeURIComponent(selectedJobName)}&wb=${encodeURIComponent(workingDir)}&userInput=${encodeURIComponent(userInput)}`;
+    const url = `/jobTracking.html?jobId=${encodeURIComponent(selectedJobName)}`;
     window.open(url, "_blank");
 });
 

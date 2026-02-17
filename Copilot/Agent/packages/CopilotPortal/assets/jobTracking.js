@@ -1,8 +1,6 @@
 // ---- Redirect if no jobId ----
 const params = new URLSearchParams(window.location.search);
 const jobId = params.get("jobId");
-const workingDir = params.get("wb");
-const userInput = params.get("userInput") || "";
 const renderer = params.get("renderer") || "elk";
 if (!jobId) {
     window.location.href = "/index.html";

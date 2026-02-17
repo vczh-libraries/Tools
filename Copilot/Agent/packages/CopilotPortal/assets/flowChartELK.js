@@ -7,6 +7,11 @@ const elkNodeStyles = {
         minHeight: 40,
         shape: "rect",
     },
+    CondNode: {
+        minWidth: 100,
+        minHeight: 50,
+        shape: "diamond",
+    },
     ParBegin: {
         minWidth: 60,
         minHeight: 10,
@@ -93,8 +98,8 @@ function elkRenderNodeSvg(svg, node, chartNode, onTaskNodeClick) {
         }));
     }
 
-    // Add label for TaskNode
-    if (chartNode.label && hintKey === "TaskNode") {
+    // Add label for TaskNode or CondNode
+    if (chartNode.label && (hintKey === "TaskNode" || hintKey === "CondNode")) {
         const textEl = elkCreateSvgElement("text", {
             x: x + w / 2,
             y: y + h / 2 + 5,
@@ -103,7 +108,7 @@ function elkRenderNodeSvg(svg, node, chartNode, onTaskNodeClick) {
         textEl.textContent = chartNode.label;
         group.appendChild(textEl);
 
-        // TaskNode click interaction
+        // TaskNode/CondNode click interaction
         if (onTaskNodeClick) {
             group.style.cursor = "pointer";
             group.addEventListener("click", () => onTaskNodeClick(chartNode, textEl));
@@ -174,9 +179,12 @@ async function renderFlowChartELK(chart, container) {
         const hintKey = elkGetHintKey(n.hint);
         let w = style.minWidth;
         let h = style.minHeight;
-        // Make TaskNodes wider if label is long
-        if (hintKey === "TaskNode" && n.label) {
+        // Make TaskNodes/CondNodes wider if label is long
+        if ((hintKey === "TaskNode" || hintKey === "CondNode") && n.label) {
             w = Math.max(w, n.label.length * 9 + 20);
+            if (hintKey === "CondNode") {
+                h = Math.max(h, w * 0.6);
+            }
         }
         return {
             id: String(n.id),

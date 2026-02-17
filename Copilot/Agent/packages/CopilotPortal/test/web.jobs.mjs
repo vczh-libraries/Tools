@@ -258,7 +258,7 @@ describe("Web: jobTracking.html layout", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
         await page.waitForTimeout(3000);
     });
 
@@ -340,7 +340,6 @@ describe("Web: jobs.html Start Job opens new window", () => {
         const url = new URL(newPage.url());
         assert.strictEqual(url.pathname, "/jobTracking.html", "should open jobTracking.html");
         assert.strictEqual(url.searchParams.get("jobId"), "simple-job", "should pass jobId");
-        assert.ok(url.searchParams.has("wb"), "should pass working directory");
         await newPage.close();
     });
 });
@@ -353,7 +352,7 @@ describe("Web: jobTracking.html ELK renderer", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools&renderer=elk`);
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=elk`);
         await page.waitForTimeout(3000);
     });
 
@@ -392,7 +391,7 @@ describe("Web: jobTracking.html ELK default renderer", () => {
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
         // No renderer param should default to ELK
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
         await page.waitForTimeout(3000);
     });
 
@@ -416,7 +415,7 @@ describe("Web: jobTracking.html Mermaid renderer", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools&renderer=mermaid`);
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=mermaid`);
         await page.waitForTimeout(3000);
     });
 
@@ -445,7 +444,7 @@ describe("Web: jobTracking.html TaskNode click interaction (ELK)", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools&renderer=elk`);
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=elk`);
         await page.waitForTimeout(3000);
     });
 
