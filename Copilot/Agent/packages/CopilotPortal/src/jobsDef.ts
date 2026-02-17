@@ -142,15 +142,15 @@ export function getModelId(model: Model, entry: Entry): string {
     }
 }
 
-function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
+export function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
     return ["RetryWithNewSession", retryTimes];
 }
 
-function retryFailed(retryTimes: number = 3): FailureAction {
+export function retryFailed(retryTimes: number = 3): FailureAction {
     return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped."]];
 }
 
-function retryFailedCondition(retryTimes: number = 3): FailureAction {
+export function retryFailedCondition(retryTimes: number = 3): FailureAction {
     return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
 }
 

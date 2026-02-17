@@ -110,8 +110,6 @@ You can find the `Job` definition in `jobsDef.ts`.
 `Job.work` is a simple control flow AST.
 Render it like a flow chart expanding to fill the whole `job part`.
 
-**TASK**: Clean up every line of rendering code in all three files, I would like to start over.
-
 ### Session Response Part
 
 (to be editing...)

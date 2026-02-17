@@ -5,6 +5,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 
 ## Related Files
 
+- `src/jobsDef.ts`
 - `src/jobsData.ts`
 - `src/jobsApi.ts`
 

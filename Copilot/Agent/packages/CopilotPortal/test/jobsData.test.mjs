@@ -2,7 +2,9 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const { expandPromptStatic, expandPromptDynamic, validateEntry, entry, availableTools, runtimeVariables } =
+const { expandPromptStatic, expandPromptDynamic, validateEntry, availableTools, runtimeVariables } =
+    await import("../dist/jobsDef.js");
+const { entry } =
     await import("../dist/jobsData.js");
 
 // Load and validate the test entry for tests that reference test-specific jobs
@@ -314,7 +316,7 @@ describe("validateEntry requireUserInput", () => {
     });
 });
 
-const { assignWorkId } = await import("../dist/jobsData.js");
+const { assignWorkId } = await import("../dist/jobsDef.js");
 
 describe("assignWorkId", () => {
     it("assigns sequential ids to TaskWork nodes", () => {

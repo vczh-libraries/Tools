@@ -105,8 +105,8 @@ Copilot/Agent/
 │   │   │   ├── jobs.html     # Jobs selection page
 │   │   │   ├── jobs.js       # Jobs page JS (matrix rendering, job selection)
 │   │   │   ├── jobs.css      # Jobs page styles
-│   │   │   ├── jobTracking.html  # Job tracking page with flow chart
-│   │   │   ├── jobTracking.js    # Job tracking JS (ELK.js flow chart rendering)
+│   │   │   ├── jobTracking.html  # Job tracking page
+│   │   │   ├── jobTracking.js    # Job tracking JS
 │   │   │   ├── jobTracking.css   # Job tracking styles
 │   │   │   ├── messageBlock.js       # MessageBlock component
 │   │   │   ├── messageBlock.css      # MessageBlock styles
