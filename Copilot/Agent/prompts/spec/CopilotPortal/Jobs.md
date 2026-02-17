@@ -181,8 +181,6 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
 Clicking it bold (exclusive) or unbold the text.
-**BUG**: This works for elk but not mermaid.
-**BUG**: You need to fix all test failures no matter they exist before your change or not.
 
 ### Session Response Part
 

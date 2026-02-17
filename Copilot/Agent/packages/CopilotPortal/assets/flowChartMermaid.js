@@ -114,9 +114,9 @@ async function renderFlowChartMermaid(chart, container) {
 
     // Add click handlers for TaskNode/CondNode elements
     for (const nodeId of taskNodeIds) {
-        const nodeEl = container.querySelector(`#${nodeId}`);
+        const nodeEl = container.querySelector(`[id^="flowchart-${nodeId}-"]`);
         if (!nodeEl) continue;
-        const group = nodeEl.closest("g") || nodeEl;
+        const group = nodeEl.closest("g.node") || nodeEl;
         group.style.cursor = "pointer";
         group.addEventListener("click", () => {
             // Find the text element inside this node

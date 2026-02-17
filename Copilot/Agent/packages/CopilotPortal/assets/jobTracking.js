@@ -1,7 +1,7 @@
 // ---- Redirect if no jobId ----
 const params = new URLSearchParams(window.location.search);
 const jobId = params.get("jobId");
-const renderer = params.get("renderer") || "elk";
+const renderer = params.get("renderer") || "mermaid";
 if (!jobId) {
     window.location.href = "/index.html";
 }

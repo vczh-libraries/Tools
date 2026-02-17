@@ -156,4 +156,4 @@ Copilot/Agent/
 - **Job Workflow Engine**: Composable work tree execution supporting sequential, parallel, loop, and conditional (alt) work patterns
 - **Task Selection UI**: Combo box in the portal to select and run tasks within an active session
 - **Tool Registration**: Custom job tools (e.g. `job_boolean_true`, `job_prepare_document`) are automatically registered with Copilot sessions
-- **Flow Chart Renderers**: Job tracking page supports ELK (default) and Mermaid renderers, selectable via `renderer` URL parameter
+- **Flow Chart Renderers**: Job tracking page supports ELK and Mermaid (default) renderers, selectable via `renderer` URL parameter

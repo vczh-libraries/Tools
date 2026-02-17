@@ -382,7 +382,7 @@ describe("Web: jobTracking.html ELK renderer", () => {
     });
 });
 
-describe("Web: jobTracking.html ELK default renderer", () => {
+describe("Web: jobTracking.html Mermaid default renderer", () => {
     let browser;
     let page;
 
@@ -390,7 +390,7 @@ describe("Web: jobTracking.html ELK default renderer", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        // No renderer param should default to ELK
+        // No renderer param should default to Mermaid
         await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
         await page.waitForTimeout(3000);
     });
@@ -399,11 +399,12 @@ describe("Web: jobTracking.html ELK default renderer", () => {
         await browser?.close();
     });
 
-    it("defaults to ELK renderer when no renderer param", async () => {
+    it("defaults to Mermaid renderer when no renderer param", async () => {
         const svgCount = await page.locator("#job-part svg").count();
-        assert.ok(svgCount > 0, "should render ELK SVG by default");
-        const taskNodes = await page.locator("#job-part .elk-node-TaskNode").count();
-        assert.ok(taskNodes > 0, "should have ELK TaskNode CSS classes");
+        assert.ok(svgCount > 0, "should render Mermaid SVG by default");
+        // Mermaid SVG should NOT have ELK-specific CSS classes
+        const elkNodes = await page.locator("#job-part .elk-node-TaskNode").count();
+        assert.strictEqual(elkNodes, 0, "should not have ELK TaskNode CSS classes");
     });
 });
 
@@ -477,5 +478,38 @@ describe("Web: jobTracking.html TaskNode click interaction (ELK)", () => {
         await taskNodes.nth(1).click(); // bold second (unbolds first)
         const boldTexts = await page.locator("#job-part .elk-node-TaskNode text.bold").count();
         assert.strictEqual(boldTexts, 1, "should have exactly one bolded TaskNode text");
+    });
+});
+
+describe("Web: jobTracking.html TaskNode click interaction (Mermaid)", () => {
+    let browser;
+    let page;
+
+    before(async () => {
+        await verifyEntryInstalled();
+        browser = await chromium.launch({ headless: true });
+        page = await browser.newPage();
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&renderer=mermaid`);
+        await page.waitForTimeout(3000);
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("clicking a TaskNode bolds its text in Mermaid", async () => {
+        const nodeGroup = page.locator('#job-part svg g.node').first();
+        await nodeGroup.click();
+        await page.waitForTimeout(200);
+        const fontWeight = await nodeGroup.locator('.nodeLabel').first().evaluate(el => el.style.fontWeight);
+        assert.strictEqual(fontWeight, "bold", "should have bold font-weight after click");
+    });
+
+    it("clicking the same TaskNode again unbolds its text in Mermaid", async () => {
+        const nodeGroup = page.locator('#job-part svg g.node').first();
+        await nodeGroup.click(); // unbold
+        await page.waitForTimeout(200);
+        const fontWeight = await nodeGroup.locator('.nodeLabel').first().evaluate(el => el.style.fontWeight);
+        assert.ok(fontWeight === "" || fontWeight === "normal", "should not have bold font-weight after second click");
     });
 });

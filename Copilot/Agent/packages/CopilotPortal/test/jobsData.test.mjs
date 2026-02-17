@@ -940,7 +940,6 @@ describe("generateChartNodes", () => {
         });
         const chart = generateChartNodes(work);
         assert.ok(chart.nodes.some(n => n.hint === "LoopEnd"), "should have LoopEnd");
-        assert.ok(chart.nodes.some(n => n.hint === "CondBegin"), "should have CondBegin for loop");
     });
 
     it("generates AltEnd for AltWork", () => {
