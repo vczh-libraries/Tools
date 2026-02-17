@@ -125,7 +125,7 @@ Each `ChartNode` is a node in the flow chart, and each hint maps to a graph:
 - `ParBegin`, `ParEnd`, `AltEnd`: A small black rectangle bar.
 - `CondBegin`: A small yellow rectangle bar.
 - `CondEnd`: A small yellow diamind.
-- `LoopEnd`: A small blue circle.
+- `LoopEnd`: A small gray circle.
 
 Each graph must have a border, and the background color would be lighter, except the black rectangle bar which has the same border and background color.
 
@@ -135,6 +135,10 @@ There will be multiple arrows connecting between nodes:
 - `ChartArrow.label` is the label attached to the arrow.
 
 Arrows would be gray.
+
+#### Rendering with ELK
+
+**TASK**: Put some short guidances of how to use ELK here, nodes should be automatically layouted.
 
 ### Session Response Part
 
