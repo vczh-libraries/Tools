@@ -37,8 +37,8 @@ const nodeStyles = {
         shape: "rect",
     },
     AltEnd: {
-        border: "#222",
-        background: "#222",
+        border: "#db2777",
+        background: "#fce7f3",
         minWidth: 60,
         minHeight: 10,
         shape: "rect",

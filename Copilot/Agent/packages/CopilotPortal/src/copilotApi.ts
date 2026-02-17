@@ -156,8 +156,7 @@ export async function apiConfig(req: http.IncomingMessage, res: http.ServerRespo
     jsonResponse(res, 200, { repoRoot });
 }
 
-export async function apiStop(req: http.IncomingMessage, res: http.ServerResponse, server: http.Server): Promise<void> {
-    jsonResponse(res, 200, {});
+export function shutdownServer(server: http.Server): void {
     console.log("Shutting down...");
     // Stop any running sessions
     for (const [sessionId, state] of sessions) {
@@ -172,6 +171,11 @@ export async function apiStop(req: http.IncomingMessage, res: http.ServerRespons
     server.close(() => {
         process.exit(0);
     });
+}
+
+export async function apiStop(req: http.IncomingMessage, res: http.ServerResponse, server: http.Server): Promise<void> {
+    jsonResponse(res, 200, {});
+    shutdownServer(server);
 }
 
 export async function apiCopilotModels(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {

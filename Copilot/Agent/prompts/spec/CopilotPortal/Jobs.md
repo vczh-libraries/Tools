@@ -145,6 +145,7 @@ Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.j
 - Use `elk.edgeRouting: "ORTHOGONAL"` for clean right-angle edge routing.
 - Use `elk.layered.considerModelOrder.strategy: "NODES_AND_EDGES"` and `elk.layered.crossingMinimization.forceNodeModelOrder: "true"` to respect the node ordering from the chart data.
 - Use `elk.layered.cycleBreaking.strategy: "MODEL_ORDER"` so ELK uses node model order (sequential IDs) to identify back-edges—any edge from a higher-order node to a lower-order node is reversed.
+- Use `elk.layered.nodePlacement.strategy: "LINEAR_SEGMENTS"` for better node centering.
 - Each `ChartNode` becomes an ELK node; each `ChartArrow` becomes an ELK edge.
 - After `elk.layout(graph)`, render the positioned nodes and routed edges into an SVG.
 
