@@ -44,6 +44,9 @@ html, body {
     padding: 16px;
     height: 100%;
     overflow: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
 }
 
 /* ---- Session Response Part ---- */

@@ -4,6 +4,7 @@ import * as fs from "node:fs";
 import type { ICopilotSession } from "./copilotSession.js";
 import type { Entry, Task, Prompt, Job, Work, TaskWork, SequentialWork, ParallelWork, LoopWork, AltWork } from "./jobsDef.js";
 import { expandPromptDynamic, getModelId } from "./jobsDef.js";
+import { generateChartNodes } from "./jobsChart.js";
 import {
     helperSessionStart,
     helperSessionStop,
@@ -881,10 +882,15 @@ export async function apiJobList(
     res: http.ServerResponse,
 ): Promise<void> {
     if (!installedEntry) {
-        jsonResponse(res, 200, { grid: [], jobs: {} });
+        jsonResponse(res, 200, { grid: [], jobs: {}, chart: {} });
         return;
     }
-    jsonResponse(res, 200, { grid: installedEntry.grid, jobs: installedEntry.jobs });
+    // Build a combined chart from all jobs
+    const chart: Record<string, ReturnType<typeof generateChartNodes>> = {};
+    for (const [jobName, job] of Object.entries(installedEntry.jobs)) {
+        chart[jobName] = generateChartNodes(job.work);
+    }
+    jsonResponse(res, 200, { grid: installedEntry.grid, jobs: installedEntry.jobs, chart });
 }
 
 export async function apiJobStart(

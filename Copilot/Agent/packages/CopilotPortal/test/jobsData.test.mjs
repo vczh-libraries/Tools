@@ -4,6 +4,8 @@ import { readFileSync } from "node:fs";
 
 const { expandPromptStatic, expandPromptDynamic, validateEntry, availableTools, runtimeVariables } =
     await import("../dist/jobsDef.js");
+const { generateChartNodes } =
+    await import("../dist/jobsChart.js");
 const { entry } =
     await import("../dist/jobsData.js");
 
@@ -808,5 +810,171 @@ describe("validateEntry work simplification", () => {
         const work = validatedTestEntry.jobs["nested-par-job"].work;
         assert.strictEqual(work.kind, "Par");
         assert.strictEqual(work.works.length, 3, "nested-par-job should be fully flattened");
+    });
+});
+
+describe("validateEntry empty works rejection", () => {
+    it("throws when SequentialWork has empty works", () => {
+        const badEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({ kind: "Seq", works: [] }),
+                },
+            },
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /works.*should have at least one element/
+        );
+    });
+
+    it("throws when ParallelWork has empty works", () => {
+        const badEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({ kind: "Par", works: [] }),
+                },
+            },
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /works.*should have at least one element/
+        );
+    });
+
+    it("throws when nested ParallelWork inside SequentialWork has empty works", () => {
+        const badEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({
+                        kind: "Seq",
+                        works: [
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                            { kind: "Par", works: [] },
+                        ],
+                    }),
+                },
+            },
+        };
+        assert.throws(
+            () => validateEntry(badEntry, "test:"),
+            /works.*should have at least one element/
+        );
+    });
+
+    it("passes when SequentialWork has at least one element", () => {
+        const goodEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({
+                        kind: "Seq",
+                        works: [
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                        ],
+                    }),
+                },
+            },
+        };
+        const result = validateEntry(goodEntry, "test:");
+        assert.ok(result);
+    });
+});
+
+describe("generateChartNodes", () => {
+    it("generates TaskNode for each TaskWork", () => {
+        const work = assignWorkId({
+            kind: "Seq",
+            works: [
+                { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "a" },
+                { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "b" },
+            ],
+        });
+        const chart = generateChartNodes(work);
+        const taskNodes = chart.nodes.filter(n => Array.isArray(n.hint) && n.hint[0] === "TaskNode");
+        assert.strictEqual(taskNodes.length, 2, "should have 2 TaskNode nodes");
+        const workIds = taskNodes.map(n => n.hint[1]).sort();
+        assert.deepStrictEqual(workIds, [0, 1]);
+    });
+
+    it("generates ParBegin and ParEnd for ParallelWork", () => {
+        const work = assignWorkId({
+            kind: "Par",
+            works: [
+                { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "a" },
+                { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "b" },
+            ],
+        });
+        const chart = generateChartNodes(work);
+        assert.ok(chart.nodes.some(n => n.hint === "ParBegin"), "should have ParBegin");
+        assert.ok(chart.nodes.some(n => n.hint === "ParEnd"), "should have ParEnd");
+    });
+
+    it("generates LoopEnd for LoopWork", () => {
+        const work = assignWorkId({
+            kind: "Loop",
+            body: { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "a" },
+        });
+        const chart = generateChartNodes(work);
+        assert.ok(chart.nodes.some(n => n.hint === "LoopEnd"), "should have LoopEnd");
+        assert.ok(chart.nodes.some(n => n.hint === "CondBegin"), "should have CondBegin for loop");
+    });
+
+    it("generates AltEnd for AltWork", () => {
+        const work = assignWorkId({
+            kind: "Alt",
+            condition: { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "a" },
+        });
+        const chart = generateChartNodes(work);
+        assert.ok(chart.nodes.some(n => n.hint === "AltEnd"), "should have AltEnd");
+    });
+
+    it("every TaskWork in test entry jobs has a ChartNode with TaskNode hint", () => {
+        function collectTaskWorkIds(work) {
+            const ids = [];
+            if (work.kind === "Ref") ids.push(work.workIdInJob);
+            else if (work.kind === "Seq" || work.kind === "Par") work.works.forEach(w => ids.push(...collectTaskWorkIds(w)));
+            else if (work.kind === "Loop") {
+                if (work.preCondition) ids.push(...collectTaskWorkIds(work.preCondition[1]));
+                ids.push(...collectTaskWorkIds(work.body));
+                if (work.postCondition) ids.push(...collectTaskWorkIds(work.postCondition[1]));
+            } else if (work.kind === "Alt") {
+                ids.push(...collectTaskWorkIds(work.condition));
+                if (work.trueWork) ids.push(...collectTaskWorkIds(work.trueWork));
+                if (work.falseWork) ids.push(...collectTaskWorkIds(work.falseWork));
+            }
+            return ids;
+        }
+        for (const [jobName, job] of Object.entries(validatedTestEntry.jobs)) {
+            const workIds = collectTaskWorkIds(job.work);
+            const chart = generateChartNodes(job.work);
+            for (const wid of workIds) {
+                const node = chart.nodes.find(n => Array.isArray(n.hint) && n.hint[0] === "TaskNode" && n.hint[1] === wid);
+                assert.ok(node, `job ${jobName}: TaskWork workIdInJob=${wid} should have a ChartNode with TaskNode hint`);
+            }
+        }
     });
 });

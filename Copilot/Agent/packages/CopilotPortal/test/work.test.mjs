@@ -138,17 +138,6 @@ describe("Work: SequentialWork - all succeed", () => {
     });
 });
 
-describe("Work: SequentialWork - empty", () => {
-    it("empty-seq-job succeeds immediately", async () => {
-        const { callbacks } = await runJob("empty-seq-job");
-        const succeeded = callbacks.some(c => c.callback === "jobSucceeded");
-        assert.ok(succeeded, "empty seq should succeed");
-
-        const { started } = getWorkEvents(callbacks);
-        assert.strictEqual(started.length, 0, "no works should start");
-    });
-});
-
 describe("Work: SequentialWork - first fails, second does not run", () => {
     it("seq-fail-first-job fails and second task never starts", async () => {
         const { callbacks } = await runJob("seq-fail-first-job");
@@ -196,17 +185,6 @@ describe("Work: ParallelWork - all succeed", () => {
         assert.strictEqual(started.length, 2, "should have 2 workStarted");
         assert.strictEqual(stopped.length, 2, "should have 2 workStopped");
         assert.ok(stopped.every(s => s.succeeded), "all works should succeed");
-    });
-});
-
-describe("Work: ParallelWork - empty", () => {
-    it("empty-par-job succeeds immediately", async () => {
-        const { callbacks } = await runJob("empty-par-job");
-        const succeeded = callbacks.some(c => c.callback === "jobSucceeded");
-        assert.ok(succeeded, "empty par should succeed");
-
-        const { started } = getWorkEvents(callbacks);
-        assert.strictEqual(started.length, 0, "no works should start");
     });
 });
 

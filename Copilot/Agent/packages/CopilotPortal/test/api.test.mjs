@@ -232,7 +232,7 @@ describe("API: copilot/test/installJobsEntry", () => {
         const tasks = await fetchJson("/api/copilot/task");
         assert.deepStrictEqual(tasks, { tasks: [] });
         const jobs = await fetchJson("/api/copilot/job");
-        assert.deepStrictEqual(jobs, { grid: [], jobs: {} });
+        assert.deepStrictEqual(jobs, { grid: [], jobs: {}, chart: {} });
     });
 
     it("returns InvalidatePath for file outside test folder", async () => {
@@ -369,6 +369,43 @@ describe("API: /api/copilot/job (after entry installed)", () => {
         assert.strictEqual(data.models, undefined, "should not include models");
         assert.strictEqual(data.promptVariables, undefined, "should not include promptVariables");
         assert.strictEqual(data.tasks, undefined, "should not include tasks");
+    });
+
+    it("includes chart map with entries for each job", async () => {
+        const data = await fetchJson("/api/copilot/job");
+        assert.ok(typeof data.chart === "object" && data.chart !== null, "chart should be an object");
+        const jobNames = Object.keys(data.jobs);
+        const chartNames = Object.keys(data.chart);
+        assert.deepStrictEqual(chartNames.sort(), jobNames.sort(), "chart keys should match job keys");
+        for (const [name, chartGraph] of Object.entries(data.chart)) {
+            assert.ok(Array.isArray(chartGraph.nodes), `chart[${name}] should have nodes array`);
+        }
+    });
+
+    it("every TaskWork has a ChartNode with TaskNode hint", async () => {
+        const data = await fetchJson("/api/copilot/job");
+        for (const [jobName, job] of Object.entries(data.jobs)) {
+            const taskWorkIds = [];
+            function collectTaskWorkIds(work) {
+                if (work.kind === "Ref") taskWorkIds.push(work.workIdInJob);
+                else if (work.kind === "Seq" || work.kind === "Par") work.works.forEach(collectTaskWorkIds);
+                else if (work.kind === "Loop") {
+                    if (work.preCondition) collectTaskWorkIds(work.preCondition[1]);
+                    collectTaskWorkIds(work.body);
+                    if (work.postCondition) collectTaskWorkIds(work.postCondition[1]);
+                } else if (work.kind === "Alt") {
+                    collectTaskWorkIds(work.condition);
+                    if (work.trueWork) collectTaskWorkIds(work.trueWork);
+                    if (work.falseWork) collectTaskWorkIds(work.falseWork);
+                }
+            }
+            collectTaskWorkIds(job.work);
+            const chart = data.chart[jobName];
+            for (const wid of taskWorkIds) {
+                const node = chart.nodes.find(n => Array.isArray(n.hint) && n.hint[0] === "TaskNode" && n.hint[1] === wid);
+                assert.ok(node, `job ${jobName}: TaskWork workIdInJob=${wid} should have a ChartNode with TaskNode hint`);
+            }
+        }
     });
 });
 
@@ -601,32 +638,6 @@ describe("API: job running - failure propagation", () => {
         const workStopped = callbacks.find((c) => c.callback === "workStopped");
         assert.ok(workStopped, "should have workStopped");
         assert.strictEqual(workStopped.succeeded, false, "work should fail");
-    });
-});
-
-describe("API: job running - empty works", () => {
-    it("empty-seq-job succeeds (empty SequentialWork)", async () => {
-        const startData = await fetchJson("/api/copilot/job/start/empty-seq-job", {
-            method: "POST",
-            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
-        });
-        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
-
-        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
-        const succeeded = callbacks.some((c) => c.callback === "jobSucceeded");
-        assert.ok(succeeded, `empty-seq-job should succeed`);
-    });
-
-    it("empty-par-job succeeds (empty ParallelWork)", async () => {
-        const startData = await fetchJson("/api/copilot/job/start/empty-par-job", {
-            method: "POST",
-            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
-        });
-        assert.ok(startData.jobId, `should return jobId: ${JSON.stringify(startData)}`);
-
-        const callbacks = await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
-        const succeeded = callbacks.some((c) => c.callback === "jobSucceeded");
-        assert.ok(succeeded, `empty-par-job should succeed`);
     });
 });
 

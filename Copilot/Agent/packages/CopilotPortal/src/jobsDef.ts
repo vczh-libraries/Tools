@@ -343,6 +343,9 @@ function validateWork(entry: Entry, work: Work<unknown>, codePath: string, model
         }
         case "Seq": {
             const sw = work as SequentialWork<unknown>;
+            if (sw.works.length === 0) {
+                throw new Error(`${codePath}.works: should have at least one element.`);
+            }
             for (let i = 0; i < sw.works.length; i++) {
                 validateWork(entry, sw.works[i], `${codePath}.works[${i}]`, modelKeys);
             }
@@ -350,6 +353,9 @@ function validateWork(entry: Entry, work: Work<unknown>, codePath: string, model
         }
         case "Par": {
             const pw = work as ParallelWork<unknown>;
+            if (pw.works.length === 0) {
+                throw new Error(`${codePath}.works: should have at least one element.`);
+            }
             for (let i = 0; i < pw.works.length; i++) {
                 validateWork(entry, pw.works[i], `${codePath}.works[${i}]`, modelKeys);
             }

@@ -138,7 +138,12 @@ Arrows would be gray.
 
 #### Rendering with ELK
 
-**TASK**: Put some short guidances of how to use ELK here, nodes should be automatically layouted.
+Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.js`) for automatic graph layout:
+- Build an ELK graph with `children` (nodes) and `edges` from the `ChartGraph`.
+- Use `elk.algorithm: "layered"` with `elk.direction: "DOWN"` for top-to-bottom flow.
+- Use `elk.edgeRouting: "ORTHOGONAL"` for clean right-angle edge routing.
+- Each `ChartNode` becomes an ELK node; each `ChartArrow` becomes an ELK edge.
+- After `elk.layout(graph)`, render the positioned nodes and routed edges into an SVG.
 
 ### Session Response Part
 

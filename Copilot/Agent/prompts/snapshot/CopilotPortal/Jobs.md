@@ -108,7 +108,42 @@ The look-and-feel must be similar to `/index.html`, but DO NOT share any css fil
 
 You can find the `Job` definition in `jobsDef.ts`.
 `Job.work` is a simple control flow AST.
-Render it like a flow chart expanding to fill the whole `job part`.
+Render it like a flow chart expanding to fill the whole `job part`.#### Flow Chart Rendering Note
+
+#### Flow Chart Rendering
+
+**TEST-NOTE-BEGIN**
+No need to create unit test to assert the chart is in a correct layout.
+Ensure every `TaskWork` has a `ChartNode` with `TaskNode` hint.
+**TEST-NOTE-END**
+
+The `api/copilot/job` has an extra `chart` node which is a `ChartGraph`.
+It is already a generated flow chart but has no layout information.
+
+Each `ChartNode` is a node in the flow chart, and each hint maps to a graph:
+- `TaskNode`: A blue rectangle with the task id, the text would be the `TaskWork` with that `workIdInJob`.
+- `ParBegin`, `ParEnd`, `AltEnd`: A small black rectangle bar.
+- `CondBegin`: A small yellow rectangle bar.
+- `CondEnd`: A small yellow diamind.
+- `LoopEnd`: A small gray circle.
+
+Each graph must have a border, and the background color would be lighter, except the black rectangle bar which has the same border and background color.
+
+There will be multiple arrows connecting between nodes:
+- `ChartArrow.id` is the target `ChartNode` with that `id`.
+- When `ChartArrow.loopBack` is true, it hints a arrow pointing upwards. All others should be downwards.
+- `ChartArrow.label` is the label attached to the arrow.
+
+Arrows would be gray.
+
+#### Rendering with ELK
+
+Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.js`) for automatic graph layout:
+- Build an ELK graph with `children` (nodes) and `edges` from the `ChartGraph`.
+- Use `elk.algorithm: "layered"` with `elk.direction: "DOWN"` for top-to-bottom flow.
+- Use `elk.edgeRouting: "ORTHOGONAL"` for clean right-angle edge routing.
+- Each `ChartNode` becomes an ELK node; each `ChartArrow` becomes an ELK edge.
+- After `elk.layout(graph)`, render the positioned nodes and routed edges into an SVG.
 
 ### Session Response Part
 

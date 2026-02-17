@@ -119,18 +119,6 @@
         "taskId": "criteria-fail-task"
       }
     },
-    "empty-seq-job": {
-      "work": {
-        "kind": "Seq",
-        "works": []
-      }
-    },
-    "empty-par-job": {
-      "work": {
-        "kind": "Par",
-        "works": []
-      }
-    },
     "seq-fail-first-job": {
       "work": {
         "kind": "Seq",

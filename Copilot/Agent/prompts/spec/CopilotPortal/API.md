@@ -559,7 +559,7 @@ List all jobs passed to `installJobsEntry` in this schema:
 {
   grid: GridRow[];
   jobs: { [key in string]: Job };
-  chart: ChartGraph;
+  chart: { [key in string]: ChartGraph };
 }
 ```
 

@@ -95,6 +95,7 @@ Copilot/Agent/
 │   │   │   ├── copilotApi.ts  # Copilot session API routes and helpers
 │   │   │   ├── jobsApi.ts     # Task management API routes and helpers
 │   │   │   ├── jobsDef.ts     # Jobs/tasks data definitions and validation
+│   │   │   ├── jobsChart.ts   # Flow chart graph generation from work trees
 │   │   │   ├── jobsData.ts    # Preloaded jobs/tasks data
 │   │   │   ├── sharedApi.ts   # Shared HTTP/live-polling utilities
 │   │   │   └── index.ts       # HTTP server, API routing, static files
