@@ -186,6 +186,9 @@ With such information, you can verify:
 - If each `TaskWork` actually triggered in the expected order or logic.
   - For `AltWork`, only one of `trueWork` or `falseWork` triggers.
   - For `ParallelWork`, all `works` should trigger but the order may vary.
+- Any task could fail, assert its side effect on the control flow.
+  - For example, if `AltWork.condition` succeeds but a defined `trueWork` does not happen, there should be problems.
+  - You need to check all possible equivalence classes of execution paths according to the control flow.
 
 More details for api and additional test notes could be found in `API.md`.
 **TEST-NOTE-END**
