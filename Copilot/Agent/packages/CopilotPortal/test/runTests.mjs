@@ -9,6 +9,7 @@ const packageDir = path.resolve(__dirname, "..");
 const testFiles = [
     path.join(__dirname, "jobsData.test.mjs"),
     path.join(__dirname, "api.test.mjs"),
+    path.join(__dirname, "work.test.mjs"),
     path.join(__dirname, "web.test.mjs"),
 ];
 

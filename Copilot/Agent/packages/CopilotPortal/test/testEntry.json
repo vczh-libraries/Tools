@@ -70,6 +70,103 @@
         "kind": "Par",
         "works": []
       }
+    },
+    "seq-fail-first-job": {
+      "work": {
+        "kind": "Seq",
+        "works": [
+          { "kind": "Ref", "workIdInJob": 0, "taskId": "criteria-fail-task" },
+          { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+        ]
+      }
+    },
+    "seq-fail-second-job": {
+      "work": {
+        "kind": "Seq",
+        "works": [
+          { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+          { "kind": "Ref", "workIdInJob": 1, "taskId": "criteria-fail-task" }
+        ]
+      }
+    },
+    "par-fail-one-job": {
+      "work": {
+        "kind": "Par",
+        "works": [
+          { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+          { "kind": "Ref", "workIdInJob": 1, "taskId": "criteria-fail-task" }
+        ]
+      }
+    },
+    "alt-true-job": {
+      "work": {
+        "kind": "Alt",
+        "condition": { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+        "trueWork": { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+      }
+    },
+    "alt-false-job": {
+      "work": {
+        "kind": "Alt",
+        "condition": { "kind": "Ref", "workIdInJob": 0, "taskId": "criteria-fail-task" },
+        "falseWork": { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+      }
+    },
+    "alt-true-undef-job": {
+      "work": {
+        "kind": "Alt",
+        "condition": { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+        "falseWork": { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+      }
+    },
+    "alt-false-undef-job": {
+      "work": {
+        "kind": "Alt",
+        "condition": { "kind": "Ref", "workIdInJob": 0, "taskId": "criteria-fail-task" },
+        "trueWork": { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+      }
+    },
+    "alt-true-fail-job": {
+      "work": {
+        "kind": "Alt",
+        "condition": { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+        "trueWork": { "kind": "Ref", "workIdInJob": 1, "taskId": "criteria-fail-task" }
+      }
+    },
+    "alt-false-fail-job": {
+      "work": {
+        "kind": "Alt",
+        "condition": { "kind": "Ref", "workIdInJob": 0, "taskId": "criteria-fail-task" },
+        "falseWork": { "kind": "Ref", "workIdInJob": 1, "taskId": "criteria-fail-task" }
+      }
+    },
+    "loop-pre-exit-job": {
+      "work": {
+        "kind": "Loop",
+        "preCondition": [true, { "kind": "Ref", "workIdInJob": 0, "taskId": "criteria-fail-task" }],
+        "body": { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+      }
+    },
+    "loop-pre-enter-job": {
+      "work": {
+        "kind": "Loop",
+        "preCondition": [true, { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" }],
+        "body": { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" }
+      }
+    },
+    "loop-body-fail-job": {
+      "work": {
+        "kind": "Loop",
+        "preCondition": [true, { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" }],
+        "body": { "kind": "Ref", "workIdInJob": 1, "taskId": "criteria-fail-task" }
+      }
+    },
+    "loop-post-exit-job": {
+      "work": {
+        "kind": "Loop",
+        "body": { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+        "postCondition": [true, { "kind": "Ref", "workIdInJob": 1, "taskId": "criteria-fail-task" }]
+      }
     }
   }
 }
