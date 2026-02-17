@@ -3,6 +3,8 @@
 Root folder of the project is `REPO-ROOT/Copilot/Agent`.
 Read `README.md` to understand the whole picture of the project as well as specification organizations.
 
+**BUG**: Files mentioned in this spec is completely missing. And ensure to create test cases for it. Split most of the content from web.test.mjs to web.index.mjs, now web.test.mjs only tests test.html, web.index.mjs for index.html, and therefore create a web.jobs.mjs following web.index.mjs for jobs.html.
+
 ## Related Files
 
 - `assets`

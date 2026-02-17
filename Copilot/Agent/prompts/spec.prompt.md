@@ -10,6 +10,7 @@ When this file is tagged, find out new changes in the spec:
 - Copy all files in `prompts/spec` to `prompts/snapshot`.
 - You can see what has been changed in the spec by git diff.
   - Ignore CRLF and LF differences if there is any.
+- Changes includes not only spec files changing but also adding or removing.
 - You are recommended to read `README.md` to understand the whole picture of the project as well as specification organizations.
 - You are recommended to read all spec files to understand dependencies and relationships between each component.
 - Implement all changes.
