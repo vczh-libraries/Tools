@@ -1,8 +1,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 const { expandPromptStatic, expandPromptDynamic, validateEntry, entry, availableTools, runtimeVariables } =
     await import("../dist/jobsData.js");
+
+// Load and validate the test entry for tests that reference test-specific jobs
+const testEntryRaw = JSON.parse(readFileSync(new URL("./testEntry.json", import.meta.url), "utf-8"));
+const validatedTestEntry = validateEntry(JSON.parse(JSON.stringify(testEntryRaw)), "testEntry:");
 
 describe("expandPromptStatic", () => {
     it("joins prompt array with LF", () => {
@@ -530,5 +535,276 @@ describe("validateEntry grid jobName", () => {
                 );
             }
         }
+    });
+});
+
+describe("validateEntry job requireUserInput", () => {
+    it("fills requireUserInput=false for job referencing only non-input tasks", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "no-input-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "no-input-task" }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        assert.strictEqual(result.jobs["test-job"].requireUserInput, false);
+    });
+
+    it("fills requireUserInput=true for job referencing an input task", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "input-task": { model: { category: "planning" }, requireUserInput: true, prompt: ["do $user-input"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "input-task" }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        assert.strictEqual(result.jobs["test-job"].requireUserInput, true);
+    });
+
+    it("fills requireUserInput=true for job with mixed tasks (Seq)", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "no-input-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+                "input-task": { model: { category: "planning" }, requireUserInput: true, prompt: ["do $user-input"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({
+                        kind: "Seq",
+                        works: [
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "no-input-task" },
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "input-task" },
+                        ]
+                    }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        assert.strictEqual(result.jobs["test-job"].requireUserInput, true);
+    });
+
+    it("passes when requireUserInput is defined correctly", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "input-task": { model: { category: "planning" }, requireUserInput: true, prompt: ["do $user-input"] },
+            },
+            jobs: {
+                "test-job": {
+                    requireUserInput: true,
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "input-task" }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        assert.strictEqual(result.jobs["test-job"].requireUserInput, true);
+    });
+
+    it("throws when requireUserInput is defined incorrectly", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "no-input-task": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    requireUserInput: true,
+                    work: assignWorkId({ kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "no-input-task" }),
+                },
+            },
+        };
+        assert.throws(
+            () => validateEntry(testEntry, "test:"),
+            /requireUserInput.*Should be false but is true/
+        );
+    });
+
+    it("all jobs in entry have requireUserInput filled after validation", () => {
+        for (const [jobName, job] of Object.entries(entry.jobs)) {
+            assert.ok(
+                job.requireUserInput !== undefined,
+                `job ${jobName} should have requireUserInput filled`
+            );
+        }
+    });
+
+    it("input-job in test entry has requireUserInput=true", () => {
+        assert.strictEqual(validatedTestEntry.jobs["input-job"].requireUserInput, true);
+    });
+
+    it("simple-job in test entry has requireUserInput=false", () => {
+        assert.strictEqual(validatedTestEntry.jobs["simple-job"].requireUserInput, false);
+    });
+});
+
+describe("validateEntry work simplification", () => {
+    it("flattens nested SequentialWork", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({
+                        kind: "Seq",
+                        works: [
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                            {
+                                kind: "Seq",
+                                works: [
+                                    { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                    { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                ]
+                            }
+                        ]
+                    }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        const work = result.jobs["test-job"].work;
+        assert.strictEqual(work.kind, "Seq");
+        assert.strictEqual(work.works.length, 3, "nested Seq should be flattened");
+        for (const w of work.works) {
+            assert.strictEqual(w.kind, "Ref");
+        }
+    });
+
+    it("flattens multi-level nested SequentialWork", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({
+                        kind: "Seq",
+                        works: [
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                            {
+                                kind: "Seq",
+                                works: [
+                                    { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                    {
+                                        kind: "Seq",
+                                        works: [
+                                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        const work = result.jobs["test-job"].work;
+        assert.strictEqual(work.kind, "Seq");
+        assert.strictEqual(work.works.length, 3, "multi-level nested Seq should be fully flattened");
+    });
+
+    it("flattens nested ParallelWork", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({
+                        kind: "Par",
+                        works: [
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                            {
+                                kind: "Par",
+                                works: [
+                                    { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                    { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                ]
+                            }
+                        ]
+                    }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        const work = result.jobs["test-job"].work;
+        assert.strictEqual(work.kind, "Par");
+        assert.strictEqual(work.works.length, 3, "nested Par should be flattened");
+    });
+
+    it("does not flatten Par inside Seq or vice versa", () => {
+        const testEntry = {
+            models: { driving: "gpt-5-mini", planning: "gpt-5.2" },
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "t": { model: { category: "planning" }, requireUserInput: false, prompt: ["hello"] },
+            },
+            jobs: {
+                "test-job": {
+                    work: assignWorkId({
+                        kind: "Seq",
+                        works: [
+                            { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                            {
+                                kind: "Par",
+                                works: [
+                                    { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                    { kind: "Ref", workIdInJob: /** @type {never} */ (undefined), taskId: "t" },
+                                ]
+                            }
+                        ]
+                    }),
+                },
+            },
+        };
+        const result = validateEntry(testEntry, "test:");
+        const work = result.jobs["test-job"].work;
+        assert.strictEqual(work.kind, "Seq");
+        assert.strictEqual(work.works.length, 2, "Par inside Seq should not be flattened");
+        assert.strictEqual(work.works[1].kind, "Par");
+    });
+
+    it("nested-seq-job in test entry has flattened work", () => {
+        const work = validatedTestEntry.jobs["nested-seq-job"].work;
+        assert.strictEqual(work.kind, "Seq");
+        assert.strictEqual(work.works.length, 3, "nested-seq-job should be fully flattened");
+    });
+
+    it("nested-par-job in test entry has flattened work", () => {
+        const work = validatedTestEntry.jobs["nested-par-job"].work;
+        assert.strictEqual(work.kind, "Par");
+        assert.strictEqual(work.works.length, 3, "nested-par-job should be fully flattened");
     });
 });

@@ -1,6 +1,6 @@
 // ---- Redirect if no working directory ----
 const params = new URLSearchParams(window.location.search);
-const workingDir = params.get("wd");
+const workingDir = params.get("wb");
 if (!workingDir) {
     window.location.href = "/index.html";
 }
@@ -11,9 +11,7 @@ let jobsData = null;
 
 // ---- DOM references ----
 const matrixPart = document.getElementById("matrix-part");
-const jobPart = document.getElementById("job-part");
-const userInputPart = document.getElementById("user-input-part");
-const sessionResponsePart = document.getElementById("session-response-part");
+const userInputTextarea = document.getElementById("user-input-textarea");
 const startJobButton = document.getElementById("start-job-button");
 const resizeBar = document.getElementById("resize-bar");
 const leftPart = document.getElementById("left-part");
@@ -127,6 +125,7 @@ function onJobButtonClick(btn, jobName) {
         selectedJobName = null;
         startJobButton.disabled = true;
         startJobButton.textContent = "Job Not Selected";
+        userInputTextarea.disabled = true;
     } else {
         // Deselect previous
         const prev = matrixPart.querySelector(".matrix-job-btn.selected");
@@ -136,8 +135,19 @@ function onJobButtonClick(btn, jobName) {
         selectedJobName = jobName;
         startJobButton.disabled = false;
         startJobButton.textContent = `Start Job: ${jobName}`;
+        // Enable text box only when requireUserInput is true
+        const job = jobsData.jobs[jobName];
+        userInputTextarea.disabled = !(job && job.requireUserInput);
     }
 }
+
+// ---- Start Job ----
+startJobButton.addEventListener("click", () => {
+    if (!selectedJobName) return;
+    const userInput = userInputTextarea.value;
+    const url = `/jobTracking.html?jobId=${encodeURIComponent(selectedJobName)}&wb=${encodeURIComponent(workingDir)}&userInput=${encodeURIComponent(userInput)}`;
+    window.location.href = url;
+});
 
 // ---- Resize bar (horizontal) ----
 let resizing = false;

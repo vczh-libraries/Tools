@@ -10,7 +10,8 @@
       "automate": false,
       "jobs": [
         { "name": "run", "jobName": "simple-job" },
-        { "name": "fail", "jobName": "fail-job" }
+        { "name": "fail", "jobName": "fail-job" },
+        { "name": "input", "jobName": "input-job" }
       ]
     },
     {
@@ -49,6 +50,48 @@
         "kind": "Ref",
         "workIdInJob": 0,
         "taskId": "simple-task"
+      }
+    },
+    "input-job": {
+      "work": {
+        "kind": "Ref",
+        "workIdInJob": 0,
+        "taskId": "input-task"
+      }
+    },
+    "nested-seq-job": {
+      "work": {
+        "kind": "Seq",
+        "works": [
+          { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+          {
+            "kind": "Seq",
+            "works": [
+              { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" },
+              {
+                "kind": "Seq",
+                "works": [
+                  { "kind": "Ref", "workIdInJob": 2, "taskId": "simple-task" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nested-par-job": {
+      "work": {
+        "kind": "Par",
+        "works": [
+          { "kind": "Ref", "workIdInJob": 0, "taskId": "simple-task" },
+          {
+            "kind": "Par",
+            "works": [
+              { "kind": "Ref", "workIdInJob": 1, "taskId": "simple-task" },
+              { "kind": "Ref", "workIdInJob": 2, "taskId": "simple-task" }
+            ]
+          }
+        ]
       }
     },
     "seq-job": {

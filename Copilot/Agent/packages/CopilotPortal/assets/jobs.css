@@ -164,14 +164,8 @@ html, body {
     cursor: not-allowed;
 }
 
-/* ---- Job Part (placeholder) ---- */
-#job-part {
-    padding: 16px;
-    height: 100%;
-}
-
-/* ---- Session Response Part (placeholder) ---- */
-#session-response-part {
-    padding: 8px;
-    height: 100%;
+#user-input-textarea:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f0f0f0;
 }

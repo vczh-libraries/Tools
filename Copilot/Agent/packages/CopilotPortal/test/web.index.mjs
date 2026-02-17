@@ -80,12 +80,12 @@ describe("Web: index.html setup UI", () => {
         const wd = await page.locator("#working-dir").inputValue();
         // Intercept navigation by listening for the URL change
         const [response] = await Promise.all([
-            page.waitForURL(/\/jobs\.html\?wd=/),
+            page.waitForURL(/\/jobs\.html\?wb=/),
             page.locator("#jobs-button").click(),
         ]);
         const url = new URL(page.url());
         assert.strictEqual(url.pathname, "/jobs.html");
-        assert.strictEqual(url.searchParams.get("wd"), wd);
+        assert.strictEqual(url.searchParams.get("wb"), wd);
     });
 });
 

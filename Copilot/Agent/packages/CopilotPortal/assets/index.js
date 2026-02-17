@@ -73,7 +73,7 @@ async function initWorkingDir() {
 
 jobsButton.addEventListener("click", () => {
     const wd = workingDirInput.value;
-    window.location.href = `/jobs.html?wd=${encodeURIComponent(wd)}`;
+    window.location.href = `/jobs.html?wb=${encodeURIComponent(wd)}`;
 });
 
 // ---- Start Session ----

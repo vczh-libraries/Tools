@@ -29,7 +29,7 @@ describe("Web: jobs.html redirect", () => {
         await browser?.close();
     });
 
-    it("redirects to index.html when no wd parameter", async () => {
+    it("redirects to index.html when no wb parameter", async () => {
         await page.goto(`${BASE}/jobs.html`);
         await page.waitForTimeout(1000);
         const url = new URL(page.url());
@@ -45,7 +45,7 @@ describe("Web: jobs.html layout", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobs.html?wd=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.goto(`${BASE}/jobs.html?wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
         await page.waitForTimeout(2000);
     });
 
@@ -77,23 +77,14 @@ describe("Web: jobs.html layout", () => {
         assert.ok(visible, "matrix part should be visible");
     });
 
-    it("job-part is hidden at start", async () => {
-        const display = await page.evaluate(() =>
-            document.getElementById("job-part").style.display
-        );
-        assert.strictEqual(display, "none", "job part should be hidden");
-    });
-
     it("user-input-part is visible at start", async () => {
         const visible = await page.locator("#user-input-part").isVisible();
         assert.ok(visible, "user input part should be visible");
     });
 
-    it("session-response-part is hidden at start", async () => {
-        const display = await page.evaluate(() =>
-            document.getElementById("session-response-part").style.display
-        );
-        assert.strictEqual(display, "none", "session response part should be hidden");
+    it("user-input-textarea is disabled by default", async () => {
+        const disabled = await page.locator("#user-input-textarea").isDisabled();
+        assert.ok(disabled, "textarea should be disabled by default");
     });
 });
 
@@ -105,7 +96,7 @@ describe("Web: jobs.html matrix rendering", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobs.html?wd=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.goto(`${BASE}/jobs.html?wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
         await page.waitForTimeout(2000);
     });
 
@@ -165,7 +156,7 @@ describe("Web: jobs.html job selection", () => {
         await verifyEntryInstalled();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobs.html?wd=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.goto(`${BASE}/jobs.html?wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
         await page.waitForTimeout(2000);
     });
 
@@ -191,6 +182,12 @@ describe("Web: jobs.html job selection", () => {
         assert.ok(!disabled, "start job button should be enabled");
     });
 
+    it("textarea stays disabled for job without requireUserInput", async () => {
+        // simple-job uses simple-task which has requireUserInput: false
+        const disabled = await page.locator("#user-input-textarea").isDisabled();
+        assert.ok(disabled, "textarea should remain disabled for jobs without user input");
+    });
+
     it("clicking the same job button deselects it", async () => {
         const btn = page.locator('.matrix-job-btn[data-job-name="simple-job"]');
         await btn.click(); // deselect
@@ -200,6 +197,8 @@ describe("Web: jobs.html job selection", () => {
         assert.strictEqual(startText, "Job Not Selected");
         const disabled = await page.locator("#start-job-button").isDisabled();
         assert.ok(disabled, "start job button should be disabled");
+        const textareaDisabled = await page.locator("#user-input-textarea").isDisabled();
+        assert.ok(textareaDisabled, "textarea should be disabled when deselected");
     });
 
     it("clicking a different job button switches selection", async () => {
@@ -215,8 +214,90 @@ describe("Web: jobs.html job selection", () => {
         assert.strictEqual(startText, "Start Job: seq-job");
     });
 
+    it("textarea enables for job with requireUserInput", async () => {
+        // Select input-job which uses input-task with requireUserInput: true
+        const btn = page.locator('.matrix-job-btn[data-job-name="input-job"]');
+        await btn.click();
+        const textareaDisabled = await page.locator("#user-input-textarea").isDisabled();
+        assert.ok(!textareaDisabled, "textarea should be enabled for jobs with requireUserInput");
+        await btn.click(); // deselect
+    });
+
     it("user input textarea is visible", async () => {
         const visible = await page.locator("#user-input-textarea").isVisible();
         assert.ok(visible, "user input textarea should be visible");
     });
 });
+
+describe("Web: jobTracking.html redirect", () => {
+    let browser;
+    let page;
+
+    before(async () => {
+        browser = await chromium.launch({ headless: true });
+        page = await browser.newPage();
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("redirects to index.html when no jobId parameter", async () => {
+        await page.goto(`${BASE}/jobTracking.html`);
+        await page.waitForTimeout(1000);
+        const url = new URL(page.url());
+        assert.strictEqual(url.pathname, "/index.html", "should redirect to index.html");
+    });
+});
+
+describe("Web: jobTracking.html layout", () => {
+    let browser;
+    let page;
+
+    before(async () => {
+        await verifyEntryInstalled();
+        browser = await chromium.launch({ headless: true });
+        page = await browser.newPage();
+        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job&wb=C%3A%5CCode%5CVczhLibraries%5CTools`);
+        await page.waitForTimeout(3000);
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("loads jobTracking.css stylesheet", async () => {
+        const links = await page.evaluate(() =>
+            Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.getAttribute("href"))
+        );
+        assert.ok(links.includes("jobTracking.css"), "should include jobTracking.css");
+    });
+
+    it("has left-part and right-part", async () => {
+        const leftVisible = await page.locator("#left-part").isVisible();
+        const rightVisible = await page.locator("#right-part").isVisible();
+        assert.ok(leftVisible, "left part should be visible");
+        assert.ok(rightVisible, "right part should be visible");
+    });
+
+    it("has horizontal resize bar", async () => {
+        const visible = await page.locator("#resize-bar").isVisible();
+        assert.ok(visible, "resize bar should be visible");
+    });
+
+    it("job-part is visible", async () => {
+        const visible = await page.locator("#job-part").isVisible();
+        assert.ok(visible, "job part should be visible");
+    });
+
+    it("renders flow chart with task nodes", async () => {
+        const taskNodes = await page.locator(".task-node").count();
+        assert.ok(taskNodes > 0, "should have at least one task node in the flow chart");
+    });
+
+    it("task node displays task id", async () => {
+        const text = await page.locator(".task-node").first().textContent();
+        assert.ok(text.includes("simple-task"), "task node should display task id");
+    });
+});
+

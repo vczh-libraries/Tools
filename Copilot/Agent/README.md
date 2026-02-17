@@ -101,6 +101,12 @@ Copilot/Agent/
 │   │   │   ├── index.html    # Main portal page
 │   │   │   ├── index.js      # Portal JS (session interaction, live polling)
 │   │   │   ├── index.css     # Portal styles
+│   │   │   ├── jobs.html     # Jobs selection page
+│   │   │   ├── jobs.js       # Jobs page JS (matrix rendering, job selection)
+│   │   │   ├── jobs.css      # Jobs page styles
+│   │   │   ├── jobTracking.html  # Job tracking page with flow chart
+│   │   │   ├── jobTracking.js    # Job tracking JS (ELK.js flow chart rendering)
+│   │   │   ├── jobTracking.css   # Job tracking styles
 │   │   │   ├── messageBlock.js       # MessageBlock component
 │   │   │   ├── messageBlock.css      # MessageBlock styles
 │   │   │   ├── sessionResponse.js    # SessionResponseRenderer component
@@ -112,7 +118,10 @@ Copilot/Agent/
 │   │   │   ├── testEntry.json        # Test entry with simple tasks/jobs for API tests
 │   │   │   ├── jobsData.test.mjs     # Jobs data validation tests
 │   │   │   ├── api.test.mjs          # RESTful API tests (incl. task/job execution)
-│   │   │   └── web.test.mjs          # Playwright UI tests
+│   │   │   ├── work.test.mjs         # Work tree execution tests
+│   │   │   ├── web.test.mjs          # Playwright UI tests (test.html)
+│   │   │   ├── web.index.mjs         # Playwright tests for index.html
+│   │   │   └── web.jobs.mjs          # Playwright tests for jobs.html and jobTracking.html
 │   │   └── package.json
 ```
 

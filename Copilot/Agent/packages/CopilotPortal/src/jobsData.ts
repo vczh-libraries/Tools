@@ -758,7 +758,20 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
         const allModelKeys = Object.keys(entry.models);
         for (const [jobName, job] of Object.entries(entry.jobs)) {
             const jobBase = `${codePath}entry.jobs["${jobName}"]`;
+
+            // Simplify work tree: flatten nested Seq/Par
+            job.work = simplifyWork(job.work);
+
             validateWork(entry, job.work, jobBase + ".work", allModelKeys);
+
+            // Compute requireUserInput for the job
+            const jobRequiresInput = collectTaskIdsFromWork(job.work).some(
+                taskId => entry.tasks[taskId]?.requireUserInput
+            );
+            if (job.requireUserInput !== undefined && job.requireUserInput !== jobRequiresInput) {
+                throw new Error(`${jobBase}.requireUserInput: Should be ${jobRequiresInput} but is ${job.requireUserInput}.`);
+            }
+            job.requireUserInput = jobRequiresInput;
         }
     }
 
@@ -827,3 +840,89 @@ function validateWork(entry: Entry, work: Work<unknown>, codePath: string, model
 }
 
 export const entry = validateEntry(entryInput, "jobsData.ts:");
+
+// ---- Helper: collect all TaskWork taskIds from a work tree ----
+
+function collectTaskIdsFromWork(work: Work<unknown>): string[] {
+    const ids: string[] = [];
+    function collect(w: Work<unknown>): void {
+        switch (w.kind) {
+            case "Ref":
+                ids.push((w as TaskWork<unknown>).taskId);
+                break;
+            case "Seq":
+            case "Par":
+                for (const child of (w as SequentialWork<unknown> | ParallelWork<unknown>).works) {
+                    collect(child);
+                }
+                break;
+            case "Loop": {
+                const lw = w as LoopWork<unknown>;
+                if (lw.preCondition) collect(lw.preCondition[1]);
+                collect(lw.body);
+                if (lw.postCondition) collect(lw.postCondition[1]);
+                break;
+            }
+            case "Alt": {
+                const aw = w as AltWork<unknown>;
+                collect(aw.condition);
+                if (aw.trueWork) collect(aw.trueWork);
+                if (aw.falseWork) collect(aw.falseWork);
+                break;
+            }
+        }
+    }
+    collect(work);
+    return ids;
+}
+
+// ---- Helper: simplify work tree (flatten nested Seq/Par) ----
+
+function simplifyWork<T>(work: Work<T>): Work<T> {
+    switch (work.kind) {
+        case "Ref":
+            return work;
+        case "Seq": {
+            const flatWorks: Work<T>[] = [];
+            for (const child of (work as SequentialWork<T>).works) {
+                const simplified = simplifyWork(child);
+                if (simplified.kind === "Seq") {
+                    flatWorks.push(...(simplified as SequentialWork<T>).works);
+                } else {
+                    flatWorks.push(simplified);
+                }
+            }
+            return { ...work, works: flatWorks } as SequentialWork<T>;
+        }
+        case "Par": {
+            const flatWorks: Work<T>[] = [];
+            for (const child of (work as ParallelWork<T>).works) {
+                const simplified = simplifyWork(child);
+                if (simplified.kind === "Par") {
+                    flatWorks.push(...(simplified as ParallelWork<T>).works);
+                } else {
+                    flatWorks.push(simplified);
+                }
+            }
+            return { ...work, works: flatWorks } as ParallelWork<T>;
+        }
+        case "Loop": {
+            const lw = work as LoopWork<T>;
+            return {
+                ...lw,
+                preCondition: lw.preCondition ? [lw.preCondition[0], simplifyWork(lw.preCondition[1])] : undefined,
+                body: simplifyWork(lw.body),
+                postCondition: lw.postCondition ? [lw.postCondition[0], simplifyWork(lw.postCondition[1])] : undefined,
+            } as LoopWork<T>;
+        }
+        case "Alt": {
+            const aw = work as AltWork<T>;
+            return {
+                ...aw,
+                condition: simplifyWork(aw.condition),
+                trueWork: aw.trueWork ? simplifyWork(aw.trueWork) : undefined,
+                falseWork: aw.falseWork ? simplifyWork(aw.falseWork) : undefined,
+            } as AltWork<T>;
+        }
+    }
+}
