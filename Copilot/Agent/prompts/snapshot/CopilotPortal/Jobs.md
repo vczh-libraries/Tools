@@ -42,7 +42,7 @@ The look-and-feel must be similar to `/index.html`, but DO NOT share any css fil
 ### Matrix Part
 
 It renders a larget table of buttons according to `grid`.
-The first row is a title "Available Jobs".
+The first row is a title "Available Jobs", followed by a button "Stop Server" at the very right doing exactly what the button in `/index.html` does.
 The first column shows `keyword`.
 The second column shows "automate" buttons only when `automate` is true.
 All other columns are for `grid[index].jobs`, `name` will be the text of the button.

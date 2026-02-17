@@ -48,35 +48,32 @@ html, body {
 #matrix-table {
     width: 100%;
     height: 100%;
-    border-collapse: separate;
-    border-spacing: 8px;
+    border-collapse: collapse;
     table-layout: fixed;
 }
 
-#matrix-table .matrix-title {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    padding: 12px;
-    border-bottom: 2px solid #ddd;
-}
-
+#matrix-table th,
 #matrix-table td {
     border: 1px solid #e0e0e0;
-    padding: 4px;
+    padding: 12px;
     text-align: center;
     vertical-align: middle;
 }
 
-#matrix-table .matrix-keyword {
+#matrix-table .matrix-title {
+    text-align: center;
+    font-size: 34px;
     font-weight: bold;
-    font-size: 18px;
-    white-space: nowrap;
+    padding: 16px;
 }
 
-#matrix-table button {
-    width: 100%;
-    padding: 10px 8px;
+#matrix-table .matrix-stop-cell {
+    text-align: right;
+    padding: 16px;
+}
+
+#matrix-table .matrix-stop-cell button {
+    padding: 8px 20px;
     font-size: 16px;
     cursor: pointer;
     border: 1px solid #888;
@@ -84,18 +81,38 @@ html, body {
     background: #f8f8f8;
 }
 
-#matrix-table button:hover {
+#matrix-table .matrix-stop-cell button:hover {
+    background: #e8e8e8;
+}
+
+#matrix-table .matrix-keyword {
+    font-weight: bold;
+    font-size: 30px;
+    white-space: nowrap;
+}
+
+#matrix-table td button {
+    width: 100%;
+    padding: 12px 10px;
+    font-size: 28px;
+    cursor: pointer;
+    border: 1px solid #888;
+    border-radius: 4px;
+    background: #f8f8f8;
+}
+
+#matrix-table td button:hover {
     background: #e8e8e8;
 }
 
 .matrix-job-btn.selected {
-    background: #4a90d9;
-    color: white;
+    font-weight: bold;
     border-color: #357abd;
+    background: #e8f0fe;
 }
 
 .matrix-job-btn.selected:hover {
-    background: #357abd;
+    background: #d0e0f8;
 }
 
 .matrix-automate-btn {

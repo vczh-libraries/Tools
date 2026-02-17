@@ -50,14 +50,6 @@ All other columns are for `grid[index].jobs`, `name` will be the text of the but
 If any cell has no button, leave it blanks.
 The table is supposed to fill all `matrix part` but leave margins to the border and between buttons.
 The table is also rendered with light color lines.
-**TASK-BEGIN**
-By sying margins and light color lines, what I was expecting is:
-- Single lines to tell cells part, instead of currently each cell being a rectangle.
-- You can alternatively set enough margins inside each cell of table margins can't finish the above item.
-- Fonts in "Matrix Part" could be 1.7x - 2x larger.
-
-Selected job button has write color which can't barely see with the background. Make it bold instead.
-**TASK-END**
 
 Font size should be large enough to reduce blanks, prepare to fill about 1000x1000 or a even larger space. The complete content can be read in `jobsData.ts`, it helps to guess a font size as it will but rarely changes.
 

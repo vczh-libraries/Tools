@@ -118,6 +118,14 @@ describe("Web: jobs.html matrix rendering", () => {
         assert.strictEqual(title, "Available Jobs", "should have title row");
     });
 
+    it("has Stop Server button in title row", async () => {
+        const btn = page.locator("#stop-server-button");
+        const visible = await btn.isVisible();
+        assert.ok(visible, "Stop Server button should be visible");
+        const text = await btn.textContent();
+        assert.strictEqual(text, "Stop Server");
+    });
+
     it("renders keyword columns", async () => {
         const keywords = await page.locator(".matrix-keyword").allTextContents();
         assert.ok(keywords.includes("test"), "should have 'test' keyword");

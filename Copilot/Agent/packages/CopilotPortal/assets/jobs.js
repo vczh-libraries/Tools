@@ -50,10 +50,29 @@ function renderMatrix() {
     const maxJobCols = Math.max(...grid.map(row => row.jobs.length));
     const totalCols = 1 + (hasAutomate ? 1 : 0) + maxJobCols;
     const titleCell = document.createElement("th");
-    titleCell.colSpan = totalCols;
+    titleCell.colSpan = totalCols - 1;
     titleCell.textContent = "Available Jobs";
     titleCell.className = "matrix-title";
     titleRow.appendChild(titleCell);
+    const stopCell = document.createElement("th");
+    stopCell.className = "matrix-stop-cell";
+    const stopBtn = document.createElement("button");
+    stopBtn.id = "stop-server-button";
+    stopBtn.textContent = "Stop Server";
+    stopBtn.addEventListener("click", async () => {
+        try {
+            await fetch("/api/stop");
+        } catch {
+            // ignore
+        }
+        window.close();
+        setTimeout(() => {
+            document.title = "Server Stopped";
+            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#ccc;background:#1e1e1e;"><h1>Server stopped — you may close this tab.</h1></div>';
+        }, 200);
+    });
+    stopCell.appendChild(stopBtn);
+    titleRow.appendChild(stopCell);
     table.appendChild(titleRow);
 
     // Data rows
