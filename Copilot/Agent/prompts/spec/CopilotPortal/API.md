@@ -559,10 +559,11 @@ List all jobs passed to `installJobsEntry` in this schema:
 {
   grid: GridRow[];
   jobs: { [key in string]: Job };
+  chart: ChartGraph;
 }
 ```
 
-Basically means it only keeps `grid` and `jobs` and drops all other fields.
+Basically means it only keeps `grid` and `jobs` and drops all other fields, and calculate `chart` with `generateChartNodes`.
 
 ### copilot/job/start/{job-name}
 
