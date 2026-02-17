@@ -147,4 +147,4 @@ Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.j
 
 ### Session Response Part
 
-(to be editing...)
+Print `JSON.stringify(chartToRender, undefined, 4)`.
