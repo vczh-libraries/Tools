@@ -168,7 +168,7 @@ function makeReviewWork(keyword: "scrum" | "design" | "plan" | "summary"): Work<
         kind: "Seq",
         works: [{
             kind: "Loop",
-            postCondition: [true, makeRefWork("review-final-task")],
+            postCondition: [false, makeRefWork("review-final-task")],
             body: {
                 kind: "Par",
                 works: ["reviewers1", "reviewers2", "reviewers3"].map(reviewerKey => makeRefWork(`review-${keyword}-task`, { category: reviewerKey }))
