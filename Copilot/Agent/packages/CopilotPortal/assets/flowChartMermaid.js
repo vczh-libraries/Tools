@@ -19,7 +19,7 @@ function mermaidBuildDefinition(chart) {
                 lines.push(`    ${id}["${label}"]`);
                 break;
             case "CondNode":
-                lines.push(`    ${id}{"${label}"}`);
+                lines.push(`    ${id}{{"${label}"}}`);
                 break;
             case "ParBegin":
             case "ParEnd":
