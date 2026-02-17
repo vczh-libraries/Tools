@@ -29,6 +29,7 @@ It's spec is in `JobsData.md`.
 - "yarn portal-for-test" to run src/index.ts in test model
 
 It starts both Website and RESTful API. Awaits for api/stop to stops.
+Additionally, allow pressing ENTER to stop. It should act the same as api/stop.
 
 ## Running the Website
 

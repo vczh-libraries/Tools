@@ -122,7 +122,8 @@ It is already a generated flow chart but has no layout information.
 
 Each `ChartNode` is a node in the flow chart, and each hint maps to a graph:
 - `TaskNode`: A blue rectangle with the task id, the text would be the `TaskWork` with that `workIdInJob`.
-- `ParBegin`, `ParEnd`, `AltEnd`: A small black rectangle bar.
+- `ParBegin`, `ParEnd`: A small black rectangle bar.
+- `AltEnd`: A small pink rectangle bar.
 - `CondBegin`: A small yellow rectangle bar.
 - `CondEnd`: A small yellow diamind.
 - `LoopEnd`: A small gray circle.
