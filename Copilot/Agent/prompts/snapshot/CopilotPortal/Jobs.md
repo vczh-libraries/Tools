@@ -12,6 +12,9 @@ Read `README.md` to understand the whole picture of the project as well as speci
   - `jobTracking.css`
   - `jobTracking.js`
   - `jobTracking.html`
+  - `flowChartELK.css`
+  - `flowChartELK.js`
+  - `flowChartMermaid.js`
 
 ### jobs.css
 
@@ -139,6 +142,12 @@ Arrows would be gray.
 
 #### Rendering with ELK
 
+Implementation stores in:
+- `flowChartELK.css`
+- `flowChartELK.js`
+
+Activate this renderer by using URL argument `renderer=elk` or not setting `renderer`.
+
 Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.js`) for automatic graph layout:
 - Build an ELK graph with `children` (nodes) and `edges` from the `ChartGraph`.
 - Use `elk.algorithm: "layered"` with `elk.direction: "DOWN"` for top-to-bottom flow.
@@ -148,6 +157,28 @@ Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.j
 - Use `elk.layered.nodePlacement.strategy: "NETWORK_SIMPLEX"` for better node centering.
 - Each `ChartNode` becomes an ELK node; each `ChartArrow` becomes an ELK edge.
 - After `elk.layout(graph)`, render the positioned nodes and routed edges into an SVG.
+- Node visual styles (colors, borders) are defined in `flowChartELK.css` using CSS classes per hint type.
+
+#### Rendering with Mermaid
+
+Implementation stores in:
+- `flowChartMermaid.js`
+
+No separate CSS file is needed; node styles are embedded as inline Mermaid `style` directives in the generated definition.
+
+Activate this renderer by using URL argument `renderer=mermaid`.
+
+Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flowchart rendering:
+- Initialize Mermaid with `startOnLoad: false` so rendering is controlled programmatically.
+- Build a Mermaid `graph TD` definition string from the `ChartGraph`.
+- Each `ChartNode` becomes a Mermaid node with shape syntax matching its hint (rectangles, diamonds `{}`, circles `(())`).
+- Each `ChartArrow` becomes a Mermaid edge with optional label.
+- Per-node inline `style` directives set fill, stroke, and text color matching the same palette as ELK.
+- Call `mermaid.render("mermaid-chart", definition)` to produce an SVG, then insert it into the container.
+
+#### Interaction with `ChartNode` which has a `TaskNode` hint
+
+Clicking it bold (exclusive) or unbold the text.
 
 ### Session Response Part
 

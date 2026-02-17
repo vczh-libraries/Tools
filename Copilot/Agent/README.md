@@ -107,8 +107,11 @@ Copilot/Agent/
 │   │   │   ├── jobs.js       # Jobs page JS (matrix rendering, job selection)
 │   │   │   ├── jobs.css      # Jobs page styles
 │   │   │   ├── jobTracking.html  # Job tracking page
-│   │   │   ├── jobTracking.js    # Job tracking JS
+│   │   │   ├── jobTracking.js    # Job tracking JS (logic + renderer dispatch)
 │   │   │   ├── jobTracking.css   # Job tracking styles
+│   │   │   ├── flowChartELK.js   # ELK flow chart renderer
+│   │   │   ├── flowChartELK.css  # ELK flow chart node styles
+│   │   │   ├── flowChartMermaid.js # Mermaid flow chart renderer
 │   │   │   ├── messageBlock.js       # MessageBlock component
 │   │   │   ├── messageBlock.css      # MessageBlock styles
 │   │   │   ├── sessionResponse.js    # SessionResponseRenderer component
@@ -153,3 +156,4 @@ Copilot/Agent/
 - **Job Workflow Engine**: Composable work tree execution supporting sequential, parallel, loop, and conditional (alt) work patterns
 - **Task Selection UI**: Combo box in the portal to select and run tasks within an active session
 - **Tool Registration**: Custom job tools (e.g. `job_boolean_true`, `job_prepare_document`) are automatically registered with Copilot sessions
+- **Flow Chart Renderers**: Job tracking page supports ELK (default) and Mermaid renderers, selectable via `renderer` URL parameter
