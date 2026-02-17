@@ -881,14 +881,10 @@ export async function apiJobList(
     res: http.ServerResponse,
 ): Promise<void> {
     if (!installedEntry) {
-        jsonResponse(res, 200, { jobs: [] });
+        jsonResponse(res, 200, { grid: [], jobs: {} });
         return;
     }
-    const jobList = Object.entries(installedEntry.jobs).map(([name, job]) => ({
-        name,
-        ...job,
-    }));
-    jsonResponse(res, 200, { jobs: jobList });
+    jsonResponse(res, 200, { grid: installedEntry.grid, jobs: installedEntry.jobs });
 }
 
 export async function apiJobStart(

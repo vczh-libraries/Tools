@@ -32,8 +32,21 @@ When the webpage is loaded, it renders a UI in the middle to let me input:
   - When there is no `project` argument, it becomes `REPO-ROOT`.
   - `REPO-ROOT` is the root folder of the repo that the source code of this project is in (no hardcoding).
 
+There are a row of buttons:
+- "Jobs" on the very left.
+- "Start" on the very right.
+
+##### Start Button
+
 When I hit the "Start" button, the UI above disappears and show the session UI.
 Send `api/copilot/session/start/{model-id}` to get the session id.
+
+Only after the model list is loaded, "Start" is enabled.
+
+##### Jobs Button
+
+When I hit the "Jobs" button, it jumpts to `/jobs.html`.
+The selected model is ignored, but the working directory should be brought to `/jobs.html`.
 
 #### Session Interaction
 

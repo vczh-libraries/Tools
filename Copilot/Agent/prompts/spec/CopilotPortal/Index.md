@@ -46,7 +46,7 @@ Only after the model list is loaded, "Start" is enabled.
 ##### Jobs Button
 
 When I hit the "Jobs" button, it jumpts to `/jobs.html`.
-The selected model is ignored, but the working directory should be brought to `/jobs.htm.`.
+The selected model is ignored, but the working directory should be brought to `/jobs.html`.
 
 #### Session Interaction
 

@@ -82,6 +82,32 @@ describe("Web: index.html setup UI", () => {
         const config = await (await fetch(`${BASE}/api/config`)).json();
         assert.strictEqual(value, config.repoRoot, "working dir should default to REPO-ROOT");
     });
+
+    it("has Jobs button on the left and Start button on the right", async () => {
+        const jobsButton = page.locator("#jobs-button");
+        const startButton = page.locator("#start-button");
+        assert.ok(await jobsButton.isVisible(), "Jobs button should be visible");
+        assert.ok(await startButton.isVisible(), "Start button should be visible");
+        assert.strictEqual(await jobsButton.textContent(), "Jobs");
+        assert.strictEqual(await startButton.textContent(), "Start");
+    });
+
+    it("Start button is enabled after models load", async () => {
+        const disabled = await page.locator("#start-button").isDisabled();
+        assert.ok(!disabled, "Start button should be enabled after models are loaded");
+    });
+
+    it("Jobs button navigates to jobs.html with working directory", async () => {
+        const wd = await page.locator("#working-dir").inputValue();
+        // Intercept navigation by listening for the URL change
+        const [response] = await Promise.all([
+            page.waitForURL(/\/jobs\.html\?wd=/),
+            page.locator("#jobs-button").click(),
+        ]);
+        const url = new URL(page.url());
+        assert.strictEqual(url.pathname, "/jobs.html");
+        assert.strictEqual(url.searchParams.get("wd"), wd);
+    });
 });
 
 describe("Web: index.html project parameter", () => {

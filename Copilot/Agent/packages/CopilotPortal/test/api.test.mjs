@@ -232,7 +232,7 @@ describe("API: copilot/test/installJobsEntry", () => {
         const tasks = await fetchJson("/api/copilot/task");
         assert.deepStrictEqual(tasks, { tasks: [] });
         const jobs = await fetchJson("/api/copilot/job");
-        assert.deepStrictEqual(jobs, { jobs: [] });
+        assert.deepStrictEqual(jobs, { grid: [], jobs: {} });
     });
 
     it("returns InvalidatePath for file outside test folder", async () => {
@@ -332,27 +332,35 @@ describe("API: /api/copilot/task (after entry installed)", () => {
 });
 
 describe("API: /api/copilot/job (after entry installed)", () => {
-    it("returns a list of jobs", async () => {
+    it("returns grid and jobs", async () => {
         const data = await fetchJson("/api/copilot/job");
-        assert.ok(Array.isArray(data.jobs), "jobs should be an array");
-        assert.ok(data.jobs.length > 0, "should have at least one job");
+        assert.ok(Array.isArray(data.grid), "grid should be an array");
+        assert.ok(typeof data.jobs === "object" && data.jobs !== null && !Array.isArray(data.jobs), "jobs should be an object");
+        assert.ok(Object.keys(data.jobs).length > 0, "should have at least one job");
     });
 
-    it("each job has name and work", async () => {
+    it("each job has work", async () => {
         const data = await fetchJson("/api/copilot/job");
-        for (const j of data.jobs) {
-            assert.ok(typeof j.name === "string", `job name should be string: ${JSON.stringify(j)}`);
-            assert.ok(j.work !== undefined, `job should have work: ${JSON.stringify(j)}`);
+        for (const [name, job] of Object.entries(data.jobs)) {
+            assert.ok(typeof name === "string", `job key should be string`);
+            assert.ok(job.work !== undefined, `job ${name} should have work`);
         }
     });
 
     it("contains expected test jobs", async () => {
         const data = await fetchJson("/api/copilot/job");
-        const jobNames = data.jobs.map((j) => j.name);
+        const jobNames = Object.keys(data.jobs);
         assert.ok(jobNames.includes("simple-job"), "should have simple-job");
         assert.ok(jobNames.includes("seq-job"), "should have seq-job");
         assert.ok(jobNames.includes("par-job"), "should have par-job");
         assert.ok(jobNames.includes("fail-job"), "should have fail-job");
+    });
+
+    it("does not include models, promptVariables, or tasks", async () => {
+        const data = await fetchJson("/api/copilot/job");
+        assert.strictEqual(data.models, undefined, "should not include models");
+        assert.strictEqual(data.promptVariables, undefined, "should not include promptVariables");
+        assert.strictEqual(data.tasks, undefined, "should not include tasks");
     });
 });
 

@@ -38,6 +38,12 @@ html, body {
     border-radius: 4px;
 }
 
+#setup-buttons {
+    display: flex;
+    justify-content: space-between;
+    min-width: 400px;
+}
+
 #setup-ui button {
     padding: 8px 24px;
     font-size: 14px;
@@ -47,8 +53,13 @@ html, body {
     background: #f8f8f8;
 }
 
-#setup-ui button:hover {
+#setup-ui button:hover:not(:disabled) {
     background: #e8e8e8;
+}
+
+#setup-ui button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ---- Session UI ---- */

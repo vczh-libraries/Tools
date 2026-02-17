@@ -62,7 +62,7 @@ function getWorkEvents(callbacks) {
 // Look up workIdInJob values from the /api/copilot/job endpoint for a given job
 async function getJobWorkIds(jobName) {
     const jobsData = await fetchJson("/api/copilot/job");
-    const job = jobsData.jobs.find(j => j.name === jobName);
+    const job = jobsData.jobs[jobName];
     assert.ok(job, `job ${jobName} should exist`);
 
     // Collect all TaskWork workIdInJob values from the work tree

@@ -11,6 +11,7 @@ const sessionUi = document.getElementById("session-ui");
 const modelSelect = document.getElementById("model-select");
 const workingDirInput = document.getElementById("working-dir");
 const startButton = document.getElementById("start-button");
+const jobsButton = document.getElementById("jobs-button");
 const sessionPart = document.getElementById("session-part");
 const requestTextarea = document.getElementById("request-textarea");
 const sendButton = document.getElementById("send-button");
@@ -42,6 +43,7 @@ async function loadModels() {
         if (defaultOption) {
             defaultOption.selected = true;
         }
+        startButton.disabled = false;
     } catch (err) {
         console.error("Failed to load models:", err);
     }
@@ -66,6 +68,13 @@ async function initWorkingDir() {
         console.error("Failed to load config:", err);
     }
 }
+
+// ---- Jobs Navigation ----
+
+jobsButton.addEventListener("click", () => {
+    const wd = workingDirInput.value;
+    window.location.href = `/jobs.html?wd=${encodeURIComponent(wd)}`;
+});
 
 // ---- Start Session ----
 
