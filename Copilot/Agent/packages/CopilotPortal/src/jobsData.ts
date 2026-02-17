@@ -64,12 +64,12 @@ function testGraph_Loop2(): Work<never> {
         kind: "Loop",
         preCondition: [false, {
             kind: "Loop",
-            preCondition: [false, makeRefWork("ask-task")],
+            preCondition: [false, { kind: "Seq", works: [makeRefWork("ask-task"), makeRefWork("code-task")] }],
             body: makeRefWork(`review-apply-task`)
         }],
         postCondition: [false, {
             kind: "Loop",
-            postCondition: [false, makeRefWork("code-task")],
+            postCondition: [false, { kind: "Seq", works: [makeRefWork("ask-task"), makeRefWork("code-task")] }],
             body: makeRefWork(`review-apply-task`)
         }],
         body: {
