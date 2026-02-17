@@ -11,6 +11,8 @@ const testFiles = [
     path.join(__dirname, "api.test.mjs"),
     path.join(__dirname, "work.test.mjs"),
     path.join(__dirname, "web.test.mjs"),
+    path.join(__dirname, "web.index.mjs"),
+    path.join(__dirname, "web.jobs.mjs"),
 ];
 
 async function runTests() {

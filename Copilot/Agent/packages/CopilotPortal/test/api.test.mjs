@@ -339,6 +339,14 @@ describe("API: /api/copilot/job (after entry installed)", () => {
         assert.ok(Object.keys(data.jobs).length > 0, "should have at least one job");
     });
 
+    it("grid has expected rows", async () => {
+        const data = await fetchJson("/api/copilot/job");
+        assert.ok(data.grid.length >= 2, "should have at least 2 grid rows");
+        const keywords = data.grid.map(r => r.keyword);
+        assert.ok(keywords.includes("test"), "should have 'test' keyword");
+        assert.ok(keywords.includes("batch"), "should have 'batch' keyword");
+    });
+
     it("each job has work", async () => {
         const data = await fetchJson("/api/copilot/job");
         for (const [name, job] of Object.entries(data.jobs)) {

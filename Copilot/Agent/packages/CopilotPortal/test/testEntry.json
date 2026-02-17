@@ -4,7 +4,24 @@
     "planning": "gpt-4.1"
   },
   "promptVariables": {},
-  "grid": [],
+  "grid": [
+    {
+      "keyword": "test",
+      "automate": false,
+      "jobs": [
+        { "name": "run", "jobName": "simple-job" },
+        { "name": "fail", "jobName": "fail-job" }
+      ]
+    },
+    {
+      "keyword": "batch",
+      "automate": true,
+      "jobs": [
+        { "name": "sequence", "jobName": "seq-job" },
+        { "name": "parallel", "jobName": "par-job" }
+      ]
+    }
+  ],
   "tasks": {
     "simple-task": {
       "model": { "category": "planning" },
