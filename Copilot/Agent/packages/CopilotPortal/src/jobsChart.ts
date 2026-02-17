@@ -14,7 +14,7 @@ export type ChartArrow = {
 }
 
 export type ChartNodeHint =
-    | ["TaskNode", TaskWork<number>["workIdInJob"]]
+    | ["TaskNode" | "CondNode", TaskWork<number>["workIdInJob"]]
     | "ParBegin"
     | "ParEnd"
     | "CondBegin"
@@ -56,7 +56,14 @@ function buildConditionNode(condition: Work<number>, nodeId: number[], nodes: Ch
         connectNodes(nodePairs[1], endNode);
         return [beginNode, endNode];
     } else {
-        return buildChart(condition, nodeId, nodes);
+        const condPair = buildChart(condition, nodeId, nodes);
+        if (condPair[0] === condPair[1]) {
+            const condNode = condPair[0];
+            if (condNode.hint instanceof Array && condNode.hint[0] === "TaskNode") {
+                condNode.hint[0] = "CondNode";
+            }
+        }
+        return condPair;
     }
 }
 

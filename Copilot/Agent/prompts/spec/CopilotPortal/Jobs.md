@@ -79,7 +79,8 @@ At the bottom there are buttons aligned to the right:
 #### Clicking Start Job Button
 
 When I hit the "Start Job" button, it jumpts to `/jobTracking.html` in a new window.
-The selected job and the working directory should be brought to `/jobTracking.html`.
+The selected job directory should be brought to `/jobTracking.html`.
+No need to bring other information.
 
 (to be editing...)
 
@@ -117,7 +118,7 @@ Render it like a flow chart expanding to fill the whole `job part`.#### Flow Cha
 
 **TEST-NOTE-BEGIN**
 No need to create unit test to assert the chart is in a correct layout.
-Ensure every `TaskWork` has a `ChartNode` with `TaskNode` hint.
+Ensure every `TaskWork` has a `ChartNode` with `TaskNode` or `CondNode` hint.
 **TEST-NOTE-END**
 
 The `api/copilot/job` has an extra `chart` node which is a `ChartGraph`.
@@ -125,6 +126,7 @@ It is already a generated flow chart but has no layout information.
 
 Each `ChartNode` is a node in the flow chart, and each hint maps to a graph:
 - `TaskNode`: A blue rectangle with the task id, the text would be the `TaskWork` with that `workIdInJob`.
+- `CondNode`: A yellow diamond with the task id, the text would be the `TaskWork` with that `workIdInJob`.
 - `ParBegin`, `ParEnd`: A small black rectangle bar.
 - `AltEnd`: A small pink rectangle bar.
 - `CondBegin`: A small yellow rectangle bar.
@@ -176,7 +178,7 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 - Per-node inline `style` directives set fill, stroke, and text color matching the same palette as ELK.
 - Call `mermaid.render("mermaid-chart", definition)` to produce an SVG, then insert it into the container.
 
-#### Interaction with `ChartNode` which has a `TaskNode` hint
+#### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
 Clicking it bold (exclusive) or unbold the text.
 
