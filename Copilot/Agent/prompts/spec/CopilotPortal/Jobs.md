@@ -148,7 +148,7 @@ Implementation stores in:
 - `flowChartELK.css`
 - `flowChartELK.js`
 
-Activate this renderer by using URL argument `renderer=elk` or not setting `renderer`.
+Activate this renderer by using URL argument `renderer=elk`.
 
 Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.js`) for automatic graph layout:
 - Build an ELK graph with `children` (nodes) and `edges` from the `ChartGraph`.
@@ -168,7 +168,7 @@ Implementation stores in:
 
 No separate CSS file is needed; node styles are embedded as inline Mermaid `style` directives in the generated definition.
 
-Activate this renderer by using URL argument `renderer=mermaid`.
+Activate this renderer by using URL argument `renderer=mermaid` or not setting `renderer`.
 
 Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flowchart rendering:
 - Initialize Mermaid with `startOnLoad: false` so rendering is controlled programmatically.
@@ -181,6 +181,8 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
 Clicking it bold (exclusive) or unbold the text.
+**BUG**: This works for elk but not mermaid.
+**BUG**: You need to fix all test failures no matter they exist before your change or not.
 
 ### Session Response Part
 
