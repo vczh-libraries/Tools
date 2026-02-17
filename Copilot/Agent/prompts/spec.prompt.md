@@ -93,6 +93,8 @@ Remember to update `README.md` to describe:
 - How to maintain and run the project.
 - Brief description of the project structure.
 
+Always send the `api/stop` to kill the server no matter it is running or not.
+
 ### Git Push
 
 This section only applies when you are running locally (aka not running in github.com maintaining a pull request).
