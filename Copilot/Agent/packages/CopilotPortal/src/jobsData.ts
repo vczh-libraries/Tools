@@ -174,6 +174,38 @@ function makeReviewWork(keyword: "scrum" | "design" | "plan" | "summary"): Work<
                 works: ["reviewers1", "reviewers2", "reviewers3"].map(reviewerKey => makeRefWork(`review-${keyword}-task`, { category: reviewerKey }))
             }
         },
+        {
+            kind: "Alt",
+            condition: makeRefWork("review-final-task"),
+            trueWork: makeRefWork(`ask-task`),
+            falseWork: makeRefWork(`code-task`)
+        },
+        {
+            kind: "Alt",
+            condition: makeRefWork("review-final-task"),
+            trueWork: makeRefWork(`ask-task`)
+        },
+        {
+            kind: "Alt",
+            condition: makeRefWork("review-final-task"),
+            falseWork: makeRefWork(`code-task`)
+        },
+        {
+            kind: "Loop",
+            preCondition: [false, makeRefWork("ask-task")],
+            body: makeRefWork(`review-apply-task`)
+        },
+        {
+            kind: "Loop",
+            postCondition: [false, makeRefWork("code-task")],
+            body: makeRefWork(`review-apply-task`)
+        },
+        {
+            kind: "Loop",
+            preCondition: [true, makeRefWork("ask-task")],
+            postCondition: [true, makeRefWork("code-task")],
+            body: makeRefWork(`review-apply-task`)
+        },
         makeRefWork(`review-apply-task`)]
     }
 }
