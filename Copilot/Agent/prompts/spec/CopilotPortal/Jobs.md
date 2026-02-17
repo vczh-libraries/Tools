@@ -178,6 +178,8 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 - Per-node inline `style` directives set fill, stroke, and text color matching the same palette as ELK.
 - Call `mermaid.render("mermaid-chart", definition)` to produce an SVG, then insert it into the container.
 
+**BUG**: The mermaid's small rectangle bar and diamond shape are too big, try to make it smaller, an idea is to make a shape without text or with one space in it, make your own decision.
+
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
 Clicking it bold (exclusive) or unbold the text.
