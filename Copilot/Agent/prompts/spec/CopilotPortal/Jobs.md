@@ -12,6 +12,8 @@ Read `README.md` to understand the whole picture of the project as well as speci
   - `jobTracking.css`
   - `jobTracking.js`
   - `jobTracking.html`
+  - `flowChartELK.css`
+  - `flowChartELK.js`
 
 ### jobs.css
 
@@ -138,6 +140,13 @@ There will be multiple arrows connecting between nodes:
 Arrows would be gray.
 
 #### Rendering with ELK
+
+**TASK**: Move `nodeStyles` in `jobTracking.js` to `flowChartELK.css`
+**TASK**: Move rendering code to `flowChartELK.js`. Keep `jobTracking.js` pure logic.
+
+Implementation stores in:
+- `flowChartELK.css`
+- `flowChartELK.js`
 
 Use [ELK.js](https://github.com/kieler/elkjs) (loaded from CDN as `elk.bundled.js`) for automatic graph layout:
 - Build an ELK graph with `children` (nodes) and `edges` from the `ChartGraph`.
