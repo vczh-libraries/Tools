@@ -113,9 +113,30 @@ Render it like a flow chart expanding to fill the whole `job part`.
 Read `JobsData.md` to find definitions of `Work` and draw a flow chart:
 - `TaskWork`: Display the task id.
 - `SequentialWork`: Draw a sequencial flow chart, showing these works are executed one after another.
-- `ParallelWork`: Draw a parallel flow chart, showing these works are executed at the same timne.
+- `ParallelWork`: Draw a parallel flow chart, showing these works are executed at the same time.
+  - The flow chart begins and ends with a black bar.
+  - Between two blac bars tasks are connected parallelly.
+  - **TASK**: Just a tip, This is already done.
 - `LoopWork`: Draw a looping flow chart, but each condition should be drawn like a `AltWork`.
+  - Draw a circle (circleA, no text) indicating the beginning of the loop chart. The "repeat the loop" arrow connects here.
+  - If `preCondition` is not defined, circleA connects to the `body`, otherwise:
+    - circleA connects to the `preCondition` work.
+    - The `preCondition` task connects to circleB.
+    - circleB connects to `body` labeled the first element of `preCondition`.
+    - circleB connects to the circleD labeled the boolean opposite of the first element of `preCondition`.
+  - Draw the `body`.
+  - If `postCondition` is not defined, `body` connects to circleC which connects circleA, otherwise:
+    - `body` connects to the `postCondition` work.
+    - The `postCondition` task connects to circleC.
+    - circleC connects to circleA labeled the first element of `postCondition`.
+    - circleC connects to circleD lablbed the boolean opposite of the first element of `postCondition`.
+  - Draw circleD indicating the ending of the loop chart.
 - `AltWork`: Draw a branching flow chart, the condition will be a node as well.
+  - The arrow to the `trueWork` should labeled `true`.
+  - The arrow to the `falseWork` should labeled `false`.
+  - Both `trueWork` and `falseWork` connects to the black bar. If one is not defined, the `true` or `false` arrow connects to the black bar.
+  - There is a black bar at the end.
+    - **TASK**: Just a tip, `ParallelWork` has the black bar, do the same graph.
 
 #### Flow Chart Rendering Note
 
