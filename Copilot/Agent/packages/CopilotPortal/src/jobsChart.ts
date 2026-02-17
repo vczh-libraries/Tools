@@ -102,15 +102,11 @@ function buildChart(work: Work<number>, nodeId: number[], nodes: ChartNode[]): [
             let beginPair: [ChartNode, ChartNode] | undefined;
             if (work.preCondition) {
                 beginPair = buildConditionNode(work.preCondition[1], nodeId, nodes);
-            } else {
-                const node: ChartNode = {
-                    id: nodeId[0]++,
-                    hint: "CondBegin",
-                }
-                nodes.push(node);
-                beginPair = [node, node];
             }
             const bodyNode = buildChart(work.body, nodeId, nodes);
+            if (!beginPair) {
+                beginPair = [bodyNode[0], bodyNode[0]];
+            }
             const endPair = (work.postCondition ? buildConditionNode(work.postCondition[1], nodeId, nodes) : undefined) as [ChartNode, ChartNode];
             const endNode: ChartNode = {
                 id: nodeId[0]++,
@@ -120,8 +116,6 @@ function buildChart(work: Work<number>, nodeId: number[], nodes: ChartNode[]): [
             if (work.preCondition) {
                 connectNodes(beginPair[1], bodyNode[0], `${work.preCondition[0]}`);
                 connectNodes(beginPair[1], endNode, `${!work.preCondition[0]}`);
-            } else {
-                connectNodes(beginPair[1], bodyNode[0]);
             }
             if (work.postCondition) {
                 connectNodes(bodyNode[1], endPair[0]);
