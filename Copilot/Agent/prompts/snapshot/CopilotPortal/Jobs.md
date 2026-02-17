@@ -126,7 +126,7 @@ It is already a generated flow chart but has no layout information.
 
 Each `ChartNode` is a node in the flow chart, and each hint maps to a graph:
 - `TaskNode`: A blue rectangle with the task id, the text would be the `TaskWork` with that `workIdInJob`.
-- `CondNode`: A yellow diamond with the task id, the text would be the `TaskWork` with that `workIdInJob`.
+- `CondNode`: A yellow hexagon with the task id, the text would be the `TaskWork` with that `workIdInJob`. In ELK it is rendered as a diamond; in Mermaid as a hexagon `{{}}` for correct arrow attachment.
 - `ParBegin`, `ParEnd`: A small black rectangle bar.
 - `AltEnd`: A small pink rectangle bar.
 - `CondBegin`: A small yellow rectangle bar.
@@ -173,7 +173,7 @@ Activate this renderer by using URL argument `renderer=mermaid` or not setting `
 Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flowchart rendering:
 - Initialize Mermaid with `startOnLoad: false` so rendering is controlled programmatically.
 - Build a Mermaid `graph TD` definition string from the `ChartGraph`.
-- Each `ChartNode` becomes a Mermaid node with shape syntax matching its hint (rectangles, diamonds `{}`, circles `(())`).
+- Each `ChartNode` becomes a Mermaid node with shape syntax matching its hint (rectangles, hexagons `{{}}`, circles `(())`).
 - Each `ChartArrow` becomes a Mermaid edge with optional label.
 - Per-node inline `style` directives set fill, stroke, and text color matching the same palette as ELK.
 - Call `mermaid.render("mermaid-chart", definition)` to produce an SVG, then insert it into the container.
