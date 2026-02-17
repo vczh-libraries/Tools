@@ -75,7 +75,7 @@ At the bottom there are buttons aligned to the right:
 
 #### Clicking Start Job Button
 
-When I hit the "Start Job" button, it jumpts to `/jobTracking.html`.
+When I hit the "Start Job" button, it jumpts to `/jobTracking.html` in a new window.
 The selected job and the working directory should be brought to `/jobTracking.html`.
 
 (to be editing...)
