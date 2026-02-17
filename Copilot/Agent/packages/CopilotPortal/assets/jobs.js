@@ -68,7 +68,8 @@ function renderMatrix() {
         window.close();
         setTimeout(() => {
             document.title = "Server Stopped";
-            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#ccc;background:#1e1e1e;"><h1>Server stopped — you may close this tab.</h1></div>';
+            document.body.style.cssText = "display:flex;align-items:center;justify-content:center;height:100vh;width:100vw;font-family:sans-serif;color:#ccc;background:#1e1e1e;margin:0;padding:0;";
+            document.body.innerHTML = '<h1>Server stopped — you may close this tab.</h1>';
         }, 200);
     });
     stopCell.appendChild(stopBtn);
