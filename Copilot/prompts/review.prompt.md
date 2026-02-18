@@ -137,8 +137,9 @@ Ignore this section if there is no `# Final` in the LATEST chat message.
 
 ### Step F1. Verify Convergence
 
-- Delete all `Copilot_Review_Finished_{FileNameFragment}.md` files.
-- Rename all `Copilot_Review_Writing_{FileNameFragment}.md` files to `Copilot_Review_Finished_{FileNameFragment}.md`.
+- Find and execute `copilotPrepareReview.ps1`, it will do the following things:
+  - Delete all `Copilot_Review_Finished_{FileNameFragment}.md` files.
+  - Rename all `Copilot_Review_Writing_{FileNameFragment}.md` files to `Copilot_Review_Finished_{FileNameFragment}.md`.
 - Collect all new `Copilot_Review_Finished_{FileNameFragment}.md` files as `Review Board Files`.
 - Ensure all conditions below are satisfied, otherwise report the problem and stop:
   - `Review Board Files` has files from all models in the review board.
