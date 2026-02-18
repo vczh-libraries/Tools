@@ -76,8 +76,9 @@ At the bottom there are buttons aligned to the right:
 
 #### Clicking Start Job Button
 
-When I hit the "Start Job" button, it jumpts to `/jobTracking.html` in a new window.
-The selected job directory should be brought to `/jobTracking.html`.
+When I hit the "Start Job" button, call `copilot/job/start/{job-name}`.
+When a job id is returned, it jumpts to `/jobTracking.html` in a new window.
+The selected job directory and the job id should be brought to `/jobTracking.html`.
 No need to bring other information.
 
 (to be editing...)
@@ -94,9 +95,15 @@ Put jobTracking.html specific javascript file in jobTracking.js.
 
 This page should only be opened by `/jobs.html`'s "Start Job" button in order to obtain the working directory.
 If it is directly loaded, it should redirect itself to `/index.html`.
-To tell this, find the `jobId` argument in the url passing from `/jobs.html`.
+To tell this, find the `jobName` and `jobId` argument in the url passing from `/jobs.html`.
+**TASK**: The original `jobId` argument is renamed to `jobName`, and find the job/chart definition using `jobName`.
 
 Call `api/copilot/job` to obtain the specified job's definition.
+`jobs[jobName]` and `chart[jobName]` is used to render the flow chart.
+
+Call `api/copilot/job/{job-id}/live`, `api/copilot/task/{task-id}/live` and `copilot/session/{session-id}/live` to update the running status of the job:
+- job live api notifies when a new task is started, task live api notifies when a new session is started.
+- When any live api is no longer needed, it should not issue.
 
 The webpage is splitted to two part:
 - The left part is `job part`.
@@ -111,6 +118,36 @@ The look-and-feel must be similar to `/index.html`, but DO NOT share any css fil
 You can find the `Job` definition in `jobsDef.ts`.
 `Job.work` is a simple control flow AST.
 Render it like a flow chart expanding to fill the whole `job part`.#### Flow Chart Rendering Note
+
+#### Tracking Job Status
+
+When the status of a task running is changed,
+update the rendering of a `ChartNode` of which `hint` is `TaskNode` or `CondNode`:
+- When a task begins running, add a green triangle towards right, at the beginning of the label.
+- When a task finishes running, the triangle is removed.
+  - If it fails, a big cross replaces the triangle.
+- There could be loops in the flow chart, which means a task could starts and stops multiple times.
+
+When a task runs, track all status of sessions in this task:
+- The driving session names `Driving`.
+  - **TASK**: The driving session should exist during the task running, and every prompt running in the driving session uses the same driving session for this task. But the task session may or may not reuse when retry. Check and ensure if it is implemented in this way.
+- Multiple occurances of the task session names beginning from `Attemp #1`.
+  - If a task is being inspected, when a session starts, `session response part` should display the new tab header, but do not switch to the new tab.
+  - Responses in a tab should keep updating if new data comes.
+- Whenever the task is being inspected or not, status should keep recording. The user will inspect here and there, data should persist.
+  - For convenience, whenever a session starts, a `Session Response Rendering` from `Shared.md` could be created and adding message blocks.
+  - When the task is being inspected, display it, otherwise removes it from the DOM.
+- When a task begins **AGAIN**, cached data will be deleted and replaced with status of the latest run.
+
+The `Flow Chart Rendering` should keep centered horizontally and vertically.
+At the very top of the `job part`:
+- At the left there is a big label showing the job that:
+  - `JOB: RUNNING`
+  - `JOB: SUCCEEDED`
+  - `JOB: FAILED`
+- At the right there is a button in the same label size "Stop Job"
+  - It is enabled when the job is running.
+  - Clicking the button should call `api/copilot/job/{job-id}/stop` and the big label becomes `JOB: CANCELED`.
 
 #### Flow Chart Rendering
 
@@ -161,8 +198,15 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
-Clicking it bold (exclusive) or unbold the text.
+Clicking it bold (exclusive) or unbold the text:
+- When it becomes bold, the task is being inspected, `session response part` should display this task.
+- When it becomes unbold, the task is not being inspected. `session response part` should restore.
 
 ### Session Response Part
 
-Print `JSON.stringify(jobToRender and chartToRender, undefined, 4)` inside a `<pre>` element.
+When no task is being inspected, print `JSON.stringify(jobToRender and chartToRender, undefined, 4)` inside a `<pre>` element.
+
+When a task is being inspected:
+- It becomes a tab control.
+- Each tab is a session, tab headers are names of sessions.
+- Clicking a shows responses from a session using `Session Response Rendering` from `Shared.md`.
