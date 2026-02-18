@@ -39,7 +39,7 @@ Report an error if `prompt` is empty.
 It works like `expandPromptStatic`, but assert `prompt` has exactly one item.
 Look up all `runtimeVariables` in `values` argument.
 Be aware of that, not all variable has an value assigned.
-When it fails to look up the value, report an error.
+When it fails to look up the value, use `<MISSING>` as its value.
 
 ### validateEntry
 
@@ -102,10 +102,20 @@ If any validation runs directly in this function fails:
 
 A task is represented by type `Task`.
 
+**BUG**: In `catch(err)`, `String(err)` is not enough to convert it to a string. When it is `Error`, you must print detailed information in JSON, including everything below if they are defined, to the `taskDecision` message. A helper function would be helpful.
+- `name`
+- `message`
+- `stack`
+- `cause` (nested error recursively)
+**BUY**: During task running, every crashing should be sent to `taskDecision`. Take a look at `Copilot/Agent/prompts/startTask.md` but only focus on the "why" part of the report. You must stick to the "how" part in specification, if the spec conflicts with the report, follow the spec.
+
 If any session crashes after the task submitting a promot to the session:
-- resend the prompt until 3 consecutive crashes.
-- Add `SESSION_CRASH_PREFIX` (exported const from `jobsApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
-- The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`, used by both task execution and condition evaluation.
+- When a task is running in forced single session mode, the session is offered from the outside, fails the task immediately.
+- Otherwise:
+  - This session will be no longer used, the task should create a new session to retry.
+  - resend the prompt until 3 consecutive crashes.
+  - Add `SESSION_CRASH_PREFIX` (exported const from `jobsApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
+  - The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`, used by both task execution and condition evaluation.
 
 If resending promot can't solve crashing:
 - The task stops immediately and marked failed.
@@ -209,6 +219,20 @@ In above sessions there are a lot of thing happenes in the driving session. A re
   - These two budgets are separated: crash retries are per-call (3 max in `sendPromptWithCrashRetry`), criteria retries are per failure action loop. A crash exhausting its per-call budget during a criteria retry loop is treated as a failed iteration rather than killing the task.
 - Any error generated in the copilot session.
 - A final decision about the task succeeded or failed.
+
+Information passing to `taskDecision` should include the following prefix in order to better categories:
+- `[SESSION CRASHED]` with detailed information from the exception.
+- `[TASK SUCCEEDED]`
+- `[TASK FAILED]`
+- `[AVAILABILITY]`
+- `[CRITERIA]`
+- `[OPERATION]`
+- `[DECISION]`
+- `[MISC]`
+
+For `availability` and `criteria`, the information should at least contain:
+- The task does not match which field and what is the content of the field (field in `availability` and `criteria` properties)
+- Why it does not match
 
 ## Running Jobs
 

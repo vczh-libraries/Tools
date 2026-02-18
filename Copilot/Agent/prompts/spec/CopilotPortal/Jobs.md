@@ -102,9 +102,9 @@ Call `api/copilot/job` to obtain the specified job's definition.
 
 Call `api/copilot/job/{job-id}/live`, `api/copilot/task/{task-id}/live` and `copilot/session/{session-id}/live` to update the running status of the job:
 - job live api notifies when a new task is started, task live api notifies when a new session is started.
-- When any live api is no longer needed, it should not issue.
+- Drain all response from live apis, no more issue until `(Sessoin|Task|Job)(Closed|NotDefined)` returns.
 - On receiving `ICopilotTaskCallback.taskDecision`
-  - Create a "User" message block with `title` set to `TaskDecision`, copying the `reason`.
+  - Create a "User" message block with `title` set to `TaskDecision`, copying the `reason`, put it in the driving session.
 
 The webpage is splitted to two part:
 - The left part is `job part`.
@@ -209,4 +209,6 @@ When no task is being inspected, print `JSON.stringify(jobToRender and chartToRe
 When a task is being inspected:
 - It becomes a tab control.
 - Each tab is a session, tab headers are names of sessions.
+  - The first tab will always be `Driving` and all driving sessions come to here.
+  - Each task session has its own tab.
 - Clicking a shows responses from a session using `Session Response Rendering` from `Shared.md`.

@@ -182,9 +182,11 @@ interface ICopilotTaskCallback {
   void taskFailed();
   // Called when the driving session finishes a test or makes a decision
   void taskDecision(reason: string);
-  // Called when a task session started. If the task session is the driving session, taskSession is undefined.
-  void taskSessionStarted(taskSession: [ICopilotSession, string] | undefined);
-  // Called when a task session stopped. If the task session is the driving session, taskSession is undefined.
+  // Called when a task session started
+  // In forced single session mode, If the task session is the driving session, taskSession is undefined.
+  // Otherwise, the driving session is created by a task. Multiple driving sessions could be created if the previous one is no longer usable.
+  void taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean);
+  // Called when a task session stopped. taskSession argument sees taskSessionStarted.
   void taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean);
 }
 
@@ -362,9 +364,16 @@ Returns in this schema if any error happens
 
 ```typescript
 {
-  error: "SessionNotFound" | "HttpRequestTimeout" | "ParallelCallNotSupported"
+  error: "SessionNotFound" | "SessionClosed" | "HttpRequestTimeout" | "ParallelCallNotSupported"
 }
 ```
+
+Special `SessionNotFound` and `SessionClosed` handling for this API:
+- `SessionNotFound` returns when the `session-id` is never used.
+- When a session is closed, but responses for this session is not drained by the API yet, the API still responses.
+- When there is no more response and the session already stopped, it returns `SessionClosed`.
+- After `SessionClosed`, the `session-id` will be no longer available for this api, future calls returns `SessionNotFound`.
+- Even the client received notification that a session stops from another API, it is recommended to keep reading until `SessionClosed` returns.
 
 **TEST-NOTE-BEGIN**
 Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
@@ -535,9 +544,12 @@ Returns in this schema if any error happens
 
 ```typescript
 {
-  error: "TaskNotFound" | "HttpRequestTimeout" | "ParallelCallNotSupported"
+  error: "TaskNotFound" | "TaskClosed" | "HttpRequestTimeout" | "ParallelCallNotSupported"
 }
 ```
+
+Special `TaskNotFound` and `TaskClosed` handling for this API:
+- Works in the same way as `SessionNotFound` and `SessionClosed` in `copilot/session/{session-id}/live`. 
 
 **TEST-NOTE-BEGIN**
 Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
@@ -646,9 +658,12 @@ Returns in this schema if any error happens
 
 ```typescript
 {
-  error: "JobNotFound" | "HttpRequestTimeout" | "ParallelCallNotSupported"
+  error: "JobNotFound" | "JobsClosed" | "HttpRequestTimeout" | "ParallelCallNotSupported"
 }
 ```
+
+Special `JobNotFound` and `JobsClosed` handling for this API:
+- Works in the same way as `SessionNotFound` and `SessionClosed` in `copilot/session/{session-id}/live`. 
 
 **TEST-NOTE-BEGIN**
 Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
