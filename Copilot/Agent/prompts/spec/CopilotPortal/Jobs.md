@@ -103,6 +103,8 @@ Call `api/copilot/job` to obtain the specified job's definition.
 Call `api/copilot/job/{job-id}/live`, `api/copilot/task/{task-id}/live` and `copilot/session/{session-id}/live` to update the running status of the job:
 - job live api notifies when a new task is started, task live api notifies when a new session is started.
 - When any live api is no longer needed, it should not issue.
+- On receiving `ICopilotTaskCallback.taskDecision`
+  - Create a "User" message block with `title` set to `TaskFailed`, copying the `reason`.
 
 The webpage is splitted to two part:
 - The left part is `job part`.

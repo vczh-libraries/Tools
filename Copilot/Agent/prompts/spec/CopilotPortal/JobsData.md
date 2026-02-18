@@ -194,6 +194,18 @@ the driving session should react to `runConditionInSameSession` when task execut
   - Retry at most "the second element" times. ALWAYS reuse the previous task session.
   - Send the prompt described by the third element to the task session, the task session should react to the prompt and retry.
 
+### Calling ICopilotTaskCallback.taskDecision
+
+In above sessions there are a lot of thing happenes in the driving session. A reason should be provided to `taskDecision`, including but not limited to:
+- The availability test failed with details.
+- The criteria test failed with details.
+- Retry budget drained because of availability or criteria failure.
+- Retry budget drained because of crashing.
+  - **TASK**: Make sure these two budgets are separated.
+- Any error generated in the copilot session.
+- A final decision about the task succeeded or failed.
+- **TASK**: Any other moments when the driving session finishes a test or makes a decision. Complete the list.
+
 ## Running Jobs
 
 **Referenced by**:
