@@ -180,6 +180,8 @@ interface ICopilotTaskCallback {
   void taskSucceeded();
   // Called when this task failed
   void taskFailed();
+  // Called when the driving session finishes a test or makes a decision
+  void taskDecision(reason: string);
   // Called when a task session started. If the task session is the driving session, taskSession is undefined.
   void taskSessionStarted(taskSession: [ICopilotSession, string] | undefined);
   // Called when a task session stopped. If the task session is the driving session, taskSession is undefined.

@@ -161,3 +161,5 @@ Copilot/Agent/
 - **Flow Chart Status Indicators**: Running tasks display a green triangle indicator; failed tasks display a red cross indicator on the flow chart
 - **Task Inspection**: Clicking a TaskNode in the flow chart opens a tab control showing session responses for that task's sessions
 - **Job-Created Tasks**: Jobs create tasks with driving sessions; task live API provides real-time session updates with `sessionId` and `isDriving` fields
+- **Task Decision Reporting**: `taskDecision` callback reports all driving session decisions (availability/criteria results, retries, crashes, final outcome) as User message blocks in the driving session tab
+- **Separated Retry Budgets**: Crash retries (per-call, 3 max) and criteria retries (per failure action) are independent; a crash during a criteria retry loop is treated as a failed iteration rather than killing the task

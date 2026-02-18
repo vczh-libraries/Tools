@@ -293,6 +293,13 @@ function startTaskPolling(taskId, workId) {
                 }
                 data.taskPollingActive = false;
                 return false;
+            } else if (cb === "taskDecision") {
+                // Create a "User" message block in the driving session's renderer
+                const drivingEntry = [...data.sessions.entries()].find(([, s]) => s.name === "Driving");
+                if (drivingEntry) {
+                    const [, drivingInfo] = drivingEntry;
+                    drivingInfo.renderer.addUserMessage(response.reason, "TaskDecision");
+                }
             }
 
             return true;

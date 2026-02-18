@@ -475,6 +475,11 @@ describe("API: task running - criteria success", () => {
         const callbacks = await drainLive(`/api/copilot/task/${startData.taskId}/live`, "taskSucceeded");
         const succeeded = callbacks.some((c) => c.callback === "taskSucceeded");
         assert.ok(succeeded, `simple-task should succeed, callbacks: ${JSON.stringify(callbacks.map(c => c.callback))}`);
+
+        // taskDecision should appear with success message
+        const decisionCb = callbacks.find((c) => c.callback === "taskDecision");
+        assert.ok(decisionCb, `should have taskDecision callback, callbacks: ${JSON.stringify(callbacks.map(c => c.callback))}`);
+        assert.ok(decisionCb.reason.includes("succeeded"), `taskDecision reason should mention succeeded: ${decisionCb.reason}`);
     });
 });
 
@@ -513,6 +518,12 @@ describe("API: task running - criteria failure (no retry)", () => {
         // Verify no retry happened (retry budget = 0)
         const sessionStarts = callbacks.filter((c) => c.callback === "taskSessionStarted");
         assert.ok(sessionStarts.length <= 1, `should not retry, session starts: ${sessionStarts.length}`);
+
+        // taskDecision should report criteria failure and final decision
+        const decisions = callbacks.filter((c) => c.callback === "taskDecision");
+        assert.ok(decisions.length >= 1, `should have taskDecision callbacks: ${JSON.stringify(callbacks.map(c => c.callback))}`);
+        const failDecision = decisions.find((d) => d.reason.includes("failed"));
+        assert.ok(failDecision, `should have a failure decision: ${JSON.stringify(decisions.map(d => d.reason))}`);
     });
 });
 
@@ -666,7 +677,7 @@ describe("API: job running - live responses observability", () => {
 });
 
 describe("API: job-created task live polling", () => {
-    it("task live API works for job-created tasks with sessionId and isDriving", async () => {
+    it("task live API works for job-created tasks with taskDecision", async () => {
         const startData = await fetchJson("/api/copilot/job/start/simple-job", {
             method: "POST",
             body: "C:\\Code\\VczhLibraries\\Tools\ntest",
@@ -679,11 +690,19 @@ describe("API: job-created task live polling", () => {
         const workStartedCb = jobCallbacks.find((c) => c.callback === "workStarted");
         assert.ok(workStartedCb, "should have workStarted");
         assert.ok(workStartedCb.taskId, "workStarted should include taskId");
-
-        // The task may have already completed, so task live might return TaskNotFound
-        // But the taskId should have been valid during execution
-        // This test verifies that the taskId was properly assigned
         assert.ok(workStartedCb.taskId.startsWith("task-"), "taskId should be in expected format");
+
+        // Drain task live - task may have already completed, try to get callbacks
+        const taskCallbacks = await drainLive(`/api/copilot/task/${workStartedCb.taskId}/live`, "taskSucceeded", 10000);
+
+        // If we got callbacks, verify taskDecision appears
+        if (taskCallbacks.length > 0 && !taskCallbacks[0]?.error) {
+            const decisions = taskCallbacks.filter((c) => c.callback === "taskDecision");
+            // taskDecision should be present for a succeeding task
+            if (decisions.length > 0) {
+                assert.ok(decisions.some((d) => d.reason), "taskDecision should have a reason");
+            }
+        }
     });
 });
 

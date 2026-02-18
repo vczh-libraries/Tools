@@ -180,7 +180,7 @@ interface ICopilotTaskCallback {
   void taskSucceeded();
   // Called when this task failed
   void taskFailed();
-  // Called when the driving session takes any action
+  // Called when the driving session finishes a test or makes a decision
   void taskDecision(reason: string);
   // Called when a task session started. If the task session is the driving session, taskSession is undefined.
   void taskSessionStarted(taskSession: [ICopilotSession, string] | undefined);
@@ -398,7 +398,6 @@ For example, when `onReasoning(reasoningId: string, delta: string): void;` is ca
 ```
 
 When running a task, any driving session generated prompts will be reported in this schema
-**BUG**: Currently generated prompts sent to the driving session does not trigger this callback. It works for task session.
 
 ```typescript
 {
