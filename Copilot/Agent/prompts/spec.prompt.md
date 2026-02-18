@@ -16,6 +16,7 @@ When this file is tagged, find out new changes in the spec:
 - Implement all changes.
 
 **IMPORTANT**: If you find any mistake in the spec causing you not being able to strictly follow, fix the spec.
+**IMPORTANT**: Always use `api/stop` to stop `yarn portal`, trying to ENTER will hang the terminal forever and you can't proceed.
 
 ## Changing the Spec
 
