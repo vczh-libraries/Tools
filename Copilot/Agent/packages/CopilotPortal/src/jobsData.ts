@@ -159,15 +159,15 @@ const entryInput: Entry = {
             "Execute the instruction in REPO-ROOT/.github/prompts/code.prompt.md immediately."
         ],
         reportDocument: [
-            "YOU MUST call the job_prepare_document with an argument: an absolute path of the document you are about to create or update."
+            "YOU MUST use the job_prepare_document tool with an argument: an absolute path of the document you are about to create or update."
         ],
         reportBoolean: [
-            "YOU MUST call either job_boolean_true or job_boolean_false to answer an yes/no question, with the reason in the argument."
+            "YOU MUST use either job_boolean_true tool or job_boolean_false tool to answer an yes/no question, with the reason in the argument."
         ],
         simpleCondition: [
             "$defineRepoRoot",
             "$reportBoolean",
-            "Call job_boolean_true if the below condition satisfies, or call job_boolean_false if it does not satisfy."
+            "Use job_boolean_true tool if the below condition satisfies, or use job_boolean_false tool if it does not satisfy."
         ],
         scrumDocReady: [
             "$simpleCondition",
@@ -485,7 +485,7 @@ const entryInput: Entry = {
             prompt: [
                 "$cppjob",
                 "$review",
-                "YOU MUST call job_prerequisite_failed if 1) in the LATEST ROUND not all models created their review document or 2) not all replies in all review documents from the LATEST ROUND agree.",
+                "YOU MUST use the job_prerequisite_failed tool tool if 1) in the LATEST ROUND not all models created their review document or 2) not all replies in all review documents from the LATEST ROUND agree.",
                 "# Final",
                 "$reviewerBoardFiles"
             ],
