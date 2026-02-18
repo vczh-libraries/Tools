@@ -57,16 +57,24 @@ export function waitForResponse(state: LiveState, timeoutMs: number): Promise<Li
 // ---- Copilot Client ----
 
 let copilotClient: CopilotClient | null = null;
+let copilotClientPromise: Promise<CopilotClient> | null = null;
 
 export async function ensureCopilotClient(): Promise<CopilotClient> {
-    if (!copilotClient) {
-        copilotClient = new CopilotClient();
-        await copilotClient.start();
+    if (copilotClient) return copilotClient;
+    if (!copilotClientPromise) {
+        copilotClientPromise = (async () => {
+            const client = new CopilotClient();
+            await client.start();
+            copilotClient = client;
+            copilotClientPromise = null;
+            return client;
+        })();
     }
-    return copilotClient;
+    return copilotClientPromise;
 }
 
 export function stopCoplilotClient(): void {
+    copilotClientPromise = null;
     if (copilotClient) {
         copilotClient.stop();
         copilotClient = null;
