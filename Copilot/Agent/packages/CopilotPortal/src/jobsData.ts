@@ -25,7 +25,7 @@ function makeReviewWork(keyword: "scrum" | "design" | "plan" | "summary"): Work<
     }
 }
 
-function makeDocumentWork(jobName: string): Work<never> {
+function makeDocumentWork(jobName: string, keyword: "scrum" | "design" | "plan" | "summary"): Work<never> {
     return {
         kind: "Seq",
         works: [
@@ -529,15 +529,15 @@ const entryInput: Entry = {
         // "test-loops": { work: testGraph_Loop() },
         // "test-alts": { work: testGraph_Alt() },
         // "test-loop-seq": { work: testGraph_Loop2() },
-        "scrum-problem": { work: makeDocumentWork("scrum-problem") },
-        "scrum-update": { work: makeDocumentWork("scrum-update") },
-        "design-problem-next": { work: makeDocumentWork("design-problem-next") },
-        "design-update": { work: makeDocumentWork("design-update") },
-        "design-problem": { work: makeDocumentWork("design-problem") },
-        "plan-problem": { work: makeDocumentWork("plan-problem") },
-        "plan-update": { work: makeDocumentWork("plan-update") },
-        "summary-problem": { work: makeDocumentWork("summary-problem") },
-        "summary-update": { work: makeDocumentWork("summary-update") },
+        "scrum-problem": { work: makeDocumentWork("scrum-problem", "scrum") },
+        "scrum-update": { work: makeDocumentWork("scrum-update", "scrum") },
+        "design-problem-next": { work: makeDocumentWork("design-problem-next", "design") },
+        "design-update": { work: makeDocumentWork("design-update", "design") },
+        "design-problem": { work: makeDocumentWork("design-problem", "design") },
+        "plan-problem": { work: makeDocumentWork("plan-problem", "plan") },
+        "plan-update": { work: makeDocumentWork("plan-update", "plan") },
+        "summary-problem": { work: makeDocumentWork("summary-problem", "summary") },
+        "summary-update": { work: makeDocumentWork("summary-update", "summary") },
         "execute-start": { work: makeRefWork("execute-task") },
         "execute-update": { work: makeRefWork("execute-update-task") },
         "verify-start": { work: makeRefWork("verify-task") },
