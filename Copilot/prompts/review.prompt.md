@@ -58,6 +58,7 @@
 ## Step 4. Write Your Review
 
 - Create a new file: `Copilot_Review_Writing_{FileNameFragment}.md`
+  - If this file already exists, it means you have already completed the review, stops.
 - You need to consolidate all information from Step 3.
 - Find what inspires you, what you agree with, and what you disagree with.
 - Complete the document following the format:
