@@ -191,8 +191,7 @@ interface ICopilotTaskCallback {
 async function startTask(
   taskName: string,
   userInput: string,
-  drivingSession: ICopilotSession,
-  forceSingleSessionMode: boolean,
+  drivingSession: ICopilotSession | undefined,
   ignorePrerequisiteCheck: boolean,
   callback: ICopilotTaskCallback,
   taskModelIdOverride?: string,
@@ -201,6 +200,10 @@ async function startTask(
 ```
 - Start a task.
 - Throw an error if `installJobsEntry` has not been called.
+- When `drivingSession` is defined, the task is forced single session mode
+- When `drivingSession` is not defined, the task is in double session mode
+  - It could still be single session due to task configuration. In this case the driving session is running with the task session model.
+  - `startTask` is going to create the driving session, instead of passed from the outside.
 
 ```typescript
 interface ICopilotJob {
