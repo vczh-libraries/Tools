@@ -92,15 +92,21 @@ function mermaidBuildDefinition(chart) {
     return lines.join("\n");
 }
 
-async function renderFlowChartMermaid(chart, container) {
+async function renderFlowChartMermaid(chart, container, onInspect) {
     const definition = mermaidBuildDefinition(chart);
 
-    // Build a map for TaskNode/CondNode click handling
+    // Build maps for TaskNode/CondNode click handling and workId lookup
     const taskNodeIds = [];
+    const nodeIdToWorkId = {};
     for (const node of chart.nodes) {
         const hintKey = mermaidGetHintKey(node.hint);
         if (hintKey === "TaskNode" || hintKey === "CondNode") {
-            taskNodeIds.push(`N${node.id}`);
+            const nid = `N${node.id}`;
+            taskNodeIds.push(nid);
+            // hint is [hintKey, workIdInJob]
+            if (Array.isArray(node.hint) && node.hint.length >= 2) {
+                nodeIdToWorkId[nid] = node.hint[1];
+            }
         }
     }
 
@@ -111,6 +117,11 @@ async function renderFlowChartMermaid(chart, container) {
 
     // Track currently bolded TaskNode/CondNode
     let currentBoldNode = null;
+    let currentBoldWorkId = null;
+
+    // Map workId -> DOM group for status updates
+    const workIdToGroup = {};
+    const workIdToTextEl = {};
 
     // Add click handlers for TaskNode/CondNode elements
     for (const nodeId of taskNodeIds) {
@@ -118,23 +129,98 @@ async function renderFlowChartMermaid(chart, container) {
         if (!nodeEl) continue;
         const group = nodeEl.closest("g.node") || nodeEl;
         group.style.cursor = "pointer";
+
+        const workId = nodeIdToWorkId[nodeId];
+        if (workId !== undefined) {
+            workIdToGroup[workId] = group;
+            const textEl = group.querySelector(".nodeLabel") || group.querySelector("text");
+            workIdToTextEl[workId] = textEl;
+        }
+
         group.addEventListener("click", () => {
-            // Find the text element inside this node
             const textEl = group.querySelector(".nodeLabel") || group.querySelector("text");
             if (!textEl) return;
+
+            const wid = nodeIdToWorkId[nodeId];
 
             if (currentBoldNode === textEl) {
                 textEl.style.fontWeight = "";
                 currentBoldNode = null;
+                currentBoldWorkId = null;
+                if (onInspect) onInspect(null);
             } else {
                 if (currentBoldNode) {
                     currentBoldNode.style.fontWeight = "";
                 }
                 textEl.style.fontWeight = "bold";
                 currentBoldNode = textEl;
+                currentBoldWorkId = wid;
+                if (onInspect) onInspect(wid);
             }
         });
     }
+
+    // Return controller for status updates
+    return {
+        // Set a node to running state (green triangle)
+        setRunning(workId) {
+            const textEl = workIdToTextEl[workId];
+            if (!textEl) return;
+            // Remove existing status indicators
+            this._clearIndicator(workId);
+            const indicator = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            indicator.textContent = "\u25B6"; // right-pointing triangle
+            indicator.setAttribute("fill", "#22c55e");
+            indicator.setAttribute("font-size", "14");
+            indicator.setAttribute("class", "task-status-indicator");
+            indicator.setAttribute("data-work-id", String(workId));
+            // Insert at the beginning of the parent
+            const parent = textEl.closest("g") || textEl.parentElement;
+            if (parent) {
+                parent.insertBefore(indicator, parent.firstChild);
+                // Position it to the left of the text
+                const textBBox = textEl.getBBox ? textEl.getBBox() : null;
+                if (textBBox) {
+                    indicator.setAttribute("x", String(textBBox.x - 18));
+                    indicator.setAttribute("y", String(textBBox.y + textBBox.height * 0.8));
+                }
+            }
+        },
+        // Set a node to completed state (remove indicator)
+        setCompleted(workId) {
+            this._clearIndicator(workId);
+        },
+        // Set a node to failed state (red cross)
+        setFailed(workId) {
+            const textEl = workIdToTextEl[workId];
+            if (!textEl) return;
+            this._clearIndicator(workId);
+            const indicator = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            indicator.textContent = "\u274C"; // cross mark
+            indicator.setAttribute("font-size", "14");
+            indicator.setAttribute("class", "task-status-indicator");
+            indicator.setAttribute("data-work-id", String(workId));
+            const parent = textEl.closest("g") || textEl.parentElement;
+            if (parent) {
+                parent.insertBefore(indicator, parent.firstChild);
+                const textBBox = textEl.getBBox ? textEl.getBBox() : null;
+                if (textBBox) {
+                    indicator.setAttribute("x", String(textBBox.x - 18));
+                    indicator.setAttribute("y", String(textBBox.y + textBBox.height * 0.8));
+                }
+            }
+        },
+        _clearIndicator(workId) {
+            const svgEl = container.querySelector("svg");
+            if (svgEl) {
+                const existing = svgEl.querySelectorAll(`.task-status-indicator[data-work-id="${workId}"]`);
+                existing.forEach(el => el.remove());
+            }
+        },
+        get inspectedWorkId() {
+            return currentBoldWorkId;
+        },
+    };
 }
 
 // Export as global

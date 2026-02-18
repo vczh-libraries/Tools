@@ -242,23 +242,48 @@ describe("Web: jobTracking.html redirect", () => {
         await browser?.close();
     });
 
-    it("redirects to index.html when no jobId parameter", async () => {
+    it("redirects to index.html when no jobName or jobId parameter", async () => {
         await page.goto(`${BASE}/jobTracking.html`);
+        await page.waitForTimeout(1000);
+        const url = new URL(page.url());
+        assert.strictEqual(url.pathname, "/index.html", "should redirect to index.html");
+    });
+
+    it("redirects when only jobName is present", async () => {
+        await page.goto(`${BASE}/jobTracking.html?jobName=simple-job`);
+        await page.waitForTimeout(1000);
+        const url = new URL(page.url());
+        assert.strictEqual(url.pathname, "/index.html", "should redirect to index.html");
+    });
+
+    it("redirects when only jobId is present", async () => {
+        await page.goto(`${BASE}/jobTracking.html?jobId=fake-job-id`);
         await page.waitForTimeout(1000);
         const url = new URL(page.url());
         assert.strictEqual(url.pathname, "/index.html", "should redirect to index.html");
     });
 });
 
+// Helper: start a job and return its jobId for use in jobTracking tests
+async function startJobForTest(jobName = "simple-job") {
+    const data = await fetchJson(`/api/copilot/job/start/${jobName}`, {
+        method: "POST",
+        body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+    });
+    return data.jobId;
+}
+
 describe("Web: jobTracking.html layout", () => {
     let browser;
     let page;
+    let testJobId;
 
     before(async () => {
         await verifyEntryInstalled();
+        testJobId = await startJobForTest();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
+        await page.goto(`${BASE}/jobTracking.html?jobName=simple-job&jobId=${encodeURIComponent(testJobId)}`);
         await page.waitForTimeout(3000);
     });
 
@@ -317,7 +342,7 @@ describe("Web: jobs.html Start Job opens new window", () => {
         await browser?.close();
     });
 
-    it("Start Job button opens jobTracking.html in a new window/tab", async () => {
+    it("Start Job button calls API and opens jobTracking.html in a new window/tab", async () => {
         // Select a job
         const btn = page.locator('.matrix-job-btn[data-job-name="simple-job"]');
         await btn.click();
@@ -326,13 +351,14 @@ describe("Web: jobs.html Start Job opens new window", () => {
         // Listen for new page (popup/tab)
         const context = page.context();
         const [newPage] = await Promise.all([
-            context.waitForEvent("page"),
+            context.waitForEvent("page", { timeout: 30000 }),
             page.locator("#start-job-button").click()
         ]);
         await newPage.waitForLoadState("domcontentloaded");
         const url = new URL(newPage.url());
         assert.strictEqual(url.pathname, "/jobTracking.html", "should open jobTracking.html");
-        assert.strictEqual(url.searchParams.get("jobId"), "simple-job", "should pass jobId");
+        assert.strictEqual(url.searchParams.get("jobName"), "simple-job", "should pass jobName");
+        assert.ok(url.searchParams.get("jobId"), "should pass jobId from start API");
         await newPage.close();
     });
 });
@@ -340,12 +366,14 @@ describe("Web: jobs.html Start Job opens new window", () => {
 describe("Web: jobTracking.html Mermaid renderer", () => {
     let browser;
     let page;
+    let testJobId;
 
     before(async () => {
         await verifyEntryInstalled();
+        testJobId = await startJobForTest();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
+        await page.goto(`${BASE}/jobTracking.html?jobName=simple-job&jobId=${encodeURIComponent(testJobId)}`);
         await page.waitForTimeout(3000);
     });
 
@@ -369,12 +397,14 @@ describe("Web: jobTracking.html Mermaid renderer", () => {
 describe("Web: jobTracking.html TaskNode click interaction (Mermaid)", () => {
     let browser;
     let page;
+    let testJobId;
 
     before(async () => {
         await verifyEntryInstalled();
+        testJobId = await startJobForTest();
         browser = await chromium.launch({ headless: true });
         page = await browser.newPage();
-        await page.goto(`${BASE}/jobTracking.html?jobId=simple-job`);
+        await page.goto(`${BASE}/jobTracking.html?jobName=simple-job&jobId=${encodeURIComponent(testJobId)}`);
         await page.waitForTimeout(3000);
     });
 
@@ -396,5 +426,60 @@ describe("Web: jobTracking.html TaskNode click interaction (Mermaid)", () => {
         await page.waitForTimeout(200);
         const fontWeight = await nodeGroup.locator('.nodeLabel').first().evaluate(el => el.style.fontWeight);
         assert.ok(fontWeight === "" || fontWeight === "normal", "should not have bold font-weight after second click");
+    });
+
+    it("clicking a TaskNode shows tab control in session response part", async () => {
+        const nodeGroup = page.locator('#job-part svg g.node').first();
+        await nodeGroup.click(); // bold / inspect
+        await page.waitForTimeout(500);
+        const tabContainer = page.locator('.tab-container');
+        const isVisible = await tabContainer.isVisible();
+        assert.ok(isVisible, "tab container should be visible when inspecting a task");
+
+        // Unbold to restore JSON view
+        await nodeGroup.click();
+        await page.waitForTimeout(500);
+    });
+
+    it("clicking a TaskNode again restores JSON view in session response part", async () => {
+        // Make sure JSON is shown after unbold
+        const text = await page.locator("#session-response-part").textContent();
+        const parsed = JSON.parse(text);
+        assert.ok(parsed.job, "should show job JSON when no task inspected");
+    });
+});
+
+describe("Web: jobTracking.html job status bar", () => {
+    let browser;
+    let page;
+    let testJobId;
+
+    before(async () => {
+        await verifyEntryInstalled();
+        testJobId = await startJobForTest();
+        browser = await chromium.launch({ headless: true });
+        page = await browser.newPage();
+        await page.goto(`${BASE}/jobTracking.html?jobName=simple-job&jobId=${encodeURIComponent(testJobId)}`);
+        await page.waitForTimeout(3000);
+    });
+
+    after(async () => {
+        await browser?.close();
+    });
+
+    it("has job status label", async () => {
+        const label = page.locator("#job-status-label");
+        const visible = await label.isVisible();
+        assert.ok(visible, "job status label should be visible");
+        const text = await label.textContent();
+        assert.ok(text.startsWith("JOB:"), "label should start with JOB:");
+    });
+
+    it("has Stop Job button", async () => {
+        const btn = page.locator("#stop-job-button");
+        const visible = await btn.isVisible();
+        assert.ok(visible, "Stop Job button should be visible");
+        const text = await btn.textContent();
+        assert.strictEqual(text, "Stop Job");
     });
 });

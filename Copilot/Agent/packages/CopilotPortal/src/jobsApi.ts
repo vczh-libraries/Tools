@@ -45,7 +45,7 @@ export interface ICopilotJob {
 export interface ICopilotJobCallback {
     jobSucceeded(): void;
     jobFailed(): void;
-    workStarted(workId: number): void;
+    workStarted(workId: number, taskId: string): void;
     workStopped(workId: number, succeeded: boolean): void;
 }
 
@@ -699,24 +699,54 @@ async function executeWork(
 
             // Start driving session
             const drivingModelId = entry.models.driving;
-            const [drivingSession] = await helperSessionStart(drivingModelId, workingDirectory);
+            const [drivingSession, drivingSessionId] = await helperSessionStart(drivingModelId, workingDirectory);
+
+            // Register task state for live API
+            const taskId = `task-${nextTaskId++}`;
+            const taskState: TaskState = {
+                taskId,
+                task: null as unknown as ICopilotTask,
+                responseQueue: [],
+                waitingResolve: null,
+                taskError: null,
+                forcedSingleSession: false,
+            };
+            tasks.set(taskId, taskState);
+
+            // Report driving session as the first session
+            pushResponse(taskState, { callback: "taskSessionStarted", sessionId: drivingSessionId, isDriving: true });
 
             runningIds.add(taskWork.workIdInJob);
-            callback.workStarted(taskWork.workIdInJob);
+            callback.workStarted(taskWork.workIdInJob, taskId);
 
             try {
                 const result = await new Promise<boolean>((resolve, reject) => {
                     const taskCallback: ICopilotTaskCallback = {
                         taskSucceeded() {
+                            pushResponse(taskState, { callback: "taskSucceeded" });
+                            setTimeout(() => tasks.delete(taskId), 10000);
                             const crashErr = (startedTask as any)?._crashError;
                             if (crashErr) { reject(crashErr); } else { resolve(true); }
                         },
                         taskFailed() {
+                            pushResponse(taskState, { callback: "taskFailed" });
+                            setTimeout(() => tasks.delete(taskId), 10000);
                             const crashErr = (startedTask as any)?._crashError;
                             if (crashErr) { reject(crashErr); } else { resolve(false); }
                         },
-                        taskSessionStarted() {},
-                        taskSessionStopped() {},
+                        taskSessionStarted(taskSession: [ICopilotSession, string] | undefined) {
+                            if (taskSession) {
+                                pushResponse(taskState, { callback: "taskSessionStarted", sessionId: taskSession[1], isDriving: false });
+                            }
+                            // If undefined → single session mode, driving session already reported
+                        },
+                        taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean) {
+                            if (taskSession) {
+                                pushResponse(taskState, { callback: "taskSessionStopped", sessionId: taskSession[1], succeeded });
+                            } else {
+                                pushResponse(taskState, { callback: "taskSessionStopped", sessionId: drivingSessionId, succeeded });
+                            }
+                        },
                     };
 
                     let startedTask: ICopilotTask | null = null;
@@ -731,8 +761,13 @@ async function executeWork(
                         workingDirectory
                     ).then(t => {
                         startedTask = t;
+                        taskState.task = t;
                         activeTasks.push(t);
-                    }).catch(err => reject(err));
+                    }).catch(err => {
+                        taskState.taskError = String(err);
+                        pushResponse(taskState, { taskError: String(err) });
+                        reject(err);
+                    });
                 });
 
                 runningIds.delete(taskWork.workIdInJob);
@@ -938,8 +973,8 @@ export async function apiJobStart(
                 // Deferred cleanup so live API can serve the final callback
                 setTimeout(() => jobs.delete(jobId), 10000);
             },
-            workStarted(workId: number) {
-                pushResponse(state, { callback: "workStarted", workId });
+            workStarted(workId: number, taskId: string) {
+                pushResponse(state, { callback: "workStarted", workId, taskId });
             },
             workStopped(workId: number, succeeded: boolean) {
                 pushResponse(state, { callback: "workStopped", workId, succeeded });

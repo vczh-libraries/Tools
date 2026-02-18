@@ -213,9 +213,9 @@ interface ICopilotJobCallback {
   void jobSucceeded();
   // Called when this job failed
   void jobFailed();
-  // Called when a TaskWork started
-  void workStarted(workId: number);
-  // Calledn when a TaskWork stopped
+  // Called when a TaskWork started, taskId is the registered task for live polling
+  void workStarted(workId: number, taskId: string);
+  // Called when a TaskWork stopped
   void workStopped(workId: number, succeeded: boolean);
 }
 
@@ -549,6 +549,8 @@ Returns in this schema if an exception it thrown from inside the session
 ```
 
 Other response maps to all methods in `ICopilotTaskCallback` in `src/jobsApi.ts`.
+
+When a task is created by a job's `executeWork`, the `taskSessionStarted` response additionally includes `sessionId` (string) and `isDriving` (boolean) fields so the frontend can poll `copilot/session/{session-id}/live` and distinguish between driving and task sessions.
 
 ### copilot/job
 

@@ -142,10 +142,32 @@ function onJobButtonClick(btn, jobName) {
 }
 
 // ---- Start Job ----
-startJobButton.addEventListener("click", () => {
+startJobButton.addEventListener("click", async () => {
     if (!selectedJobName) return;
-    const url = `/jobTracking.html?jobId=${encodeURIComponent(selectedJobName)}`;
-    window.open(url, "_blank");
+    startJobButton.disabled = true;
+    try {
+        const userInput = userInputTextarea.value || "";
+        const body = workingDir + "\n" + userInput;
+        const res = await fetch(`/api/copilot/job/start/${encodeURIComponent(selectedJobName)}`, {
+            method: "POST",
+            body: body,
+        });
+        const data = await res.json();
+        if (data.error) {
+            alert("Failed to start job: " + data.error);
+            startJobButton.disabled = false;
+            return;
+        }
+        if (data.jobId) {
+            const url = `/jobTracking.html?jobName=${encodeURIComponent(selectedJobName)}&jobId=${encodeURIComponent(data.jobId)}`;
+            window.open(url, "_blank");
+        } else {
+            alert("Failed to start job: unexpected response");
+        }
+    } catch (err) {
+        alert("Failed to start job: " + err.message);
+    }
+    startJobButton.disabled = false;
 });
 
 // ---- Resize bar (horizontal) ----

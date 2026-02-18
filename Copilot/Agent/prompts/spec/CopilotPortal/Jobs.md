@@ -96,7 +96,6 @@ Put jobTracking.html specific javascript file in jobTracking.js.
 This page should only be opened by `/jobs.html`'s "Start Job" button in order to obtain the working directory.
 If it is directly loaded, it should redirect itself to `/index.html`.
 To tell this, find the `jobName` and `jobId` argument in the url passing from `/jobs.html`.
-**TASK**: The original `jobId` argument is renamed to `jobName`, and find the job/chart definition using `jobName`.
 
 Call `api/copilot/job` to obtain the specified job's definition.
 `jobs[jobName]` and `chart[jobName]` is used to render the flow chart.
@@ -130,7 +129,6 @@ update the rendering of a `ChartNode` of which `hint` is `TaskNode` or `CondNode
 
 When a task runs, track all status of sessions in this task:
 - The driving session names `Driving`.
-  - **TASK**: The driving session should exist during the task running, and every prompt running in the driving session uses the same driving session for this task. But the task session may or may not reuse when retry. Check and ensure if it is implemented in this way.
 - Multiple occurances of the task session names beginning from `Attemp #1`.
   - If a task is being inspected, when a session starts, `session response part` should display the new tab header, but do not switch to the new tab.
   - Responses in a tab should keep updating if new data comes.

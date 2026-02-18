@@ -157,3 +157,7 @@ Copilot/Agent/
 - **Task Selection UI**: Combo box in the portal to select and run tasks within an active session
 - **Tool Registration**: Custom job tools (e.g. `job_boolean_true`, `job_prepare_document`) are automatically registered with Copilot sessions
 - **Flow Chart Renderers**: Job tracking page supports ELK and Mermaid (default) renderers, selectable via `renderer` URL parameter
+- **Job Status Tracking**: Live polling of job execution status with visual status bar (RUNNING/SUCCEEDED/FAILED/CANCELED) and Stop Job button
+- **Flow Chart Status Indicators**: Running tasks display a green triangle indicator; failed tasks display a red cross indicator on the flow chart
+- **Task Inspection**: Clicking a TaskNode in the flow chart opens a tab control showing session responses for that task's sessions
+- **Job-Created Tasks**: Jobs create tasks with driving sessions; task live API provides real-time session updates with `sessionId` and `isDriving` fields
