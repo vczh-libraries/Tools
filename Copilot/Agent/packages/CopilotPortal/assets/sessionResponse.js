@@ -98,6 +98,11 @@ export class SessionResponseRenderer {
             block.complete();
         }
 
+        // Generated user prompt (sent to driving/task session by the engine)
+        else if (cb === "onGeneratedUserPrompt") {
+            this.addUserMessage(data.prompt, "Task");
+        }
+
         // Auto-scroll to bottom
         this.scrollToBottom();
 

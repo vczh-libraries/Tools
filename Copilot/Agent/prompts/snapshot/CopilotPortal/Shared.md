@@ -87,7 +87,7 @@ The container div gets a CSS class `session-response-container` for styling (scr
 It manages an internal map of `MessageBlock` instances keyed by `"blockType-blockId"`.
 An "Awaits responses ..." status element is created and appended to the container.
 
-- `processCallback(data)`: Processes a callback object (from the live polling API) and handles creating/updating/completing message blocks for Reasoning, Message, and Tool callbacks. Returns the callback name string so the caller can react to lifecycle events (e.g. `"onAgentEnd"`).
+- `processCallback(data)`: Processes a callback object (from the live polling API) and handles creating/updating/completing message blocks for Reasoning, Message, Tool, and onGeneratedUserPrompt callbacks. For `onGeneratedUserPrompt`, it calls `addUserMessage(data.prompt, "Task")`. Returns the callback name string so the caller can react to lifecycle events (e.g. `"onAgentEnd"`).
 - `addUserMessage(text)`: Creates a "User" `MessageBlock`, appends the text, completes it, and scrolls to bottom.
 - `setAwaiting(awaiting)`: Shows or hides the "Awaits responses ..." status text.
 - `scrollToBottom()`: Scrolls the container to the bottom.
