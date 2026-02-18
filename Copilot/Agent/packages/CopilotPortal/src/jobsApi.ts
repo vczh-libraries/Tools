@@ -413,6 +413,9 @@ export async function startTask(
                 callback.taskDecision(`Started task session with model ${taskModelId}`);
             }
 
+            // Set $task-model runtime variable to the actual model name used for the task session
+            runtimeValues["task-model"] = taskModelId || entry.models.driving;
+
             if (stopped) return;
 
             // Check availability
