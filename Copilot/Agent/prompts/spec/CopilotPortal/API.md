@@ -191,8 +191,7 @@ interface ICopilotTaskCallback {
 async function startTask(
   taskName: string,
   userInput: string,
-  drivingSession: ICopilotSession,
-  forceSingleSessionMode: boolean,
+  drivingSession: ICopilotSession | undefined,
   ignorePrerequisiteCheck: boolean,
   callback: ICopilotTaskCallback,
   taskModelIdOverride?: string,
@@ -201,6 +200,21 @@ async function startTask(
 ```
 - Start a task.
 - Throw an error if `installJobsEntry` has not been called.
+- When `drivingSession` is defined, the task is forced single session mode
+- When `drivingSession` is not defined, the task is in double session mode
+  - It could still be single session due to task configuration. In this case the driving session is running with the task session model.
+  - `startTask` is going to create the driving session, instead of passed from the outside.
+    - **TASK**: Just a hint: a job starts tasks without forcing single session mode.
+
+**TASK-BEGIN**
+Currently the `checkCriteria` do the retry.
+I think it is better moving the retry back to the `startTask` function,
+so that only one place executes the task.
+
+And improve the code quality of the `startTask` function, I would like to see a piece of clear code:
+- Running a task is complex, do not copy code.
+- It is good that we check availability in one place, but criteria is a little bit messy.
+**TASK-END**
 
 ```typescript
 interface ICopilotJob {
