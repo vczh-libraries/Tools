@@ -110,16 +110,17 @@ const MAX_CRASH_RETRIES = 3;
 async function sendPromptWithCrashRetry(
     session: ICopilotSession,
     prompt: string,
-    drivingSession: ICopilotSession
+    drivingCallback: ICopilotTaskCallback
 ): Promise<void> {
     let lastError: unknown;
     for (let attempt = 0; attempt < MAX_CRASH_RETRIES; attempt++) {
         const actualPrompt = attempt === 0 ? prompt : SESSION_CRASH_PREFIX + prompt;
         try {
-            helperPushSessionResponse(drivingSession, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
+            helperPushSessionResponse(session, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
             await session.sendRequest(actualPrompt);
             return; // Success
         } catch (err) {
+            drivingCallback.taskDecision(`Task execution crashed: ${String(err)}`);
             lastError = err;
             // Will retry on next iteration
         }
@@ -264,6 +265,7 @@ export async function startTask(
                 taskSession = [session, sessionId];
                 taskSessionObj = session;
                 callback.taskSessionStarted(taskSession);
+                callback.taskDecision(`Started task session with model ${taskModelId}`);
             }
 
             if (stopped) return;
@@ -292,7 +294,7 @@ export async function startTask(
             // Monitor tools during task execution
             const monitor = monitorSessionTools(taskSessionObj, runtimeValues);
             try {
-                await sendPromptWithCrashRetry(taskSessionObj, taskPromptText, drivingSession);
+                await sendPromptWithCrashRetry(taskSessionObj, taskPromptText, callback);
             } catch (err) {
                 monitor.cleanup();
                 callback.taskDecision(`Task execution crashed: ${String(err)}`);
@@ -381,7 +383,7 @@ async function checkAvailability(
         const conditionPrompt = expandPrompt(entry, availability.condition, runtimeValues);
         const monitor = monitorSessionTools(drivingSession, runtimeValues);
         try {
-            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, drivingSession);
+            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, callback);
         } catch (err) {
             monitor.cleanup();
             callback.taskDecision(`Availability check crashed: ${String(err)}`);
@@ -431,7 +433,7 @@ async function checkCriteria(
         const conditionPrompt = expandPrompt(entry, criteria.condition, runtimeValues);
         const monitor = monitorSessionTools(drivingSession, runtimeValues);
         try {
-            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, drivingSession);
+            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, callback);
         } catch (err) {
             monitor.cleanup();
             callback.taskDecision(`Criteria condition check crashed: ${String(err)}`);
@@ -482,7 +484,7 @@ async function checkCriteria(
                     const retryMonitor = monitorSessionTools(taskSessionObj, runtimeValues);
                     let taskCrashed = false;
                     try {
-                        await sendPromptWithCrashRetry(taskSessionObj, taskPromptText, drivingSession);
+                        await sendPromptWithCrashRetry(taskSessionObj, taskPromptText, callback);
                     } catch (err) {
                         retryMonitor.cleanup();
                         callback.taskDecision(`Session crash during retry #${i + 1}: ${String(err)}`);
@@ -501,7 +503,7 @@ async function checkCriteria(
                     const retryCondPrompt = expandPrompt(entry, criteria.condition!, runtimeValues);
                     let condCrashed = false;
                     try {
-                        await sendPromptWithCrashRetry(drivingSession, retryCondPrompt, drivingSession);
+                        await sendPromptWithCrashRetry(drivingSession, retryCondPrompt, callback);
                     } catch (err) {
                         condMonitor.cleanup();
                         callback.taskDecision(`Criteria condition check crash during retry #${i + 1}: ${String(err)}`);
@@ -534,7 +536,7 @@ async function checkCriteria(
                     const retryMonitor = monitorSessionTools(taskSessionObj, runtimeValues);
                     let taskCrashed = false;
                     try {
-                        await sendPromptWithCrashRetry(taskSessionObj, retryPromptText, drivingSession);
+                        await sendPromptWithCrashRetry(taskSessionObj, retryPromptText, callback);
                     } catch (err) {
                         retryMonitor.cleanup();
                         callback.taskDecision(`Session crash during retry #${i + 1}: ${String(err)}`);
@@ -553,7 +555,7 @@ async function checkCriteria(
                     const retryCondPrompt = expandPrompt(entry, criteria.condition!, runtimeValues);
                     let condCrashed = false;
                     try {
-                        await sendPromptWithCrashRetry(drivingSession, retryCondPrompt, drivingSession);
+                        await sendPromptWithCrashRetry(drivingSession, retryCondPrompt, callback);
                     } catch (err) {
                         condMonitor.cleanup();
                         callback.taskDecision(`Criteria condition check crash during retry #${i + 1}: ${String(err)}`);
