@@ -130,6 +130,7 @@ because runtime variables could change.
 - JobsData.md: `### expandPromptDynamic`, `### Task.availability`, `### Task.criteria`, `### validateEntry`
 
 `$user-input` will be passed from the user directly.
+`$task-model` will be the model name selected to run the task session. It is not the category, it is the actual model name.
 
 The following tools could be called in the driving or task session.
 - When `job_prepare_document` is called, its argument becomes `$reported-document`. If there is multiple line, only keep the first line and trim and space characters before and after it.

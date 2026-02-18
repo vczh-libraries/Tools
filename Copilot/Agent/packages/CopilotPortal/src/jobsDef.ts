@@ -129,6 +129,7 @@ export const availableTools: string[] = [
 
 export const runtimeVariables: string[] = [
     "$user-input",
+    "$task-model",
     "$reported-document",
     "$reported-true-reason",
     "$reported-false-reason"

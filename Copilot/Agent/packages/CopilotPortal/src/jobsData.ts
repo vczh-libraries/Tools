@@ -116,6 +116,8 @@ const entryInput: Entry = {
     },
     promptVariables: {
         reviewerBoardFiles: [
+            "## Your Identity",
+            "You are $task-model, one of the reviewers in the review board.",
             "## Reviewer Board Files",
             "- gpt -> Copilot_Review_*_GPT.md",
             "- claude opus -> Copilot_Review_*_OPUS.md",
