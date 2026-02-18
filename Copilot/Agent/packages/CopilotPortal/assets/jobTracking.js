@@ -169,7 +169,9 @@ async function pollLive(url, handler, shouldStop) {
             const res = await fetch(`/api/${url}`);
             const data = await res.json();
             if (data.error === "HttpRequestTimeout") continue;
-            if (data.error) break;
+            // Only treat error as a system-level stop signal when there's no callback field.
+            // Callback payloads like onEndToolExecution can have an error field as part of the data.
+            if (data.error && !data.callback) break;
             if (data.jobError || data.taskError || data.sessionError) {
                 handler(data);
                 break;
