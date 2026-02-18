@@ -486,14 +486,13 @@ const entryInput: Entry = {
             prompt: [
                 "$cppjob",
                 "$review",
-                "YOU MUST use the job_prerequisite_failed tool tool if 1) in the LATEST ROUND not all models created their review document or 2) not all replies in all review documents from the LATEST ROUND agree.",
                 "# Final",
                 "$reviewerBoardFiles"
             ],
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$reviewDocReady"],
-                failureAction: retryFailedCondition()
+                failureAction: retryFailedCondition(0)
             }
         },
         "review-apply-task": {
