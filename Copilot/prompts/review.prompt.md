@@ -11,14 +11,14 @@
 - The mentioned `Copilot_Review.md` and `Copilot_Review_*_*.md` files are in `REPO-ROOT/.github/TaskLogs/`.
 - Each model writes its review to a separate file.
 - When you are asked to create a `Copilot_Review_*_*.md`, You are only allowed to create your own review file.
-- Each round of review should consider knowledges from the knowledge base.
-- Each round of review should consider learnings from `KnowledgeBase/Learning.md`, `KnowledgeBase/Learning.md`, `Learning/Learning_Coding.md`, and `Learning/Learning_Testing.md` if they exist.
+- Document review should consider knowledges from the knowledge base.
+- Document review should consider learnings from `KnowledgeBase/Learning.md`, `KnowledgeBase/Learning.md`, `Learning/Learning_Coding.md`, and `Learning/Learning_Testing.md` if they exist.
 
 ## Identify the Review Board Team
 
 - In the LATEST chat message there should be a section called `## Reviewer Board Files`.
 - Model and their file name fragment is bullet-listed in this format:
-  - `{ModelName} -> Copilot_Review_{RoundIndex}_{FileNameFragment}.md`.
+  - `{ModelName} -> Copilot_Review_{Finished|Writing}_{FileNameFragment}.md`.
 - If you cannot find this section, stops immediately.
 
 ## Copilot_Review_*_*.md Structure
@@ -40,24 +40,24 @@
   - `# Apply`: skip all remaining steps and go to the `Apply Review` section.
 - If there is nothing: it means you are accidentally stopped. Please continue your work.
 
-## Step 2. Determine the Current Round Index
+## Step 2. Identify Documents from the Review Board
 
 - You are one of the models in the review board. `YourFileNameFragment` is your own file name fragment in all file operations below.
-- Look for your own `Copilot_Review_PREVIOUSINDEX_{YourFileNameFragment}.md` file.
-  - If it exists, the current round index is biggest `PREVIOUSINDEX` + 1.
-  - If none exists, the current round index is `1`.
+- All reviews from the PREVIOUS ROUND should be `Copilot_Review_Finished_{FileNameFragment}.md`.
+- You are going to write `Copilot_Review_Writing_{FileNameFragment}.md` in the CURRENT ROUND.
 
 ## Step 3. Read Context
 
 - Read the target document identified in Step 1.
   - For `Copilot_Scrum.md`, focus only on unfinished tasks.
-- If the current round index is greater than `1`, read all `Reviewer Board Files` except yours from the PREVIOUS ROUND to collect other models' opinions:
+- Read all `Reviewer Board Files` except yours from the PREVIOUS ROUND to collect other models' opinions:
+  - If you can't find a file from the previous model, you need to disagree with that model and explain that you cannot find their review file.
   - Their opinion of the review.
   - Their replies to you.
 
 ## Step 4. Write Your Review
 
-- Create a new file: `Copilot_Review_{RoundIndex}_{YourFileNameFragment}.md`
+- Create a new file: `Copilot_Review_Writing_{FileNameFragment}.md`
 - You need to consolidate all information from Step 3.
 - Find what inspires you, what you agree with, and what you disagree with.
 - Complete the document following the format:
@@ -65,12 +65,13 @@
   - `## Opinion`:
     - Your complete summarized feedback and suggestions for the target document.
     - You should not omit anything what is in any documents in the PREVIOUS ROUND, this is what "complete" means.
-  - `## Replies`: this section exists only when the current round index is greater than `1`.
-    - In every `Copilot_Review_{RoundIndex-1}_{FileNameFragment}.md` except yours.
+  - `## Replies`:
+    - In every `Copilot_Review_Finished_{FileNameFragment}.md` except yours.
       - Find `## Opinion`.
       - Find `## Replies` to you.
     - If you totally agree with a model, add this section: `### AGREE with {ModelName}` with no content. If you have anything to add, put them in your own `## Opinion`.
     - If you partially or totally disagree with a model, add this section: `### DISAGREE with {ModelName}` and explain why you disagree and what you think is correct.
+    - If the file does not exist, add this section: `### DISAGREE with {ModelName}` and explain that you cannot find their review file.
 - The following sections are about what you need to pay attention to when reviewing the target document.
 - After finishing the review document, stops.
 
@@ -136,19 +137,21 @@ Ignore this section if there is no `# Final` in the LATEST chat message.
 
 ### Step F1. Verify Convergence
 
-- Find the LATEST ROUND of `Review Board Files`.
+- Delete all `Copilot_Review_Finished_{FileNameFragment}.md` files.
+- Rename all `Copilot_Review_Writing_{FileNameFragment}.md` files to `Copilot_Review_Finished_{FileNameFragment}.md`.
+- Collect all new `Copilot_Review_Finished_{FileNameFragment}.md` files as `Review Board Files`.
 - Ensure all conditions below are satisfied, otherwise report the problem and stop:
-  - All models in the review board have submitted their review file in the LATEST ROUND.
-  - All models in the review board have the same target document in the LATEST ROUND.
-  - All models in the review board have no disagreement in the LATEST ROUND.
+  - `Review Board Files` has files from all models in the review board.
+  - `Review Board Files` all have the same target document.
+  - `Review Board Files` have no disagreement in their `## Replies` section.
 
 ### Step F2. Identify the Target Document
 
-- Identify all `Review Board Files` from the LATEST ROUND. Read their `# Review Target`, they should be the same.
+- Identify all `Review Board Files`. Read their `# Review Target`, they should be the same.
 
 ### Step F3. Create the Summary
 
-- Read the `## Opinion` section from each review file from the LATEST ROUND.
+- Read the `## Opinion` section from all `Review Board Files`.
 - Consolidate all options into a single review opinion.
 - Write the review opinion to `Copilot_Review.md` as a cohesive set of actionable feedback.
   - The only title in this file should be `# Review Target: {TargetDocumentName}`.
