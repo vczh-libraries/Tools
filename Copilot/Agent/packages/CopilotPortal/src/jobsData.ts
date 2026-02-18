@@ -30,7 +30,7 @@ function makeDocumentWork(jobName: string, keyword: "scrum" | "design" | "plan" 
         kind: "Seq",
         works: [
             makeRefWork(`${jobName}-task`),
-            makeReviewWork("scrum")
+            makeReviewWork(keyword)
         ]
     };
 }
