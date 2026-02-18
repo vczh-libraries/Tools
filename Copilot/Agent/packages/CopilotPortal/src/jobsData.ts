@@ -159,7 +159,8 @@ const entryInput: Entry = {
             "Execute the instruction in REPO-ROOT/.github/prompts/code.prompt.md immediately."
         ],
         reportDocument: [
-            "YOU MUST use the job_prepare_document tool with an argument: an absolute path of the document you are about to create or update."
+            "YOU MUST use the job_prepare_document tool with an argument: an absolute path of the document you are about to create or update.",
+            "YOU MUST use the job_prepare_document tool even when you think nothing needs to be updated, it is to make sure you are clear about which document to work on."
         ],
         reportBoolean: [
             "YOU MUST use either job_boolean_true tool or job_boolean_false tool to answer an yes/no question, with the reason in the argument."
