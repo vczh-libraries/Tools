@@ -151,7 +151,7 @@ Copilot/Agent/
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
 - **Live Polling**: Sequential long-polling for real-time session callbacks
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
-- **Session Crash Retry**: `sendPromptWithCrashRetry` automatically retries up to 3 times if a Copilot session crashes during prompt execution, creating new sessions when needed via an optional `createNewSession` factory
+- **Session Crash Retry**: `sendPromptWithCrashRetry` automatically retries up to 5 times if a Copilot session crashes during prompt execution, creating new sessions when needed via an optional `createNewSession` factory
 - **Detailed Error Reporting**: `errorToDetailedString` helper converts errors to detailed JSON with name, message, stack, and recursive cause chain for comprehensive crash diagnostics
 - **Jobs API**: RESTful API for listing, starting, stopping, and monitoring tasks and jobs via live polling
 - **Live Polling Drain**: Live APIs (session/task/job) use a drain model — clients continue polling until receiving terminal `*Closed` or `*NotFound` errors, ensuring all buffered responses are consumed
@@ -162,10 +162,11 @@ Copilot/Agent/
 - **Tool Registration**: Custom job tools (e.g. `job_boolean_true`, `job_prepare_document`) are automatically registered with Copilot sessions
 - **Flow Chart Renderers**: Job tracking page supports ELK and Mermaid (default) renderers, selectable via `renderer` URL parameter
 - **Job Status Tracking**: Live polling of job execution status with visual status bar (RUNNING/SUCCEEDED/FAILED/CANCELED) and Stop Job button
-- **Flow Chart Status Indicators**: Running tasks display a green triangle indicator; failed tasks display a red cross indicator on the flow chart
+- **Flow Chart Status Indicators**: Running tasks display a green triangle indicator; succeeded tasks display a green tick indicator; failed tasks display a red cross indicator on the flow chart
 - **Task Inspection**: Clicking a TaskNode in the flow chart opens a tab control showing session responses for that task's sessions
+- **Job Preview Mode**: Job tracking page supports a preview mode (no jobId) showing the flow chart without tracking, with no Stop Job button and "JOB: PREVIEW" status
 - **Job-Created Tasks**: Jobs create tasks without forcing single session mode; `startTask` manages driving session creation internally. Task live API provides real-time session updates with `sessionId` and `isDriving` fields
 - **Task Decision Reporting**: `taskDecision` callback reports all driving session decisions with categorized prefixes (`[OPERATION]`, `[CRITERIA]`, `[AVAILABILITY]`, `[SESSION CRASHED]`, `[TASK SUCCEEDED]`, `[TASK FAILED]`, `[DECISION]`) as User message blocks in the driving session tab
 - **Driving Session Consolidation**: All driving sessions for a task are consolidated into a single "Driving" tab; when a driving session is replaced (e.g., due to crash retry), the new session reuses the same tab and renderer
 - **Forced Single Session Mode**: Tasks can run with an externally-provided session; crashes in forced mode fail immediately without retry
-- **Separated Retry Budgets**: Crash retries (per-call, 3 max) and criteria retries (per failure action) are independent; a crash during a criteria retry loop is treated as a failed iteration rather than killing the task
+- **Separated Retry Budgets**: Crash retries (per-call, 5 max) and criteria retries (per failure action) are independent; a crash during a criteria retry loop is treated as a failed iteration rather than killing the task

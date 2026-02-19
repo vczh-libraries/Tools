@@ -1,12 +1,14 @@
 import { SessionResponseRenderer } from "./sessionResponse.js";
 
-// ---- Redirect if no jobName or jobId ----
+// ---- Redirect if no jobName ----
 const params = new URLSearchParams(window.location.search);
 const jobName = params.get("jobName");
 const jobId = params.get("jobId");
-if (!jobName || !jobId) {
+if (!jobName) {
     window.location.href = "/index.html";
 }
+
+const isPreviewMode = !jobId;
 
 // ---- DOM references ----
 const jobPart = document.getElementById("job-part");
@@ -16,7 +18,7 @@ const rightPart = document.getElementById("right-part");
 
 // ---- State ----
 let chartController = null; // returned from renderFlowChartMermaid
-let jobStatus = "RUNNING"; // RUNNING | SUCCEEDED | FAILED | CANCELED
+let jobStatus = isPreviewMode ? "PREVIEW" : "RUNNING"; // PREVIEW | RUNNING | SUCCEEDED | FAILED | CANCELED
 let jobStopped = false;
 
 // Map: workId -> { taskId, sessions: Map<sessionId, { name, renderer, div, active }>, attemptCount }
@@ -43,25 +45,27 @@ function createStatusBar() {
 
     statusLabel = document.createElement("div");
     statusLabel.id = "job-status-label";
-    statusLabel.textContent = "JOB: RUNNING";
+    statusLabel.textContent = `JOB: ${jobStatus}`;
     bar.appendChild(statusLabel);
 
-    stopJobButton = document.createElement("button");
-    stopJobButton.id = "stop-job-button";
-    stopJobButton.textContent = "Stop Job";
-    stopJobButton.addEventListener("click", async () => {
-        if (jobStopped) return;
-        try {
-            await fetch(`/api/copilot/job/${encodeURIComponent(jobId)}/stop`, { method: "POST" });
-            jobStopped = true;
-            jobStatus = "CANCELED";
-            updateStatusLabel();
-            stopJobButton.disabled = true;
-        } catch (err) {
-            console.error("Failed to stop job:", err);
-        }
-    });
-    bar.appendChild(stopJobButton);
+    if (!isPreviewMode) {
+        stopJobButton = document.createElement("button");
+        stopJobButton.id = "stop-job-button";
+        stopJobButton.textContent = "Stop Job";
+        stopJobButton.addEventListener("click", async () => {
+            if (jobStopped) return;
+            try {
+                await fetch(`/api/copilot/job/${encodeURIComponent(jobId)}/stop`, { method: "POST" });
+                jobStopped = true;
+                jobStatus = "CANCELED";
+                updateStatusLabel();
+                stopJobButton.disabled = true;
+            } catch (err) {
+                console.error("Failed to stop job:", err);
+            }
+        });
+        bar.appendChild(stopJobButton);
+    }
 
     return bar;
 }
@@ -468,10 +472,12 @@ async function loadJobData() {
         jobPart.appendChild(chartContainer);
 
         // Render with Mermaid
-        chartController = await renderFlowChartMermaid(chart, chartContainer, onInspect);
+        chartController = await renderFlowChartMermaid(chart, chartContainer, isPreviewMode ? () => {} : onInspect);
 
-        // Start job live polling
-        startJobPolling();
+        // Start job live polling only when not in preview mode
+        if (!isPreviewMode) {
+            startJobPolling();
+        }
     } catch (err) {
         console.error("Failed to load job data:", err);
         jobPart.textContent = "Failed to load job data.";

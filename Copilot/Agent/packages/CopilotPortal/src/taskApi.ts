@@ -68,7 +68,7 @@ function expandPrompt(entry: Entry, prompt: Prompt, runtimeValues: Record<string
 
 export const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";
 
-const MAX_CRASH_RETRIES = 3;
+const MAX_CRASH_RETRIES = 5;
 
 /**
  * Sends a prompt to a session with crash retry logic.

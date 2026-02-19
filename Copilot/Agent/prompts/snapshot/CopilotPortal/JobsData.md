@@ -65,8 +65,6 @@ Here are all checks that `validateEntry` needs to do:
   - Must be in fields of `entry.models`.
 - `entry.tasks[name].requireUserInput`:
   - If it is true, its evaluated `prompt` should use `$user-input`, otherwise should not use.
-- `entry.tasks[name].availability.previousJobKeywords[index]`:
-  - Must be in any `entry.grid[index].keyword`.
 - `entry.tasks[name].availability.previousTasks[index]`:
   - Must be in keys of `entry.tasks`.
 - `entry.tasks[name].criteria.toolExecuted[index]`:
@@ -106,7 +104,7 @@ If any session crashes after the task submitting a promot to the session:
 - When a task is running in forced single session mode, the session is offered from the outside, fails the task immediately.
 - Otherwise:
   - This session will be no longer used, the task should create a new session to retry.
-  - resend the prompt until 3 consecutive crashes.
+  - resend the prompt until 5 consecutive crashes.
   - Add `SESSION_CRASH_PREFIX` (exported const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
   - The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`, used by both task execution and condition evaluation.
 
@@ -164,7 +162,6 @@ there will be no prerequisite checking,
 the task just run.
 
 All conditions must satisfy at the same time to run the task:
-- When `Task.availability.previousJobKeywords` is defined, the previous job's keyword must be in the list.
 - When `Task.availability.previousTasks` is defined, the previous task's name must be in the list.
 - When `Task.availability.condition` is defined, the condition must satisfy.
   - The driving session will run the prompt.
@@ -209,7 +206,7 @@ In above sessions there are a lot of thing happenes in the driving session. A re
 - Starting a retry (RetryWithNewSession or RetryWithUserPrompt) with retry number.
 - Retry budget drained because of availability or criteria failure.
 - Retry budget drained because of crashing.
-  - These two budgets are separated: crash retries are per-call (3 max in `sendPromptWithCrashRetry`), criteria retries are per failure action loop. A crash exhausting its per-call budget during a criteria retry loop is treated as a failed iteration rather than killing the task.
+  - These two budgets are separated: crash retries are per-call (5 max in `sendPromptWithCrashRetry`), criteria retries are per failure action loop. A crash exhausting its per-call budget during a criteria retry loop is treated as a failed iteration rather than killing the task.
 - Any error generated in the copilot session.
 - A final decision about the task succeeded or failed.
 

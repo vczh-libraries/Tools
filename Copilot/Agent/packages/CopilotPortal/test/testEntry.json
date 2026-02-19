@@ -7,8 +7,8 @@
   "grid": [
     {
       "keyword": "test",
-      "automate": false,
       "jobs": [
+        null,
         { "name": "run", "jobName": "simple-job" },
         { "name": "fail", "jobName": "fail-job" },
         { "name": "input", "jobName": "input-job" }
@@ -16,7 +16,6 @@
     },
     {
       "keyword": "batch",
-      "automate": true,
       "jobs": [
         { "name": "sequence", "jobName": "seq-job" },
         { "name": "parallel", "jobName": "par-job" }

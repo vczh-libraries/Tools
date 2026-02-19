@@ -491,7 +491,6 @@ describe("validateEntry grid jobName", () => {
             promptVariables: {},
             grid: [{
                 keyword: "test",
-                automate: false,
                 jobs: [{ name: "col", jobName: "nonexistent-job" }]
             }],
             tasks: {},
@@ -509,7 +508,6 @@ describe("validateEntry grid jobName", () => {
             promptVariables: {},
             grid: [{
                 keyword: "test",
-                automate: false,
                 jobs: [{ name: "col", jobName: "real-job" }]
             }],
             tasks: {
@@ -531,6 +529,7 @@ describe("validateEntry grid jobName", () => {
             const row = entry.grid[rowIndex];
             for (let colIndex = 0; colIndex < row.jobs.length; colIndex++) {
                 const col = row.jobs[colIndex];
+                if (col === undefined || col === null) continue; // undefined renders an empty cell
                 assert.ok(
                     jobKeys.includes(col.jobName),
                     `grid[${rowIndex}].jobs[${colIndex}].jobName "${col.jobName}" should be a valid job name`

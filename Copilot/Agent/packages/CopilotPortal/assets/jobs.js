@@ -43,10 +43,9 @@ function renderMatrix() {
 
     // Title row
     const titleRow = document.createElement("tr");
-    // Count max columns: keyword + automate(if any) + max jobs
-    const hasAutomate = grid.some(row => row.automate);
+    // Count max columns: keyword + max jobs
     const maxJobCols = Math.max(...grid.map(row => row.jobs.length));
-    const totalCols = 1 + (hasAutomate ? 1 : 0) + maxJobCols;
+    const totalCols = 1 + maxJobCols;
     const titleCell = document.createElement("th");
     titleCell.colSpan = totalCols - 1;
     titleCell.textContent = "Available Jobs";
@@ -84,29 +83,20 @@ function renderMatrix() {
         kwCell.className = "matrix-keyword";
         tr.appendChild(kwCell);
 
-        // Automate column (only if any row has automate)
-        if (hasAutomate) {
-            const autoCell = document.createElement("td");
-            if (row.automate) {
-                const btn = document.createElement("button");
-                btn.textContent = "automate";
-                btn.className = "matrix-automate-btn";
-                autoCell.appendChild(btn);
-            }
-            tr.appendChild(autoCell);
-        }
-
         // Job columns
         for (let i = 0; i < maxJobCols; i++) {
             const jobCell = document.createElement("td");
             if (i < row.jobs.length) {
                 const col = row.jobs[i];
-                const btn = document.createElement("button");
-                btn.textContent = col.name;
-                btn.className = "matrix-job-btn";
-                btn.dataset.jobName = col.jobName;
-                btn.addEventListener("click", () => onJobButtonClick(btn, col.jobName));
-                jobCell.appendChild(btn);
+                if (col !== undefined && col !== null) {
+                    const btn = document.createElement("button");
+                    btn.textContent = col.name;
+                    btn.className = "matrix-job-btn";
+                    btn.dataset.jobName = col.jobName;
+                    btn.addEventListener("click", () => onJobButtonClick(btn, col.jobName));
+                    jobCell.appendChild(btn);
+                }
+                // undefined renders an empty cell
             }
             tr.appendChild(jobCell);
         }
@@ -125,6 +115,7 @@ function onJobButtonClick(btn, jobName) {
         selectedJobName = null;
         startJobButton.disabled = true;
         startJobButton.textContent = "Job Not Selected";
+        previewButton.disabled = true;
         userInputTextarea.disabled = true;
     } else {
         // Deselect previous
@@ -135,6 +126,7 @@ function onJobButtonClick(btn, jobName) {
         selectedJobName = jobName;
         startJobButton.disabled = false;
         startJobButton.textContent = `Start Job: ${jobName}`;
+        previewButton.disabled = false;
         // Enable text box only when requireUserInput is true
         const job = jobsData.jobs[jobName];
         userInputTextarea.disabled = !(job && job.requireUserInput);
@@ -168,6 +160,14 @@ startJobButton.addEventListener("click", async () => {
         alert("Failed to start job: " + err.message);
     }
     startJobButton.disabled = false;
+});
+
+// ---- Preview Button ----
+const previewButton = document.getElementById("preview-button");
+previewButton.addEventListener("click", () => {
+    if (!selectedJobName) return;
+    const url = `/jobTracking.html?jobName=${encodeURIComponent(selectedJobName)}`;
+    window.open(url, "_blank");
 });
 
 // ---- Resize bar (horizontal) ----

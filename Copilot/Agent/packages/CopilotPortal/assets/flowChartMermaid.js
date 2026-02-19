@@ -162,53 +162,71 @@ async function renderFlowChartMermaid(chart, container, onInspect) {
 
     // Return controller for status updates
     return {
-        // Set a node to running state (green triangle)
+        // Helper: position an indicator at the center of the left border of the node
+        _positionIndicator(indicator, group) {
+            // Try to find the shape element (rect, polygon, etc.) of the node
+            const shape = group.querySelector("rect, polygon, circle, ellipse, path");
+            if (shape) {
+                const shapeBBox = shape.getBBox ? shape.getBBox() : null;
+                if (shapeBBox) {
+                    // Center of the left border, but outside
+                    indicator.setAttribute("x", String(shapeBBox.x - 20));
+                    indicator.setAttribute("y", String(shapeBBox.y + shapeBBox.height / 2 + 5));
+                    return;
+                }
+            }
+            // Fallback: use text position
+            const textEl = workIdToTextEl[parseInt(indicator.getAttribute("data-work-id"))];
+            if (textEl) {
+                const textBBox = textEl.getBBox ? textEl.getBBox() : null;
+                if (textBBox) {
+                    indicator.setAttribute("x", String(textBBox.x - 20));
+                    indicator.setAttribute("y", String(textBBox.y + textBBox.height * 0.8));
+                }
+            }
+        },
+        // Set a node to running state (green triangle emoji)
         setRunning(workId) {
-            const textEl = workIdToTextEl[workId];
-            if (!textEl) return;
-            // Remove existing status indicators
+            const group = workIdToGroup[workId];
+            if (!group) return;
             this._clearIndicator(workId);
             const indicator = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            indicator.textContent = "\u25B6"; // right-pointing triangle
+            indicator.textContent = "\u25B6\uFE0F"; // ▶️ green triangle emoji
             indicator.setAttribute("fill", "#22c55e");
             indicator.setAttribute("font-size", "14");
             indicator.setAttribute("class", "task-status-indicator");
             indicator.setAttribute("data-work-id", String(workId));
-            // Insert at the beginning of the parent
-            const parent = textEl.closest("g") || textEl.parentElement;
-            if (parent) {
-                parent.insertBefore(indicator, parent.firstChild);
-                // Position it to the left of the text
-                const textBBox = textEl.getBBox ? textEl.getBBox() : null;
-                if (textBBox) {
-                    indicator.setAttribute("x", String(textBBox.x - 18));
-                    indicator.setAttribute("y", String(textBBox.y + textBBox.height * 0.8));
-                }
-            }
+            const parent = group;
+            parent.insertBefore(indicator, parent.firstChild);
+            this._positionIndicator(indicator, group);
         },
-        // Set a node to completed state (remove indicator)
+        // Set a node to completed state (green tick emoji)
         setCompleted(workId) {
-            this._clearIndicator(workId);
-        },
-        // Set a node to failed state (red cross)
-        setFailed(workId) {
-            const textEl = workIdToTextEl[workId];
-            if (!textEl) return;
+            const group = workIdToGroup[workId];
+            if (!group) return;
             this._clearIndicator(workId);
             const indicator = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            indicator.textContent = "\u274C"; // cross mark
+            indicator.textContent = "\u2705"; // ✅ green tick emoji
             indicator.setAttribute("font-size", "14");
             indicator.setAttribute("class", "task-status-indicator");
             indicator.setAttribute("data-work-id", String(workId));
-            const parent = textEl.closest("g") || textEl.parentElement;
-            if (parent) {
-                parent.insertBefore(indicator, parent.firstChild);
-                const textBBox = textEl.getBBox ? textEl.getBBox() : null;
-                if (textBBox) {
-                    indicator.setAttribute("x", String(textBBox.x - 18));
-                    indicator.setAttribute("y", String(textBBox.y + textBBox.height * 0.8));
-                }
-            }
+            const parent = group;
+            parent.insertBefore(indicator, parent.firstChild);
+            this._positionIndicator(indicator, group);
+        },
+        // Set a node to failed state (red cross emoji)
+        setFailed(workId) {
+            const group = workIdToGroup[workId];
+            if (!group) return;
+            this._clearIndicator(workId);
+            const indicator = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            indicator.textContent = "\u274C"; // ❌ red cross emoji
+            indicator.setAttribute("font-size", "14");
+            indicator.setAttribute("class", "task-status-indicator");
+            indicator.setAttribute("data-work-id", String(workId));
+            const parent = group;
+            parent.insertBefore(indicator, parent.firstChild);
+            this._positionIndicator(indicator, group);
         },
         _clearIndicator(workId) {
             const svgEl = container.querySelector("svg");
