@@ -235,9 +235,9 @@ const entryInput: Entry = {
         "execute-task": {
             model: { category: "coding" },
             requireUserInput: false,
-            prompt: ["$cppjob", "$execute"],
+            prompt: ["$cppjob", "$clearBuildTestLog", "$execute"],
             availability: {
-                condition: ["$execDocReady", "$clearBuildTestLog"]
+                condition: ["$execDocReady"]
             },
             criteria: {
                 runConditionInSameSession: false,
@@ -248,9 +248,9 @@ const entryInput: Entry = {
         "execute-update-task": {
             model: { category: "coding" },
             requireUserInput: true,
-            prompt: ["$cppjob", "$execute", "# Update", "$user-input"],
+            prompt: ["$cppjob", "$clearBuildTestLog", "$execute", "# Update", "$user-input"],
             availability: {
-                condition: ["$execDocReady", "$clearBuildTestLog"]
+                condition: ["$execDocReady"]
             },
             criteria: {
                 runConditionInSameSession: false,
@@ -261,9 +261,9 @@ const entryInput: Entry = {
         "verify-task": {
             model: { category: "coding" },
             requireUserInput: false,
-            prompt: ["$cppjob", "$verify"],
+            prompt: ["$cppjob", "$clearBuildTestLog", "$verify"],
             availability: {
-                condition: ["$execDocReady", "$clearBuildTestLog"]
+                condition: ["$execDocReady"]
             },
             criteria: {
                 runConditionInSameSession: false,
@@ -274,9 +274,9 @@ const entryInput: Entry = {
         "verify-update-task": {
             model: { category: "coding" },
             requireUserInput: true,
-            prompt: ["$cppjob", "$verify", "# Update", "$user-input"],
+            prompt: ["$cppjob", "$clearBuildTestLog", "$verify", "# Update", "$user-input"],
             availability: {
-                condition: ["$execDocReady", "$clearBuildTestLog"]
+                condition: ["$execDocReady"]
             },
             criteria: {
                 runConditionInSameSession: false,
