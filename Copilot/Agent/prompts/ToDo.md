@@ -1,5 +1,10 @@
 # TODO
 
+## Task Execution
+
+When the driving session is created in the task, it is better to always spawn new driving sessions for checking availability and criteria.
+Whenever a driving session or a task session crashed, spawn a new session to replace it.
+
 ## Job Execution
 
 Needs to support multiple client watching for the same job running.
