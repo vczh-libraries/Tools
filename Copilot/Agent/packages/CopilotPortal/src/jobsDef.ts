@@ -2,17 +2,15 @@
 
 export type Prompt = string[];
 
-export type FailureAction =
-    // retry X times with a new session, but if job_prerequisite_failed is called, fails directly.
-    | ["RetryWithNewSession", number]
-    // retry X times within the same session with an additional prompt, but if job_prerequisite_failed is called, fails directly.
-    | ["RetryWithUserPrompt", number, Prompt]
-    ;
-
 export type Model =
     | { category: string; }
     | { id: string; }
     ;
+
+export interface TaskRetry {
+    retryTimes: number;
+    additionalPrompt?: Prompt;
+}
 
 export interface Task {
     model?: Model;
@@ -24,7 +22,7 @@ export interface Task {
     };
     criteria?: {
         toolExecuted?: string[];
-        failureAction: FailureAction;
+        failureAction: TaskRetry;
     } & ({
         condition: Prompt;
         runConditionInSameSession: boolean;
@@ -151,16 +149,16 @@ export function getModelId(model: Model, entry: Entry): string {
     }
 }
 
-export function retryWithNewSessionCondition(retryTimes: number = 3): FailureAction {
-    return ["RetryWithNewSession", retryTimes];
+export function retryWithNewSessionCondition(retryTimes: number = 3): TaskRetry {
+    return { retryTimes };
 }
 
-export function retryFailed(retryTimes: number = 3): FailureAction {
-    return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped."]];
+export function retryFailed(retryTimes: number = 3): TaskRetry {
+    return { retryTimes, additionalPrompt: ["Please continue as you seemed to be accidentally stopped."] };
 }
 
-export function retryFailedCondition(retryTimes: number = 3): FailureAction {
-    return ["RetryWithUserPrompt", retryTimes, ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"]];
+export function retryFailedCondition(retryTimes: number = 3): TaskRetry {
+    return { retryTimes, additionalPrompt: ["Please continue as you seemed to be accidentally stopped, because I spotted that: $reported-false-reason"] };
 }
 
 export function expandPromptStatic(entry: Entry, codePath: string, prompt: Prompt, requiresBooleanTool?: boolean): Prompt {
@@ -284,8 +282,8 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
             if (task.criteria.condition) {
                 task.criteria.condition = expandPromptStatic(entry, `${taskBase}.criteria.condition`, task.criteria.condition, true);
             }
-            if (task.criteria.failureAction && task.criteria.failureAction.length === 3) {
-                task.criteria.failureAction[2] = expandPromptStatic(entry, `${taskBase}.criteria.failureAction[2]`, task.criteria.failureAction[2]);
+            if (task.criteria.failureAction.additionalPrompt) {
+                task.criteria.failureAction.additionalPrompt = expandPromptStatic(entry, `${taskBase}.criteria.failureAction.additionalPrompt`, task.criteria.failureAction.additionalPrompt);
             }
         }
     }

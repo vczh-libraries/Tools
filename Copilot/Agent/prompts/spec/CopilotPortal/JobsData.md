@@ -100,6 +100,48 @@ If any validation runs directly in this function fails:
 
 A task is represented by type `Task`.
 
+A task can be running with `borrowing session mode` or `managed session mode`.
+
+**TASK**: The main difference is about how a task manages session. The new way is easier. Play attention to design the code. I want to see a clean code organization, do not do unnecessary code duplication. Carefully check all spec and if anything conflicts with the new session management design, fix it.
+
+### Borrowing Session Mode
+
+Every prompt will be running in the given session.
+If the session crashes, fail the task immediately.
+
+### Managed Session Mode
+
+Before starting a task, it needs to decide if the task is running in single model or multiple models.
+Single model option will be enabled when one of the following conditions satisfies:
+- `Task.criteria` is undefined.
+- `Task.criteria.runConditionInSameSession` is undefined or it is true.
+
+Every session is created and managed by the task.
+No matter single model or multiple models is selected:
+- If a session crashes, new session must be created to replace it.
+- If executing the same prompt results in 5 consecutive crashes, fail the task immediately.
+- Add `SESSION_CRASH_PREFIX` (exported const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
+- The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`.
+- The exception cannot be consumed silently, and every exception should be reported by `ICopilotTaskCallback.taskDecision`.
+
+#### Managed Session Mode (single model)
+
+A session will be created, and it serves both a driving session and a task session.
+`Entry.models[Task.model]` will be used. When `Task.model` is undefined, the model id should be assigned from `startTask`.
+
+#### Managed Session Mode (multiple models)
+
+Session are created only when needed, and it is closed when its mission finishes.
+
+The mission of a driving session is:
+- Perform one `Task.availability.condition` check.
+- Perform one `Task.criteria.condition` check.
+- Finishing the check closes the driving session
+
+The mission of a task session is:
+- Perform one `Task.prompt`.
+- Finishing one `Task.prompt` closes the task session
+
 If any session crashes after the task submitting a promot to the session:
 - When a task is running in forced single session mode, the session is offered from the outside, fails the task immediately.
 - Otherwise:
@@ -108,17 +150,10 @@ If any session crashes after the task submitting a promot to the session:
   - Add `SESSION_CRASH_PREFIX` (exported const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
   - The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`, used by both task execution and condition evaluation.
 
-If resending promot can't solve crashing:
-- The task stops immediately and marked failed.
-- The exception cannot be consumed silently.
+The driving session uses `Entry.models.driving`.
+The task session uses `Entry.models[Task.model]`. When `Task.model` is undefined, the model id should be assigned.
 
-There will be two options to run the task:
-- The driving session and the task session is the same session.
-- Double model option: The driving session uses `Entry.models.driving`. The task session uses the task model.
-- Task model: `Entry.models[Task.model]` will be used. When `Task.model` does not exist, the model id should be assigned
-
-Both driving session and task session shares the same runtime variables.
-Names of runtime variables are defined in `runtimeVariables`.
+#### Preprocess Prompt
 
 Before sending any prompt to the driving or task session,
 `expandPromptDynamic` will be called to apply runtime variables.
@@ -141,15 +176,6 @@ The following tools could be called in the driving or task session.
 - When the `job_boolean_false` tool is called, the condition fails.
   - The argument will be assigned to the `$reported-false-reason` runtime variable.
   - `$reported-true-reason` will be deleted.
-
-### Determine the Model Option
-
-**Referenced by**:
-- JobsData.md: `### TaskWork`
-
-Single model option will be enabled when one of the following conditions satisfies:
-- `Task.criteria.runConditionInSameSession` is undefined or it is true.
-- Single model option is explicitly required.
 
 ### Task.availability
 
@@ -182,25 +208,22 @@ the task is treat as succeeded.
 
 All conditions must be satisfy to indicate that the task succeeded:
 - When `Task.criteria.toolExecuted` is defined, all tools in the list should have been executed in the last round of task session response.
+  - When retrying the task due to `toolExecuted`, append `## Required Tool Not Called: {tool names ...}`.
 - When `Task.criteria.condition` is defined:
   - The driving session will run the prompt.
   - The condition satisfies when the `job_boolean_true` is called in this round of driving session response.
 
-If `Task.criteria.condition` and `Task.criteria.runConditionInSameSession` both defined,
-the driving session should react to `runConditionInSameSession` when task execution does not satisfy the condition:
-- The first element is `RetryWithNewSession`:
-  - Retry at most "the second element" times. Each time a new task session should be used. DO NOT reuse the previous task session.
-  - If all task executions did not satisfy the condition, the task failed.
-- The first element is `RetryWithUserPrompt`:
-  - Retry at most "the second element" times. ALWAYS reuse the previous task session.
-  - Send the prompt described by the third element to the task session, the task session should react to the prompt and retry.
+The task should react to `Task.criteria.failureAction` when task execution does not satisfy the condition:
+- Retry at most `retryTimes` times.
+- Send the original prompt, extra prompt is appended if:
+  - The criteria test fails due to `toolExecuted`: append `## Required Tool Not Called: {tool names ...}`.
+  - `additionalPrompt` defines: append `"## You accidentally Stopped"` followed by the `additionalPrompt`.
 
 ### Calling ICopilotTaskCallback.taskDecision
 
 In above sessions there are a lot of thing happenes in the driving session. A reason should be provided to `taskDecision`, including but not limited to:
 - The availability test passed.
 - The availability test failed with details.
-- The criteria toolExecuted check failed with details (specific tools not called).
 - The criteria condition test passed.
 - The criteria condition test failed with details.
 - Starting a retry (RetryWithNewSession or RetryWithUserPrompt) with retry number.
@@ -276,11 +299,11 @@ More details for api and additional test notes could be found in `API.md`.
 **Referenced by**:
 - JobsData.md: `### Determine TaskWork.workId`
 
-When a task is executed by a `TaskWork`, it is in double session model.
+When a task is executed by a `TaskWork`, it is in `managed session model`.
 The job has to start all sessions.
 `TaskWork` fails if the last retry:
-- Does not pass `Task.availability` checking. Undefined means successful.
-- Does not pass `Task.criteria` checking. Undefined means successful.
+- Does not pass `Task.availability` checking. Undefined means the check always succeeds.
+- Does not pass `Task.criteria` checking. Undefined means the check always succeeds.
 
 ### Determine TaskWork.workId
 

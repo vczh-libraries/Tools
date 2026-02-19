@@ -185,12 +185,14 @@ interface ICopilotTaskCallback {
   void taskFailed();
   // Called when the driving session finishes a test or makes a decision
   void taskDecision(reason: string);
-  // Called when a task session started
-  // In forced single session mode, If the task session is the driving session, taskSession is undefined.
-  // Otherwise, the driving session is created by a task. Multiple driving sessions could be created if the previous one is no longer usable.
-  void taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean);
-  // Called when a task session stopped. taskSession argument sees taskSessionStarted.
-  void taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean);
+  // This callback is unavailable if it is running with borrowing session mode
+  // Called when a task session started, with its session id
+  // When this session is created as a driving session, the isDrivingSession argument is true.
+  void taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean);
+  // This callback is unavailable if it is running with borrowing session mode
+  // Called when a task session stopped, with its session id
+  // If the task succeeded, the succeeded argument is true
+  void taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean);
 }
 
 async function startTask(
@@ -205,10 +207,10 @@ async function startTask(
 ```
 - Start a task.
 - Throw an error if `installJobsEntry` has not been called.
-- When `drivingSession` is defined, the task is forced single session mode
-- When `drivingSession` is not defined, the task is in double session mode
-  - It could still be single session due to task configuration. In this case the driving session is running with the task session model.
-  - `startTask` is going to create the driving session, instead of passed from the outside.
+- When `drivingSession` is defined:
+  - the task is in borrowing session mode
+- When `drivingSession` is not defined:
+  - `startTask` needs to create and maintain all sessions it needs.
 
 ## Helpers (jobsApi.ts)
 
@@ -495,7 +497,7 @@ It is able to make up a failed test by:
 The body will be user input.
 
 Start a new task and return in this schema.
-Single session mode is forced with an existing session id.
+borrowing session mode is forced with an existing session id.
 Prerequisite checking is skipped.
 
 After the task finishes, it stops automatically, the task id will be unavailable immediately.
@@ -517,8 +519,7 @@ or when error happens:
 
 ### copilot/task/{task-id}/stop
 
-The API will ignore the action and return `TaskCannotClose` if the task is started forcing single session mode.
-Be aware of that it is possible that a task runs in single session mode but it is not forced.
+The API will ignore the action and return `TaskCannotClose` if the task is started with borrowing session mode.
 
 A task will automatically stops when finishes,
 this api forced the task to stop.

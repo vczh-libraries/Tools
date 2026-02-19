@@ -67,44 +67,57 @@ const entryInput: Entry = {
         defineRepoRoot: [
             "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)"
         ],
+        noQuestion: [
+            "DO NOT ask user if you can start doing something, especially after you made a plan, always perform your job automatically and proactively til the end."
+        ],
         cppjob: [
             "$defineRepoRoot",
             "YOU MUST FOLLOW REPO-ROOT/.github/copilot-instructions.md as a general guideline for all your tasks."
         ],
         scrum: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/0-scrum.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/0-scrum.prompt.md immediately.",
+            "$noQuestion"
         ],
         design: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/1-design.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/1-design.prompt.md immediately.",
+            "$noQuestion"
         ],
         plan: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/2-planning.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/2-planning.prompt.md immediately.",
+            "$noQuestion"
         ],
         summary: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/3-summarizing.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/3-summarizing.prompt.md immediately.",
+            "$noQuestion"
         ],
         codingPrefix: [
             "**IMPORT**: It is FORBIDDEN to modify any script files in `REPO-ROOT/.github/Scripts`. If you are getting trouble, the only reason is your code has problem. Fix the code instead of any other kind of working around.",
         ],
         execute: [
             "$codingPrefix",
-            "Execute the instruction in REPO-ROOT/.github/prompts/4-execution.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/4-execution.prompt.md immediately.",
+            "$noQuestion"
         ],
         verify: [
             "$codingPrefix",
-            "Execute the instruction in REPO-ROOT/.github/prompts/5-verifying.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/5-verifying.prompt.md immediately.",
+            "$noQuestion"
         ],
         refine: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/refine.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/refine.prompt.md immediately.",
+            "$noQuestion"
         ],
         review: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/review.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/review.prompt.md immediately.",
+            "$noQuestion"
         ],
         ask: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/ask.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/ask.prompt.md immediately.",
+            "$noQuestion"
         ],
         code: [
-            "Execute the instruction in REPO-ROOT/.github/prompts/code.prompt.md immediately."
+            "Execute the instruction in REPO-ROOT/.github/prompts/code.prompt.md immediately.",
+            "$noQuestion"
         ],
         reportDocument: [
             "YOU MUST use the job_prepare_document tool with an argument: an absolute path of the document you are about to create or update.",
