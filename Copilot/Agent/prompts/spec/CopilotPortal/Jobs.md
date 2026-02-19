@@ -74,6 +74,7 @@ There is a text box fills the page. Disabled by default.
 At the bottom there are buttons aligned to the right:
 - "Start Job: ${selectedJobName}" or "Job Not Selected". Disabled by default.
 - "Preview".
+**BUG**: There must be a proper margin between two buttons.
 
 #### Clicking Start Job Button
 
@@ -173,6 +174,8 @@ At the very top of the `job part`:
 
 #### Flow Chart Rendering
 
+**BUG**: When the flow chart is too height, scrolling to the bottom appears good, but scrolling to the top the chart still clips. Check positions and see if for example all y values are positive (I am assuming the left/top corner is 0,0, make your own decision if it is wrong).
+
 **TEST-NOTE-BEGIN**
 No need to create unit test to assert the chart is in a correct layout.
 Ensure every `TaskWork` has a `ChartNode` with `TaskNode` or `CondNode` hint.
@@ -220,9 +223,10 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
-Clicking it bold (exclusive) or unbold the text:
-- When it becomes bold, the task is being inspected, `session response part` should display this task.
-- When it becomes unbold, the task is not being inspected. `session response part` should restore.
+Clicking it select (exclusive) or unselect the text:
+- When it becomes selected, the task is being inspected, `session response part` should display this task.
+- When it becomes unselected, the task is not being inspected. `session response part` should restore.
+- The border of the node becomes obviously thicker when selected.
 
 ### Session Response Part
 
@@ -230,6 +234,7 @@ When no task is being inspected, print `JSON.stringify(jobToRender and chartToRe
 
 When a task is being inspected:
 - It becomes a tab control.
+  - **BUG**: Currently the tab header has a gap to the `session response part`. I don't like the gap, and make it as thick as the job status bar in `job part`.
 - Each tab is a session, tab headers are names of sessions.
   - The first tab will always be `Driving` and all driving sessions come to here.
   - Each task session has its own tab.
