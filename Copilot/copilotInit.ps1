@@ -41,6 +41,24 @@ function SyncFolder($folderName, $sourceFolder, $targetFolder, $skipIfExists) {
     Copy-Item -Path $sourcePath -Destination $targetFolder -Recurse -Force
 }
 
+function FixAgentFiles($agentFolder) {
+    Push-Location $agentFolder
+    try {
+        git clean -xdf
+        Get-ChildItem -Path . -Filter *.md -Recurse | ForEach-Object {
+            $content = Get-Content -Path $_.FullName -Raw
+            if ($content -match '\bCopilot/Agent\b') {
+                $newContent = $content -replace '\bCopilot/Agent\b', '.github/Agent'
+                Set-Content -Path $_.FullName -Value $newContent -NoNewline
+                Write-Host "Updated: $($_.FullName)"
+            }
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 $projectName = ExtractProjectName
 $targetFolder = "$PSScriptRoot\..\..\$projectName\.github"
 Write-Host "Detected project name: $projectName"
@@ -49,6 +67,11 @@ if ($UpdateKB) {
     SyncFolder "KnowledgeBase" "$targetFolder" "$PSScriptRoot" $False
 }
 else {
+    New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
+
+    SyncFolder "Agent"         "$PSScriptRoot" "$targetFolder" $False
+    FixAgentFiles (Join-Path $targetFolder "Agent")
+
     SyncFolder "Guidelines"    "$PSScriptRoot" "$targetFolder" $False
     SyncFolder "KnowledgeBase" "$PSScriptRoot" "$targetFolder" $False
     SyncFolder "prompts"       "$PSScriptRoot" "$targetFolder" $False
@@ -56,9 +79,9 @@ else {
     SyncFolder "TaskLogs"      "$PSScriptRoot" "$targetFolder" $True
     SyncFolder "Learning"      "$PSScriptRoot" "$targetFolder" $True
 
-    New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
-
     # Copy from $PSScriptRoot to $targetFolder
+    Write-Host "Copying: bot.ps1"
+    Copy-Item -Path (Join-Path $PSScriptRoot "bot.ps1") -Destination (Join-Path $targetFolder "bot.ps1") -Force
     Write-Host "Copying: copilot-instructions.md"
     Copy-Item -Path (Join-Path $PSScriptRoot "copilot-instructions.md") -Destination (Join-Path $targetFolder "copilot-instructions.md") -Force
 
