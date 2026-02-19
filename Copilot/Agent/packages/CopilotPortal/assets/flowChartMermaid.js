@@ -118,16 +118,19 @@ async function renderFlowChartMermaid(chart, container, onInspect) {
     // Fix SVG viewBox to ensure nothing is clipped at the top
     const svgEl = container.querySelector("svg");
     if (svgEl) {
-        const contentGroup = svgEl.querySelector("g");
-        if (contentGroup) {
-            const bbox = contentGroup.getBBox();
-            const padding = 8;
-            const newViewBox = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`;
-            svgEl.setAttribute("viewBox", newViewBox);
-            svgEl.style.width = `${bbox.width + padding * 2}px`;
-            svgEl.style.height = `${bbox.height + padding * 2}px`;
-            svgEl.style.maxWidth = "100%";
-        }
+        // Get the bounding box of the entire SVG content
+        const bbox = svgEl.getBBox();
+        const padding = 8;
+        const vbX = bbox.x - padding;
+        const vbY = bbox.y - padding;
+        const vbW = bbox.width + padding * 2;
+        const vbH = bbox.height + padding * 2;
+        svgEl.setAttribute("viewBox", `${vbX} ${vbY} ${vbW} ${vbH}`);
+        // Set explicit dimensions so the SVG doesn't collapse or scale unexpectedly
+        svgEl.style.width = `${vbW}px`;
+        svgEl.style.height = `${vbH}px`;
+        svgEl.style.minWidth = `${vbW}px`;
+        svgEl.style.minHeight = `${vbH}px`;
     }
 
     // Track currently selected TaskNode/CondNode
