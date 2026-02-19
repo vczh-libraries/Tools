@@ -21,6 +21,23 @@ import {
     type LiveResponse,
 } from "./sharedApi.js";
 
+// ---- Error Formatting Helper ----
+
+function errorToDetailedString(err: unknown): string {
+    if (err instanceof Error) {
+        const info: Record<string, unknown> = {};
+        if (err.name !== undefined) info.name = err.name;
+        if (err.message !== undefined) info.message = err.message;
+        if (err.stack !== undefined) info.stack = err.stack;
+        if ((err as any).cause !== undefined) {
+            info.cause = errorToDetailedString((err as any).cause);
+        }
+        return JSON.stringify(info);
+    }
+    if (typeof err === "string") return err;
+    try { return JSON.stringify(err); } catch { return String(err); }
+}
+
 // ---- Types ----
 
 export interface ICopilotTask {
@@ -33,7 +50,7 @@ export interface ICopilotTaskCallback {
     taskSucceeded(): void;
     taskFailed(): void;
     taskDecision(reason: string): void;
-    taskSessionStarted(taskSession: [ICopilotSession, string] | undefined): void;
+    taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean): void;
     taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean): void;
 }
 
@@ -73,6 +90,7 @@ interface TaskState extends LiveState {
     task: ICopilotTask;
     taskError: string | null;
     forcedSingleSession: boolean;
+    closed: boolean;
 }
 
 const tasks = new Map<string, TaskState>();
@@ -110,19 +128,29 @@ const MAX_CRASH_RETRIES = 3;
 async function sendPromptWithCrashRetry(
     session: ICopilotSession,
     prompt: string,
-    drivingCallback: ICopilotTaskCallback
-): Promise<void> {
+    drivingCallback: ICopilotTaskCallback,
+    createNewSession?: () => Promise<ICopilotSession>
+): Promise<ICopilotSession> {
     let lastError: unknown;
+    let currentSession = session;
     for (let attempt = 0; attempt < MAX_CRASH_RETRIES; attempt++) {
         const actualPrompt = attempt === 0 ? prompt : SESSION_CRASH_PREFIX + prompt;
         try {
-            helperPushSessionResponse(session, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
-            await session.sendRequest(actualPrompt);
-            return; // Success
+            helperPushSessionResponse(currentSession, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
+            await currentSession.sendRequest(actualPrompt);
+            return currentSession; // Success, return the session that worked
         } catch (err) {
-            drivingCallback.taskDecision(`Task execution crashed: ${String(err)}`);
+            drivingCallback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
             lastError = err;
-            // Will retry on next iteration
+            // If we can create a new session for retry, do so
+            if (createNewSession && attempt < MAX_CRASH_RETRIES - 1) {
+                try {
+                    currentSession = await createNewSession();
+                } catch (sessionErr) {
+                    drivingCallback.taskDecision(`[SESSION CRASHED] Failed to create new session: ${errorToDetailedString(sessionErr)}`);
+                    throw sessionErr;
+                }
+            }
         }
     }
     throw lastError; // All retries exhausted
@@ -208,7 +236,7 @@ async function checkCriteria(
             }
         }
         if (missingTools.length > 0) {
-            callback.taskDecision(`Criteria failed: required tools not called: ${missingTools.join(", ")}`);
+            callback.taskDecision(`[CRITERIA] toolExecuted check failed: required tools not called: ${missingTools.join(", ")}. Expected: ${JSON.stringify(criteria.toolExecuted)}`);
             return false;
         }
     }
@@ -221,17 +249,17 @@ async function checkCriteria(
             await sendPromptWithCrashRetry(drivingSession, conditionPrompt, callback);
         } catch (err) {
             monitor.cleanup();
-            callback.taskDecision(`Criteria condition check crashed: ${String(err)}`);
+            callback.taskDecision(`[SESSION CRASHED] Criteria condition check crashed: ${errorToDetailedString(err)}`);
             throw err;
         }
         monitor.cleanup();
 
         if (monitor.booleanResult === true) {
-            callback.taskDecision("Criteria condition passed");
+            callback.taskDecision("[CRITERIA] Criteria condition passed");
             return true;
         }
 
-        callback.taskDecision("Criteria condition failed");
+        callback.taskDecision(`[CRITERIA] Criteria condition failed. Condition: ${JSON.stringify(criteria.condition)}`);
         return false;
     }
 
@@ -258,15 +286,15 @@ async function checkAvailability(
             await sendPromptWithCrashRetry(drivingSession, conditionPrompt, callback);
         } catch (err) {
             monitor.cleanup();
-            callback.taskDecision(`Availability check crashed: ${String(err)}`);
+            callback.taskDecision(`[SESSION CRASHED] Availability check crashed: ${errorToDetailedString(err)}`);
             throw err; // Session crashed - don't consume silently
         }
         monitor.cleanup();
         if (monitor.booleanResult !== true) {
-            callback.taskDecision("Availability check failed: condition not satisfied");
+            callback.taskDecision(`[AVAILABILITY] Availability check failed: condition not satisfied. Condition: ${JSON.stringify(availability.condition)}`);
             return false;
         }
-        callback.taskDecision("Availability check passed");
+        callback.taskDecision("[AVAILABILITY] Availability check passed");
     }
 
     return true;
@@ -278,6 +306,8 @@ async function checkAvailability(
  * Execute a prompt on a session and check criteria.
  * Returns true if criteria passed, false otherwise.
  * Throws on unrecoverable crash.
+ * When forcedSingleSession is true, crashes fail immediately without retry.
+ * When createNewSession is provided, new sessions are created on crash for retry.
  */
 async function executePromptAndCheckCriteria(
     entry: Entry,
@@ -287,19 +317,35 @@ async function executePromptAndCheckCriteria(
     prompt: Prompt,
     runtimeValues: Record<string, string>,
     callback: ICopilotTaskCallback,
-): Promise<boolean> {
+    forcedSingleSession?: boolean,
+    createNewSession?: () => Promise<ICopilotSession>
+): Promise<{ succeeded: boolean; usedSession: ICopilotSession }> {
     const promptText = expandPrompt(entry, prompt, runtimeValues);
     const monitor = monitorSessionTools(targetSession, runtimeValues);
-    try {
-        await sendPromptWithCrashRetry(targetSession, promptText, callback);
-    } catch (err) {
-        monitor.cleanup();
-        throw err;
+
+    let usedSession = targetSession;
+    if (forcedSingleSession) {
+        // In forced single session mode, just send once - no retry
+        try {
+            helperPushSessionResponse(targetSession, { callback: "onGeneratedUserPrompt", prompt: promptText });
+            await targetSession.sendRequest(promptText);
+        } catch (err) {
+            monitor.cleanup();
+            throw err;
+        }
+    } else {
+        try {
+            usedSession = await sendPromptWithCrashRetry(targetSession, promptText, callback, createNewSession);
+        } catch (err) {
+            monitor.cleanup();
+            throw err;
+        }
     }
     monitor.cleanup();
 
-    if (!criteria) return true;
-    return checkCriteria(entry, criteria, drivingSession, runtimeValues, monitor.toolsCalled, callback);
+    if (!criteria) return { succeeded: true, usedSession };
+    const criteriaResult = await checkCriteria(entry, criteria, drivingSession, runtimeValues, monitor.toolsCalled, callback);
+    return { succeeded: criteriaResult, usedSession };
 }
 
 export async function startTask(
@@ -401,7 +447,7 @@ export async function startTask(
             let taskSessionObj: ICopilotSession;
             if (singleSession) {
                 taskSessionObj = actualDrivingSession;
-                callback.taskSessionStarted(undefined);
+                callback.taskSessionStarted(undefined, forcedSingleSession);
             } else {
                 if (!taskModelId) {
                     taskModelId = entry.models.driving;
@@ -409,8 +455,8 @@ export async function startTask(
                 const [session, sessionId] = await helperSessionStart(taskModelId, workingDirectory);
                 taskSession = [session, sessionId];
                 taskSessionObj = session;
-                callback.taskSessionStarted(taskSession);
-                callback.taskDecision(`Started task session with model ${taskModelId}`);
+                callback.taskSessionStarted(taskSession, false);
+                callback.taskDecision(`[OPERATION] Started task session with model ${taskModelId}`);
             }
 
             // Set $task-model runtime variable to the actual model name used for the task session
@@ -431,15 +477,39 @@ export async function startTask(
 
             if (stopped) return;
 
+            // Helper to create a new task session for crash retry in non-forced mode
+            const createNewTaskSession = forcedSingleSession ? undefined : async (): Promise<ICopilotSession> => {
+                // Old session is no longer usable
+                if (taskSession) {
+                    await helperSessionStop(taskSession[0]).catch(() => {});
+                    callback.taskSessionStopped(taskSession, false);
+                }
+                const retryModelId = taskModelId || entry.models.driving;
+                const [newSession, newSessionId] = await helperSessionStart(retryModelId, workingDirectory);
+                taskSession = [newSession, newSessionId];
+                taskSessionObj = newSession;
+                callback.taskSessionStarted(taskSession, false);
+                return newSession;
+            };
+
             // Initial task execution + criteria check
             let succeeded: boolean;
             try {
-                succeeded = await executePromptAndCheckCriteria(
+                const result = await executePromptAndCheckCriteria(
                     entry, criteria, taskSessionObj, actualDrivingSession,
-                    task.prompt, runtimeValues, callback
+                    task.prompt, runtimeValues, callback,
+                    forcedSingleSession,
+                    createNewTaskSession
                 );
+                succeeded = result.succeeded;
+                taskSessionObj = result.usedSession;
             } catch (err) {
-                callback.taskDecision(`Task execution crashed: ${String(err)}`);
+                if (forcedSingleSession) {
+                    // In forced single session mode, the session is offered from outside, fail immediately
+                    callback.taskDecision(`[SESSION CRASHED] Task execution crashed in forced single session mode: ${errorToDetailedString(err)}`);
+                    throw err;
+                }
+                callback.taskDecision(`[SESSION CRASHED] Task execution crashed: ${errorToDetailedString(err)}`);
                 throw err;
             }
 
@@ -456,7 +526,7 @@ export async function startTask(
                     const maxRetries = failureAction[1];
                     for (let i = 0; i < maxRetries && !succeeded; i++) {
                         if (stopped) return;
-                        callback.taskDecision(`Starting retry #${i + 1} (${failureAction[0]})`);
+                        callback.taskDecision(`[OPERATION] Starting retry #${i + 1} (${failureAction[0]})`);
 
                         if (failureAction[0] === "RetryWithNewSession") {
                             // Stop old task session and create new one
@@ -469,40 +539,48 @@ export async function startTask(
                             const [newSession, newSessionId] = await helperSessionStart(retryModelId, workingDirectory);
                             taskSession = [newSession, newSessionId];
                             taskSessionObj = newSession;
-                            callback.taskSessionStarted(taskSession);
+                            callback.taskSessionStarted(taskSession, false);
 
                             // Re-execute task + re-check criteria (crash = failed iteration)
                             try {
-                                succeeded = await executePromptAndCheckCriteria(
+                                const result = await executePromptAndCheckCriteria(
                                     entry, criteria, taskSessionObj, actualDrivingSession,
-                                    task.prompt, runtimeValues, callback
+                                    task.prompt, runtimeValues, callback,
+                                    false,
+                                    createNewTaskSession
                                 );
+                                succeeded = result.succeeded;
+                                taskSessionObj = result.usedSession;
                             } catch (err) {
-                                callback.taskDecision(`Session crash during retry #${i + 1}: ${String(err)}`);
+                                callback.taskDecision(`[SESSION CRASHED] Session crash during retry #${i + 1}: ${errorToDetailedString(err)}`);
                                 continue;
                             }
                         } else {
                             // RetryWithUserPrompt: send retry prompt to SAME task session
                             const retryPromptTemplate = failureAction[2];
                             try {
-                                succeeded = await executePromptAndCheckCriteria(
+                                const result = await executePromptAndCheckCriteria(
                                     entry, criteria, taskSessionObj, actualDrivingSession,
-                                    retryPromptTemplate, runtimeValues, callback
+                                    retryPromptTemplate, runtimeValues, callback,
+                                    false,
+                                    createNewTaskSession
                                 );
+                                succeeded = result.succeeded;
+                                taskSessionObj = result.usedSession;
                             } catch (err) {
-                                callback.taskDecision(`Session crash during retry #${i + 1}: ${String(err)}`);
+                                callback.taskDecision(`[SESSION CRASHED] Session crash during retry #${i + 1}: ${errorToDetailedString(err)}`);
                                 continue;
                             }
                         }
 
                         if (succeeded) {
-                            callback.taskDecision(`Criteria condition passed on retry #${i + 1}`);
+                            callback.taskDecision(`[CRITERIA] Criteria condition passed on retry #${i + 1}`);
                         } else {
-                            callback.taskDecision(`Criteria condition failed on retry #${i + 1}`);
+                            callback.taskDecision(`[CRITERIA] Criteria condition failed on retry #${i + 1}`);
                         }
                     }
                     if (!succeeded) {
-                        callback.taskDecision(`Retry budget drained: criteria failure after ${maxRetries} retries (${failureAction[0]})`);
+                        callback.taskDecision(`[DECISION] Retry budget drained: criteria failure after ${maxRetries} retries (${failureAction[0]})`);
                     }
                 }
             }
@@ -510,12 +588,12 @@ export async function startTask(
             // Final result
             if (succeeded) {
                 status = "Succeeded";
-                callback.taskDecision("Decision: task succeeded");
+                callback.taskDecision("[TASK SUCCEEDED] Decision: task succeeded");
                 await cleanupSessions(true);
                 callback.taskSucceeded();
             } else {
                 status = "Failed";
-                callback.taskDecision("Decision: task failed (criteria not satisfied)");
+                callback.taskDecision("[TASK FAILED] Decision: task failed (criteria not satisfied)");
                 await cleanupSessions(false);
                 callback.taskFailed();
             }
@@ -524,7 +602,7 @@ export async function startTask(
                 status = "Failed";
             }
             (copilotTask as any)._crashError = err;
-            callback.taskDecision(`Task error: ${String(err)}`);
+            callback.taskDecision(`[TASK FAILED] Task error: ${errorToDetailedString(err)}`);
             if (taskSession) {
                 helperSessionStop(taskSession[0]).catch(() => {});
                 callback.taskSessionStopped(taskSession, false);
@@ -586,27 +664,26 @@ export async function apiTaskStart(
             waitingResolve: null,
             taskError: null,
             forcedSingleSession: true,
+            closed: false,
         };
 
         const taskCallback: ICopilotTaskCallback = {
             taskSucceeded() {
                 pushResponse(state, { callback: "taskSucceeded" });
-                // Deferred cleanup so live API can serve the final callback
-                setTimeout(() => tasks.delete(taskId), 10000);
+                state.closed = true;
             },
             taskFailed() {
                 pushResponse(state, { callback: "taskFailed" });
-                // Deferred cleanup so live API can serve the final callback
-                setTimeout(() => tasks.delete(taskId), 10000);
+                state.closed = true;
             },
             taskDecision(reason: string) {
                 pushResponse(state, { callback: "taskDecision", reason });
             },
-            taskSessionStarted(taskSession: [ICopilotSession, string] | undefined) {
+            taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean) {
                 if (taskSession) {
-                    pushResponse(state, { callback: "taskSessionStarted", taskSession: [taskSession[1]] });
+                    pushResponse(state, { callback: "taskSessionStarted", taskSession: [taskSession[1]], isDrivingSession });
                 } else {
-                    pushResponse(state, { callback: "taskSessionStarted" });
+                    pushResponse(state, { callback: "taskSessionStarted", isDrivingSession });
                 }
             },
             taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean) {
@@ -626,14 +703,15 @@ export async function apiTaskStart(
         const execPromise = (copilotTask as any)._executionPromise as Promise<void> | undefined;
         if (execPromise) {
             execPromise.catch((err: unknown) => {
-                state.taskError = String(err);
-                pushResponse(state, { taskError: String(err) });
+                state.taskError = errorToDetailedString(err);
+                pushResponse(state, { taskError: state.taskError });
+                state.closed = true;
             });
         }
 
         jsonResponse(res, 200, { taskId });
     } catch (err) {
-        jsonResponse(res, 200, { taskError: String(err) });
+        jsonResponse(res, 200, { taskError: errorToDetailedString(err) });
     }
 }
 
@@ -675,6 +753,12 @@ export async function apiTaskLive(
         jsonResponse(res, 200, { error: "ParallelCallNotSupported" });
         return;
     }
+    // If closed and no more responses in queue, return TaskClosed and remove
+    if (state.closed && state.responseQueue.length === 0) {
+        tasks.delete(taskId);
+        jsonResponse(res, 200, { error: "TaskClosed" });
+        return;
+    }
     const response = await waitForResponse(state, 5000);
     if (response === null) {
         jsonResponse(res, 200, { error: "HttpRequestTimeout" });
@@ -691,6 +775,7 @@ interface JobState extends LiveState {
     jobId: string;
     job: ICopilotJob;
     jobError: string | null;
+    closed: boolean;
 }
 
 const jobs = new Map<string, JobState>();
@@ -730,6 +815,7 @@ async function executeWork(
                 waitingResolve: null,
                 taskError: null,
                 forcedSingleSession: false,
+                closed: false,
             };
             tasks.set(taskId, taskState);
 
@@ -741,24 +827,24 @@ async function executeWork(
                     const taskCallback: ICopilotTaskCallback = {
                         taskSucceeded() {
                             pushResponse(taskState, { callback: "taskSucceeded" });
-                            setTimeout(() => tasks.delete(taskId), 10000);
+                            taskState.closed = true;
                             const crashErr = (startedTask as any)?._crashError;
                             if (crashErr) { reject(crashErr); } else { resolve(true); }
                         },
                         taskFailed() {
                             pushResponse(taskState, { callback: "taskFailed" });
-                            setTimeout(() => tasks.delete(taskId), 10000);
+                            taskState.closed = true;
                             const crashErr = (startedTask as any)?._crashError;
                             if (crashErr) { reject(crashErr); } else { resolve(false); }
                         },
                         taskDecision(reason: string) {
                             pushResponse(taskState, { callback: "taskDecision", reason });
                         },
-                        taskSessionStarted(taskSession: [ICopilotSession, string] | undefined) {
+                        taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean) {
                             if (taskSession) {
-                                pushResponse(taskState, { callback: "taskSessionStarted", sessionId: taskSession[1], isDriving: false });
+                                pushResponse(taskState, { callback: "taskSessionStarted", sessionId: taskSession[1], isDriving: isDrivingSession });
                             }
-                            // If undefined → single session mode, driving session already reported via .then()
+                            // If undefined → single session mode in forced mode, driving session already reported via .then()
                         },
                         taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean) {
                             if (taskSession) {
@@ -791,8 +877,9 @@ async function executeWork(
                             pushResponse(taskState, { callback: "taskSessionStarted", sessionId: dsId, isDriving: true });
                         }
                     }).catch(err => {
-                        taskState.taskError = String(err);
-                        pushResponse(taskState, { taskError: String(err) });
+                        taskState.taskError = errorToDetailedString(err);
+                        pushResponse(taskState, { taskError: taskState.taskError });
+                        taskState.closed = true;
                         reject(err);
                     });
                 });
@@ -983,18 +1070,17 @@ export async function apiJobStart(
             responseQueue: [],
             waitingResolve: null,
             jobError: null,
+            closed: false,
         };
 
         const jobCallback: ICopilotJobCallback = {
             jobSucceeded() {
                 pushResponse(state, { callback: "jobSucceeded" });
-                // Deferred cleanup so live API can serve the final callback
-                setTimeout(() => jobs.delete(jobId), 10000);
+                state.closed = true;
             },
             jobFailed() {
                 pushResponse(state, { callback: "jobFailed" });
-                // Deferred cleanup so live API can serve the final callback
-                setTimeout(() => jobs.delete(jobId), 10000);
+                state.closed = true;
             },
             workStarted(workId: number, taskId: string) {
                 pushResponse(state, { callback: "workStarted", workId, taskId });
@@ -1012,14 +1098,15 @@ export async function apiJobStart(
         const execPromise = (copilotJob as any)._executionPromise as Promise<void> | undefined;
         if (execPromise) {
             execPromise.catch((err: unknown) => {
-                state.jobError = String(err);
-                pushResponse(state, { jobError: String(err) });
+                state.jobError = errorToDetailedString(err);
+                pushResponse(state, { jobError: state.jobError });
+                state.closed = true;
             });
         }
 
         jsonResponse(res, 200, { jobId });
     } catch (err) {
-        jsonResponse(res, 200, { jobError: String(err) });
+        jsonResponse(res, 200, { jobError: errorToDetailedString(err) });
     }
 }
 
@@ -1055,6 +1142,12 @@ export async function apiJobLive(
     }
     if (state.waitingResolve) {
         jsonResponse(res, 200, { error: "ParallelCallNotSupported" });
+        return;
+    }
+    // If closed and no more responses in queue, return JobsClosed and remove
+    if (state.closed && state.responseQueue.length === 0) {
+        jobs.delete(jobId);
+        jsonResponse(res, 200, { error: "JobsClosed" });
         return;
     }
     const response = await waitForResponse(state, 5000);

@@ -197,7 +197,7 @@ export function expandPromptDynamic(entry: Entry, prompt: Prompt, values: Record
         if (key in values) {
             return values[key];
         }
-        throw new Error(`expandPromptDynamic: Cannot find runtime variable: ${variableName}.`);
+        return "<MISSING>";
     });
     return [resolved];
 }

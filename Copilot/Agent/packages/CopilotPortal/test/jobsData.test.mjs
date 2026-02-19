@@ -90,11 +90,9 @@ describe("expandPromptDynamic", () => {
         );
     });
 
-    it("throws when variable not in values", () => {
-        assert.throws(
-            () => expandPromptDynamic(entry, ["$user-input"], {}),
-            /Cannot find runtime variable: \$user-input/
-        );
+    it("returns <MISSING> when variable not in values", () => {
+        const result = expandPromptDynamic(entry, ["$user-input"], {});
+        assert.deepStrictEqual(result, ["<MISSING>"]);
     });
 });
 

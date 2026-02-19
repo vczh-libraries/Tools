@@ -112,13 +112,20 @@ function showTaskSessionTabs(workId) {
 
     let activeTab = null;
 
-    for (const [sessionId, sessionInfo] of data.sessions) {
+    // Ensure "Driving" tab always appears first
+    const sortedEntries = [...data.sessions.entries()].sort((a, b) => {
+        if (a[1].name === "Driving") return -1;
+        if (b[1].name === "Driving") return 1;
+        return 0;
+    });
+
+    for (const [sessionId, sessionInfo] of sortedEntries) {
         const tabBtn = document.createElement("button");
         tabBtn.className = "tab-header-btn";
         tabBtn.textContent = sessionInfo.name;
         tabBtn.dataset.sessionId = sessionId;
         tabBtn.addEventListener("click", () => {
-            switchTab(sessionId);
+            switchTab(tabBtn.dataset.sessionId);
         });
         tabHeaders.appendChild(tabBtn);
 
@@ -128,7 +135,7 @@ function showTaskSessionTabs(workId) {
     }
 
     // Activate the first tab
-    const firstEntry = data.sessions.entries().next().value;
+    const firstEntry = sortedEntries[0];
     if (firstEntry) {
         switchTab(firstEntry[0]);
     }
@@ -163,21 +170,21 @@ function onInspect(workId) {
 // ---- Live Polling Helpers ----
 
 async function pollLive(url, handler, shouldStop) {
+    const terminalPattern = /^(Session|Task|Jobs?)(Closed|NotFound)$/;
     while (true) {
         if (shouldStop()) break;
         try {
             const res = await fetch(`/api/${url}`);
             const data = await res.json();
             if (data.error === "HttpRequestTimeout") continue;
-            // Only treat error as a system-level stop signal when there's no callback field.
-            // Callback payloads like onEndToolExecution can have an error field as part of the data.
-            if (data.error && !data.callback) break;
-            if (data.jobError || data.taskError || data.sessionError) {
-                handler(data);
-                break;
+            if (data.error === "ParallelCallNotSupported") {
+                await new Promise(r => setTimeout(r, 100));
+                continue;
             }
-            const shouldContinue = handler(data);
-            if (shouldContinue === false) break;
+            // Terminal: Closed or NotFound — drain complete
+            if (data.error && terminalPattern.test(data.error)) break;
+            // Non-terminal error without callback: pass to handler and continue draining
+            handler(data);
         } catch (err) {
             console.error(`Poll error for ${url}:`, err);
             break;
@@ -199,14 +206,13 @@ function startSessionPolling(sessionId, workId) {
         (response) => {
             if (response.sessionError) {
                 console.error(`Session ${sessionId} error:`, response.sessionError);
-                return false;
+                return;
             }
             if (response.callback) {
                 sessionInfo.renderer.processCallback(response);
             }
-            return true;
         },
-        () => !sessionInfo.active
+        () => jobStopped
     );
 }
 
@@ -222,7 +228,7 @@ function startTaskPolling(taskId, workId) {
         (response) => {
             if (response.taskError) {
                 console.error(`Task ${taskId} error:`, response.taskError);
-                return false;
+                return;
             }
             const cb = response.callback;
 
@@ -230,29 +236,87 @@ function startTaskPolling(taskId, workId) {
                 const sessionId = response.sessionId;
                 const isDriving = response.isDriving;
                 if (sessionId) {
-                    let name;
                     if (isDriving) {
-                        name = "Driving";
+                        // Consolidate all driving sessions into one "Driving" tab
+                        if (data.drivingSessionId) {
+                            const oldInfo = data.sessions.get(data.drivingSessionId);
+                            if (oldInfo) oldInfo.active = false;
+                            data.sessions.delete(data.drivingSessionId);
+                        }
+
+                        let div, renderer;
+                        if (data.drivingDiv) {
+                            // Reuse existing driving renderer
+                            div = data.drivingDiv;
+                            renderer = data.drivingRenderer;
+                        } else {
+                            // First driving session
+                            div = document.createElement("div");
+                            div.className = "session-renderer-container";
+                            renderer = new SessionResponseRenderer(div);
+                            data.drivingDiv = div;
+                            data.drivingRenderer = renderer;
+                        }
+
+                        data.drivingSessionId = sessionId;
+                        data.sessions.set(sessionId, {
+                            name: "Driving",
+                            renderer,
+                            div,
+                            active: true,
+                        });
+
+                        // Update tab UI if inspecting
+                        if (inspectedWorkId === workId && tabContainer) {
+                            const tabHeaders = tabContainer.querySelector(".tab-headers");
+                            const tabContent = tabContainer.querySelector(".tab-content");
+                            if (tabHeaders && tabContent) {
+                                const existingDrivingBtn = [...tabHeaders.querySelectorAll(".tab-header-btn")]
+                                    .find(btn => btn.textContent === "Driving");
+                                if (existingDrivingBtn) {
+                                    // Update session ID reference on existing button
+                                    existingDrivingBtn.dataset.sessionId = sessionId;
+                                } else {
+                                    // First driving session — insert tab at front
+                                    const tabBtn = document.createElement("button");
+                                    tabBtn.className = "tab-header-btn";
+                                    tabBtn.textContent = "Driving";
+                                    tabBtn.dataset.sessionId = sessionId;
+                                    tabBtn.addEventListener("click", () => {
+                                        const targetId = tabBtn.dataset.sessionId;
+                                        for (const btn of tabHeaders.querySelectorAll(".tab-header-btn")) {
+                                            btn.classList.toggle("active", btn === tabBtn);
+                                        }
+                                        for (const [sid, sInfo] of data.sessions) {
+                                            sInfo.div.style.display = sid === targetId ? "block" : "none";
+                                        }
+                                    });
+                                    tabHeaders.insertBefore(tabBtn, tabHeaders.firstChild);
+                                    div.style.display = "none";
+                                    tabContent.insertBefore(div, tabContent.firstChild);
+                                }
+                            }
+                        }
+
+                        startSessionPolling(sessionId, workId);
                     } else {
+                        // Task session — each gets its own tab
                         data.attemptCount = (data.attemptCount || 0) + 1;
-                        name = `Attempt #${data.attemptCount}`;
-                    }
+                        const name = `Attempt #${data.attemptCount}`;
 
-                    const div = document.createElement("div");
-                    div.className = "session-renderer-container";
-                    const renderer = new SessionResponseRenderer(div);
+                        const div = document.createElement("div");
+                        div.className = "session-renderer-container";
+                        const renderer = new SessionResponseRenderer(div);
 
-                    data.sessions.set(sessionId, {
-                        name,
-                        renderer,
-                        div,
-                        active: true,
-                    });
+                        data.sessions.set(sessionId, {
+                            name,
+                            renderer,
+                            div,
+                            active: true,
+                        });
 
-                    // If this task is currently inspected, update the tab display
-                    if (inspectedWorkId === workId) {
                         // Add new tab header without switching to it
-                        if (tabContainer) {
+                        if (inspectedWorkId === workId && tabContainer) {
                             const tabHeaders = tabContainer.querySelector(".tab-headers");
                             const tabContent = tabContainer.querySelector(".tab-content");
                             if (tabHeaders && tabContent) {
@@ -261,7 +325,6 @@ function startTaskPolling(taskId, workId) {
                                 tabBtn.textContent = name;
                                 tabBtn.dataset.sessionId = sessionId;
                                 tabBtn.addEventListener("click", () => {
-                                    // Activate this tab
                                     for (const btn of tabHeaders.querySelectorAll(".tab-header-btn")) {
                                         btn.classList.toggle("active", btn.dataset.sessionId === sessionId);
                                     }
@@ -275,10 +338,9 @@ function startTaskPolling(taskId, workId) {
                                 tabContent.appendChild(div);
                             }
                         }
-                    }
 
-                    // Start polling this session
-                    startSessionPolling(sessionId, workId);
+                        startSessionPolling(sessionId, workId);
+                    }
                 }
             } else if (cb === "taskSessionStopped") {
                 const sessionId = response.sessionId;
@@ -289,24 +351,19 @@ function startTaskPolling(taskId, workId) {
                     }
                 }
             } else if (cb === "taskSucceeded" || cb === "taskFailed") {
-                // Stop all session polling for this task
+                // Mark all sessions inactive
                 for (const [, sInfo] of data.sessions) {
                     sInfo.active = false;
                 }
                 data.taskPollingActive = false;
-                return false;
             } else if (cb === "taskDecision") {
                 // Create a "User" message block in the driving session's renderer
-                const drivingEntry = [...data.sessions.entries()].find(([, s]) => s.name === "Driving");
-                if (drivingEntry) {
-                    const [, drivingInfo] = drivingEntry;
-                    drivingInfo.renderer.addUserMessage(response.reason, "TaskDecision");
+                if (data.drivingRenderer) {
+                    data.drivingRenderer.addUserMessage(response.reason, "TaskDecision");
                 }
             }
-
-            return true;
         },
-        () => !data.taskPollingActive
+        () => jobStopped
     );
 }
 
@@ -319,7 +376,7 @@ function startJobPolling() {
             if (response.jobError) {
                 jobStatus = "FAILED";
                 updateStatusLabel();
-                return false;
+                return;
             }
             const cb = response.callback;
 
@@ -367,14 +424,10 @@ function startJobPolling() {
             } else if (cb === "jobSucceeded") {
                 jobStatus = "SUCCEEDED";
                 updateStatusLabel();
-                return false;
             } else if (cb === "jobFailed") {
                 jobStatus = "FAILED";
                 updateStatusLabel();
-                return false;
             }
-
-            return true;
         },
         () => jobStopped
     );

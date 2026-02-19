@@ -28,12 +28,14 @@ interface SessionState extends LiveState {
     sessionId: string;
     session: ICopilotSession;
     sessionError: string | null;
+    closed: boolean;
 }
 
 // ---- Copilot Client ----
 
 async function closeCopilotClientIfNoSessions(): Promise<void> {
-    if (sessions.size === 0) {
+    const hasActive = [...sessions.values()].some(s => !s.closed);
+    if (!hasActive) {
         stopCoplilotClient();
     }
 }
@@ -109,6 +111,7 @@ export async function helperSessionStart(modelId: string, workingDirectory?: str
         responseQueue: [],
         waitingResolve: null,
         sessionError: null,
+        closed: false,
     };
 
     const session = await startSession(client, modelId, createSessionCallbacks(state), workingDirectory);
@@ -120,11 +123,14 @@ export async function helperSessionStart(modelId: string, workingDirectory?: str
 export async function helperSessionStop(session: ICopilotSession): Promise<void> {
     for (const [id, state] of sessions) {
         if (state.session === session) {
-            sessions.delete(id);
-            if (state.waitingResolve) {
+            state.closed = true;
+            // Don't delete yet — let live API drain remaining responses
+            // If there's a waiting resolve and no queued responses, resolve with SessionClosed
+            if (state.waitingResolve && state.responseQueue.length === 0) {
                 const resolve = state.waitingResolve;
                 state.waitingResolve = null;
-                resolve({ error: "SessionNotFound" });
+                resolve({ error: "SessionClosed" });
+                sessions.delete(id);
             }
             break;
         }
@@ -147,7 +153,7 @@ export function helperPushSessionResponse(session: ICopilotSession, response: Li
 }
 
 export function hasRunningSessions(): boolean {
-    return sessions.size > 0;
+    return [...sessions.values()].some(s => !s.closed);
 }
 
 // ---- API Functions ----
@@ -223,15 +229,19 @@ export async function apiCopilotSessionStop(req: http.IncomingMessage, res: http
         jsonResponse(res, 200, { error: "SessionNotFound" });
         return;
     }
-    sessions.delete(sessionId);
-    // Resolve any waiting live request
-    if (state.waitingResolve) {
+    state.closed = true;
+    // If there's a waiting resolve and no queued responses, send SessionClosed
+    if (state.waitingResolve && state.responseQueue.length === 0) {
         const resolve = state.waitingResolve;
         state.waitingResolve = null;
-        resolve({ error: "SessionNotFound" });
+        resolve({ error: "SessionClosed" });
+        sessions.delete(sessionId);
     }
-    // Close CopilotClient if all sessions are closed
-    await closeCopilotClientIfNoSessions();
+    // Close CopilotClient if all active (non-closed) sessions are gone
+    const hasActive = [...sessions.values()].some(s => !s.closed);
+    if (!hasActive) {
+        await closeCopilotClientIfNoSessions();
+    }
     jsonResponse(res, 200, { result: "Closed" });
 }
 
@@ -260,8 +270,20 @@ export async function apiCopilotSessionLive(req: http.IncomingMessage, res: http
         jsonResponse(res, 200, { error: "ParallelCallNotSupported" });
         return;
     }
+    // If closed and no more responses in queue, return SessionClosed and remove
+    if (state.closed && state.responseQueue.length === 0) {
+        sessions.delete(sessionId);
+        jsonResponse(res, 200, { error: "SessionClosed" });
+        return;
+    }
     const response = await waitForResponse(state, 5000);
     if (response === null) {
+        // Check again if closed during wait
+        if (state.closed && state.responseQueue.length === 0) {
+            sessions.delete(sessionId);
+            jsonResponse(res, 200, { error: "SessionClosed" });
+            return;
+        }
         jsonResponse(res, 200, { error: "HttpRequestTimeout" });
     } else {
         jsonResponse(res, 200, response);

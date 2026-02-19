@@ -150,8 +150,11 @@ Copilot/Agent/
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
 - **Live Polling**: Sequential long-polling for real-time session callbacks
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
-- **Session Crash Retry**: `sendPromptWithCrashRetry` automatically retries up to 3 times if a Copilot session crashes during prompt execution
+- **Session Crash Retry**: `sendPromptWithCrashRetry` automatically retries up to 3 times if a Copilot session crashes during prompt execution, creating new sessions when needed via an optional `createNewSession` factory
+- **Detailed Error Reporting**: `errorToDetailedString` helper converts errors to detailed JSON with name, message, stack, and recursive cause chain for comprehensive crash diagnostics
 - **Jobs API**: RESTful API for listing, starting, stopping, and monitoring tasks and jobs via live polling
+- **Live Polling Drain**: Live APIs (session/task/job) use a drain model — clients continue polling until receiving terminal `*Closed` or `*NotFound` errors, ensuring all buffered responses are consumed
+- **Closed State Management**: Sessions, tasks, and jobs transition through a `closed` state that buffers remaining responses before cleanup, preventing lost data
 - **Test Mode API**: `copilot/test/installJobsEntry` endpoint (test mode only) for dynamically installing job entries during testing
 - **Job Workflow Engine**: Composable work tree execution supporting sequential, parallel, loop, and conditional (alt) work patterns
 - **Task Selection UI**: Combo box in the portal to select and run tasks within an active session
@@ -161,5 +164,7 @@ Copilot/Agent/
 - **Flow Chart Status Indicators**: Running tasks display a green triangle indicator; failed tasks display a red cross indicator on the flow chart
 - **Task Inspection**: Clicking a TaskNode in the flow chart opens a tab control showing session responses for that task's sessions
 - **Job-Created Tasks**: Jobs create tasks without forcing single session mode; `startTask` manages driving session creation internally. Task live API provides real-time session updates with `sessionId` and `isDriving` fields
-- **Task Decision Reporting**: `taskDecision` callback reports all driving session decisions (availability/criteria results, retries, crashes, final outcome) as User message blocks in the driving session tab
+- **Task Decision Reporting**: `taskDecision` callback reports all driving session decisions with categorized prefixes (`[OPERATION]`, `[CRITERIA]`, `[AVAILABILITY]`, `[SESSION CRASHED]`, `[TASK SUCCEEDED]`, `[TASK FAILED]`, `[DECISION]`) as User message blocks in the driving session tab
+- **Driving Session Consolidation**: All driving sessions for a task are consolidated into a single "Driving" tab; when a driving session is replaced (e.g., due to crash retry), the new session reuses the same tab and renderer
+- **Forced Single Session Mode**: Tasks can run with an externally-provided session; crashes in forced mode fail immediately without retry
 - **Separated Retry Budgets**: Crash retries (per-call, 3 max) and criteria retries (per failure action) are independent; a crash during a criteria retry loop is treated as a failed iteration rather than killing the task

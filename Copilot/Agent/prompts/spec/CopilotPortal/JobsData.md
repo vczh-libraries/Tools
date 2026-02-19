@@ -102,13 +102,6 @@ If any validation runs directly in this function fails:
 
 A task is represented by type `Task`.
 
-**BUG**: In `catch(err)`, `String(err)` is not enough to convert it to a string. When it is `Error`, you must print detailed information in JSON, including everything below if they are defined, to the `taskDecision` message. A helper function would be helpful.
-- `name`
-- `message`
-- `stack`
-- `cause` (nested error recursively)
-**BUY**: During task running, every crashing should be sent to `taskDecision`. Take a look at `Copilot/Agent/prompts/startTask.md` but only focus on the "why" part of the report. You must stick to the "how" part in specification, if the spec conflicts with the report, follow the spec.
-
 If any session crashes after the task submitting a promot to the session:
 - When a task is running in forced single session mode, the session is offered from the outside, fails the task immediately.
 - Otherwise:
