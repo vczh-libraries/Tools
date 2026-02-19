@@ -421,8 +421,10 @@ const entryInput: Entry = {
             model: { category: "driving" },
             requireUserInput: false,
             prompt: [
+                "`git add` to add all files.",
                 "`git status` to list affected files.",
                 "`git commit -am` everything with this message: [BOT] Backup.",
+                "DO NOT run multiple commands at once.",
                 "DO NOT git push."
             ],
             criteria: {
@@ -439,10 +441,12 @@ const entryInput: Entry = {
             model: { category: "driving" },
             requireUserInput: false,
             prompt: [
+                "`git add` to add all files.",
                 "`git status` to list affected files.",
                 "`git commit -am` everything with this message: [BOT] Backup.",
                 "`git branch` to see the current branch.",
-                "`git push` to the current branch."
+                "`git push` to the current branch.",
+                "DO NOT run multiple commands at once."
             ],
             criteria: {
                 runConditionInSameSession: true,
