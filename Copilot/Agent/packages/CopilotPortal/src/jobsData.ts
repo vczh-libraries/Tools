@@ -40,7 +40,7 @@ const entryInput: Entry = {
         driving: "gpt-5-mini",
         planning: "gpt-5.2",
         coding: "gpt-5.2-codex",
-        reviewers1: "gpt-5.2-codex",
+        reviewers1: "gpt-5.3-codex",
         reviewers2: "claude-opus-4.5",
         reviewers3: "gemini-3-pro-preview"
     },
