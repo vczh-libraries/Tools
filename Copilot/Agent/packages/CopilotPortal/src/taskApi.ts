@@ -59,15 +59,6 @@ export function resetJobsEntry(): void {
 
 // ---- Runtime Variable Helpers ----
 
-function buildRuntimeValues(runtimeValues: Record<string, string>): Record<string, string> {
-    // Build a copy with keys matching what expandPromptDynamic expects (without $ prefix)
-    const values: Record<string, string> = {};
-    for (const [key, value] of Object.entries(runtimeValues)) {
-        values[key] = value;
-    }
-    return values;
-}
-
 function expandPrompt(entry: Entry, prompt: Prompt, runtimeValues: Record<string, string>): string {
     const result = expandPromptDynamic(entry, prompt, runtimeValues);
     return result[0];
