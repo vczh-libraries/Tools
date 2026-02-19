@@ -112,6 +112,7 @@ export async function helperSessionStart(modelId: string, workingDirectory?: str
 }
 
 export async function helperSessionStop(session: ICopilotSession): Promise<void> {
+    await session.stop();
     for (const [id, state] of sessions) {
         if (state.session === session) {
             state.closed = true;

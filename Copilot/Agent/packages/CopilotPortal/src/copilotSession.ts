@@ -3,6 +3,7 @@ import { CopilotClient, defineTool, type CopilotSession } from "@github/copilot-
 export interface ICopilotSession {
   get rawSection(): CopilotSession;
   sendRequest(message: string, timeout?: number): Promise<void>;
+  stop(): Promise<void>;
 }
 
 export interface ICopilotSessionCallbacks {
@@ -172,6 +173,10 @@ export async function startSession(
 
     async sendRequest(message: string, timeout: number = 2147483647): Promise<void> {
       await session.sendAndWait({ prompt: message }, timeout);
+    },
+
+    async stop(): Promise<void> {
+      await session.destroy();
     },
   };
 }
