@@ -76,7 +76,10 @@ There are two folders storing specification:
 File organization in these two folders are identical:
 - `CopilotPortal` folder: about `packages/CopilotPortal`
   - `JobsData.md`: Definitions of jobs data.
-  - `API.md`: RESTful API, and how to start the project.
+  - `API.md`: RESTful API, and how to start the project. More specific content in these files:
+    - `API_Session.md`
+    - `API_Task.md`
+    - `API_Job.md`
   - `Index.md`: index.html page.
   - `Jobs.md`: jobs.html and jobTracking.html pages.
   - `Test.md`: test.html page.
