@@ -30,7 +30,18 @@ function makeDocumentWork(jobName: string, keyword: "scrum" | "design" | "plan" 
         kind: "Seq",
         works: [
             makeRefWork(`${jobName}-task`),
-            makeReviewWork(keyword)
+            makeReviewWork(keyword),
+            makeRefWork("git-commit")
+        ]
+    };
+}
+
+function makeCodingWork(taskId: string, modelOverride?: Model): Work<never> {
+    return {
+        kind: "Seq",
+        works: [
+            makeRefWork(taskId, modelOverride),
+            makeRefWork("git-commit")
         ]
     };
 }
@@ -387,6 +398,43 @@ const entryInput: Entry = {
                 condition: ["$simpleCondition", "Both conditions satisfy: 1) $buildSucceededFragment; 2) $testPassedFragment."],
                 failureAction: retryFailedCondition()
             }
+        },
+        "git-commit": {
+            model: { category: "driving" },
+            requireUserInput: true,
+            prompt: [
+                "`git status` to list affected files.",
+                "`git commit -am` everything with this message: [BOT] Backup.",
+                "DO NOT git push."
+            ],
+            criteria: {
+                runConditionInSameSession: true,
+                condition: [
+                    "$simpleCondition",
+                    "`git status` to list file affected, make sure there is nothing uncommited.",
+                    "But it is fine if all uncommited changes are only whitespace related."
+                ],
+                failureAction: retryFailedCondition()
+            }
+        },
+        "git-push": {
+            model: { category: "driving" },
+            requireUserInput: true,
+            prompt: [
+                "`git status` to list affected files.",
+                "`git commit -am` everything with this message: [BOT] Backup.",
+                "`git branch` to see the current branch.",
+                "`git push` to the current branch."
+            ],
+            criteria: {
+                runConditionInSameSession: true,
+                condition: [
+                    "$simpleCondition",
+                    "`git status` to list file affected, make sure there is nothing uncommited.",
+                    "But it is fine if all uncommited changes are only whitespace related."
+                ],
+                failureAction: retryFailedCondition()
+            }
         }
     },
     jobs: {
@@ -402,39 +450,44 @@ const entryInput: Entry = {
         "summary-problem": { work: makeDocumentWork("summary-problem", "summary") },
         "summary-update": { work: makeDocumentWork("summary-update", "summary") },
         // ---- coding ----
-        "execute-start": { work: makeRefWork("execute-task") },
-        "execute-update": { work: makeRefWork("execute-update-task") },
-        "verify-start": { work: makeRefWork("verify-task") },
-        "verify-update": { work: makeRefWork("verify-update-task") },
+        "execute-start": { work: makeCodingWork("execute-task") },
+        "execute-update": { work: makeCodingWork("execute-update-task") },
+        "verify-start": { work: makeCodingWork("verify-task") },
+        "verify-update": { work: makeCodingWork("verify-update-task") },
         // ---- evolution ----
-        "scrum-learn": { work: makeRefWork("scrum-learn-task") },
-        "refine": { work: makeRefWork("refine-task") },
+        "scrum-learn": { work: makeCodingWork("scrum-learn-task") },
+        "refine": { work: makeCodingWork("refine-task") },
         // ---- automation ----
         "design-automate": { work: { kind: "Seq", works: [
             makeDocumentWork("design-problem-next", "design"),
             makeDocumentWork("plan-problem", "plan"),
             makeDocumentWork("summary-problem", "summary"),
-            makeRefWork("execute-task"),
-            makeRefWork("verify-task")
+            makeCodingWork("execute-task"),
+            makeCodingWork("verify-task"),
+            makeCodingWork("git-push")
         ]}},
         "scrum-automate": { work: { kind: "Seq", works: [
             makeDocumentWork("plan-problem", "plan"),
             makeDocumentWork("summary-problem", "summary"),
-            makeRefWork("execute-task"),
-            makeRefWork("verify-task")
+            makeCodingWork("execute-task"),
+            makeCodingWork("verify-task"),
+            makeCodingWork("git-push")
         ]}},
         "summary-automate": { work: { kind: "Seq", works: [
             makeDocumentWork("summary-problem", "summary"),
-            makeRefWork("execute-task"),
-            makeRefWork("verify-task")
+            makeCodingWork("execute-task"),
+            makeCodingWork("verify-task"),
+            makeCodingWork("git-push")
         ]}},
         "execute-automate": { work: { kind: "Seq", works: [
-            makeRefWork("execute-task"),
-            makeRefWork("verify-task")
+            makeCodingWork("execute-task"),
+            makeCodingWork("verify-task"),
+            makeCodingWork("git-push")
         ]}},
         "learn-automate": { work: { kind: "Seq", works: [
-            makeRefWork("scrum-learn-task"),
-            makeRefWork("refine-task")
+            makeCodingWork("scrum-learn-task"),
+            makeCodingWork("refine-task"),
+            makeCodingWork("git-push")
         ]}},
     },
     grid: [{
