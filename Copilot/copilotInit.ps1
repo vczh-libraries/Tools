@@ -44,7 +44,6 @@ function SyncFolder($folderName, $sourceFolder, $targetFolder, $skipIfExists) {
 function FixAgentFiles($agentFolder) {
     Push-Location $agentFolder
     try {
-        git clean -xdf
         Get-ChildItem -Path . -Filter *.md -Recurse | ForEach-Object {
             $content = Get-Content -Path $_.FullName -Raw
             if ($content -match '\bCopilot/Agent\b') {
@@ -67,6 +66,9 @@ if ($UpdateKB) {
     SyncFolder "KnowledgeBase" "$targetFolder" "$PSScriptRoot" $False
 }
 else {
+    Push-Location $PSScriptRoot\Agent
+    git clean -xdf
+    Pop-Location
     New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 
     SyncFolder "Agent"         "$PSScriptRoot" "$targetFolder" $False
