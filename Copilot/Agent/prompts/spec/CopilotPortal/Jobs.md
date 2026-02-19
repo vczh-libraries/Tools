@@ -45,8 +45,8 @@ The look-and-feel must be similar to `/index.html`, but DO NOT share any css fil
 It renders a larget table of buttons according to `grid`.
 The first row is a title "Available Jobs", followed by a button "Stop Server" at the very right doing exactly what the button in `/index.html` does.
 The first column shows `keyword`.
-The second column shows "automate" buttons only when `automate` is true.
 All other columns are for `grid[index].jobs`, `name` will be the text of the button.
+`undefined` in any `grid[index].jobs` element renders an empty cell.
 
 If any cell has no button, leave it blanks.
 The table is supposed to fill all `matrix part` but leave margins to the border and between buttons.
@@ -73,6 +73,7 @@ There is a text box fills the page. Disabled by default.
 
 At the bottom there are buttons aligned to the right:
 - "Start Job: ${selectedJobName}" or "Job Not Selected". Disabled by default.
+- "Preview".
 
 #### Clicking Start Job Button
 
@@ -80,6 +81,12 @@ When I hit the "Start Job" button, call `copilot/job/start/{job-name}`.
 When a job id is returned, it jumpts to `/jobTracking.html` in a new window.
 The selected job directory and the job id should be brought to `/jobTracking.html`.
 No need to bring other information.
+
+#### Clicking Preview Button
+
+Sync "Preview"'s enability to "Start Job".
+Call `/jobTracking.html` without starting the job and not passing the job id.
+This triggers the preview mode.
 
 (to be editing...)
 
@@ -100,11 +107,22 @@ To tell this, find the `jobName` and `jobId` argument in the url passing from `/
 Call `api/copilot/job` to obtain the specified job's definition.
 `jobs[jobName]` and `chart[jobName]` is used to render the flow chart.
 
+#### When jobId argument presents
+
 Call `api/copilot/job/{job-id}/live`, `api/copilot/task/{task-id}/live` and `copilot/session/{session-id}/live` to update the running status of the job:
 - job live api notifies when a new task is started, task live api notifies when a new session is started.
 - Drain all response from live apis, no more issue until `(Sessoin|Task|Job)(Closed|NotDefined)` returns.
 - On receiving `ICopilotTaskCallback.taskDecision`
   - Create a "User" message block with `title` set to `TaskDecision`, copying the `reason`, put it in the driving session.
+
+#### When jobId argument not presents
+
+The webpage preview the job only, no tracking is performed.
+The "Stop Job" button disappears.
+The job status becomes "JOB: PREVIEW".
+Clicking `ChartNode` does nothing.
+
+#### Layout
 
 The webpage is splitted to two part:
 - The left part is `job part`.
@@ -124,9 +142,13 @@ Render it like a flow chart expanding to fill the whole `job part`.#### Flow Cha
 
 When the status of a task running is changed,
 update the rendering of a `ChartNode` of which `hint` is `TaskNode` or `CondNode`:
-- When a task begins running, add a green triangle towards right, at the beginning of the label.
+- If a symbol attaches to a node, it is at the center of the left border but outside.
+  - Use emoji if possible.
+  - If it is technically impossible to touch the left border you can choose another place.
+- When a task begins running, attach a green triangle.
 - When a task finishes running, the triangle is removed.
-  - If it fails, a big cross replaces the triangle.
+  - If it succeeds, a green tick replaces the triangle.
+  - If it fails, a red cross replaces the triangle.
 - There could be loops in the flow chart, which means a task could starts and stops multiple times.
 
 When a task runs, track all status of sessions in this task:

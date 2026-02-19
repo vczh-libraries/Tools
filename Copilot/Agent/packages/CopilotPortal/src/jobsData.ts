@@ -35,76 +35,6 @@ function makeDocumentWork(jobName: string, keyword: "scrum" | "design" | "plan" 
     };
 }
 
-function testGraph_Loop(): Work<never> {
-    return {
-        kind: "Par",
-        works: [
-            {
-                kind: "Loop",
-                preCondition: [false, makeRefWork("ask-task")],
-                body: makeRefWork(`review-apply-task`)
-            },
-            {
-                kind: "Loop",
-                postCondition: [false, makeRefWork("code-task")],
-                body: makeRefWork(`review-apply-task`)
-            },
-            {
-                kind: "Loop",
-                preCondition: [true, makeRefWork("ask-task")],
-                postCondition: [true, makeRefWork("code-task")],
-                body: makeRefWork(`review-apply-task`)
-            }
-        ]
-    }
-}
-
-function testGraph_Loop2(): Work<never> {
-    return {
-        kind: "Loop",
-        preCondition: [false, {
-            kind: "Loop",
-            preCondition: [false, { kind: "Seq", works: [makeRefWork("ask-task"), makeRefWork("code-task")] }],
-            body: makeRefWork(`review-apply-task`)
-        }],
-        postCondition: [false, {
-            kind: "Loop",
-            postCondition: [false, { kind: "Seq", works: [makeRefWork("ask-task"), makeRefWork("code-task")] }],
-            body: makeRefWork(`review-apply-task`)
-        }],
-        body: {
-            kind: "Loop",
-            preCondition: [true, makeRefWork("ask-task")],
-            postCondition: [true, makeRefWork("code-task")],
-            body: makeRefWork(`review-apply-task`)
-        }
-    }
-}
-
-function testGraph_Alt(): Work<never> {
-    return {
-        kind: "Par",
-        works: [
-            {
-                kind: "Alt",
-                condition: makeRefWork("review-final-task"),
-                trueWork: makeRefWork(`ask-task`),
-                falseWork: makeRefWork(`code-task`)
-            },
-            {
-                kind: "Alt",
-                condition: makeRefWork("review-final-task"),
-                trueWork: makeRefWork(`ask-task`)
-            },
-            {
-                kind: "Alt",
-                condition: makeRefWork("review-final-task"),
-                falseWork: makeRefWork(`code-task`)
-            }
-        ]
-    }
-}
-
 const entryInput: Entry = {
     models: {
         driving: "gpt-5-mini",
@@ -210,70 +140,6 @@ const entryInput: Entry = {
             "REPO-ROOT/.github/Scripts/Execute.log must exist and the last several lines shows how many test files and test cases passed"
         ]
     },
-    grid: [{
-    //     keyword: "test",
-    //     automate: false,
-    //     jobs: [
-    //         { name: "loops", jobName: "test-loops" },
-    //         { name: "alts", jobName: "test-alts" },
-    //         { name: "loop-seq", jobName: "test-loop-seq" }
-    //     ]
-    // }, {
-        keyword: "scrum",
-        automate: false,
-        jobs: [
-            { name: "problem", jobName: "scrum-problem" },
-            { name: "update", jobName: "scrum-update" }
-        ]
-    }, {
-        keyword: "design",
-        automate: true,
-        jobs: [
-            { name: "problem next", jobName: "design-problem-next" },
-            { name: "update", jobName: "design-update" },
-            { name: "problem", jobName: "design-problem" }
-        ]
-    }, {
-        keyword: "plan",
-        automate: true,
-        jobs: [
-            { name: "problem", jobName: "plan-problem" },
-            { name: "update", jobName: "plan-update" }
-        ]
-    }, {
-        keyword: "summary",
-        automate: true,
-        jobs: [
-            { name: "problem", jobName: "summary-problem" },
-            { name: "update", jobName: "summary-update" }
-        ]
-    }, {
-        keyword: "execute",
-        automate: true,
-        jobs: [
-            { name: "start", jobName: "execute-start" },
-            { name: "update", jobName: "execute-update" }
-        ]
-    }, {
-        keyword: "verify",
-        automate: true,
-        jobs: [
-            { name: "start", jobName: "verify-start" },
-            { name: "update", jobName: "verify-update" }
-        ]
-    }, {
-        keyword: "scrum",
-        automate: true,
-        jobs: [
-            { name: "learn", jobName: "scrum-learn" }
-        ]
-    }, {
-        keyword: "refine",
-        automate: false,
-        jobs: [
-            { name: "start", jobName: "refine" }
-        ]
-    }],
     tasks: {
         "scrum-problem-task": {
             model: { category: "planning" },
@@ -527,9 +393,6 @@ const entryInput: Entry = {
         }
     },
     jobs: {
-        // "test-loops": { work: testGraph_Loop() },
-        // "test-alts": { work: testGraph_Alt() },
-        // "test-loop-seq": { work: testGraph_Loop2() },
         "scrum-problem": { work: makeDocumentWork("scrum-problem", "scrum") },
         "scrum-update": { work: makeDocumentWork("scrum-update", "scrum") },
         "design-problem-next": { work: makeDocumentWork("design-problem-next", "design") },
@@ -545,7 +408,55 @@ const entryInput: Entry = {
         "verify-update": { work: makeRefWork("verify-update-task") },
         "scrum-learn": { work: makeRefWork("scrum-learn-task") },
         "refine": { work: makeRefWork("refine-task") },
-    }
+    },
+    grid: [{
+        keyword: "scrum",
+        jobs: [
+            { name: "problem", jobName: "scrum-problem" },
+            { name: "update", jobName: "scrum-update" }
+        ]
+    }, {
+        keyword: "design",
+        jobs: [
+            { name: "problem next", jobName: "design-problem-next" },
+            { name: "update", jobName: "design-update" },
+            { name: "problem", jobName: "design-problem" }
+        ]
+    }, {
+        keyword: "plan",
+        jobs: [
+            { name: "problem", jobName: "plan-problem" },
+            { name: "update", jobName: "plan-update" }
+        ]
+    }, {
+        keyword: "summary",
+        jobs: [
+            { name: "problem", jobName: "summary-problem" },
+            { name: "update", jobName: "summary-update" }
+        ]
+    }, {
+        keyword: "execute",
+        jobs: [
+            { name: "start", jobName: "execute-start" },
+            { name: "update", jobName: "execute-update" }
+        ]
+    }, {
+        keyword: "verify",
+        jobs: [
+            { name: "start", jobName: "verify-start" },
+            { name: "update", jobName: "verify-update" }
+        ]
+    }, {
+        keyword: "scrum",
+        jobs: [
+            { name: "learn", jobName: "scrum-learn" }
+        ]
+    }, {
+        keyword: "refine",
+        jobs: [
+            { name: "start", jobName: "refine" }
+        ]
+    }]
 }
 
 export const entry = validateEntry(entryInput, "jobsData.ts:");

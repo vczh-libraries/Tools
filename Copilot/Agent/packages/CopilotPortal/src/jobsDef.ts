@@ -1,13 +1,4 @@
-export interface GridColumn {
-    name: string;
-    jobName: string;
-}
-
-export interface GridRow {
-    keyword: string;
-    automate: boolean;
-    jobs: GridColumn[];
-}
+// ---- Task ----
 
 export type Prompt = string[];
 
@@ -40,6 +31,8 @@ export interface Task {
         runConditionInSameSession: boolean;
     } | never);
 }
+
+// ---- Work ----
 
 export interface TaskWork<T> {
     kind: "Ref";
@@ -107,18 +100,34 @@ export function assignWorkId(work: Work<never>): Work<number> {
     return helper(work, [0]);
 }
 
+// ---- Job ----
+
 export interface Job {
     requireUserInput?: boolean;
     work: Work<number>;
 }
 
+export interface GridColumn {
+    name: string;
+    jobName: string;
+}
+
+export interface GridRow {
+    keyword: string;
+    jobs: (GridColumn | undefined)[];
+}
+
+// ---- Entry ----
+
 export interface Entry {
     models: { [key in string]: string };
     promptVariables: { [key in string]: string[] };
-    grid: GridRow[];
     tasks: { [key in string]: Task };
     jobs: { [key in string]: Job };
+    grid: GridRow[];
 }
+
+// ---- Validation and Helpers ----
 
 export const availableTools: string[] = [
     "job_prepare_document",
