@@ -107,7 +107,7 @@ If any session crashes after the task submitting a promot to the session:
 - Otherwise:
   - This session will be no longer used, the task should create a new session to retry.
   - resend the prompt until 3 consecutive crashes.
-  - Add `SESSION_CRASH_PREFIX` (exported const from `jobsApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
+  - Add `SESSION_CRASH_PREFIX` (exported const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
   - The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`, used by both task execution and condition evaluation.
 
 If resending promot can't solve crashing:

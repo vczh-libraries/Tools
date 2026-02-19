@@ -267,15 +267,6 @@ if (!testMode) {
 }
 
 server.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-    console.log("Press ENTER or use api/stop to stop the server.");
+    console.log(`http://localhost:${port}`);
+    console.log(`http://localhost:${port}/api/stop`);
 });
-
-if (process.stdin.isTTY) {
-    process.stdin.setEncoding("utf8");
-    process.stdin.on("data", (data: string) => {
-        if (data.trim() === "") {
-            shutdownServer(server);
-        }
-    });
-}

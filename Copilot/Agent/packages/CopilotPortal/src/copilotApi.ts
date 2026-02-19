@@ -31,15 +31,6 @@ interface SessionState extends LiveState {
     closed: boolean;
 }
 
-// ---- Copilot Client ----
-
-async function closeCopilotClientIfNoSessions(): Promise<void> {
-    const hasActive = [...sessions.values()].some(s => !s.closed);
-    if (!hasActive) {
-        stopCoplilotClient();
-    }
-}
-
 // ---- Session Management ----
 
 const sessions = new Map<string, SessionState>();
@@ -135,7 +126,6 @@ export async function helperSessionStop(session: ICopilotSession): Promise<void>
             break;
         }
     }
-    await closeCopilotClientIfNoSessions();
 }
 
 export function helperGetSession(sessionId: string): ICopilotSession | undefined {
@@ -236,11 +226,6 @@ export async function apiCopilotSessionStop(req: http.IncomingMessage, res: http
         state.waitingResolve = null;
         resolve({ error: "SessionClosed" });
         sessions.delete(sessionId);
-    }
-    // Close CopilotClient if all active (non-closed) sessions are gone
-    const hasActive = [...sessions.values()].some(s => !s.closed);
-    if (!hasActive) {
-        await closeCopilotClientIfNoSessions();
     }
     jsonResponse(res, 200, { result: "Closed" });
 }

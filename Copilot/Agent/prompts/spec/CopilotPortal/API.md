@@ -8,6 +8,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `src/copilotSession.ts`
 - `src/sharedApi.ts`
 - `src/copilotApi.ts`
+- `src/taskApi.ts`
 - `src/jobsApi.ts`
 - `src/index.ts`
 
@@ -142,7 +143,6 @@ interface ICopilotSessionCallbacks {
 - Create a session with the given model, register job tools, wire up all event handlers, and return an `ICopilotSession`.
 
 ## Helpers (taskApi.ts)
-**TASK**: Move `startTask` and all its dependencies to the new file.
 
 All helper functions and types are exported and API implementations should use them.
 

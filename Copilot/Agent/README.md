@@ -93,7 +93,8 @@ Copilot/Agent/
 │   │   ├── src/
 │   │   │   ├── copilotSession.ts # Copilot SDK session wrapper
 │   │   │   ├── copilotApi.ts  # Copilot session API routes and helpers
-│   │   │   ├── jobsApi.ts     # Task management API routes and helpers
+│   │   │   ├── taskApi.ts     # Task execution engine (startTask, crash retry)
+│   │   │   ├── jobsApi.ts     # Job/task API routes and job execution
 │   │   │   ├── jobsDef.ts     # Jobs/tasks data definitions and validation
 │   │   │   ├── jobsChart.ts   # Flow chart graph generation from work trees
 │   │   │   ├── jobsData.ts    # Preloaded jobs/tasks data
@@ -146,7 +147,7 @@ Copilot/Agent/
 - **Message Blocks**: User, Reasoning, Tool, and Message blocks with expand/collapse behavior
 - **Markdown Rendering**: Completed message blocks (except Tool) render markdown content as formatted HTML using marked.js
 - **Awaiting Status**: "Awaits responses ..." indicator shown in the session part while the agent is working
-- **Lazy CopilotClient**: Client starts on demand and stops when all sessions close
+- **Lazy CopilotClient**: Client starts on demand and closes when the server shuts down
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
 - **Live Polling**: Sequential long-polling for real-time session callbacks
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
