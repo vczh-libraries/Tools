@@ -105,9 +105,11 @@ Wraps `@github/copilot-sdk` to provide a simplified session interface with event
 interface ICopilotSession {
   get rawSection(): CopilotSession;
   sendRequest(message: string, timeout?: number): Promise<void>;
+  stop(): Promise<void>
 }
 ```
 - Interface for interacting with a Copilot session.
+- When a session is no longer using, `stop` must be called. `CopilotSession.destroy` should be called by `stop`.
 
 ### ICopilotSessionCallbacks
 
