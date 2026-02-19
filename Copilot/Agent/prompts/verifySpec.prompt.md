@@ -34,3 +34,7 @@ Ensure file names and session names exists, and fix the list if you find any mis
 ## Grammar and Typos
 
 Fix typos and grammar or syntax mistakes in spec files.
+
+## README.md
+
+Scan `README.md` and ensure all information is up to date, especially file lists.
