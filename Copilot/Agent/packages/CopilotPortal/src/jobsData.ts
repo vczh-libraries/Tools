@@ -83,10 +83,15 @@ const entryInput: Entry = {
         summary: [
             "Execute the instruction in REPO-ROOT/.github/prompts/3-summarizing.prompt.md immediately."
         ],
+        codingPrefix: [
+            "**IMPORT**: It is FORBIDDEN to modify any script files in `REPO-ROOT/.github/Scripts`. If you are getting trouble, the only reason is your code has problem. Fix the code instead of any other kind of working around.",
+        ],
         execute: [
+            "$codingPrefix",
             "Execute the instruction in REPO-ROOT/.github/prompts/4-execution.prompt.md immediately."
         ],
         verify: [
+            "$codingPrefix",
             "Execute the instruction in REPO-ROOT/.github/prompts/5-verifying.prompt.md immediately."
         ],
         refine: [
