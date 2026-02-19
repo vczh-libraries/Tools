@@ -41,7 +41,10 @@
         "Invoke-WebRequest": false,
         "Invoke-Expression": false,
         "Get-Acl": false,
-        "Set-Acl": false
+        "Set-Acl": false,
+        "jq": false,
+        "xargs": false,
+        "iex": false
     },
     "chatgpt.openOnStartup": true
 }
