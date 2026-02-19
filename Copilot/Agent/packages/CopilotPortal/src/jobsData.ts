@@ -481,15 +481,11 @@ const entryInput: Entry = {
             { name: "update", jobName: "verify-update" }
         ]
     }, {
-        keyword: "scrum",
+        keyword: "evolution",
         jobs: [
-            { name: "learn and refine", jobName: "learn-automate" },
-            { name: "learn", jobName: "scrum-learn" }
-        ]
-    }, {
-        keyword: "refine",
-        jobs: [
-            { name: "start", jobName: "refine" }
+            { name: "evolution", jobName: "learn-automate" },
+            { name: "scrum learn", jobName: "scrum-learn" },
+            { name: "refine", jobName: "refine" }
         ]
     }]
 }
