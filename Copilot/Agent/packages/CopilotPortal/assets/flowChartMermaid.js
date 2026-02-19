@@ -115,12 +115,12 @@ async function renderFlowChartMermaid(chart, container, onInspect) {
     container.innerHTML = "";
     container.innerHTML = svg;
 
-    // Fix SVG viewBox to ensure nothing is clipped at the top
+    // Fix SVG viewBox to ensure nothing is clipped (especially emoji indicators on leftmost nodes)
     const svgEl = container.querySelector("svg");
     if (svgEl) {
         // Get the bounding box of the entire SVG content
         const bbox = svgEl.getBBox();
-        const padding = 8;
+        const padding = 24;
         const vbX = bbox.x - padding;
         const vbY = bbox.y - padding;
         const vbW = bbox.width + padding * 2;
@@ -132,6 +132,23 @@ async function renderFlowChartMermaid(chart, container, onInspect) {
         svgEl.style.minWidth = `${vbW}px`;
         svgEl.style.minHeight = `${vbH}px`;
     }
+
+    // Ctrl+Scroll zoom on the chart container
+    let zoomLevel = 1;
+    const zoomMin = 0.2;
+    const zoomMax = 3;
+    const zoomStep = 0.1;
+    container.addEventListener("wheel", (e) => {
+        if (!e.ctrlKey) return;
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+        zoomLevel = Math.min(zoomMax, Math.max(zoomMin, zoomLevel + delta));
+        const svgInner = container.querySelector("svg");
+        if (svgInner) {
+            svgInner.style.transformOrigin = "top left";
+            svgInner.style.transform = `scale(${zoomLevel})`;
+        }
+    }, { passive: false });
 
     // Track currently selected TaskNode/CondNode
     let currentSelectedGroup = null;

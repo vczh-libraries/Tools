@@ -217,6 +217,15 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 - Each `ChartArrow` becomes a Mermaid edge with optional label.
 - Per-node inline `style` directives set fill, stroke, and text color.
 - Call `mermaid.render("mermaid-chart", definition)` to produce an SVG, then insert it into the container.
+- The SVG viewBox must have enough padding (at least 24px) so that status indicator emojis on leftmost nodes are not clipped.
+
+#### Ctrl+Scroll Zoom
+
+When the user holds **Ctrl** and scrolls the mouse wheel over the `#chart-container`:
+- The flow chart SVG scales up (scroll up) or down (scroll down) in discrete steps of 0.1.
+- Zoom range is clamped between 0.2x and 3x, defaulting to 1x.
+- CSS `transform: scale(...)` with `transform-origin: top left` is applied to the SVG element.
+- The default browser scroll/zoom behavior is suppressed (`preventDefault`).
 
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
