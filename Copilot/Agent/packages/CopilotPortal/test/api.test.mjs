@@ -515,9 +515,9 @@ describe("API: task running - criteria failure (no retry)", () => {
         const failed = callbacks.some((c) => c.callback === "taskFailed");
         assert.ok(failed, `criteria-fail-task should fail, callbacks: ${JSON.stringify(callbacks.map(c => c.callback))}`);
 
-        // Verify no retry happened (retry budget = 0)
+        // In borrowing mode, no taskSessionStarted callbacks
         const sessionStarts = callbacks.filter((c) => c.callback === "taskSessionStarted");
-        assert.ok(sessionStarts.length <= 1, `should not retry, session starts: ${sessionStarts.length}`);
+        assert.strictEqual(sessionStarts.length, 0, `should have no session starts in borrowing mode, got: ${sessionStarts.length}`);
 
         // taskDecision should report criteria failure and final decision
         const decisions = callbacks.filter((c) => c.callback === "taskDecision");
@@ -557,11 +557,12 @@ describe("API: task running - live responses", () => {
 
         const callbacks = await drainLive(`/api/copilot/task/${startData.taskId}/live`, "taskSucceeded");
 
+        // In borrowing session mode, taskSessionStarted/Stopped are unavailable
         const sessionStarted = callbacks.some((c) => c.callback === "taskSessionStarted");
-        assert.ok(sessionStarted, "should have taskSessionStarted callback");
+        assert.ok(!sessionStarted, "should NOT have taskSessionStarted callback in borrowing mode");
 
         const sessionStopped = callbacks.some((c) => c.callback === "taskSessionStopped");
-        assert.ok(sessionStopped, "should have taskSessionStopped callback");
+        assert.ok(!sessionStopped, "should NOT have taskSessionStopped callback in borrowing mode");
 
         const lastCallback = callbacks[callbacks.length - 1];
         assert.strictEqual(lastCallback.callback, "taskSucceeded", "last callback should be taskSucceeded");

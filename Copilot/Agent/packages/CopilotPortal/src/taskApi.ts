@@ -37,8 +37,10 @@ export interface ICopilotTaskCallback {
     taskSucceeded(): void;
     taskFailed(): void;
     taskDecision(reason: string): void;
-    taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean): void;
-    taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean): void;
+    // Unavailable in borrowing session mode
+    taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean): void;
+    // Unavailable in borrowing session mode
+    taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean): void;
 }
 
 // ---- Entry Management ----
@@ -166,138 +168,7 @@ function monitorSessionTools(session: ICopilotSession, runtimeValues: Record<str
     } as ToolMonitor;
 }
 
-// ---- Criteria Check (single pass, no retry) ----
-
-type CriteriaType = { condition?: Prompt; runConditionInSameSession?: boolean; toolExecuted?: string[]; failureAction: unknown };
-
-async function checkCriteria(
-    entry: Entry,
-    criteria: CriteriaType,
-    drivingSession: ICopilotSession,
-    runtimeValues: Record<string, string>,
-    toolsCalled: Set<string>,
-    callback: ICopilotTaskCallback,
-): Promise<boolean> {
-    // Check toolExecuted
-    if (criteria.toolExecuted) {
-        const missingTools: string[] = [];
-        for (const tool of criteria.toolExecuted) {
-            if (!toolsCalled.has(tool)) {
-                missingTools.push(tool);
-            }
-        }
-        if (missingTools.length > 0) {
-            callback.taskDecision(`[CRITERIA] toolExecuted check failed: required tools not called: ${missingTools.join(", ")}. Expected: ${JSON.stringify(criteria.toolExecuted)}`);
-            return false;
-        }
-    }
-
-    // Check condition
-    if (criteria.condition) {
-        const conditionPrompt = expandPrompt(entry, criteria.condition, runtimeValues);
-        const monitor = monitorSessionTools(drivingSession, runtimeValues);
-        try {
-            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, callback);
-        } catch (err) {
-            monitor.cleanup();
-            callback.taskDecision(`[SESSION CRASHED] Criteria condition check crashed: ${errorToDetailedString(err)}`);
-            throw err;
-        }
-        monitor.cleanup();
-
-        if (monitor.booleanResult === true) {
-            callback.taskDecision("[CRITERIA] Criteria condition passed");
-            return true;
-        }
-
-        callback.taskDecision(`[CRITERIA] Criteria condition failed. Condition: ${JSON.stringify(criteria.condition)}`);
-        return false;
-    }
-
-    return true;
-}
-
-// ---- Availability Check ----
-
-async function checkAvailability(
-    entry: Entry,
-    task: Task,
-    drivingSession: ICopilotSession,
-    runtimeValues: Record<string, string>,
-    callback: ICopilotTaskCallback
-): Promise<boolean> {
-    const availability = task.availability;
-    if (!availability) return true;
-
-    // Check condition (the main runtime check)
-    if (availability.condition) {
-        const conditionPrompt = expandPrompt(entry, availability.condition, runtimeValues);
-        const monitor = monitorSessionTools(drivingSession, runtimeValues);
-        try {
-            await sendPromptWithCrashRetry(drivingSession, conditionPrompt, callback);
-        } catch (err) {
-            monitor.cleanup();
-            callback.taskDecision(`[SESSION CRASHED] Availability check crashed: ${errorToDetailedString(err)}`);
-            throw err; // Session crashed - don't consume silently
-        }
-        monitor.cleanup();
-        if (monitor.booleanResult !== true) {
-            callback.taskDecision(`[AVAILABILITY] Availability check failed: condition not satisfied. Condition: ${JSON.stringify(availability.condition)}`);
-            return false;
-        }
-        callback.taskDecision("[AVAILABILITY] Availability check passed");
-    }
-
-    return true;
-}
-
 // ---- startTask ----
-
-/**
- * Execute a prompt on a session and check criteria.
- * Returns true if criteria passed, false otherwise.
- * Throws on unrecoverable crash.
- * When forcedSingleSession is true, crashes fail immediately without retry.
- * When createNewSession is provided, new sessions are created on crash for retry.
- */
-async function executePromptAndCheckCriteria(
-    entry: Entry,
-    criteria: CriteriaType | undefined,
-    targetSession: ICopilotSession,
-    drivingSession: ICopilotSession,
-    prompt: Prompt,
-    runtimeValues: Record<string, string>,
-    callback: ICopilotTaskCallback,
-    forcedSingleSession?: boolean,
-    createNewSession?: () => Promise<ICopilotSession>
-): Promise<{ succeeded: boolean; usedSession: ICopilotSession }> {
-    const promptText = expandPrompt(entry, prompt, runtimeValues);
-    const monitor = monitorSessionTools(targetSession, runtimeValues);
-
-    let usedSession = targetSession;
-    if (forcedSingleSession) {
-        // In forced single session mode, just send once - no retry
-        try {
-            helperPushSessionResponse(targetSession, { callback: "onGeneratedUserPrompt", prompt: promptText });
-            await targetSession.sendRequest(promptText);
-        } catch (err) {
-            monitor.cleanup();
-            throw err;
-        }
-    } else {
-        try {
-            usedSession = await sendPromptWithCrashRetry(targetSession, promptText, callback, createNewSession);
-        } catch (err) {
-            monitor.cleanup();
-            throw err;
-        }
-    }
-    monitor.cleanup();
-
-    if (!criteria) return { succeeded: true, usedSession };
-    const criteriaResult = await checkCriteria(entry, criteria, drivingSession, runtimeValues, monitor.toolsCalled, callback);
-    return { succeeded: criteriaResult, usedSession };
-}
 
 export async function startTask(
     taskName: string,
@@ -318,235 +189,439 @@ export async function startTask(
         throw new Error(`Task "${taskName}" not found.`);
     }
 
-    // Determine model option
-    const criteria = task.criteria as CriteriaType | undefined;
-    const forcedSingleSession = drivingSession !== undefined;
-    const singleSession = forcedSingleSession ||
+    const criteria = task.criteria;
+    const borrowingMode = drivingSession !== undefined;
+    const singleModel = borrowingMode ||
         !criteria ||
-        criteria.runConditionInSameSession === undefined ||
-        criteria.runConditionInSameSession === true;
+        !("runConditionInSameSession" in criteria) ||
+        (criteria as any).runConditionInSameSession === undefined ||
+        (criteria as any).runConditionInSameSession === true;
 
     // Determine task model ID
-    let taskModelId: string | undefined;
-    if (taskModelIdOverride) {
-        taskModelId = taskModelIdOverride;
-    } else if (task.model) {
+    let taskModelId: string | undefined = taskModelIdOverride;
+    if (!taskModelId && task.model) {
         taskModelId = getModelId(task.model, entry);
     }
-
-    // Create driving session if not provided
-    const createdDrivingSession = !drivingSession;
-    let actualDrivingSession: ICopilotSession;
-    let drivingSessionId: string | undefined;
-
-    if (drivingSession) {
-        actualDrivingSession = drivingSession;
-    } else {
-        // When single session due to config, driving session uses task model
-        const drivingModelId = singleSession
-            ? (taskModelId || entry.models.driving)
-            : entry.models.driving;
-        const [session, sessionId] = await helperSessionStart(drivingModelId, workingDirectory);
-        actualDrivingSession = session;
-        drivingSessionId = sessionId;
+    if (!taskModelId && !borrowingMode && singleModel) {
+        taskModelId = entry.models.driving;
+    }
+    if (!taskModelId && !borrowingMode && !singleModel) {
+        taskModelId = entry.models.driving;
     }
 
-    // Initialize runtime variables
+    // Runtime variables
     const runtimeValues: Record<string, string> = {};
-    if (userInput) {
-        runtimeValues["user-input"] = userInput;
-    }
+    if (userInput) runtimeValues["user-input"] = userInput;
 
+    // Shared state
     let status: "Executing" | "Succeeded" | "Failed" = "Executing";
     let stopped = false;
-    let taskSession: [ICopilotSession, string] | undefined = undefined;
+    const activeSessions = new Map<string, ICopilotSession>(); // sessionId -> session
+    let primaryDrivingSession: ICopilotSession | undefined = drivingSession;
+
+    // ---- Session management helpers ----
+
+    async function openSession(modelId: string, isDriving: boolean): Promise<[ICopilotSession, string]> {
+        const [session, sessionId] = await helperSessionStart(modelId, workingDirectory);
+        activeSessions.set(sessionId, session);
+        callback.taskSessionStarted(session, sessionId, isDriving);
+        if (isDriving && !primaryDrivingSession) primaryDrivingSession = session;
+        return [session, sessionId];
+    }
+
+    async function closeExistingSession(session: ICopilotSession, sessionId: string, succeeded: boolean): Promise<void> {
+        activeSessions.delete(sessionId);
+        await helperSessionStop(session).catch(() => {});
+        callback.taskSessionStopped(session, sessionId, succeeded);
+    }
+
+    // ---- Send prompt with monitoring and crash retry ----
+
+    async function sendMonitoredPrompt(
+        sessionRef: { session: ICopilotSession; id: string },
+        prompt: string,
+        modelId: string,
+        isDriving: boolean,
+    ): Promise<{ toolsCalled: Set<string>; booleanResult: boolean | null }> {
+        const maxAttempts = borrowingMode ? 1 : MAX_CRASH_RETRIES;
+        let lastError: unknown;
+
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            const actualPrompt = attempt === 0 ? prompt : SESSION_CRASH_PREFIX + prompt;
+            const monitor = monitorSessionTools(sessionRef.session, runtimeValues);
+
+            try {
+                helperPushSessionResponse(sessionRef.session, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
+                await sessionRef.session.sendRequest(actualPrompt);
+                monitor.cleanup();
+                return { toolsCalled: monitor.toolsCalled, booleanResult: monitor.booleanResult };
+            } catch (err) {
+                monitor.cleanup();
+                lastError = err;
+                callback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
+
+                if (!borrowingMode && attempt < maxAttempts - 1) {
+                    try {
+                        await closeExistingSession(sessionRef.session, sessionRef.id, false);
+                        const [newSession, newId] = await openSession(modelId, isDriving);
+                        sessionRef.session = newSession;
+                        sessionRef.id = newId;
+                    } catch (sessionErr) {
+                        callback.taskDecision(`[SESSION CRASHED] Failed to create replacement session: ${errorToDetailedString(sessionErr)}`);
+                        throw sessionErr;
+                    }
+                }
+            }
+        }
+
+        throw lastError;
+    }
+
+    // ---- Criteria checking ----
+
+    async function checkCriteriaResult(
+        toolsCalled: Set<string>,
+        drivingRef: { session: ICopilotSession; id: string } | undefined,
+        drivingModelId: string,
+    ): Promise<{ passed: boolean; missingTools: string[] }> {
+        if (!criteria) return { passed: true, missingTools: [] };
+
+        // Check toolExecuted
+        let missingTools: string[] = [];
+        if (criteria.toolExecuted) {
+            for (const tool of criteria.toolExecuted) {
+                if (!toolsCalled.has(tool)) {
+                    missingTools.push(tool);
+                }
+            }
+            if (missingTools.length > 0) {
+                callback.taskDecision(`[CRITERIA] toolExecuted check failed: missing tools: ${missingTools.join(", ")}`);
+                if (!("condition" in criteria) || !(criteria as any).condition) {
+                    return { passed: false, missingTools };
+                }
+            }
+        }
+
+        // Check condition
+        if ("condition" in criteria && (criteria as any).condition) {
+            let condRef: { session: ICopilotSession; id: string };
+            let needsClose = false;
+
+            if (drivingRef) {
+                // Single model or borrowing: use existing session
+                condRef = drivingRef;
+            } else {
+                // Multiple models: create new driving session for condition check
+                const [ds, dsId] = await openSession(drivingModelId, true);
+                condRef = { session: ds, id: dsId };
+                needsClose = true;
+            }
+
+            const condPrompt = expandPrompt(entry, (criteria as any).condition, runtimeValues);
+            let condPassed: boolean;
+            try {
+                const result = await sendMonitoredPrompt(condRef, condPrompt, drivingModelId, true);
+                condPassed = result.booleanResult === true;
+            } catch (err) {
+                if (needsClose) await closeExistingSession(condRef.session, condRef.id, false);
+                throw err;
+            }
+
+            if (needsClose) await closeExistingSession(condRef.session, condRef.id, condPassed);
+
+            if (condPassed) {
+                callback.taskDecision("[CRITERIA] Criteria condition passed");
+            } else {
+                callback.taskDecision(`[CRITERIA] Criteria condition failed. Condition: ${JSON.stringify((criteria as any).condition)}`);
+                return { passed: false, missingTools };
+            }
+        }
+
+        // If toolsOk was false but condition passed, tools still failed
+        if (missingTools.length > 0) {
+            return { passed: false, missingTools };
+        }
+
+        return { passed: true, missingTools: [] };
+    }
+
+    // ---- Build retry prompt ----
+
+    function buildRetryPrompt(missingTools: string[]): string {
+        let prompt = expandPrompt(entry, task.prompt, runtimeValues);
+        if (missingTools.length > 0) {
+            prompt += `\n## Required Tool Not Called: ${missingTools.join(", ")}`;
+        }
+        if (criteria?.failureAction?.additionalPrompt) {
+            const expandedAdditional = expandPrompt(entry, criteria.failureAction.additionalPrompt, runtimeValues);
+            prompt += `\n## You accidentally Stopped\n${expandedAdditional}`;
+        }
+        return prompt;
+    }
+
+    // ---- ICopilotTask object ----
 
     const copilotTask: ICopilotTask = {
-        get drivingSession() { return actualDrivingSession; },
+        get drivingSession() { return primaryDrivingSession || drivingSession!; },
         get status() { return status; },
         stop() {
             if (stopped) return;
             stopped = true;
             status = "Failed";
-            if (taskSession) {
-                helperSessionStop(taskSession[0]).catch(() => { /* ignore */ });
+            for (const [, session] of activeSessions) {
+                helperSessionStop(session).catch(() => {});
             }
-            if (createdDrivingSession) {
-                helperSessionStop(actualDrivingSession).catch(() => { /* ignore */ });
-            }
+            activeSessions.clear();
         },
     };
-    (copilotTask as any)._drivingSessionId = drivingSessionId;
 
-    // Helper: clean up sessions that startTask manages
-    async function cleanupSessions(taskSucceeded: boolean): Promise<void> {
-        if (taskSession) {
-            await helperSessionStop(taskSession[0]).catch(() => {});
-            callback.taskSessionStopped(taskSession, taskSucceeded);
-        } else {
-            callback.taskSessionStopped(undefined, taskSucceeded);
-        }
-        if (createdDrivingSession) {
-            await helperSessionStop(actualDrivingSession).catch(() => {});
-        }
-    }
+    // ---- Main execution ----
 
-    // Start task execution in background
     const executionPromise = (async () => {
         try {
-            // Create task session if double model mode
-            let taskSessionObj: ICopilotSession;
-            if (singleSession) {
-                taskSessionObj = actualDrivingSession;
-                callback.taskSessionStarted(undefined, forcedSingleSession);
-            } else {
-                if (!taskModelId) {
-                    taskModelId = entry.models.driving;
-                }
-                const [session, sessionId] = await helperSessionStart(taskModelId, workingDirectory);
-                taskSession = [session, sessionId];
-                taskSessionObj = session;
-                callback.taskSessionStarted(taskSession, false);
-                callback.taskDecision(`[OPERATION] Started task session with model ${taskModelId}`);
-            }
+            if (borrowingMode) {
+                // === BORROWING SESSION MODE ===
+                runtimeValues["task-model"] = taskModelId || "";
 
-            // Set $task-model runtime variable to the actual model name used for the task session
-            runtimeValues["task-model"] = taskModelId || entry.models.driving;
+                // Execute prompt directly on the given session
+                const promptText = expandPrompt(entry, task.prompt, runtimeValues);
+                const borrowedSession = drivingSession!;
 
-            if (stopped) return;
-
-            // Check availability
-            if (task.availability && !ignorePrerequisiteCheck) {
-                const available = await checkAvailability(entry, task, actualDrivingSession, runtimeValues, callback);
-                if (!available) {
-                    status = "Failed";
-                    await cleanupSessions(false);
-                    callback.taskFailed();
-                    return;
-                }
-            }
-
-            if (stopped) return;
-
-            // Helper to create a new task session for crash retry in non-forced mode
-            const createNewTaskSession = forcedSingleSession ? undefined : async (): Promise<ICopilotSession> => {
-                // Old session is no longer usable
-                if (taskSession) {
-                    await helperSessionStop(taskSession[0]).catch(() => {});
-                    callback.taskSessionStopped(taskSession, false);
-                }
-                const retryModelId = taskModelId || entry.models.driving;
-                const [newSession, newSessionId] = await helperSessionStart(retryModelId, workingDirectory);
-                taskSession = [newSession, newSessionId];
-                taskSessionObj = newSession;
-                callback.taskSessionStarted(taskSession, false);
-                return newSession;
-            };
-
-            // Initial task execution + criteria check
-            let succeeded: boolean;
-            try {
-                const result = await executePromptAndCheckCriteria(
-                    entry, criteria, taskSessionObj, actualDrivingSession,
-                    task.prompt, runtimeValues, callback,
-                    forcedSingleSession,
-                    createNewTaskSession
-                );
-                succeeded = result.succeeded;
-                taskSessionObj = result.usedSession;
-            } catch (err) {
-                if (forcedSingleSession) {
-                    // In forced single session mode, the session is offered from outside, fail immediately
-                    callback.taskDecision(`[SESSION CRASHED] Task execution crashed in forced single session mode: ${errorToDetailedString(err)}`);
+                const monitor = monitorSessionTools(borrowedSession, runtimeValues);
+                try {
+                    helperPushSessionResponse(borrowedSession, { callback: "onGeneratedUserPrompt", prompt: promptText });
+                    await borrowedSession.sendRequest(promptText);
+                } catch (err) {
+                    monitor.cleanup();
+                    callback.taskDecision(`[SESSION CRASHED] Task crashed in borrowing session mode: ${errorToDetailedString(err)}`);
                     throw err;
                 }
-                callback.taskDecision(`[SESSION CRASHED] Task execution crashed: ${errorToDetailedString(err)}`);
-                throw err;
-            }
+                monitor.cleanup();
 
-            if (stopped) return;
+                // Check criteria using the borrowed session
+                const borrowedRef = { session: borrowedSession, id: "" };
+                let { passed, missingTools } = criteria
+                    ? await checkCriteriaResult(monitor.toolsCalled, borrowedRef, "")
+                    : { passed: true, missingTools: [] as string[] };
 
-            // Retry loop if criteria failed and failureAction is defined
-            if (!succeeded && criteria) {
-                const failureAction = criteria.failureAction as
-                    | ["RetryWithNewSession", number]
-                    | ["RetryWithUserPrompt", number, Prompt]
-                    | undefined;
-
-                if (failureAction && criteria.runConditionInSameSession !== undefined) {
-                    const maxRetries = failureAction[1];
-                    for (let i = 0; i < maxRetries && !succeeded; i++) {
+                // Retry loop (borrowing mode: same session, crash = immediate fail)
+                if (!passed && criteria?.failureAction) {
+                    const maxRetries = criteria.failureAction.retryTimes;
+                    for (let i = 0; i < maxRetries && !passed; i++) {
                         if (stopped) return;
-                        callback.taskDecision(`[OPERATION] Starting retry #${i + 1} (${failureAction[0]})`);
+                        callback.taskDecision(`[OPERATION] Starting retry #${i + 1}`);
 
-                        if (failureAction[0] === "RetryWithNewSession") {
-                            // Stop old task session and create new one
-                            if (taskSession) {
-                                await helperSessionStop(taskSession[0]).catch(() => {});
-                                callback.taskSessionStopped(taskSession, false);
-                            }
-
-                            const retryModelId = taskModelId || entry.models.driving;
-                            const [newSession, newSessionId] = await helperSessionStart(retryModelId, workingDirectory);
-                            taskSession = [newSession, newSessionId];
-                            taskSessionObj = newSession;
-                            callback.taskSessionStarted(taskSession, false);
-
-                            // Re-execute task + re-check criteria (crash = failed iteration)
-                            try {
-                                const result = await executePromptAndCheckCriteria(
-                                    entry, criteria, taskSessionObj, actualDrivingSession,
-                                    task.prompt, runtimeValues, callback,
-                                    false,
-                                    createNewTaskSession
-                                );
-                                succeeded = result.succeeded;
-                                taskSessionObj = result.usedSession;
-                            } catch (err) {
-                                callback.taskDecision(`[SESSION CRASHED] Session crash during retry #${i + 1}: ${errorToDetailedString(err)}`);
-                                continue;
-                            }
-                        } else {
-                            // RetryWithUserPrompt: send retry prompt to SAME task session
-                            const retryPromptTemplate = failureAction[2];
-                            try {
-                                const result = await executePromptAndCheckCriteria(
-                                    entry, criteria, taskSessionObj, actualDrivingSession,
-                                    retryPromptTemplate, runtimeValues, callback,
-                                    false,
-                                    createNewTaskSession
-                                );
-                                succeeded = result.succeeded;
-                                taskSessionObj = result.usedSession;
-                            } catch (err) {
-                                callback.taskDecision(`[SESSION CRASHED] Session crash during retry #${i + 1}: ${errorToDetailedString(err)}`);
-                                continue;
-                            }
+                        const retryPrompt = buildRetryPrompt(missingTools);
+                        const retryMonitor = monitorSessionTools(borrowedSession, runtimeValues);
+                        try {
+                            helperPushSessionResponse(borrowedSession, { callback: "onGeneratedUserPrompt", prompt: retryPrompt });
+                            await borrowedSession.sendRequest(retryPrompt);
+                        } catch (err) {
+                            retryMonitor.cleanup();
+                            callback.taskDecision(`[SESSION CRASHED] Crash during retry in borrowing mode: ${errorToDetailedString(err)}`);
+                            throw err;
                         }
+                        retryMonitor.cleanup();
 
-                        if (succeeded) {
-                            callback.taskDecision(`[CRITERIA] Criteria condition passed on retry #${i + 1}`);
-                        } else {
-                            callback.taskDecision(`[CRITERIA] Criteria condition failed on retry #${i + 1}`);
-                        }
+                        const retResult = await checkCriteriaResult(retryMonitor.toolsCalled, borrowedRef, "");
+                        passed = retResult.passed;
+                        missingTools = retResult.missingTools;
+
+                        callback.taskDecision(passed
+                            ? `[CRITERIA] Criteria passed on retry #${i + 1}`
+                            : `[CRITERIA] Criteria failed on retry #${i + 1}`);
                     }
-                    if (!succeeded) {
-                        callback.taskDecision(`[DECISION] Retry budget drained: criteria failure after ${maxRetries} retries (${failureAction[0]})`);
+                    if (!passed) {
+                        callback.taskDecision(`[DECISION] Retry budget drained after ${maxRetries} retries`);
                     }
                 }
-            }
 
-            // Final result
-            if (succeeded) {
-                status = "Succeeded";
-                callback.taskDecision("[TASK SUCCEEDED] Decision: task succeeded");
-                await cleanupSessions(true);
-                callback.taskSucceeded();
+                // Report result
+                if (passed) {
+                    status = "Succeeded";
+                    callback.taskDecision("[TASK SUCCEEDED] Decision: task succeeded");
+                    callback.taskSucceeded();
+                } else {
+                    status = "Failed";
+                    callback.taskDecision("[TASK FAILED] Decision: task failed (criteria not satisfied)");
+                    callback.taskFailed();
+                }
+
+            } else if (singleModel) {
+                // === MANAGED SESSION MODE (SINGLE MODEL) ===
+                const modelId = taskModelId || entry.models.driving;
+                runtimeValues["task-model"] = modelId;
+
+                const [session, sessionId] = await openSession(modelId, true);
+                const ref = { session, id: sessionId };
+
+                if (stopped) return;
+
+                // Check availability
+                if (task.availability && !ignorePrerequisiteCheck) {
+                    if (task.availability.condition) {
+                        const condPrompt = expandPrompt(entry, task.availability.condition, runtimeValues);
+                        const result = await sendMonitoredPrompt(ref, condPrompt, modelId, true);
+                        if (result.booleanResult !== true) {
+                            callback.taskDecision(`[AVAILABILITY] Availability check failed: condition not satisfied. Condition: ${JSON.stringify(task.availability.condition)}`);
+                            status = "Failed";
+                            await closeExistingSession(ref.session, ref.id, false);
+                            callback.taskFailed();
+                            return;
+                        }
+                        callback.taskDecision("[AVAILABILITY] Availability check passed");
+                    }
+                }
+
+                if (stopped) return;
+
+                // Execute prompt
+                const promptText = expandPrompt(entry, task.prompt, runtimeValues);
+                const { toolsCalled } = await sendMonitoredPrompt(ref, promptText, modelId, true);
+
+                // Check criteria
+                let { passed, missingTools } = criteria
+                    ? await checkCriteriaResult(toolsCalled, ref, modelId)
+                    : { passed: true, missingTools: [] as string[] };
+
+                // Retry loop
+                if (!passed && criteria?.failureAction) {
+                    const maxRetries = criteria.failureAction.retryTimes;
+                    for (let i = 0; i < maxRetries && !passed; i++) {
+                        if (stopped) return;
+                        callback.taskDecision(`[OPERATION] Starting retry #${i + 1}`);
+
+                        const retryPrompt = buildRetryPrompt(missingTools);
+                        const retryResult = await sendMonitoredPrompt(ref, retryPrompt, modelId, true);
+
+                        const checkResult = await checkCriteriaResult(retryResult.toolsCalled, ref, modelId);
+                        passed = checkResult.passed;
+                        missingTools = checkResult.missingTools;
+
+                        callback.taskDecision(passed
+                            ? `[CRITERIA] Criteria passed on retry #${i + 1}`
+                            : `[CRITERIA] Criteria failed on retry #${i + 1}`);
+                    }
+                    if (!passed) {
+                        callback.taskDecision(`[DECISION] Retry budget drained after ${maxRetries} retries`);
+                    }
+                }
+
+                // Report result
+                if (passed) {
+                    status = "Succeeded";
+                    callback.taskDecision("[TASK SUCCEEDED] Decision: task succeeded");
+                    await closeExistingSession(ref.session, ref.id, true);
+                    callback.taskSucceeded();
+                } else {
+                    status = "Failed";
+                    callback.taskDecision("[TASK FAILED] Decision: task failed (criteria not satisfied)");
+                    await closeExistingSession(ref.session, ref.id, false);
+                    callback.taskFailed();
+                }
+
             } else {
-                status = "Failed";
-                callback.taskDecision("[TASK FAILED] Decision: task failed (criteria not satisfied)");
-                await cleanupSessions(false);
-                callback.taskFailed();
+                // === MANAGED SESSION MODE (MULTIPLE MODELS) ===
+                const drivingModelId = entry.models.driving;
+                const tModelId = taskModelId || entry.models.driving;
+                runtimeValues["task-model"] = tModelId;
+
+                if (stopped) return;
+
+                // Check availability
+                if (task.availability && !ignorePrerequisiteCheck) {
+                    if (task.availability.condition) {
+                        const [ds, dsId] = await openSession(drivingModelId, true);
+                        const dRef = { session: ds, id: dsId };
+
+                        const condPrompt = expandPrompt(entry, task.availability.condition, runtimeValues);
+                        let condPassed: boolean;
+                        try {
+                            const result = await sendMonitoredPrompt(dRef, condPrompt, drivingModelId, true);
+                            condPassed = result.booleanResult === true;
+                        } catch (err) {
+                            await closeExistingSession(dRef.session, dRef.id, false);
+                            throw err;
+                        }
+
+                        await closeExistingSession(dRef.session, dRef.id, condPassed);
+
+                        if (!condPassed) {
+                            callback.taskDecision(`[AVAILABILITY] Availability check failed: condition not satisfied. Condition: ${JSON.stringify(task.availability.condition)}`);
+                            status = "Failed";
+                            callback.taskFailed();
+                            return;
+                        }
+                        callback.taskDecision("[AVAILABILITY] Availability check passed");
+                    }
+                }
+
+                if (stopped) return;
+
+                // Execute prompt (task session)
+                const [ts, tsId] = await openSession(tModelId, false);
+                let taskRef = { session: ts, id: tsId };
+
+                const promptText = expandPrompt(entry, task.prompt, runtimeValues);
+                let { toolsCalled } = await sendMonitoredPrompt(taskRef, promptText, tModelId, false);
+
+                // Close task session (mission done)
+                await closeExistingSession(taskRef.session, taskRef.id, true);
+
+                // Check criteria (new driving session for condition if needed)
+                let { passed, missingTools } = criteria
+                    ? await checkCriteriaResult(toolsCalled, undefined, drivingModelId)
+                    : { passed: true, missingTools: [] as string[] };
+
+                // Retry loop
+                if (!passed && criteria?.failureAction) {
+                    const maxRetries = criteria.failureAction.retryTimes;
+                    for (let i = 0; i < maxRetries && !passed; i++) {
+                        if (stopped) return;
+                        callback.taskDecision(`[OPERATION] Starting retry #${i + 1}`);
+
+                        // New task session for retry
+                        const [rts, rtsId] = await openSession(tModelId, false);
+                        taskRef = { session: rts, id: rtsId };
+
+                        const retryPrompt = buildRetryPrompt(missingTools);
+                        let retryToolsCalled: Set<string>;
+                        try {
+                            const retryResult = await sendMonitoredPrompt(taskRef, retryPrompt, tModelId, false);
+                            retryToolsCalled = retryResult.toolsCalled;
+                        } catch (err) {
+                            // Crash exhausting per-call budget is a failed iteration
+                            callback.taskDecision(`[SESSION CRASHED] Session crash during retry #${i + 1}: ${errorToDetailedString(err)}`);
+                            continue;
+                        }
+
+                        // Close task session
+                        await closeExistingSession(taskRef.session, taskRef.id, true);
+
+                        // Re-check criteria
+                        const checkResult = await checkCriteriaResult(retryToolsCalled, undefined, drivingModelId);
+                        passed = checkResult.passed;
+                        missingTools = checkResult.missingTools;
+
+                        callback.taskDecision(passed
+                            ? `[CRITERIA] Criteria passed on retry #${i + 1}`
+                            : `[CRITERIA] Criteria failed on retry #${i + 1}`);
+                    }
+                    if (!passed) {
+                        callback.taskDecision(`[DECISION] Retry budget drained after ${maxRetries} retries`);
+                    }
+                }
+
+                // Report result
+                if (passed) {
+                    status = "Succeeded";
+                    callback.taskDecision("[TASK SUCCEEDED] Decision: task succeeded");
+                    callback.taskSucceeded();
+                } else {
+                    status = "Failed";
+                    callback.taskDecision("[TASK FAILED] Decision: task failed (criteria not satisfied)");
+                    callback.taskFailed();
+                }
             }
         } catch (err) {
             if (status === "Executing") {
@@ -554,22 +629,21 @@ export async function startTask(
             }
             (copilotTask as any)._crashError = err;
             callback.taskDecision(`[TASK FAILED] Task error: ${errorToDetailedString(err)}`);
-            if (taskSession) {
-                helperSessionStop(taskSession[0]).catch(() => {});
-                callback.taskSessionStopped(taskSession, false);
-            } else {
-                callback.taskSessionStopped(undefined, false);
+
+            // Close all remaining active sessions
+            for (const [id, session] of activeSessions) {
+                await helperSessionStop(session).catch(() => {});
+                if (!borrowingMode) callback.taskSessionStopped(session, id, false);
             }
-            if (createdDrivingSession) {
-                helperSessionStop(actualDrivingSession).catch(() => {});
-            }
+            activeSessions.clear();
+
             callback.taskFailed();
-            throw err; // Don't consume silently
+            throw err;
         }
     })();
 
     (copilotTask as any)._executionPromise = executionPromise;
-    executionPromise.catch(() => {}); // Prevent unhandled rejection; callers should handle
+    executionPromise.catch(() => {}); // Prevent unhandled rejection
 
     return copilotTask;
 }

@@ -50,7 +50,7 @@ Perform all verifications, verify and update all prompts with `expandPromptStati
 - entry.tasks[name].prompt
 - entry.tasks[name].availability.condition (run extra verification)
 - entry.tasks[name].criteria.condition (run extra verification)
-- entry.tasks[name].criteria.failureAction[2]
+- entry.tasks[name].criteria.failureAction.additionalPrompt
 
 When extra verification is needed,
 `expandPromptStatic`'s `requiresBooleanTool` will be set to true,
@@ -102,8 +102,6 @@ A task is represented by type `Task`.
 
 A task can be running with `borrowing session mode` or `managed session mode`.
 
-**TASK**: The main difference is about how a task manages session. The new way is easier. Play attention to design the code. I want to see a clean code organization, do not do unnecessary code duplication. Carefully check all spec and if anything conflicts with the new session management design, fix it.
-
 ### Borrowing Session Mode
 
 Every prompt will be running in the given session.
@@ -121,7 +119,7 @@ No matter single model or multiple models is selected:
 - If a session crashes, new session must be created to replace it.
 - If executing the same prompt results in 5 consecutive crashes, fail the task immediately.
 - Add `SESSION_CRASH_PREFIX` (exported const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
-- The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`.
+- The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `taskApi.ts`.
 - The exception cannot be consumed silently, and every exception should be reported by `ICopilotTaskCallback.taskDecision`.
 
 #### Managed Session Mode (single model)
@@ -141,14 +139,6 @@ The mission of a driving session is:
 The mission of a task session is:
 - Perform one `Task.prompt`.
 - Finishing one `Task.prompt` closes the task session
-
-If any session crashes after the task submitting a promot to the session:
-- When a task is running in forced single session mode, the session is offered from the outside, fails the task immediately.
-- Otherwise:
-  - This session will be no longer used, the task should create a new session to retry.
-  - resend the prompt until 5 consecutive crashes.
-  - Add `SESSION_CRASH_PREFIX` (exported const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
-  - The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `jobsApi.ts`, used by both task execution and condition evaluation.
 
 The driving session uses `Entry.models.driving`.
 The task session uses `Entry.models[Task.model]`. When `Task.model` is undefined, the model id should be assigned.
@@ -226,7 +216,7 @@ In above sessions there are a lot of thing happenes in the driving session. A re
 - The availability test failed with details.
 - The criteria condition test passed.
 - The criteria condition test failed with details.
-- Starting a retry (RetryWithNewSession or RetryWithUserPrompt) with retry number.
+- Starting a retry with retry number.
 - Retry budget drained because of availability or criteria failure.
 - Retry budget drained because of crashing.
   - These two budgets are separated: crash retries are per-call (5 max in `sendPromptWithCrashRetry`), criteria retries are per failure action loop. A crash exhausting its per-call budget during a criteria retry loop is treated as a failed iteration rather than killing the task.

@@ -34,7 +34,7 @@
       "requireUserInput": false,
       "criteria": {
         "toolExecuted": ["job_prepare_document"],
-        "failureAction": ["RetryWithNewSession", 0]
+        "failureAction": { "retryTimes": 0 }
       }
     },
     "input-task": {

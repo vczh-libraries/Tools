@@ -165,8 +165,9 @@ Copilot/Agent/
 - **Flow Chart Status Indicators**: Running tasks display a green triangle indicator; succeeded tasks display a green tick indicator; failed tasks display a red cross indicator on the flow chart
 - **Task Inspection**: Clicking a TaskNode in the flow chart opens a tab control showing session responses for that task's sessions
 - **Job Preview Mode**: Job tracking page supports a preview mode (no jobId) showing the flow chart without tracking, with no Stop Job button and "JOB: PREVIEW" status
-- **Job-Created Tasks**: Jobs create tasks without forcing single session mode; `startTask` manages driving session creation internally. Task live API provides real-time session updates with `sessionId` and `isDriving` fields
+- **Job-Created Tasks**: Jobs create tasks in managed session mode; `startTask` manages driving session creation internally. Task live API provides real-time session updates with `sessionId` and `isDriving` fields
 - **Task Decision Reporting**: `taskDecision` callback reports all driving session decisions with categorized prefixes (`[OPERATION]`, `[CRITERIA]`, `[AVAILABILITY]`, `[SESSION CRASHED]`, `[TASK SUCCEEDED]`, `[TASK FAILED]`, `[DECISION]`) as User message blocks in the driving session tab
 - **Driving Session Consolidation**: All driving sessions for a task are consolidated into a single "Driving" tab; when a driving session is replaced (e.g., due to crash retry), the new session reuses the same tab and renderer
-- **Forced Single Session Mode**: Tasks can run with an externally-provided session; crashes in forced mode fail immediately without retry
+- **Borrowing Session Mode**: Tasks can run with an externally-provided session (borrowing mode); crashes in borrowing mode fail immediately without retry
+- **Managed Session Mode**: Tasks in managed mode create their own sessions — single model mode reuses one session, multiple models mode creates ephemeral sessions per mission
 - **Separated Retry Budgets**: Crash retries (per-call, 5 max) and criteria retries (per failure action) are independent; a crash during a criteria retry loop is treated as a failed iteration rather than killing the task

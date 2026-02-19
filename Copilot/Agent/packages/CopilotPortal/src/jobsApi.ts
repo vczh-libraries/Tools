@@ -50,7 +50,7 @@ interface TaskState extends LiveState {
     taskId: string;
     task: ICopilotTask;
     taskError: string | null;
-    forcedSingleSession: boolean;
+    borrowingSessionMode: boolean;
     closed: boolean;
 }
 
@@ -97,7 +97,7 @@ export async function apiTaskStart(
             responseQueue: [],
             waitingResolve: null,
             taskError: null,
-            forcedSingleSession: true,
+            borrowingSessionMode: true,
             closed: false,
         };
 
@@ -113,19 +113,12 @@ export async function apiTaskStart(
             taskDecision(reason: string) {
                 pushResponse(state, { callback: "taskDecision", reason });
             },
-            taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean) {
-                if (taskSession) {
-                    pushResponse(state, { callback: "taskSessionStarted", taskSession: [taskSession[1]], isDrivingSession });
-                } else {
-                    pushResponse(state, { callback: "taskSessionStarted", isDrivingSession });
-                }
+            // Unavailable in borrowing session mode - won't be called
+            taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean) {
+                pushResponse(state, { callback: "taskSessionStarted", sessionId: taskId, isDriving: isDrivingSession });
             },
-            taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean) {
-                if (taskSession) {
-                    pushResponse(state, { callback: "taskSessionStopped", taskSession: [taskSession[1]], succeeded });
-                } else {
-                    pushResponse(state, { callback: "taskSessionStopped", succeeded });
-                }
+            taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean) {
+                pushResponse(state, { callback: "taskSessionStopped", sessionId: taskId, succeeded });
             },
         };
 
@@ -159,7 +152,7 @@ export async function apiTaskStop(
         jsonResponse(res, 200, { error: "TaskNotFound" });
         return;
     }
-    if (state.forcedSingleSession) {
+    if (state.borrowingSessionMode) {
         jsonResponse(res, 200, { error: "TaskCannotClose" });
         return;
     }
@@ -248,7 +241,7 @@ async function executeWork(
                 responseQueue: [],
                 waitingResolve: null,
                 taskError: null,
-                forcedSingleSession: false,
+                borrowingSessionMode: false,
                 closed: false,
             };
             tasks.set(taskId, taskState);
@@ -274,20 +267,11 @@ async function executeWork(
                         taskDecision(reason: string) {
                             pushResponse(taskState, { callback: "taskDecision", reason });
                         },
-                        taskSessionStarted(taskSession: [ICopilotSession, string] | undefined, isDrivingSession: boolean) {
-                            if (taskSession) {
-                                pushResponse(taskState, { callback: "taskSessionStarted", sessionId: taskSession[1], isDriving: isDrivingSession });
-                            }
-                            // If undefined → single session mode in forced mode, driving session already reported via .then()
+                        taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean) {
+                            pushResponse(taskState, { callback: "taskSessionStarted", sessionId: taskId, isDriving: isDrivingSession });
                         },
-                        taskSessionStopped(taskSession: [ICopilotSession, string] | undefined, succeeded: boolean) {
-                            if (taskSession) {
-                                pushResponse(taskState, { callback: "taskSessionStopped", sessionId: taskSession[1], succeeded });
-                            } else {
-                                // Single session mode: use driving session ID from the task object
-                                const dsId = (startedTask as any)?._drivingSessionId;
-                                pushResponse(taskState, { callback: "taskSessionStopped", sessionId: dsId || "", succeeded });
-                            }
+                        taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean) {
+                            pushResponse(taskState, { callback: "taskSessionStopped", sessionId: taskId, succeeded });
                         },
                     };
 
@@ -295,7 +279,7 @@ async function executeWork(
                     startTask(
                         taskName,
                         userInput,
-                        undefined, // double session mode for jobs
+                        undefined, // managed session mode for jobs
                         false, // not ignoring prerequisites
                         taskCallback,
                         taskModelId,
@@ -304,12 +288,6 @@ async function executeWork(
                         startedTask = t;
                         taskState.task = t;
                         activeTasks.push(t);
-
-                        // Report driving session (created by startTask)
-                        const dsId = (t as any)._drivingSessionId as string;
-                        if (dsId) {
-                            pushResponse(taskState, { callback: "taskSessionStarted", sessionId: dsId, isDriving: true });
-                        }
                     }).catch(err => {
                         taskState.taskError = errorToDetailedString(err);
                         pushResponse(taskState, { taskError: taskState.taskError });
