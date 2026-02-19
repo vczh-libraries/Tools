@@ -79,7 +79,7 @@ All helper functions and types are exported and API implementations should use t
 ### helperPushSessionResponse
 
 **Referenced by**:
-- API.md: `### copilot/session/{session-id}/live`, `### sendPromptWithCrashRetry`
+- API.md: `### copilot/session/{session-id}/live`
 
 `helperPushSessionResponse(session: ICopilotSession, response: LiveResponse): void;`
 - Push a response to a session's response queue.
@@ -99,7 +99,7 @@ Wraps `@github/copilot-sdk` to provide a simplified session interface with event
 ### ICopilotSession
 
 **Referenced by**:
-- API.md: `### helperSessionStart`, `### helperSessionStop`, `### helperGetSession`, `### helperPushSessionResponse`, `### startSession`, `### sendPromptWithCrashRetry`
+- API.md: `### helperSessionStart`, `### helperSessionStop`, `### helperGetSession`, `### helperPushSessionResponse`, `### startSession`
 
 ```typescript
 interface ICopilotSession {
@@ -151,22 +151,28 @@ All helper functions and types are exported and API implementations should use t
 ### SESSION_CRASH_PREFIX
 
 **Referenced by**:
-- API.md: `### sendPromptWithCrashRetry`
 - JobsData.md: `## Running Tasks`
 
-`export const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";`
-- Prefix added to prompts when resending after a session crash.
+`const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";`
+- Internal constant (not exported). Prefix added to prompts when resending after a session crash.
 
-### sendPromptWithCrashRetry
+### sendMonitoredPrompt (crash retry)
 
 **Referenced by**:
 - API.md: `### copilot/test/installJobsEntry`, `### copilot/task/start/{task-name}/session/{session-id}`, `### copilot/task/{task-id}/stop`, `### copilot/task/{task-id}/live`, `### copilot/job/start/{job-name}`, `### copilot/job/{job-id}/stop`, `### copilot/job/{job-id}/live`
 - JobsData.md: `## Running Tasks`, `## Running Jobs`, `### Task.availability`, `### Task.criteria`
 
-A shared function used by both task execution and condition evaluation.
-Sends a prompt to a session, retrying up to 3 consecutive crashes.
+A private method on the `CopilotTaskImpl` class used by both task execution and condition evaluation.
+Sends a prompt to a session, retrying up to 5 consecutive crashes (except in borrowing mode where retry is 1).
 On retry, prepends `SESSION_CRASH_PREFIX` to the prompt.
 Also pushes `onGeneratedUserPrompt` to the driving session's response queue.
+
+### errorToDetailedString
+
+`errorToDetailedString(err: unknown): string;`
+- Convert any error into a detailed JSON string representation including name, message, stack, and cause.
+
+### installJobsEntry
 
 `async installJobsEntry(entry: Entry): Promise<void>;`
 - Use the entry. It could be `entry` from `jobsData.ts` or whatever.
@@ -176,25 +182,26 @@ Also pushes `onGeneratedUserPrompt` to the driving session's response queue.
 interface ICopilotTask {
   readonly drivingSession: ICopilotSession;
   readonly status: "Executing" | "Succeeded" | "Failed";
+  readonly crashError?: any;
   // stop all running sessions, no further callback issues.
   stop(): void;
 }
 
 interface ICopilotTaskCallback {
   // Called when this task succeeded
-  void taskSucceeded();
+  taskSucceeded(): void;
   // Called when this task failed
-  void taskFailed();
+  taskFailed(): void;
   // Called when the driving session finishes a test or makes a decision
-  void taskDecision(reason: string);
+  taskDecision(reason: string): void;
   // This callback is unavailable if it is running with borrowing session mode
   // Called when a task session started, with its session id
   // When this session is created as a driving session, the isDrivingSession argument is true.
-  void taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean);
+  taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean): void;
   // This callback is unavailable if it is running with borrowing session mode
   // Called when a task session stopped, with its session id
   // If the task succeeded, the succeeded argument is true
-  void taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean);
+  taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean): void;
 }
 
 async function startTask(
@@ -203,8 +210,9 @@ async function startTask(
   drivingSession: ICopilotSession | undefined,
   ignorePrerequisiteCheck: boolean,
   callback: ICopilotTaskCallback,
-  taskModelIdOverride?: string,
-  workingDirectory?: string
+  taskModelIdOverride: string | undefined,
+  workingDirectory: string | undefined,
+  exceptionHandler: (err: any) => void
 ): Promise<ICopilotTask>
 ```
 - Start a task.
@@ -213,6 +221,7 @@ async function startTask(
   - the task is in borrowing session mode
 - When `drivingSession` is not defined:
   - `startTask` needs to create and maintain all sessions it needs.
+- The `exceptionHandler` is called if the task execution throws an unhandled exception.
 
 ## Helpers (jobsApi.ts)
 
@@ -221,18 +230,18 @@ interface ICopilotJob {
   get runningWorkIds(): number[];
   get status(): "Executing" | "Succeeded" | "Failed";
   // stop all running tasks, no further callback issues.
-  get stop();
+  stop(): void;
 }
 
 interface ICopilotJobCallback {
   // Called when this job succeeded
-  void jobSucceeded();
+  jobSucceeded(): void;
   // Called when this job failed
-  void jobFailed();
+  jobFailed(): void;
   // Called when a TaskWork started, taskId is the registered task for live polling
-  void workStarted(workId: number, taskId: string);
+  workStarted(workId: number, taskId: string): void;
   // Called when a TaskWork stopped
-  void workStopped(workId: number, succeeded: boolean);
+  workStopped(workId: number, succeeded: boolean): void;
 }
 
 async function startJob(

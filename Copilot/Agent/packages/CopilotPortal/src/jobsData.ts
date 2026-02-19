@@ -1,5 +1,5 @@
 import type { Entry, Work, TaskWork, Model } from "./jobsDef.js";
-import { retryWithNewSessionCondition, retryFailed, retryFailedCondition, validateEntry } from "./jobsDef.js";
+import { retryWithNewSessionCondition, retryFailedCondition, validateEntry } from "./jobsDef.js";
 
 function makeRefWork(taskId: string, modelOverride?: Model): TaskWork<never> {
     return {

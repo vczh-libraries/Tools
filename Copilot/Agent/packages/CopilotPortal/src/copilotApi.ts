@@ -14,7 +14,6 @@ import {
 } from "./sharedApi.js";
 
 export { jsonResponse };
-export type { ICopilotSession };
 
 // ---- Types ----
 

@@ -1,10 +1,6 @@
 import {
     Work,
     TaskWork,
-    SequentialWork,
-    ParallelWork,
-    LoopWork,
-    AltWork,
 } from "./jobsDef.js";
 
 export type ChartArrow = {

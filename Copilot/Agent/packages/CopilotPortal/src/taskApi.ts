@@ -128,7 +128,7 @@ function monitorSessionTools(session: ICopilotSession, runtimeValues: Record<str
 
 // ---- Session Crash Retry ----
 
-export const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";
+const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";
 
 const MAX_CRASH_RETRIES = 5;
 

@@ -151,7 +151,7 @@ Copilot/Agent/
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
 - **Live Polling**: Sequential long-polling for real-time session callbacks
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
-- **Session Crash Retry**: `sendPromptWithCrashRetry` automatically retries up to 5 times if a Copilot session crashes during prompt execution, creating new sessions when needed via an optional `createNewSession` factory
+- **Session Crash Retry**: `sendMonitoredPrompt` (private method on `CopilotTaskImpl`) automatically retries up to 5 times if a Copilot session crashes during prompt execution, creating new sessions when needed
 - **Detailed Error Reporting**: `errorToDetailedString` helper converts errors to detailed JSON with name, message, stack, and recursive cause chain for comprehensive crash diagnostics
 - **Jobs API**: RESTful API for listing, starting, stopping, and monitoring tasks and jobs via live polling
 - **Live Polling Drain**: Live APIs (session/task/job) use a drain model — clients continue polling until receiving terminal `*Closed` or `*NotFound` errors, ensuring all buffered responses are consumed

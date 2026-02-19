@@ -9,7 +9,6 @@ import {
 import {
     apiConfig,
     apiStop,
-    shutdownServer,
     apiCopilotModels,
     apiCopilotSessionStart,
     apiCopilotSessionStop,

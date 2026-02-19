@@ -44,7 +44,7 @@ When it fails to look up the value, use `<MISSING>` as its value.
 ### validateEntry
 
 **Referenced by**:
-- API.md: `### copilot/test/installJobsEntry`, `### sendPromptWithCrashRetry`
+- API.md: `### copilot/test/installJobsEntry`, `### sendMonitoredPrompt (crash retry)`
 
 Perform all verifications, verify and update all prompts with `expandPromptStatic`:
 - entry.tasks[name].prompt
@@ -95,7 +95,7 @@ If any validation runs directly in this function fails:
 ## Running Tasks
 
 **Referenced by**:
-- API.md: `### sendPromptWithCrashRetry`
+- API.md: `### sendMonitoredPrompt (crash retry)`
 - JobsData.md: `### TaskWork`
 
 A task is represented by type `Task`.
@@ -118,8 +118,8 @@ Every session is created and managed by the task.
 No matter single model or multiple models is selected:
 - If a session crashes, new session must be created to replace it.
 - If executing the same prompt results in 5 consecutive crashes, fail the task immediately.
-- Add `SESSION_CRASH_PREFIX` (exported const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
-- The crash retry logic is implemented in a shared `sendPromptWithCrashRetry` function in `taskApi.ts`.
+- Add `SESSION_CRASH_PREFIX` (const from `taskApi.ts`: `"The session crashed, please redo and here is the last request:\n"`) before the prompt when resend.
+- The crash retry logic is implemented in the private `sendMonitoredPrompt` method on `CopilotTaskImpl` in `taskApi.ts`.
 - The exception cannot be consumed silently, and every exception should be reported by `ICopilotTaskCallback.taskDecision`.
 
 #### Managed Session Mode (single model)
@@ -219,7 +219,7 @@ In above sessions there are a lot of thing happenes in the driving session. A re
 - Starting a retry with retry number.
 - Retry budget drained because of availability or criteria failure.
 - Retry budget drained because of crashing.
-  - These two budgets are separated: crash retries are per-call (5 max in `sendPromptWithCrashRetry`), criteria retries are per failure action loop. A crash exhausting its per-call budget during a criteria retry loop is treated as a failed iteration rather than killing the task.
+  - These two budgets are separated: crash retries are per-call (5 max in `sendMonitoredPrompt`), criteria retries are per failure action loop. A crash exhausting its per-call budget during a criteria retry loop is treated as a failed iteration rather than killing the task.
 - Any error generated in the copilot session.
 - A final decision about the task succeeded or failed.
 
@@ -240,7 +240,7 @@ For `availability` and `criteria`, the information should at least contain:
 ## Running Jobs
 
 **Referenced by**:
-- API.md: `### sendPromptWithCrashRetry`
+- API.md: `### sendMonitoredPrompt (crash retry)`
 
 A `Job` is workflow of multiple `Task`. If its work fails, the job fails.
 
@@ -307,7 +307,7 @@ When creating a `Work` AST, you can create one in `Work<never>` without worrying
 ### Exception Handling
 
 **Referenced by**:
-- API.md: `### sendPromptWithCrashRetry`
+- API.md: `### sendMonitoredPrompt (crash retry)`
 
 If any task crashes:
 - The job stops immediately and marked failed.

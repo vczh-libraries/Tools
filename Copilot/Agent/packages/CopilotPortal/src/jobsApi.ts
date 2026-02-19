@@ -2,7 +2,7 @@ import * as http from "node:http";
 import * as path from "node:path";
 import * as fs from "node:fs";
 import type { ICopilotSession } from "./copilotSession.js";
-import type { Entry, Job, Work, TaskWork, SequentialWork, ParallelWork, LoopWork, AltWork } from "./jobsDef.js";
+import type { Entry, Work, TaskWork, SequentialWork, ParallelWork, LoopWork, AltWork } from "./jobsDef.js";
 import { getModelId } from "./jobsDef.js";
 import { generateChartNodes } from "./jobsChart.js";
 import {
@@ -21,13 +21,12 @@ import {
     type ICopilotTaskCallback,
     installedEntry,
     installJobsEntry,
-    resetJobsEntry,
     startTask,
     errorToDetailedString,
 } from "./taskApi.js";
 
 export type { ICopilotTask, ICopilotTaskCallback };
-export { installJobsEntry, resetJobsEntry };
+export { installJobsEntry };
 
 // ---- Types ----
 
