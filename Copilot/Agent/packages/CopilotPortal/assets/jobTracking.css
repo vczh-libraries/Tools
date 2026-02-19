@@ -114,7 +114,7 @@ html, body {
 
 /* ---- Session Response Part ---- */
 #session-response-part {
-    padding: 8px;
+    padding: 0;
     height: 100%;
     overflow: auto;
 }
@@ -131,24 +131,24 @@ html, body {
     flex-wrap: wrap;
     gap: 2px;
     border-bottom: 2px solid #444;
-    padding: 4px 4px 0;
+    padding: 6px 16px 0;
     flex-shrink: 0;
-    background: #1e1e1e;
+    background: #2d2d2d;
 }
 
 .tab-header-btn {
-    padding: 6px 16px;
+    padding: 8px 16px;
     border: 1px solid #444;
     border-bottom: none;
     border-radius: 4px 4px 0 0;
-    background: #2d2d2d;
+    background: #3d3d3d;
     color: #aaa;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .tab-header-btn:hover {
-    background: #3d3d3d;
+    background: #4d4d4d;
 }
 
 .tab-header-btn.active {

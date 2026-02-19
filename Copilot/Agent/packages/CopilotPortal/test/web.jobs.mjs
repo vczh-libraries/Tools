@@ -406,37 +406,37 @@ describe("Web: jobTracking.html TaskNode click interaction (Mermaid)", () => {
         await browser?.close();
     });
 
-    it("clicking a TaskNode bolds its text in Mermaid", async () => {
+    it("clicking a TaskNode selects it with thicker border in Mermaid", async () => {
         const nodeGroup = page.locator('#job-part svg g.node').first();
         await nodeGroup.click();
         await page.waitForTimeout(200);
-        const fontWeight = await nodeGroup.locator('.nodeLabel').first().evaluate(el => el.style.fontWeight);
-        assert.strictEqual(fontWeight, "bold", "should have bold font-weight after click");
+        const strokeWidth = await nodeGroup.locator('rect, polygon, circle, ellipse, path').first().evaluate(el => el.style.strokeWidth);
+        assert.strictEqual(strokeWidth, "5px", "should have thick stroke-width after click");
     });
 
-    it("clicking the same TaskNode again unbolds its text in Mermaid", async () => {
+    it("clicking the same TaskNode again unselects it in Mermaid", async () => {
         const nodeGroup = page.locator('#job-part svg g.node').first();
-        await nodeGroup.click(); // unbold
+        await nodeGroup.click(); // unselect
         await page.waitForTimeout(200);
-        const fontWeight = await nodeGroup.locator('.nodeLabel').first().evaluate(el => el.style.fontWeight);
-        assert.ok(fontWeight === "" || fontWeight === "normal", "should not have bold font-weight after second click");
+        const strokeWidth = await nodeGroup.locator('rect, polygon, circle, ellipse, path').first().evaluate(el => el.style.strokeWidth);
+        assert.ok(strokeWidth !== "5px", "should not have thick stroke-width after second click");
     });
 
     it("clicking a TaskNode shows tab control in session response part", async () => {
         const nodeGroup = page.locator('#job-part svg g.node').first();
-        await nodeGroup.click(); // bold / inspect
+        await nodeGroup.click(); // select / inspect
         await page.waitForTimeout(500);
         const tabContainer = page.locator('.tab-container');
         const isVisible = await tabContainer.isVisible();
         assert.ok(isVisible, "tab container should be visible when inspecting a task");
 
-        // Unbold to restore JSON view
+        // Unselect to restore JSON view
         await nodeGroup.click();
         await page.waitForTimeout(500);
     });
 
     it("clicking a TaskNode again restores JSON view in session response part", async () => {
-        // Make sure JSON is shown after unbold
+        // Make sure JSON is shown after unselect
         const text = await page.locator("#session-response-part").textContent();
         const parsed = JSON.parse(text);
         assert.ok(parsed.job, "should show job JSON when no task inspected");

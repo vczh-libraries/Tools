@@ -89,6 +89,7 @@ function showJsonView() {
         tabContainer = null;
     }
     jsonPre = document.createElement("pre");
+    jsonPre.style.padding = "8px";
     jsonPre.textContent = JSON.stringify({ job: jobToRender, chart: chartToRender }, undefined, 4);
     sessionResponsePart.appendChild(jsonPre);
 }

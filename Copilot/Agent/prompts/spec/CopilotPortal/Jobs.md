@@ -74,7 +74,6 @@ There is a text box fills the page. Disabled by default.
 At the bottom there are buttons aligned to the right:
 - "Start Job: ${selectedJobName}" or "Job Not Selected". Disabled by default.
 - "Preview".
-**BUG**: There must be a proper margin between two buttons.
 
 #### Clicking Start Job Button
 
@@ -174,8 +173,6 @@ At the very top of the `job part`:
 
 #### Flow Chart Rendering
 
-**BUG**: When the flow chart is too height, scrolling to the bottom appears good, but scrolling to the top the chart still clips. Check positions and see if for example all y values are positive (I am assuming the left/top corner is 0,0, make your own decision if it is wrong).
-
 **TEST-NOTE-BEGIN**
 No need to create unit test to assert the chart is in a correct layout.
 Ensure every `TaskWork` has a `ChartNode` with `TaskNode` or `CondNode` hint.
@@ -234,7 +231,6 @@ When no task is being inspected, print `JSON.stringify(jobToRender and chartToRe
 
 When a task is being inspected:
 - It becomes a tab control.
-  - **BUG**: Currently the tab header has a gap to the `session response part`. I don't like the gap, and make it as thick as the job status bar in `job part`.
 - Each tab is a session, tab headers are names of sessions.
   - The first tab will always be `Driving` and all driving sessions come to here.
   - Each task session has its own tab.

@@ -115,9 +115,25 @@ async function renderFlowChartMermaid(chart, container, onInspect) {
     container.innerHTML = "";
     container.innerHTML = svg;
 
-    // Track currently bolded TaskNode/CondNode
-    let currentBoldNode = null;
-    let currentBoldWorkId = null;
+    // Fix SVG viewBox to ensure nothing is clipped at the top
+    const svgEl = container.querySelector("svg");
+    if (svgEl) {
+        const contentGroup = svgEl.querySelector("g");
+        if (contentGroup) {
+            const bbox = contentGroup.getBBox();
+            const padding = 8;
+            const newViewBox = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`;
+            svgEl.setAttribute("viewBox", newViewBox);
+            svgEl.style.width = `${bbox.width + padding * 2}px`;
+            svgEl.style.height = `${bbox.height + padding * 2}px`;
+            svgEl.style.maxWidth = "100%";
+        }
+    }
+
+    // Track currently selected TaskNode/CondNode
+    let currentSelectedGroup = null;
+    let currentSelectedOriginalStrokeWidth = null;
+    let currentSelectedWorkId = null;
 
     // Map workId -> DOM group for status updates
     const workIdToGroup = {};
@@ -138,23 +154,33 @@ async function renderFlowChartMermaid(chart, container, onInspect) {
         }
 
         group.addEventListener("click", () => {
-            const textEl = group.querySelector(".nodeLabel") || group.querySelector("text");
-            if (!textEl) return;
-
             const wid = nodeIdToWorkId[nodeId];
+            const shapeEl = group.querySelector("rect, polygon, circle, ellipse, path");
 
-            if (currentBoldNode === textEl) {
-                textEl.style.fontWeight = "";
-                currentBoldNode = null;
-                currentBoldWorkId = null;
+            if (currentSelectedGroup === group) {
+                // Unselect
+                if (shapeEl && currentSelectedOriginalStrokeWidth !== null) {
+                    shapeEl.style.strokeWidth = currentSelectedOriginalStrokeWidth;
+                }
+                currentSelectedGroup = null;
+                currentSelectedOriginalStrokeWidth = null;
+                currentSelectedWorkId = null;
                 if (onInspect) onInspect(null);
             } else {
-                if (currentBoldNode) {
-                    currentBoldNode.style.fontWeight = "";
+                // Unselect previous
+                if (currentSelectedGroup) {
+                    const prevShape = currentSelectedGroup.querySelector("rect, polygon, circle, ellipse, path");
+                    if (prevShape && currentSelectedOriginalStrokeWidth !== null) {
+                        prevShape.style.strokeWidth = currentSelectedOriginalStrokeWidth;
+                    }
                 }
-                textEl.style.fontWeight = "bold";
-                currentBoldNode = textEl;
-                currentBoldWorkId = wid;
+                // Select new
+                currentSelectedOriginalStrokeWidth = shapeEl ? (shapeEl.style.strokeWidth || shapeEl.getAttribute("style")?.match(/stroke-width:\s*([^;]+)/)?.[1] || getComputedStyle(shapeEl).strokeWidth) : null;
+                if (shapeEl) {
+                    shapeEl.style.strokeWidth = "5px";
+                }
+                currentSelectedGroup = group;
+                currentSelectedWorkId = wid;
                 if (onInspect) onInspect(wid);
             }
         });
@@ -236,7 +262,7 @@ async function renderFlowChartMermaid(chart, container, onInspect) {
             }
         },
         get inspectedWorkId() {
-            return currentBoldWorkId;
+            return currentSelectedWorkId;
         },
     };
 }

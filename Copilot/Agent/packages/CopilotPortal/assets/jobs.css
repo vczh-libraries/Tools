@@ -144,6 +144,7 @@ html, body {
     display: flex;
     justify-content: flex-end;
     padding-top: 6px;
+    gap: 8px;
 }
 
 #user-input-buttons button {

@@ -220,9 +220,10 @@ Use [Mermaid.js](https://mermaid.js.org/) (loaded from CDN) for declarative flow
 
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
-Clicking it bold (exclusive) or unbold the text:
-- When it becomes bold, the task is being inspected, `session response part` should display this task.
-- When it becomes unbold, the task is not being inspected. `session response part` should restore.
+Clicking it select (exclusive) or unselect the text:
+- When it becomes selected, the task is being inspected, `session response part` should display this task.
+- When it becomes unselected, the task is not being inspected. `session response part` should restore.
+- The border of the node becomes obviously thicker when selected.
 
 ### Session Response Part
 
