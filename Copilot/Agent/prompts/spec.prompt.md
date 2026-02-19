@@ -19,6 +19,7 @@ When this file is tagged, find out new changes in the spec:
 **IMPORTANT**: Always use `api/stop` to stop `yarn portal`, trying to ENTER will hang the terminal forever and you can't proceed.
 **IMPORTANT**: Avoid global variables at all cost, until you find no other way.
 **IMPORTANT**: This project is full of parallel tasks, try to keep all functions re-entrable.
+**IMPORTANT**: DO NOT add dynamic properties to any object. If the interface need to change, change the interface and the spec together.
 
 ## Changing the Spec
 

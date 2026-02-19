@@ -122,19 +122,13 @@ export async function apiTaskStart(
             },
         };
 
-        const copilotTask = await startTask(taskName, userInput, session, true, taskCallback);
+        const copilotTask = await startTask(taskName, userInput, session, true, taskCallback, undefined, undefined, (err: unknown) => {
+            state.taskError = errorToDetailedString(err);
+            pushResponse(state, { taskError: state.taskError });
+            state.closed = true;
+        });
         state.task = copilotTask;
         tasks.set(taskId, state);
-
-        // Catch execution crashes
-        const execPromise = (copilotTask as any)._executionPromise as Promise<void> | undefined;
-        if (execPromise) {
-            execPromise.catch((err: unknown) => {
-                state.taskError = errorToDetailedString(err);
-                pushResponse(state, { taskError: state.taskError });
-                state.closed = true;
-            });
-        }
 
         jsonResponse(res, 200, { taskId });
     } catch (err) {
@@ -255,13 +249,13 @@ async function executeWork(
                         taskSucceeded() {
                             pushResponse(taskState, { callback: "taskSucceeded" });
                             taskState.closed = true;
-                            const crashErr = (startedTask as any)?._crashError;
+                            const crashErr = startedTask?.crashError;
                             if (crashErr) { reject(crashErr); } else { resolve(true); }
                         },
                         taskFailed() {
                             pushResponse(taskState, { callback: "taskFailed" });
                             taskState.closed = true;
-                            const crashErr = (startedTask as any)?._crashError;
+                            const crashErr = startedTask?.crashError;
                             if (crashErr) { reject(crashErr); } else { resolve(false); }
                         },
                         taskDecision(reason: string) {
@@ -283,7 +277,8 @@ async function executeWork(
                         false, // not ignoring prerequisites
                         taskCallback,
                         taskModelId,
-                        workingDirectory
+                        workingDirectory,
+                        () => { }
                     ).then(t => {
                         startedTask = t;
                         taskState.task = t;
@@ -427,7 +422,7 @@ export async function startJob(
     })();
 
     (copilotJob as any)._executionPromise = executionPromise;
-    executionPromise.catch(() => {}); // Prevent unhandled rejection; callers should handle
+    executionPromise.catch(() => { }); // Prevent unhandled rejection; callers should handle
 
     return copilotJob;
 }
