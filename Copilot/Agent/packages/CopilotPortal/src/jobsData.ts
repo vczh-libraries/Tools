@@ -469,30 +469,30 @@ const entryInput: Entry = {
             makeDocumentWork("summary-problem", "summary"),
             makeCodingWork("execute-task"),
             makeCodingWork("verify-task"),
-            makeCodingWork("git-push")
+            makeRefWork("git-push")
         ]}},
         "scrum-automate": { work: { kind: "Seq", works: [
             makeDocumentWork("plan-problem", "plan"),
             makeDocumentWork("summary-problem", "summary"),
             makeCodingWork("execute-task"),
             makeCodingWork("verify-task"),
-            makeCodingWork("git-push")
+            makeRefWork("git-push")
         ]}},
         "summary-automate": { work: { kind: "Seq", works: [
             makeDocumentWork("summary-problem", "summary"),
             makeCodingWork("execute-task"),
             makeCodingWork("verify-task"),
-            makeCodingWork("git-push")
+            makeRefWork("git-push")
         ]}},
         "execute-automate": { work: { kind: "Seq", works: [
             makeCodingWork("execute-task"),
             makeCodingWork("verify-task"),
-            makeCodingWork("git-push")
+            makeRefWork("git-push")
         ]}},
         "learn-automate": { work: { kind: "Seq", works: [
             makeCodingWork("scrum-learn-task"),
             makeCodingWork("refine-task"),
-            makeCodingWork("git-push")
+            makeRefWork("git-push")
         ]}},
     },
     grid: [{
