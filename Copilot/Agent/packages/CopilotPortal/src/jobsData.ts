@@ -250,7 +250,6 @@ const entryInput: Entry = {
             requireUserInput: true,
             prompt: ["$cppjob", "$execute", "# Update", "$user-input"],
             availability: {
-                previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady", "$clearBuildTestLog"]
             },
             criteria: {
@@ -264,7 +263,6 @@ const entryInput: Entry = {
             requireUserInput: false,
             prompt: ["$cppjob", "$verify"],
             availability: {
-                previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady", "$clearBuildTestLog"]
             },
             criteria: {
@@ -278,7 +276,6 @@ const entryInput: Entry = {
             requireUserInput: true,
             prompt: ["$cppjob", "$verify", "# Update", "$user-input"],
             availability: {
-                previousJobKeywords: ["execute", "verify"],
                 condition: ["$execDocReady", "$clearBuildTestLog"]
             },
             criteria: {
@@ -393,8 +390,10 @@ const entryInput: Entry = {
         }
     },
     jobs: {
+        // ---- scrum ----
         "scrum-problem": { work: makeDocumentWork("scrum-problem", "scrum") },
         "scrum-update": { work: makeDocumentWork("scrum-update", "scrum") },
+        // ---- task design ----
         "design-problem-next": { work: makeDocumentWork("design-problem-next", "design") },
         "design-update": { work: makeDocumentWork("design-update", "design") },
         "design-problem": { work: makeDocumentWork("design-problem", "design") },
@@ -402,22 +401,53 @@ const entryInput: Entry = {
         "plan-update": { work: makeDocumentWork("plan-update", "plan") },
         "summary-problem": { work: makeDocumentWork("summary-problem", "summary") },
         "summary-update": { work: makeDocumentWork("summary-update", "summary") },
+        // ---- coding ----
         "execute-start": { work: makeRefWork("execute-task") },
         "execute-update": { work: makeRefWork("execute-update-task") },
         "verify-start": { work: makeRefWork("verify-task") },
         "verify-update": { work: makeRefWork("verify-update-task") },
+        // ---- evolution ----
         "scrum-learn": { work: makeRefWork("scrum-learn-task") },
         "refine": { work: makeRefWork("refine-task") },
+        // ---- automation ----
+        "design-automate": { work: { kind: "Seq", works: [
+            makeDocumentWork("design-problem-next", "design"),
+            makeDocumentWork("plan-problem", "plan"),
+            makeDocumentWork("summary-problem", "summary"),
+            makeRefWork("execute-task"),
+            makeRefWork("verify-task")
+        ]}},
+        "scrum-automate": { work: { kind: "Seq", works: [
+            makeDocumentWork("plan-problem", "plan"),
+            makeDocumentWork("summary-problem", "summary"),
+            makeRefWork("execute-task"),
+            makeRefWork("verify-task")
+        ]}},
+        "summary-automate": { work: { kind: "Seq", works: [
+            makeDocumentWork("summary-problem", "summary"),
+            makeRefWork("execute-task"),
+            makeRefWork("verify-task")
+        ]}},
+        "execute-automate": { work: { kind: "Seq", works: [
+            makeRefWork("execute-task"),
+            makeRefWork("verify-task")
+        ]}},
+        "learn-automate": { work: { kind: "Seq", works: [
+            makeRefWork("scrum-learn-task"),
+            makeRefWork("refine-task")
+        ]}},
     },
     grid: [{
         keyword: "scrum",
         jobs: [
+            undefined,
             { name: "problem", jobName: "scrum-problem" },
             { name: "update", jobName: "scrum-update" }
         ]
     }, {
         keyword: "design",
         jobs: [
+            { name: "code directly", jobName: "design-automate" },
             { name: "problem next", jobName: "design-problem-next" },
             { name: "update", jobName: "design-update" },
             { name: "problem", jobName: "design-problem" }
@@ -425,30 +455,35 @@ const entryInput: Entry = {
     }, {
         keyword: "plan",
         jobs: [
+            { name: "code directly", jobName: "scrum-automate" },
             { name: "problem", jobName: "plan-problem" },
             { name: "update", jobName: "plan-update" }
         ]
     }, {
         keyword: "summary",
         jobs: [
+            { name: "code directly", jobName: "summary-automate" },
             { name: "problem", jobName: "summary-problem" },
             { name: "update", jobName: "summary-update" }
         ]
     }, {
         keyword: "execute",
         jobs: [
+            { name: "code directly", jobName: "execute-automate" },
             { name: "start", jobName: "execute-start" },
             { name: "update", jobName: "execute-update" }
         ]
     }, {
         keyword: "verify",
         jobs: [
+            undefined,
             { name: "start", jobName: "verify-start" },
             { name: "update", jobName: "verify-update" }
         ]
     }, {
         keyword: "scrum",
         jobs: [
+            { name: "learn and refine", jobName: "learn-automate" },
             { name: "learn", jobName: "scrum-learn" }
         ]
     }, {

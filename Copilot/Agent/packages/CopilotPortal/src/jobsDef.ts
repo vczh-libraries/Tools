@@ -19,7 +19,6 @@ export interface Task {
     prompt: Prompt;
     requireUserInput: boolean;
     availability?: {
-        previousJobKeywords?: string[];
         previousTasks?: string[];
         condition?: Prompt;
     };
@@ -226,7 +225,7 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
         const row = entry.grid[rowIndex];
         for (let columnIndex = 0; columnIndex < row.jobs.length; columnIndex++) {
             const col = row.jobs[columnIndex];
-            if (!jobKeys.includes(col.jobName)) {
+            if (col && !jobKeys.includes(col.jobName)) {
                 throw new Error(`${codePath}entry.grid[${rowIndex}].jobs[${columnIndex}].jobName: "${col.jobName}" is not a valid job name.`);
             }
         }
@@ -259,14 +258,6 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
 
         // Validate availability
         if (task.availability) {
-            if (task.availability.previousJobKeywords) {
-                for (let i = 0; i < task.availability.previousJobKeywords.length; i++) {
-                    const kw = task.availability.previousJobKeywords[i];
-                    if (!gridKeywords.includes(kw)) {
-                        throw new Error(`${taskBase}.availability.previousJobKeywords[${i}]: "${kw}" is not a valid grid keyword.`);
-                    }
-                }
-            }
             if (task.availability.previousTasks) {
                 for (let i = 0; i < task.availability.previousTasks.length; i++) {
                     const pt = task.availability.previousTasks[i];
