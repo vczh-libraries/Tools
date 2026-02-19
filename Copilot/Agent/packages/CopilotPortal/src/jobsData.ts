@@ -406,7 +406,7 @@ const entryInput: Entry = {
         },
         "git-commit": {
             model: { category: "driving" },
-            requireUserInput: true,
+            requireUserInput: false,
             prompt: [
                 "`git status` to list affected files.",
                 "`git commit -am` everything with this message: [BOT] Backup.",
@@ -424,7 +424,7 @@ const entryInput: Entry = {
         },
         "git-push": {
             model: { category: "driving" },
-            requireUserInput: true,
+            requireUserInput: false,
             prompt: [
                 "`git status` to list affected files.",
                 "`git commit -am` everything with this message: [BOT] Backup.",
