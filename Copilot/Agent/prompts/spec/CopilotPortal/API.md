@@ -29,7 +29,9 @@ It's spec is in `JobsData.md`.
 - "yarn portal-for-test" to run src/index.ts in test model
 
 It starts both Website and RESTful API. Awaits for api/stop to stops.
-Additionally, allow pressing ENTER to stop. It should act the same as api/stop.
+Prints the following URL for shortcut:
+- http://localhost:port
+- http://localhost:port/api/stop
 
 ## Running the Website
 
@@ -139,7 +141,8 @@ interface ICopilotSessionCallbacks {
 `async startSession(client: CopilotClient, modelId: string, callback: ICopilotSessionCallbacks, workingDirectory?: string): Promise<ICopilotSession>;`
 - Create a session with the given model, register job tools, wire up all event handlers, and return an `ICopilotSession`.
 
-## Helpers (jobsApi.ts)
+## Helpers (taskApi.ts)
+**TASK**: Move `startTask` and all its dependencies to the new file.
 
 All helper functions and types are exported and API implementations should use them.
 
@@ -206,6 +209,8 @@ async function startTask(
 - When `drivingSession` is not defined, the task is in double session mode
   - It could still be single session due to task configuration. In this case the driving session is running with the task session model.
   - `startTask` is going to create the driving session, instead of passed from the outside.
+
+## Helpers (jobsApi.ts)
 
 ```typescript
 interface ICopilotJob {
@@ -312,6 +317,7 @@ or when error happens:
 ```
 
 Multiple sessions could be running parallelly, start a `CopilotClient` if it is not started yet, it shares between all sessions.
+The `CopilotClient` will be closed when the server is shutting down.
 
 ### copilot/session/{session-id}/stop
 
@@ -323,8 +329,6 @@ Stop the session and return in this schema
 ```typescript
 {result:"Closed"} | {error:"SessionNotFound"}
 ```
-
-If all session is closed, close the `CopilotClient` as well.
 
 ### copilot/session/{session-id}/query
 
