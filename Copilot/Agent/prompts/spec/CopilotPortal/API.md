@@ -40,6 +40,30 @@ Prints the following URL for shortcut:
 - In the assets folder there stores all files for the website.
 - Requesting for http://localhost:port/index.html returns assets/index.html.
 
+## Helpers (index.ts) --------------------------------------------------------------------------------------------------------------------------
+
+### installJobsEntry
+
+`async installJobsEntry(entry: Entry): Promise<void>;`
+- Use the entry. It could be `entry` from `jobsData.ts` or whatever.
+- This function can only be called when no session is running, otherwise throws.
+
+### ensureInstalledEntry
+
+**Referenced by**:
+- API_Task.md: `### copilot/task/start/{task-name}/session/{session-id}`
+- API_Job.md: `copilot/job/start/{job-name}`
+
+`ensureInstalledEntry(): Entry`
+- Throw an error if `installJobsEntry` has not been called.
+- Return the installed entry.
+
+**TASK**: Move `installJobsEntry` and its dependencies to `index.ts`:
+- Only api entries is allowed to use this function. 
+- API helper functions should allow the entry to be passed to its first argument.
+- In `index.ts`, `ensureInstalledEntry` will be used to ensure the entry exists, and serve it too all api implementations.
+- Clean related imports in other files.
+
 ## Helpers (copilotApi.ts) --------------------------------------------------------------------------------------------------------------------------
 
 All helper functions and types are exported and API implementations should use them.
@@ -73,13 +97,6 @@ Returns the repo root path (detected by walking up from the server's directory u
 }
 ```
 
-### test
-
-**Referenced by**:
-- Test.md: `### test.html`
-
-Returns `{"message":"Hello, world!"}`
-
 ### stop
 
 **Referenced by**:
@@ -105,3 +122,32 @@ Returns all copilot sdk supported models in this schema
   }[]
 }
 ```
+
+## API (index.ts) ------------------------------------------------------------------------------------------------------------------------------
+
+### test
+
+**Referenced by**:
+- Test.md: `### test.html`
+
+Returns `{"message":"Hello, world!"}`
+
+### copilot/test/installJobsEntry
+
+Only available when `src/index.ts` is launched with `--test`.
+The body will be an absolute path of a custom JSON file for entry.
+The API will first check if the JSON file is in the `test` folder.
+It reads the JSON file, called `validateEntry` followed by `installJobsEntry`.
+
+Return in this schema:
+```typescript
+{
+  result: "OK" | "InvalidatePath" | "InvalidateEntry" | "Rejected",
+  error?: string
+}
+```
+
+Return "InvalidatePath" when the file is not in the `test` folder.
+Return "InvalidateEntry" when `validateEntry` throws.
+Return "Rejected" when `installJobsEntry` throws.
+"error" stores the exception message.
