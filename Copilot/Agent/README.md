@@ -95,13 +95,13 @@ Copilot/Agent/
 │   ├── CopilotPortal/        # Web UI + RESTful API server
 │   │   ├── src/
 │   │   │   ├── copilotSession.ts # Copilot SDK session wrapper
-│   │   │   ├── copilotApi.ts  # Copilot session API routes and helpers
-│   │   │   ├── taskApi.ts     # Task execution engine (startTask, crash retry)
-│   │   │   ├── jobsApi.ts     # Job/task API routes and job execution
+│   │   │   ├── copilotApi.ts  # Copilot session API routes, token endpoint, and helpers
+│   │   │   ├── taskApi.ts     # Task execution engine and task API routes
+│   │   │   ├── jobsApi.ts     # Job API routes and job execution
 │   │   │   ├── jobsDef.ts     # Jobs/tasks data definitions and validation
 │   │   │   ├── jobsChart.ts   # Flow chart graph generation from work trees
 │   │   │   ├── jobsData.ts    # Preloaded jobs/tasks data
-│   │   │   ├── sharedApi.ts   # Shared HTTP/live-polling utilities
+│   │   │   ├── sharedApi.ts   # Shared HTTP utilities and token-based live entity state management
 │   │   │   └── index.ts       # HTTP server, API routing, static files, entry management
 │   │   ├── assets/           # Static website files
 │   │   │   ├── index.html    # Main portal page
@@ -151,13 +151,13 @@ Copilot/Agent/
 - **Awaiting Status**: "Awaits responses ..." indicator shown in the session part while the agent is working
 - **Lazy CopilotClient**: Client starts on demand and closes when the server shuts down
 - **Multiple Sessions**: Supports parallel sessions sharing a single CopilotClient
-- **Live Polling**: Sequential long-polling for real-time session callbacks
+- **Live Polling**: Token-based sequential long-polling for real-time session/task/job callbacks. Clients acquire a token via `api/token`, then poll `live/{token}` endpoints. Responses are stored in a list with per-token reading positions, enabling multiple consumers to independently read the same response history
 - **Task System**: Job/task execution engine with availability checks, criteria validation, and retry logic
 - **Session Crash Retry**: `sendMonitoredPrompt` (private method on `CopilotTaskImpl`) automatically retries if a Copilot session crashes during prompt execution, creating new sessions when needed. Driving sessions use `entry.drivingSessionRetries` budget with multi-model fallback; task sessions retry up to 5 times with the same model.
 - **Detailed Error Reporting**: `errorToDetailedString` helper converts errors to detailed JSON with name, message, stack, and recursive cause chain for comprehensive crash diagnostics
 - **Jobs API**: RESTful API for listing, starting, stopping, and monitoring tasks and jobs via live polling
-- **Live Polling Drain**: Live APIs (session/task/job) use a drain model — clients continue polling until receiving terminal `*Closed` or `*NotFound` errors, ensuring all buffered responses are consumed
-- **Closed State Management**: Sessions, tasks, and jobs transition through a `closed` state that buffers remaining responses before cleanup, preventing lost data
+- **Live Polling Drain**: Live APIs (session/task/job) use a drain model — clients continue polling until receiving terminal `*Closed` or `*NotFound` errors, ensuring all buffered responses are consumed. Each entity has a configurable countdown (1 minute normal, 5 seconds in test mode) after closing, during which new tokens can still join and read history
+- **Closed State Management**: Sessions, tasks, and jobs use `LiveEntityState` with token-based lifecycle management — entities transition through open/closed states with countdown periods before cleanup, preventing lost data
 - **Test Mode API**: `copilot/test/installJobsEntry` endpoint (test mode only) for dynamically installing job entries during testing
 - **Job Workflow Engine**: Composable work tree execution supporting sequential, parallel, loop, and conditional (alt) work patterns
 - **Task Selection UI**: Combo box in the portal to select and run tasks within an active session

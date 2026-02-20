@@ -236,12 +236,6 @@ If a `token` is used for the session during its life-cycle, the session will be 
 If the `session-id` does not exist, or a `token` is used after the session's life-cycle:
 - the session is not visible and it should return `SessionNotFound`.
 
-**TASK**: New change adds token to all 3 live api calls, test cases need to change:
-- A token should be obtained in order to do live api calls.
-- It works for a 3 live api calls, all 3 live api calls should reuse the same piece of code to manage life-cycle, pending api calls and tokens.
-- New test cases could be added, to ensure that, before all `SessionClosed` are issued, a new token could still read the first response for a visible life cycle.
-- If the server is launched with `--test` to enter a test mode, the 1 minute count down becomes 5 seconds, that enable you to test the logic efficiently.
-
 #### Session Response Storages
 
 Tips for implementation:

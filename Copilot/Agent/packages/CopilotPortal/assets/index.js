@@ -114,9 +114,20 @@ function startLivePolling() {
 }
 
 async function pollLive() {
+    // Acquire a token for this polling session
+    let token;
+    try {
+        const tokenRes = await fetch("/api/token");
+        const tokenData = await tokenRes.json();
+        token = tokenData.token;
+    } catch (err) {
+        console.error("Failed to acquire token:", err);
+        return;
+    }
+
     while (livePollingActive) {
         try {
-            const res = await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/live`);
+            const res = await fetch(`/api/copilot/session/${encodeURIComponent(sessionId)}/live/${encodeURIComponent(token)}`);
             if (!livePollingActive) break;
             const data = await res.json();
             if (!livePollingActive) break;
@@ -125,7 +136,7 @@ async function pollLive() {
                 // Timeout, just resend
                 continue;
             }
-            if (data.error === "SessionNotFound") {
+            if (data.error === "SessionNotFound" || data.error === "SessionClosed") {
                 livePollingActive = false;
                 break;
             }

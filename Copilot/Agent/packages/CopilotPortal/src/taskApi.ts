@@ -1,3 +1,4 @@
+import * as http from "node:http";
 import type { ICopilotSession } from "./copilotSession.js";
 import type { Entry, Task, Prompt } from "./jobsDef.js";
 import { expandPromptDynamic, getModelId, SESSION_CRASH_PREFIX } from "./jobsDef.js";
@@ -5,7 +6,20 @@ import {
     helperSessionStart,
     helperSessionStop,
     helperPushSessionResponse,
+    helperGetSession,
+    jsonResponse,
 } from "./copilotApi.js";
+import {
+    readBody,
+    getCountDownMs,
+    createLiveEntityState,
+    pushLiveResponse,
+    closeLiveEntity,
+    waitForLiveResponse,
+    shutdownLiveEntity,
+    type LiveEntityState,
+    type LiveResponse,
+} from "./sharedApi.js";
 
 // ---- Error Formatting Helper ----
 
@@ -733,4 +747,144 @@ export async function startTask(
 
     copilotTask.execute().catch(exceptionHandler);
     return copilotTask;
+}
+
+// ---- Task State for Live API ----
+
+interface TaskState {
+    taskId: string;
+    task: ICopilotTask | null;
+    entity: LiveEntityState;
+    taskError: string | null;
+    borrowingSessionMode: boolean;
+}
+
+const tasks = new Map<string, TaskState>();
+let nextTaskId = 1;
+
+// Export for jobsApi.ts to register tasks created during job execution
+export function registerJobTask(borrowingSessionMode: boolean): { taskId: string; entity: LiveEntityState; setTask: (t: ICopilotTask) => void; setError: (err: string) => void; setClosed: () => void; pushResponse: (resp: LiveResponse) => void } {
+    const taskId = `task-${nextTaskId++}`;
+    const entity = createLiveEntityState(getCountDownMs(), () => {
+        tasks.delete(taskId);
+    });
+    const state: TaskState = {
+        taskId,
+        task: null,
+        entity,
+        taskError: null,
+        borrowingSessionMode,
+    };
+    tasks.set(taskId, state);
+    return {
+        taskId,
+        entity,
+        setTask: (t: ICopilotTask) => { state.task = t; },
+        setError: (err: string) => { state.taskError = err; },
+        setClosed: () => { closeLiveEntity(state.entity); },
+        pushResponse: (resp: LiveResponse) => { pushLiveResponse(state.entity, resp); },
+    };
+}
+
+// ---- Task API Handlers ----
+
+export async function apiTaskList(
+    entry: Entry,
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+): Promise<void> {
+    const taskList = Object.entries(entry.tasks).map(([name, task]) => ({
+        name,
+        requireUserInput: task.requireUserInput,
+    }));
+    jsonResponse(res, 200, { tasks: taskList });
+}
+
+export async function apiTaskStart(
+    entry: Entry,
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    taskName: string,
+    sessionId: string,
+): Promise<void> {
+    const session = helperGetSession(sessionId);
+    if (!session) {
+        jsonResponse(res, 200, { error: "SessionNotFound" });
+        return;
+    }
+
+    const body = await readBody(req);
+    const userInput = body;
+
+    try {
+        const reg = registerJobTask(true);
+
+        const taskCallback: ICopilotTaskCallback = {
+            taskSucceeded() {
+                reg.pushResponse({ callback: "taskSucceeded" });
+                reg.setClosed();
+            },
+            taskFailed() {
+                reg.pushResponse({ callback: "taskFailed" });
+                reg.setClosed();
+            },
+            taskDecision(reason: string) {
+                reg.pushResponse({ callback: "taskDecision", reason });
+            },
+            // Unavailable in borrowing session mode - won't be called
+            taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean) {
+                reg.pushResponse({ callback: "taskSessionStarted", sessionId: taskId, isDriving: isDrivingSession });
+            },
+            taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean) {
+                reg.pushResponse({ callback: "taskSessionStopped", sessionId: taskId, succeeded });
+            },
+        };
+
+        const copilotTask = await startTask(entry, taskName, userInput, session, true, taskCallback, undefined, undefined, (err: unknown) => {
+            reg.setError(errorToDetailedString(err));
+            reg.pushResponse({ taskError: errorToDetailedString(err) });
+            reg.setClosed();
+        });
+        reg.setTask(copilotTask);
+
+        jsonResponse(res, 200, { taskId: reg.taskId });
+    } catch (err) {
+        jsonResponse(res, 200, { taskError: errorToDetailedString(err) });
+    }
+}
+
+export async function apiTaskStop(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    taskId: string,
+): Promise<void> {
+    const state = tasks.get(taskId);
+    if (!state) {
+        jsonResponse(res, 200, { error: "TaskNotFound" });
+        return;
+    }
+    if (state.borrowingSessionMode) {
+        jsonResponse(res, 200, { error: "TaskCannotClose" });
+        return;
+    }
+    if (state.task) state.task.stop();
+    closeLiveEntity(state.entity);
+    jsonResponse(res, 200, { result: "Closed" });
+}
+
+export async function apiTaskLive(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    taskId: string,
+    token: string,
+): Promise<void> {
+    const state = tasks.get(taskId);
+    const response = await waitForLiveResponse(
+        state?.entity,
+        token,
+        5000,
+        "TaskNotFound",
+        "TaskClosed",
+    );
+    jsonResponse(res, 200, response);
 }

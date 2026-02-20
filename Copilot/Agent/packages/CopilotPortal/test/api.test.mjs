@@ -11,6 +11,11 @@ async function fetchJson(urlPath, options) {
     return res.json();
 }
 
+async function getToken() {
+    const data = await fetchJson("/api/token");
+    return data.token;
+}
+
 // Helper: resolve test entry path
 const testEntryPath = path.resolve(__dirname, "testEntry.json");
 
@@ -59,9 +64,24 @@ describe("API: /api/copilot/models", () => {
     });
 });
 
+describe("API: /api/token", () => {
+    it("returns a token string", async () => {
+        const data = await fetchJson("/api/token");
+        assert.ok(typeof data.token === "string", "token should be a string");
+        assert.ok(data.token.length > 0, "token should not be empty");
+    });
+
+    it("returns different tokens on each call", async () => {
+        const data1 = await fetchJson("/api/token");
+        const data2 = await fetchJson("/api/token");
+        assert.notStrictEqual(data1.token, data2.token, "tokens should be unique");
+    });
+});
+
 describe("API: session not found errors", () => {
     it("live returns SessionNotFound for invalid session", async () => {
-        const data = await fetchJson("/api/copilot/session/nonexistent/live");
+        const token = await getToken();
+        const data = await fetchJson(`/api/copilot/session/nonexistent/live/${token}`);
         assert.deepStrictEqual(data, { error: "SessionNotFound" });
     });
 
@@ -111,16 +131,18 @@ describe("API: full session lifecycle", () => {
 
     it("live returns HttpRequestTimeout when idle", async () => {
         assert.ok(sessionId, "session must be started");
-        const data = await fetchJson(`/api/copilot/session/${sessionId}/live`);
+        const token = await getToken();
+        const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token}`);
         assert.strictEqual(data.error, "HttpRequestTimeout");
     });
 
     it("live returns ParallelCallNotSupported for concurrent calls", async () => {
         assert.ok(sessionId, "session must be started");
+        const token = await getToken();
         const [first, second] = await Promise.all([
-            fetchJson(`/api/copilot/session/${sessionId}/live`),
+            fetchJson(`/api/copilot/session/${sessionId}/live/${token}`),
             new Promise((r) => setTimeout(r, 100)).then(() =>
-                fetchJson(`/api/copilot/session/${sessionId}/live`)
+                fetchJson(`/api/copilot/session/${sessionId}/live/${token}`)
             ),
         ]);
         assert.strictEqual(second.error, "ParallelCallNotSupported",
@@ -142,10 +164,11 @@ describe("API: full session lifecycle", () => {
         assert.ok(sessionId, "session must be started");
         const callbacks = [];
         let gotAgentEnd = false;
+        const token = await getToken();
 
         const timeout = Date.now() + 60000;
         while (!gotAgentEnd && Date.now() < timeout) {
-            const data = await fetchJson(`/api/copilot/session/${sessionId}/live`);
+            const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token}`);
             if (data.error === "HttpRequestTimeout") continue;
             if (data.error) break;
             callbacks.push(data);
@@ -214,7 +237,8 @@ describe("API: task not found errors", () => {
     });
 
     it("task live returns TaskNotFound for invalid task id", async () => {
-        const data = await fetchJson("/api/copilot/task/nonexistent/live");
+        const token = await getToken();
+        const data = await fetchJson(`/api/copilot/task/nonexistent/live/${token}`);
         assert.deepStrictEqual(data, { error: "TaskNotFound" });
     });
 
@@ -425,19 +449,22 @@ describe("API: job not found errors", () => {
     });
 
     it("job live returns JobNotFound for invalid job id", async () => {
-        const data = await fetchJson("/api/copilot/job/nonexistent/live");
+        const token = await getToken();
+        const data = await fetchJson(`/api/copilot/job/nonexistent/live/${token}`);
         assert.deepStrictEqual(data, { error: "JobNotFound" });
     });
 });
 
 // Helper: drain all live responses until a specific callback or timeout
 async function drainLive(livePath, targetCallback, timeoutMs = 120000) {
+    const token = await getToken();
     const callbacks = [];
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
-        const data = await fetchJson(livePath);
+        const data = await fetchJson(`${livePath}/${token}`);
         if (data.error === "HttpRequestTimeout") continue;
-        if (data.error === "TaskNotFound" || data.error === "JobNotFound") break;
+        if (data.error === "TaskNotFound" || data.error === "TaskClosed") break;
+        if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
         callbacks.push(data);
         if (data.callback === targetCallback) break;
         if (data.taskError || data.jobError) break;

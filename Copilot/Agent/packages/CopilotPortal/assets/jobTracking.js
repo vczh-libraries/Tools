@@ -176,10 +176,22 @@ function onInspect(workId) {
 
 async function pollLive(url, handler, shouldStop) {
     const terminalPattern = /^(Session|Task|Jobs?)(Closed|NotFound)$/;
+
+    // Acquire a token for this polling session
+    let token;
+    try {
+        const tokenRes = await fetch("/api/token");
+        const tokenData = await tokenRes.json();
+        token = tokenData.token;
+    } catch (err) {
+        console.error("Failed to acquire token:", err);
+        return;
+    }
+
     while (true) {
         if (shouldStop()) break;
         try {
-            const res = await fetch(`/api/${url}`);
+            const res = await fetch(`/api/${url}/${encodeURIComponent(token)}`);
             const data = await res.json();
             if (data.error === "HttpRequestTimeout") continue;
             if (data.error === "ParallelCallNotSupported") {

@@ -39,8 +39,8 @@ All helper functions and types are exported and API implementations should use t
 ### sendMonitoredPrompt (crash retry)
 
 **Referenced by**:
-- API_Task.md: `### copilot/task/start/{task-name}/session/{session-id}`, `### copilot/task/{task-id}/stop`, `### copilot/task/{task-id}/live`
-- API_Job.md: `### copilot/job/start/{job-name}`, `### copilot/job/{job-id}/stop`, `### copilot/job/{job-id}/live`
+- API_Task.md: `### copilot/task/start/{task-name}/session/{session-id}`, `### copilot/task/{task-id}/stop`, `### copilot/task/{task-id}/live/{token}`
+- API_Job.md: `### copilot/job/start/{job-name}`, `### copilot/job/{job-id}/stop`, `### copilot/job/{job-id}/live/{token}`
 - JobsData.md: `## Running Tasks`, `## Running Jobs`, `### Task.availability`, `### Task.criteria`
 
 A private method on the `CopilotTaskImpl` class used by both task execution and condition evaluation.
@@ -99,6 +99,12 @@ async function startTask(
 - The `exceptionHandler` is called if the task execution throws an unhandled exception.
 
 ## API (taskApi.ts) ---------------------------------------------------------------------------------------------------------------------------------
+
+All restful read arguments from the path and returns a JSON document.
+
+All title names below represents http:/*:port/api/TITLE
+
+Task hosting is implemented by `src/taskApi.ts`.
 
 ### copilot/task
 
@@ -186,13 +192,14 @@ or when error happens:
 }
 ```
 
-### copilot/task/{task-id}/live
+### copilot/task/{task-id}/live/{token}
 
 **Referenced by**:
 - Jobs.md: `### jobTracking.html`
 
-It works like `copilot/session/{session-id}/live` but it reacts to `ICopilotTaskCallback`.
+It works like `copilot/session/{session-id}/live/{token}` but it reacts to `ICopilotTaskCallback`.
 They should be implemented in the same way, but only respond in schemas mentioned below.
+`token` can be obtained by `/token` but no checking needs to perform.
 
 Returns in this schema if any error happens
 
@@ -203,7 +210,7 @@ Returns in this schema if any error happens
 ```
 
 Special `TaskNotFound` and `TaskClosed` handling for this API:
-- Works in the same way as `SessionNotFound` and `SessionClosed` in `copilot/session/{session-id}/live`. 
+- Works in the same way as `SessionNotFound` and `SessionClosed` in `copilot/session/{session-id}/live/{token}`. 
 
 **TEST-NOTE-BEGIN**
 Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
@@ -221,4 +228,4 @@ Returns in this schema if an exception it thrown from inside the session
 
 Other response maps to all methods in `ICopilotTaskCallback` in `src/taskApi.ts`.
 
-When a task is created by a job's `executeWork`, the `taskSessionStarted` response additionally includes `sessionId` (string) and `isDriving` (boolean) fields so the frontend can poll `copilot/session/{session-id}/live` and distinguish between driving and task sessions.
+When a task is created by a job's `executeWork`, the `taskSessionStarted` response additionally includes `sessionId` (string) and `isDriving` (boolean) fields so the frontend can poll `copilot/session/{session-id}/live/{token}` and distinguish between driving and task sessions.

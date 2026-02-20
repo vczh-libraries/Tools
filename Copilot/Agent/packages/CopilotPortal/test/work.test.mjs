@@ -11,14 +11,20 @@ async function fetchJson(urlPath, options) {
     return res.json();
 }
 
+async function getToken() {
+    const data = await fetchJson("/api/token");
+    return data.token;
+}
+
 // Drain live responses until a specific callback or timeout
 async function drainLive(livePath, targetCallback, timeoutMs = 120000) {
+    const token = await getToken();
     const callbacks = [];
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
-        const data = await fetchJson(livePath);
+        const data = await fetchJson(`${livePath}/${token}`);
         if (data.error === "HttpRequestTimeout") continue;
-        if (data.error === "JobNotFound") break;
+        if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
         callbacks.push(data);
         if (data.callback === targetCallback) break;
         if (data.jobError) break;
@@ -35,12 +41,13 @@ async function runJob(jobName) {
     assert.ok(startData.jobId, `should return jobId for ${jobName}: ${JSON.stringify(startData)}`);
 
     // Drain until jobSucceeded or jobFailed
+    const token = await getToken();
     const callbacks = [];
     const deadline = Date.now() + 120000;
     while (Date.now() < deadline) {
-        const data = await fetchJson(`/api/copilot/job/${startData.jobId}/live`);
+        const data = await fetchJson(`/api/copilot/job/${startData.jobId}/live/${token}`);
         if (data.error === "HttpRequestTimeout") continue;
-        if (data.error === "JobNotFound") break;
+        if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
         callbacks.push(data);
         if (data.callback === "jobSucceeded" || data.callback === "jobFailed") break;
         if (data.jobError) break;

@@ -56,6 +56,12 @@ async function startJob(
 
 ## API (jobsApi.ts) ---------------------------------------------------------------------------------------------------------------------------------
 
+All restful read arguments from the path and returns a JSON document.
+
+All title names below represents http:/*:port/api/TITLE
+
+Job hosting is implemented by and `src/jobsApi.ts`.
+
 ### copilot/job
 
 **Referenced by**:
@@ -134,13 +140,14 @@ or when error happens:
 }
 ```
 
-### copilot/job/{job-id}/live
+### copilot/job/{job-id}/live/{token}
 
 **Referenced by**:
 - Jobs.md: `### Job Part`, `### Session Response Part`, `### jobTracking.html`
 
-It works like `copilot/session/{session-id}/live` but it reacts to `ICopilotJobCallback`.
+It works like `copilot/session/{session-id}/live/{token}` but it reacts to `ICopilotJobCallback`.
 They should be implemented in the same way, but only respond in schemas mentioned below.
+`token` can be obtained by `/token` but no checking needs to perform.
 
 Returns in this schema if any error happens
 
@@ -151,7 +158,7 @@ Returns in this schema if any error happens
 ```
 
 Special `JobNotFound` and `JobsClosed` handling for this API:
-- Works in the same way as `SessionNotFound` and `SessionClosed` in `copilot/session/{session-id}/live`. 
+- Works in the same way as `SessionNotFound` and `SessionClosed` in `copilot/session/{session-id}/live/{token}`. 
 
 **TEST-NOTE-BEGIN**
 Can't trigger "HttpRequestTimeout" stably in unit test so it is not covered.
