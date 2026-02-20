@@ -133,10 +133,12 @@ When en single mode, retry budgets are still separately applying, depending on i
 Driving session retries in this way:
 - Ensure `entry.model.driving === entry.drivingSessionRetries[0].modelId`. This should have been ensured by `validateEntry` but assert in here again.
   - This should be done in `startTask` and therefore assume it always satisfies.
-- For each `entry.drivingSessionRetries`:
-  - Retry with the appriopriate prompt for each using `modelId` for `retries` times.
-  - If retry results in consecutive crashing for `retries` times, try the next item.
-- Crashing retry budget drained when every `entry.drivingSessionRetries` is used but ends up crashing all the time.
+- Open a `number[]` array copying all `entry.drivingSessionRetries[index].retries`.
+- For each `entry.drivingSessionRetries[index]`, if `retryBudget[index]` > 0, decreases it and perform the retry.
+  - Retry with the appriopriate prompt for each using `modelId`.
+  - This mean try all candidate models in each round, but pay attention to the retry budget as they are different per model.
+- Keep doing until `retryBudget` contains only zeros, which means all retyr budget trained.
+- Budget refreshes for every driving mission (which the current implementation is already doing but it follows the old retry budget design).
 - **TASK**: Handle this in `sendMonitoredPrompt` when `isDriving === true`.
 
 #### Managed Session Mode (single model)
