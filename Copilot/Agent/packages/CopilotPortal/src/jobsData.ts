@@ -345,10 +345,7 @@ const entryInput: Entry = {
         "refine-task": {
             model: { category: "planning" },
             requireUserInput: false,
-            prompt: ["$cppjob", "$refine"],
-            availability: {
-                previousTasks: ["scrum-learn-task"]
-            }
+            prompt: ["$cppjob", "$refine"]
         },
         "review-scrum-task": {
             prompt: ["$cppjob", "$review", "$reportDocument", "# Scrum", "$reviewerBoardFiles"],
@@ -409,9 +406,6 @@ const entryInput: Entry = {
             model: { category: "planning" },
             requireUserInput: false,
             prompt: ["$cppjob", "$review", "# Apply", "$reviewerBoardFiles"],
-            availability: {
-                previousTasks: ["review-final-task"]
-            },
             criteria: {
                 runConditionInSameSession: false,
                 condition: ["$simpleCondition", "Every REPO-ROOT/.github/TaskLogs/Copilot_Review*.md must have been deleted."],

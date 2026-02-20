@@ -17,7 +17,6 @@ export interface Task {
     prompt: Prompt;
     requireUserInput: boolean;
     availability?: {
-        previousTasks?: string[];
         condition?: Prompt;
     };
     criteria?: {
@@ -273,14 +272,6 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
 
         // Validate availability
         if (task.availability) {
-            if (task.availability.previousTasks) {
-                for (let i = 0; i < task.availability.previousTasks.length; i++) {
-                    const pt = task.availability.previousTasks[i];
-                    if (!(pt in entry.tasks)) {
-                        throw new Error(`${taskBase}.availability.previousTasks[${i}]: "${pt}" is not a valid task name.`);
-                    }
-                }
-            }
             if (task.availability.condition) {
                 task.availability.condition = expandPromptStatic(entry, `${taskBase}.availability.condition`, task.availability.condition, true);
             }
