@@ -1,11 +1,11 @@
 // ---- Task ----
 
-export type Prompt = string[];
-
 export type Model =
     | { category: string; }
     | { id: string; }
     ;
+
+export type Prompt = string[];
 
 export interface TaskRetry {
     retryTimes: number;
@@ -92,7 +92,7 @@ export function assignWorkId(work: Work<never>): Work<number> {
                     falseWork: w.falseWork ? helper(w.falseWork, nextId) : undefined
                 };
             }
-        }   
+        }
     }
     return helper(work, [0]);
 }
@@ -116,8 +116,14 @@ export interface GridRow {
 
 // ---- Entry ----
 
+export interface ModelRetry {
+    modelId: string;
+    retries: number;
+}
+
 export interface Entry {
     models: { [key in string]: string };
+    drivingSessionRetries: ModelRetry[];
     promptVariables: { [key in string]: string[] };
     tasks: { [key in string]: Task };
     jobs: { [key in string]: Job };
@@ -151,7 +157,6 @@ export function getModelId(model: Model, entry: Entry): string {
 
 
 export const SESSION_CRASH_PREFIX = "The session crashed, please redo and here is the last request:\n";
-export const MAX_CRASH_RETRIES = 5;
 export const DEFAULT_CRITERIA_RETRIES = 5;
 
 export function retryWithNewSessionCondition(retryTimes: number = 3): TaskRetry {
