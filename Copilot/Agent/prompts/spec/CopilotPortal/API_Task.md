@@ -100,6 +100,13 @@ async function startTask(
 
 ## API (taskApi.ts) ---------------------------------------------------------------------------------------------------------------------------------
 
+All restful read arguments from the path and returns a JSON document.
+
+All title names below represents http:/*:port/api/TITLE
+
+Task hosting is implemented by `src/taskApi.ts`.
+**TASK**: Move `apiTask*` and its dependencies from `jobsApi.ts` to `taskApi.ts`, keep only `jobsApi.ts` depends on `taskApi.ts` not the opposite.
+
 ### copilot/task
 
 **Referenced by**:

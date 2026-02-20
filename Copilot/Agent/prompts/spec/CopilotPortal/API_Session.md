@@ -126,7 +126,7 @@ interface ICopilotSessionCallbacks {
 
 All restful read arguments from the path and returns a JSON document.
 
-All title names below represents http://localhost:port/api/TITLE
+All title names below represents http://*:port/api/TITLE
 
 Copilot hosting is implemented by `@github/copilot-sdk` and `src/copilotSession.ts`.
 

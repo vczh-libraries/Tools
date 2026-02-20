@@ -56,6 +56,12 @@ async function startJob(
 
 ## API (jobsApi.ts) ---------------------------------------------------------------------------------------------------------------------------------
 
+All restful read arguments from the path and returns a JSON document.
+
+All title names below represents http:/*:port/api/TITLE
+
+Job hosting is implemented by and `src/jobsApi.ts`.
+
 ### copilot/job
 
 **Referenced by**:
