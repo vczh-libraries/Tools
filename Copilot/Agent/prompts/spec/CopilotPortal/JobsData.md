@@ -196,7 +196,7 @@ If `Task.criteria` is not defined,
 there will be no criteria checking,
 the task is treat as succeeded.
 
-All conditions must be satisfy to indicate that the task succeeded:
+All conditions must satisfy to indicate that the task succeeded:
 - When `Task.criteria.toolExecuted` is defined, all tools in the list should have been executed in the last round of task session response.
   - When retrying the task due to `toolExecuted`, append `## Required Tool Not Called: {tool names ...}`.
 - When `Task.criteria.condition` is defined:

@@ -29,7 +29,7 @@ Its spec is in `JobsData.md`.
 - "yarn portal" to run src/index.ts.
 - "yarn portal-for-test" to run src/index.ts in test mode
 
-It starts both Website and RESTful API. Awaits for api/stop to stops.
+It starts both Website and RESTful API. Awaits for api/stop to stop.
 Prints the following URL for shortcut:
 - http://localhost:port
 - http://localhost:port/api/stop

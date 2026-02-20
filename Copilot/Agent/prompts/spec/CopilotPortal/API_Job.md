@@ -126,8 +126,8 @@ or when error happens:
 **Referenced by**:
 - Jobs.md: `### Job Part`, `### Session Response Part`, `### jobTracking.html`
 
-It works likes `copilot/session/{session-id}/live` but it reacts to `ICopilotJobCallback`.
-They should be implemented in the same way, but only response in schemas mentioned below.
+It works like `copilot/session/{session-id}/live` but it reacts to `ICopilotJobCallback`.
+They should be implemented in the same way, but only respond in schemas mentioned below.
 
 Returns in this schema if any error happens
 

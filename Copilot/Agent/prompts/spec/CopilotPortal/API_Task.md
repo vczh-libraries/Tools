@@ -214,7 +214,7 @@ or when error happens:
 - Jobs.md: `### jobTracking.html`
 
 It works like `copilot/session/{session-id}/live` but it reacts to `ICopilotTaskCallback`.
-They should be implemented in the same way, but only response in schemas mentioned below.
+They should be implemented in the same way, but only respond in schemas mentioned below.
 
 Returns in this schema if any error happens
 
