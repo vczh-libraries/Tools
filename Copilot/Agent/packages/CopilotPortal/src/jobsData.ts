@@ -139,7 +139,8 @@ const entryInput: Entry = {
         ],
         scrumDocReady: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Scrum.md should exist and its content should not be just a title."
+            "REPO-ROOT/.github/TaskLogs/Copilot_Scrum.md should exist and its content should not be just a title.",
+            "NOTE: If you can't find the file, try different ways to make sure, including absolute path, relative path, powershell tool, view tool, slash and backslash, etc."
         ],
         designDocReady: [
             "$simpleCondition",
