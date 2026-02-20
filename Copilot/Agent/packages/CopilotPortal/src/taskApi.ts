@@ -5,7 +5,6 @@ import {
     helperSessionStart,
     helperSessionStop,
     helperPushSessionResponse,
-    hasRunningSessions,
 } from "./copilotApi.js";
 
 // ---- Error Formatting Helper ----
@@ -42,22 +41,6 @@ export interface ICopilotTaskCallback {
     taskSessionStarted(taskSession: ICopilotSession, taskId: string, isDrivingSession: boolean): void;
     // Unavailable in borrowing session mode
     taskSessionStopped(taskSession: ICopilotSession, taskId: string, succeeded: boolean): void;
-}
-
-// ---- Entry Management ----
-
-export let installedEntry: Entry | null = null;
-
-export async function installJobsEntry(entryValue: Entry): Promise<void> {
-    if (hasRunningSessions()) {
-        throw new Error("Cannot call installJobsEntry while sessions are running.");
-    }
-    installedEntry = entryValue;
-}
-
-// For testing: reset the installed entry
-export function resetJobsEntry(): void {
-    installedEntry = null;
 }
 
 // ---- Runtime Variable Helpers ----
@@ -159,6 +142,7 @@ class CopilotTaskImpl implements ICopilotTask {
     }
 
     constructor(
+        entry: Entry,
         taskName: string,
         userInput: string,
         private assignedDrivingSession: ICopilotSession | undefined,
@@ -166,10 +150,7 @@ class CopilotTaskImpl implements ICopilotTask {
         private callback: ICopilotTaskCallback,
         taskModelIdOverride?: string,
         private workingDirectory?: string) {
-        if (!installedEntry) {
-            throw new Error("installJobsEntry has not been called.");
-        }
-        this.entry = installedEntry;
+        this.entry = entry;
         this.task = this.entry.tasks[taskName];
         if (!this.task) {
             throw new Error(`Task "${taskName}" not found.`);
@@ -620,6 +601,7 @@ class CopilotTaskImpl implements ICopilotTask {
 }
 
 export async function startTask(
+    entry: Entry,
     taskName: string,
     userInput: string,
     drivingSession: ICopilotSession | undefined,
@@ -631,6 +613,7 @@ export async function startTask(
 ): Promise<ICopilotTask> {
 
     const copilotTask = new CopilotTaskImpl(
+        entry,
         taskName,
         userInput,
         drivingSession,

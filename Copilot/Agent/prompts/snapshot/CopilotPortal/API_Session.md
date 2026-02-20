@@ -13,6 +13,14 @@ Read `README.md` to understand the whole picture of the project as well as speci
 Data structures about jobs and tasks are in `src/jobsDef.ts`.
 Its spec is in `JobsData.md`.
 
+**TEST-NOTE-BEGIN**
+`yarn launch-for-test` will be used for unit testing therefore you have a chance to specify your own entry file.
+DO NOT use the default entry for testing.
+
+The free model "gpt-4.1" must be used in every `Entry.models`.
+If the model is no longer available, choose a new one and update both spec and custom entry JSON files.
+**TEST-NOTE-END**
+
 ## Helpers (copilotApi.ts) --------------------------------------------------------------------------------------------------------------------------
 
 All helper functions and types are exported and API implementations should use them.

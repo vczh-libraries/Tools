@@ -102,7 +102,7 @@ Copilot/Agent/
 │   │   │   ├── jobsChart.ts   # Flow chart graph generation from work trees
 │   │   │   ├── jobsData.ts    # Preloaded jobs/tasks data
 │   │   │   ├── sharedApi.ts   # Shared HTTP/live-polling utilities
-│   │   │   └── index.ts       # HTTP server, API routing, static files
+│   │   │   └── index.ts       # HTTP server, API routing, static files, entry management
 │   │   ├── assets/           # Static website files
 │   │   │   ├── index.html    # Main portal page
 │   │   │   ├── index.js      # Portal JS (session interaction, live polling)

@@ -58,12 +58,6 @@ Prints the following URL for shortcut:
 - Throw an error if `installJobsEntry` has not been called.
 - Return the installed entry.
 
-**TASK**: Move `installJobsEntry` and its dependencies to `index.ts`:
-- Only api entries is allowed to use this function. 
-- API helper functions should allow the entry to be passed to its first argument.
-- In `index.ts`, `ensureInstalledEntry` will be used to ensure the entry exists, and serve it too all api implementations.
-- Clean related imports in other files.
-
 ## Helpers (copilotApi.ts) --------------------------------------------------------------------------------------------------------------------------
 
 All helper functions and types are exported and API implementations should use them.

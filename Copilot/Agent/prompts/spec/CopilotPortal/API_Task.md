@@ -16,7 +16,7 @@ Its spec is in `JobsData.md`.
 `yarn launch-for-test` will be used for unit testing therefore you have a chance to specify your own entry file.
 DO NOT use the default entry for testing.
 
-The free model "gpt-5.1-mini" must be used in every `Entry.models`.
+The free model "gpt-4.1" must be used in every `Entry.models`.
 If the model is no longer available, choose a new one and update both spec and custom entry JSON files.
 **TEST-NOTE-END**
 
