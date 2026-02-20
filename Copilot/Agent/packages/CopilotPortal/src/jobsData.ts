@@ -478,67 +478,113 @@ const entryInput: Entry = {
         // ---- evolution ----
         "scrum-learn": { work: makeCodingWork("scrum-learn-task") },
         "refine": { work: makeCodingWork("refine-task") },
+        // ---- review ----
+        "scrum-review": { work: { kind: "Seq", works: [makeReviewWork("scrum"), makeRefWork("git-commit")] } },
+        "design-review": { work: { kind: "Seq", works: [makeReviewWork("design"), makeRefWork("git-commit")] } },
+        "plan-review": { work: { kind: "Seq", works: [makeReviewWork("plan"), makeRefWork("git-commit")] } },
+        "summary-review": { work: { kind: "Seq", works: [makeReviewWork("summary"), makeRefWork("git-commit")] } },
         // ---- automation ----
-        "design-automate": { work: { kind: "Seq", works: [
-            makeDocumentWork("design-problem-next", "design"),
-            makeDocumentWork("plan-problem", "plan"),
-            makeDocumentWork("summary-problem", "summary"),
-            makeCodingWork("execute-task"),
-            makeCodingWork("verify-task"),
-            makeRefWork("git-push")
-        ]}},
-        "scrum-automate": { work: { kind: "Seq", works: [
-            makeDocumentWork("plan-problem", "plan"),
-            makeDocumentWork("summary-problem", "summary"),
-            makeCodingWork("execute-task"),
-            makeCodingWork("verify-task"),
-            makeRefWork("git-push")
-        ]}},
-        "summary-automate": { work: { kind: "Seq", works: [
-            makeDocumentWork("summary-problem", "summary"),
-            makeCodingWork("execute-task"),
-            makeCodingWork("verify-task"),
-            makeRefWork("git-push")
-        ]}},
-        "execute-automate": { work: { kind: "Seq", works: [
-            makeCodingWork("execute-task"),
-            makeCodingWork("verify-task"),
-            makeRefWork("git-push")
-        ]}},
-        "learn-automate": { work: { kind: "Seq", works: [
-            makeCodingWork("scrum-learn-task"),
-            makeCodingWork("refine-task"),
-            makeRefWork("git-push")
-        ]}},
+        "design-next-automate": {
+            work: {
+                kind: "Seq", works: [
+                    makeDocumentWork("design-problem-next", "design"),
+                    makeDocumentWork("plan-problem", "plan"),
+                    makeDocumentWork("summary-problem", "summary"),
+                    makeCodingWork("execute-task"),
+                    makeCodingWork("verify-task"),
+                    makeRefWork("git-push")
+                ]
+            }
+        },
+        "design-problem-automate": {
+            work: {
+                kind: "Seq", works: [
+                    makeDocumentWork("design-problem", "design"),
+                    makeDocumentWork("plan-problem", "plan"),
+                    makeDocumentWork("summary-problem", "summary"),
+                    makeCodingWork("execute-task"),
+                    makeCodingWork("verify-task"),
+                    makeRefWork("git-push")
+                ]
+            }
+        },
+        "plan-automate": {
+            work: {
+                kind: "Seq", works: [
+                    makeDocumentWork("plan-problem", "plan"),
+                    makeDocumentWork("summary-problem", "summary"),
+                    makeCodingWork("execute-task"),
+                    makeCodingWork("verify-task"),
+                    makeRefWork("git-push")
+                ]
+            }
+        },
+        "summary-automate": {
+            work: {
+                kind: "Seq", works: [
+                    makeDocumentWork("summary-problem", "summary"),
+                    makeCodingWork("execute-task"),
+                    makeCodingWork("verify-task"),
+                    makeRefWork("git-push")
+                ]
+            }
+        },
+        "execute-automate": {
+            work: {
+                kind: "Seq", works: [
+                    makeCodingWork("execute-task"),
+                    makeCodingWork("verify-task"),
+                    makeRefWork("git-push")
+                ]
+            }
+        },
+        "learn-automate": {
+            work: {
+                kind: "Seq", works: [
+                    makeCodingWork("scrum-learn-task"),
+                    makeCodingWork("refine-task"),
+                    makeRefWork("git-push")
+                ]
+            }
+        },
     },
     grid: [{
         keyword: "scrum",
         jobs: [
             undefined,
             { name: "problem", jobName: "scrum-problem" },
-            { name: "update", jobName: "scrum-update" }
+            { name: "update", jobName: "scrum-update" },
+            { name: "review", jobName: "scrum-review" }
         ]
     }, {
-        keyword: "design",
+        keyword: "design w/ scrum",
         jobs: [
-            { name: "code directly", jobName: "design-automate" },
+            { name: "code directly", jobName: "design-next-automate" },
             { name: "problem next", jobName: "design-problem-next" },
             { name: "update", jobName: "design-update" },
+            { name: "review", jobName: "design-review" }
+        ]
+    }, {
+        keyword: "design w/ task",
+        jobs: [
+            { name: "code directly", jobName: "design-problem-automate" },
             { name: "problem", jobName: "design-problem" }
         ]
     }, {
         keyword: "plan",
         jobs: [
-            { name: "code directly", jobName: "scrum-automate" },
+            { name: "code directly", jobName: "plan-automate" },
             { name: "problem", jobName: "plan-problem" },
-            { name: "update", jobName: "plan-update" }
+            { name: "update", jobName: "plan-update" },
+            { name: "review", jobName: "plan-review" }
         ]
     }, {
         keyword: "summary",
         jobs: [
             { name: "code directly", jobName: "summary-automate" },
             { name: "problem", jobName: "summary-problem" },
-            { name: "update", jobName: "summary-update" }
+            { name: "update", jobName: "summary-update" },
+            { name: "review", jobName: "summary-review" }
         ]
     }, {
         keyword: "execute",
