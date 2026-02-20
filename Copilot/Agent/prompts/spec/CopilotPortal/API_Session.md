@@ -11,7 +11,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `src/index.ts`
 
 Data structures about jobs and tasks are in `src/jobsDef.ts`.
-It's spec is in `JobsData.md`.
+Its spec is in `JobsData.md`.
 
 ## Helpers (copilotApi.ts) --------------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ All helper functions and types are exported and API implementations should use t
 ### helperSessionStart
 
 **Referenced by**:
-- API.md: `### copilot/session/start/{model-id}`
+- API_Session.md: `### copilot/session/start/{model-id}`
 
 `async helperSessionStart(modelId: string, workingDirectory?: string): Promise<[ICopilotSession, string]>;`
 - Start a session, return the session object and its id.
@@ -28,7 +28,8 @@ All helper functions and types are exported and API implementations should use t
 ### helperSessionStop
 
 **Referenced by**:
-- API.md: `### copilot/session/{session-id}/stop`, `### stop`
+- API_Session.md: `### copilot/session/{session-id}/stop`
+- API.md: `### stop`
 
 `async helperSessionStop(session: ICopilotSession): Promise<void>;`
 - Stop a session.
@@ -36,7 +37,7 @@ All helper functions and types are exported and API implementations should use t
 ### helperGetSession
 
 **Referenced by**:
-- API.md: `### copilot/session/{session-id}/stop`, `### copilot/session/{session-id}/query`, `### copilot/session/{session-id}/live`
+- API_Session.md: `### copilot/session/{session-id}/stop`, `### copilot/session/{session-id}/query`, `### copilot/session/{session-id}/live`
 
 `helperGetSession(sessionId: string): ICopilotSession | undefined;`
 - Get a session by its id.
@@ -44,7 +45,7 @@ All helper functions and types are exported and API implementations should use t
 ### helperPushSessionResponse
 
 **Referenced by**:
-- API.md: `### copilot/session/{session-id}/live`
+- API_Session.md: `### copilot/session/{session-id}/live`
 
 `helperPushSessionResponse(session: ICopilotSession, response: LiveResponse): void;`
 - Push a response to a session's response queue.
@@ -64,7 +65,7 @@ Wraps `@github/copilot-sdk` to provide a simplified session interface with event
 ### ICopilotSession
 
 **Referenced by**:
-- API.md: `### helperSessionStart`, `### helperSessionStop`, `### helperGetSession`, `### helperPushSessionResponse`, `### startSession`
+- API_Session.md: `### helperSessionStart`, `### helperSessionStop`, `### helperGetSession`, `### helperPushSessionResponse`, `### startSession`
 
 ```typescript
 interface ICopilotSession {
@@ -79,7 +80,7 @@ interface ICopilotSession {
 ### ICopilotSessionCallbacks
 
 **Referenced by**:
-- API.md: `### copilot/session/{session-id}/live`, `### startSession`
+- API_Session.md: `### copilot/session/{session-id}/live`, `### startSession`
 - Index.md: `#### Session Interaction`, `#### Request Part`
 - Shared.md: `#### Session Response Rendering`
 
@@ -104,7 +105,7 @@ interface ICopilotSessionCallbacks {
 ### startSession
 
 **Referenced by**:
-- API.md: `### copilot/session/start/{model-id}`
+- API_Session.md: `### copilot/session/start/{model-id}`
 
 `async startSession(client: CopilotClient, modelId: string, callback: ICopilotSessionCallbacks, workingDirectory?: string): Promise<ICopilotSession>;`
 - Create a session with the given model, register job tools, wire up all event handlers, and return an `ICopilotSession`.
@@ -176,7 +177,9 @@ Returns in this schema
 **Referenced by**:
 - Index.md: `#### Session Interaction`
 - Shared.md: `#### Session Response Rendering`
-- API.md: `### copilot/task/{task-id}/live`, `### copilot/job/{job-id}/live`
+- API_Task.md: `### copilot/task/{task-id}/live`
+- API_Job.md: `### copilot/job/{job-id}/live`
+- Jobs.md: `### jobTracking.html`
 
 This is a query to wait for one response back for this session.
 Each session generates many responses, storing in a queue.

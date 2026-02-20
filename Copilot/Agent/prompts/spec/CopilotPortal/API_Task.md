@@ -10,7 +10,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `src/index.ts`
 
 Data structures about jobs and tasks are in `src/jobsDef.ts`.
-It's spec is in `JobsData.md`.
+Its spec is in `JobsData.md`.
 
 ## Helpers (taskApi.ts) -----------------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,8 @@ All helper functions and types are exported and API implementations should use t
 ### sendMonitoredPrompt (crash retry)
 
 **Referenced by**:
-- API.md: `### copilot/test/installJobsEntry`, `### copilot/task/start/{task-name}/session/{session-id}`, `### copilot/task/{task-id}/stop`, `### copilot/task/{task-id}/live`, `### copilot/job/start/{job-name}`, `### copilot/job/{job-id}/stop`, `### copilot/job/{job-id}/live`
+- API_Task.md: `### copilot/task/start/{task-name}/session/{session-id}`, `### copilot/task/{task-id}/stop`, `### copilot/task/{task-id}/live`
+- API_Job.md: `### copilot/job/start/{job-name}`, `### copilot/job/{job-id}/stop`, `### copilot/job/{job-id}/live`
 - JobsData.md: `## Running Tasks`, `## Running Jobs`, `### Task.availability`, `### Task.criteria`
 
 A private method on the `CopilotTaskImpl` class used by both task execution and condition evaluation.
@@ -209,7 +210,10 @@ or when error happens:
 
 ### copilot/task/{task-id}/live
 
-It works likes `copilot/session/{session-id}/live` but it reacts to `ICopilotTaskCallback`.
+**Referenced by**:
+- Jobs.md: `### jobTracking.html`
+
+It works like `copilot/session/{session-id}/live` but it reacts to `ICopilotTaskCallback`.
 They should be implemented in the same way, but only response in schemas mentioned below.
 
 Returns in this schema if any error happens
@@ -237,6 +241,6 @@ Returns in this schema if an exception it thrown from inside the session
 }
 ```
 
-Other response maps to all methods in `ICopilotTaskCallback` in `src/jobsApi.ts`.
+Other response maps to all methods in `ICopilotTaskCallback` in `src/taskApi.ts`.
 
 When a task is created by a job's `executeWork`, the `taskSessionStarted` response additionally includes `sessionId` (string) and `isDriving` (boolean) fields so the frontend can poll `copilot/session/{session-id}/live` and distinguish between driving and task sessions.

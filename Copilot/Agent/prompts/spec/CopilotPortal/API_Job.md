@@ -10,7 +10,7 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `src/index.ts`
 
 Data structures about jobs and tasks are in `src/jobsDef.ts`.
-It's spec is in `JobsData.md`.
+Its spec is in `JobsData.md`.
 
 ## Helpers (jobsApi.ts) -----------------------------------------------------------------------------------------------------------------------------
 
@@ -47,6 +47,7 @@ async function startJob(
 
 **Referenced by**:
 - Jobs.md: `### jobs.html`, `### Matrix Part`
+- Jobs.md: `### jobTracking.html`
 
 List all jobs passed to `installJobsEntry` in this schema:
 ```typescript
@@ -70,7 +71,7 @@ Besides of testing API failures, it is important to make sure job running works.
 Create test cases for running a job, focused on different types of `Work`s.
 Test every kinds of `Work` and ensure:
 - It succeeds when all involved tasks succeed. Should test against every type of `Work`.
-- If fails properly. Should test against every type of `Work`, in each possible failure opsition.
+- If fails properly. Should test against every type of `Work`, in each possible failure position.
 - Whenever the job succeeded or failed, the live api responses correctly.
 - Execution of tasks in `Work` should be observable from the live api.
 
@@ -123,7 +124,7 @@ or when error happens:
 ### copilot/job/{job-id}/live
 
 **Referenced by**:
-- Jobs.md: `### Job Part`, `### Session Response Part`
+- Jobs.md: `### Job Part`, `### Session Response Part`, `### jobTracking.html`
 
 It works likes `copilot/session/{session-id}/live` but it reacts to `ICopilotJobCallback`.
 They should be implemented in the same way, but only response in schemas mentioned below.

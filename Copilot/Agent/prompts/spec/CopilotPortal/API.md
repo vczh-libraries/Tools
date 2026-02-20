@@ -13,12 +13,12 @@ Read `README.md` to understand the whole picture of the project as well as speci
 - `src/index.ts`
 
 Data structures about jobs and tasks are in `src/jobsDef.ts`.
-It's spec is in `JobsData.md`.
+Its spec is in `JobsData.md`.
 
 ## Starting the HTTP Server
 
 **Referenced by**:
-- API.md: `### copilot/test/installJobsEntry`
+- API_Task.md: `### copilot/test/installJobsEntry`
 
 - This package starts an http server, serving a website as well as a set of RESTful API.
 - In src/index.ts it accepts command line options like this:
@@ -27,7 +27,7 @@ It's spec is in `JobsData.md`.
 - Website entry is http://localhost:port
 - API entry is http://localhost:port/api/...
 - "yarn portal" to run src/index.ts.
-- "yarn portal-for-test" to run src/index.ts in test model
+- "yarn portal-for-test" to run src/index.ts in test mode
 
 It starts both Website and RESTful API. Awaits for api/stop to stops.
 Prints the following URL for shortcut:
@@ -49,7 +49,7 @@ All helper functions and types are exported and API implementations should use t
 **Referenced by**:
 - API.md: `### copilot/models`
 
-`async helperGetModels(): Promise<ModelInfo[]>;`
+`async helperGetModels(): Promise<ModelInfo[]>`
 - List all models.
 
 ## API (copilotApi.ts) ------------------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ Copilot hosting is implemented by `@github/copilot-sdk` and `src/copilotSession.
 ### config
 
 **Referenced by**:
-- Index.md: `#### Starting an Copilot Session`
+- Index.md: `#### Starting a Copilot Session`
 
 Returns the repo root path (detected by walking up from the server's directory until a `.git` folder is found).
 
@@ -92,7 +92,7 @@ Returns `{}` and stops.
 ### copilot/models
 
 **Referenced by**:
-- Index.md: `#### Starting an Copilot Session`
+- Index.md: `#### Starting a Copilot Session`
 
 Returns all copilot sdk supported models in this schema
 

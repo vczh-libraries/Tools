@@ -113,8 +113,6 @@ Copilot/Agent/
 │   │   │   ├── jobTracking.html  # Job tracking page
 │   │   │   ├── jobTracking.js    # Job tracking JS (logic + renderer dispatch)
 │   │   │   ├── jobTracking.css   # Job tracking styles
-│   │   │   ├── flowChartELK.js   # ELK flow chart renderer
-│   │   │   ├── flowChartELK.css  # ELK flow chart node styles
 │   │   │   ├── flowChartMermaid.js # Mermaid flow chart renderer
 │   │   │   ├── messageBlock.js       # MessageBlock component
 │   │   │   ├── messageBlock.css      # MessageBlock styles
@@ -130,7 +128,8 @@ Copilot/Agent/
 │   │   │   ├── work.test.mjs         # Work tree execution tests
 │   │   │   ├── web.test.mjs          # Playwright UI tests (test.html)
 │   │   │   ├── web.index.mjs         # Playwright tests for index.html
-│   │   │   └── web.jobs.mjs          # Playwright tests for jobs.html and jobTracking.html
+│   │   │   ├── web.jobs.mjs          # Playwright tests for jobs.html and jobTracking.html
+│   │   │   └── windowsHide.cjs       # Windows process hiding helper
 │   │   └── package.json
 ```
 
@@ -142,7 +141,7 @@ Copilot/Agent/
 - **Run portal in test mode**: `yarn portal-for-test` starts in test mode.
 - **Run tests only**: `yarn testStart && yarn testExecute` starts server in test mode and runs tests.
 - **Playwright**: Install with `npx playwright install chromium`. Used for testing the portal UI.
-- **Spec-driven**: Portal features are defined in `packages/CopilotPortal/Spec.md`.
+- **Spec-driven**: Portal features are defined in `prompts/spec/CopilotPortal/`.
 
 ## Features
 
@@ -163,7 +162,7 @@ Copilot/Agent/
 - **Job Workflow Engine**: Composable work tree execution supporting sequential, parallel, loop, and conditional (alt) work patterns
 - **Task Selection UI**: Combo box in the portal to select and run tasks within an active session
 - **Tool Registration**: Custom job tools (e.g. `job_boolean_true`, `job_prepare_document`) are automatically registered with Copilot sessions
-- **Flow Chart Renderers**: Job tracking page supports ELK and Mermaid (default) renderers, selectable via `renderer` URL parameter
+- **Flow Chart Renderers**: Job tracking page uses Mermaid for declarative flowchart rendering
 - **Job Status Tracking**: Live polling of job execution status with visual status bar (RUNNING/SUCCEEDED/FAILED/CANCELED) and Stop Job button
 - **Flow Chart Status Indicators**: Running tasks display a green triangle indicator; succeeded tasks display a green tick indicator; failed tasks display a red cross indicator on the flow chart
 - **Task Inspection**: Clicking a TaskNode in the flow chart opens a tab control showing session responses for that task's sessions
