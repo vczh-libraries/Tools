@@ -64,7 +64,8 @@ The session part and the request part should always fill the whole webpage.
 Between two parts there is a bar to drag vertically to adjust the height of the request part which defaults to 300px.
 
 After the UI is loaded,
-the page must keep sending `api/copilot/session/{session-id}/live` to the server sequentially (aka not parallelly).
+call `api/token` for a token,
+the page must keep sending `api/copilot/session/{session-id}/live/{token}` to the server sequentially (aka not parallelly).
 When a timeout happens, resend the api.
 When it returns any response, process it and still keep sending the api.
 Whenever `ICopilotSessionCallbacks::METHOD` is mentioned, it means a response from this api.

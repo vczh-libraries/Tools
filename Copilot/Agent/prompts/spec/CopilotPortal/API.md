@@ -91,6 +91,11 @@ Returns the repo root path (detected by walking up from the server's directory u
 }
 ```
 
+### token
+
+Returns a random generated GUID everytime, no special meaning.
+No need to store generated tokens.
+
 ### stop
 
 **Referenced by**:
