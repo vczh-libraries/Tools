@@ -40,6 +40,15 @@ export function errorToDetailedString(err: unknown): string {
     try { return JSON.stringify(err); } catch { return String(err); }
 }
 
+// ---- Task Stopped Error ----
+
+export class TaskStoppedError extends Error {
+    constructor() {
+        super("Task was stopped");
+        this.name = "TaskStoppedError";
+    }
+}
+
 // ---- Types ----
 
 export interface ICopilotTask {
@@ -157,6 +166,14 @@ class CopilotTaskImpl implements ICopilotTask {
         this.activeSessions.clear();
     }
 
+    // Helper that wraps session.sendRequest with stopped guards.
+    // When this.stopped, throws TaskStoppedError so retrying won't issue.
+    private async guardedSendRequest(session: ICopilotSession, message: string, timeout?: number): Promise<void> {
+        if (this.stopped) throw new TaskStoppedError();
+        await session.sendRequest(message, timeout);
+        if (this.stopped) throw new TaskStoppedError();
+    }
+
     constructor(
         entry: Entry,
         taskName: string,
@@ -241,11 +258,12 @@ class CopilotTaskImpl implements ICopilotTask {
         const monitor = monitorSessionTools(sessionRef.session, this.runtimeValues);
         try {
             helperPushSessionResponse(sessionRef.session, { callback: "onGeneratedUserPrompt", prompt });
-            await sessionRef.session.sendRequest(prompt);
+            await this.guardedSendRequest(sessionRef.session, prompt);
             monitor.cleanup();
             return { toolsCalled: monitor.toolsCalled, booleanResult: monitor.booleanResult };
         } catch (err) {
             monitor.cleanup();
+            if (err instanceof TaskStoppedError) throw err;
             this.callback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
             throw err;
         }
@@ -265,11 +283,12 @@ class CopilotTaskImpl implements ICopilotTask {
 
             try {
                 helperPushSessionResponse(sessionRef.session, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
-                await sessionRef.session.sendRequest(actualPrompt);
+                await this.guardedSendRequest(sessionRef.session, actualPrompt);
                 monitor.cleanup();
                 return { toolsCalled: monitor.toolsCalled, booleanResult: monitor.booleanResult };
             } catch (err) {
                 monitor.cleanup();
+                if (err instanceof TaskStoppedError) throw err;
                 lastError = err;
                 this.callback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
 
@@ -304,11 +323,12 @@ class CopilotTaskImpl implements ICopilotTask {
             const monitor = monitorSessionTools(sessionRef.session, this.runtimeValues);
             try {
                 helperPushSessionResponse(sessionRef.session, { callback: "onGeneratedUserPrompt", prompt });
-                await sessionRef.session.sendRequest(prompt);
+                await this.guardedSendRequest(sessionRef.session, prompt);
                 monitor.cleanup();
                 return { toolsCalled: monitor.toolsCalled, booleanResult: monitor.booleanResult };
             } catch (err) {
                 monitor.cleanup();
+                if (err instanceof TaskStoppedError) throw err;
                 lastError = err;
                 this.callback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
             }
@@ -336,11 +356,12 @@ class CopilotTaskImpl implements ICopilotTask {
                 const monitor = monitorSessionTools(sessionRef.session, this.runtimeValues);
                 try {
                     helperPushSessionResponse(sessionRef.session, { callback: "onGeneratedUserPrompt", prompt: actualPrompt });
-                    await sessionRef.session.sendRequest(actualPrompt);
+                    await this.guardedSendRequest(sessionRef.session, actualPrompt);
                     monitor.cleanup();
                     return { toolsCalled: monitor.toolsCalled, booleanResult: monitor.booleanResult };
                 } catch (err) {
                     monitor.cleanup();
+                    if (err instanceof TaskStoppedError) throw err;
                     lastError = err;
                     this.callback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
                 }
@@ -443,9 +464,10 @@ class CopilotTaskImpl implements ICopilotTask {
         const monitor = monitorSessionTools(borrowedSession, this.runtimeValues);
         try {
             helperPushSessionResponse(borrowedSession, { callback: "onGeneratedUserPrompt", prompt: promptText });
-            await borrowedSession.sendRequest(promptText);
+            await this.guardedSendRequest(borrowedSession, promptText);
         } catch (err) {
             monitor.cleanup();
+            if (err instanceof TaskStoppedError) throw err;
             this.callback.taskDecision(`[SESSION CRASHED] Task crashed in borrowing session mode: ${errorToDetailedString(err)}`);
             throw err;
         }
@@ -461,16 +483,16 @@ class CopilotTaskImpl implements ICopilotTask {
         if (!passed && this.criteria?.failureAction) {
             const maxRetries = this.criteria.failureAction.retryTimes;
             for (let i = 0; i < maxRetries && !passed; i++) {
-                if (this.stopped) return;
                 this.callback.taskDecision(`[OPERATION] Starting retry #${i + 1}`);
 
                 const retryPrompt = this.buildRetryPrompt(missingTools);
                 const retryMonitor = monitorSessionTools(borrowedSession, this.runtimeValues);
                 try {
                     helperPushSessionResponse(borrowedSession, { callback: "onGeneratedUserPrompt", prompt: retryPrompt });
-                    await borrowedSession.sendRequest(retryPrompt);
+                    await this.guardedSendRequest(borrowedSession, retryPrompt);
                 } catch (err) {
                     retryMonitor.cleanup();
+                    if (err instanceof TaskStoppedError) throw err;
                     this.callback.taskDecision(`[SESSION CRASHED] Crash during retry in borrowing mode: ${errorToDetailedString(err)}`);
                     throw err;
                 }
@@ -509,8 +531,6 @@ class CopilotTaskImpl implements ICopilotTask {
         const [session, sessionId] = await this.openSession(modelId, true);
         const ref = { session, id: sessionId };
 
-        if (this.stopped) return;
-
         // Check availability
         if (this.task.availability && !this.ignorePrerequisiteCheck) {
             if (this.task.availability.condition) {
@@ -527,8 +547,6 @@ class CopilotTaskImpl implements ICopilotTask {
             }
         }
 
-        if (this.stopped) return;
-
         // Execute prompt
         const promptText = expandPrompt(this.entry, this.task.prompt, this.runtimeValues);
         const { toolsCalled } = await this.sendMonitoredPrompt(ref, promptText, modelId, true);
@@ -542,7 +560,6 @@ class CopilotTaskImpl implements ICopilotTask {
         if (!passed && this.task.criteria?.failureAction) {
             const maxRetries = this.task.criteria.failureAction.retryTimes;
             for (let i = 0; i < maxRetries && !passed; i++) {
-                if (this.stopped) return;
                 this.callback.taskDecision(`[OPERATION] Starting retry #${i + 1}`);
 
                 const retryPrompt = this.buildRetryPrompt(missingTools);
@@ -581,8 +598,6 @@ class CopilotTaskImpl implements ICopilotTask {
         const tModelId = this.taskModelId || this.entry.models.driving;
         this.runtimeValues["task-model"] = tModelId;
 
-        if (this.stopped) return;
-
         // Check availability
         if (this.task.availability && !this.ignorePrerequisiteCheck) {
             if (this.task.availability.condition) {
@@ -611,8 +626,6 @@ class CopilotTaskImpl implements ICopilotTask {
             }
         }
 
-        if (this.stopped) return;
-
         // Execute prompt (task session)
         const [ts, tsId] = await this.openSession(tModelId, false);
         let taskRef = { session: ts, id: tsId };
@@ -632,7 +645,6 @@ class CopilotTaskImpl implements ICopilotTask {
         if (!passed && this.criteria?.failureAction) {
             const maxRetries = this.criteria.failureAction.retryTimes;
             for (let i = 0; i < maxRetries && !passed; i++) {
-                if (this.stopped) return;
                 this.callback.taskDecision(`[OPERATION] Starting retry #${i + 1}`);
 
                 // New task session for retry

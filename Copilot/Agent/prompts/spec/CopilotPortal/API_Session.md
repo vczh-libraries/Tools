@@ -236,9 +236,6 @@ If a `token` is used for the session during its life-cycle, the session will be 
 If the `session-id` does not exist, or a `token` is used after the session's life-cycle:
 - the session is not visible and it should return `SessionNotFound`.
 
-**TASK**: 
-- New test cases could be added, to ensure that, before all `SessionClosed` are issued, a new token could still read the first response for a visible life cycle.
-
 #### Session Response Storages
 
 Tips for implementation:

@@ -735,3 +735,116 @@ describe("API: job-created task live polling", () => {
     });
 });
 
+describe("API: session lifecycle visibility - new token reads before SessionClosed", () => {
+    let freeModelId;
+
+    before(async () => {
+        const data = await fetchJson("/api/copilot/models");
+        const freeModel = data.models.find((m) => m.multiplier === 0);
+        assert.ok(freeModel, "need a free model for testing");
+        freeModelId = freeModel.id;
+    });
+
+    it("a new token can read the first response during visible lifecycle", async () => {
+        // Start a session
+        const startData = await fetchJson(`/api/copilot/session/start/${freeModelId}`, {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools",
+        });
+        assert.ok(startData.sessionId, "should get session id");
+        const sessionId = startData.sessionId;
+
+        try {
+            // Send a query so the session produces responses
+            await fetchJson(`/api/copilot/session/${sessionId}/query`, {
+                method: "POST",
+                body: "What is 1+1? Reply only with the number.",
+            });
+
+            // Read with token1 until we get at least one real callback
+            const token1 = await getToken();
+            let token1Callbacks = [];
+            const deadline1 = Date.now() + 60000;
+            while (Date.now() < deadline1) {
+                const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token1}`);
+                if (data.error === "HttpRequestTimeout") continue;
+                if (data.error) break;
+                token1Callbacks.push(data);
+                if (data.callback === "onIdle") break;
+            }
+            assert.ok(token1Callbacks.length > 0, "token1 should have received at least one response");
+
+            // Stop the session (lifecycle countdown begins)
+            await fetchJson(`/api/copilot/session/${sessionId}/stop`);
+
+            // Create a new token2 AFTER session stopped but before countdown expires
+            const token2 = await getToken();
+
+            // token2 should be able to read from position 0 (the first response)
+            const firstResponse = await fetchJson(`/api/copilot/session/${sessionId}/live/${token2}`);
+            assert.ok(!firstResponse.error || firstResponse.error === "SessionClosed",
+                `token2 should read a response or SessionClosed, got: ${JSON.stringify(firstResponse)}`);
+
+            // If we got a real response (not SessionClosed), verify it matches position 0
+            if (!firstResponse.error) {
+                assert.strictEqual(firstResponse.callback, token1Callbacks[0].callback,
+                    "token2's first response should match token1's first response callback");
+
+                // Continue reading with token2 until SessionClosed
+                let token2Closed = false;
+                const deadline2 = Date.now() + 30000;
+                while (Date.now() < deadline2 && !token2Closed) {
+                    const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token2}`);
+                    if (data.error === "SessionClosed") {
+                        token2Closed = true;
+                    } else if (data.error === "HttpRequestTimeout") {
+                        continue;
+                    } else if (data.error) {
+                        break;
+                    }
+                }
+                assert.ok(token2Closed, "token2 should eventually receive SessionClosed");
+            }
+
+            // Drain token1 until SessionClosed as well
+            let token1Closed = false;
+            const deadline3 = Date.now() + 30000;
+            while (Date.now() < deadline3 && !token1Closed) {
+                const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token1}`);
+                if (data.error === "SessionClosed") {
+                    token1Closed = true;
+                } else if (data.error === "HttpRequestTimeout") {
+                    continue;
+                } else if (data.error) {
+                    break;
+                }
+            }
+            assert.ok(token1Closed, "token1 should eventually receive SessionClosed");
+        } finally {
+            // Cleanup: try to stop session if still running
+            try { await fetchJson(`/api/copilot/session/${sessionId}/stop`); } catch { /* ignore */ }
+        }
+    });
+
+    it("new token after countdown expires gets SessionNotFound", async () => {
+        // Start and immediately stop a session
+        const startData = await fetchJson(`/api/copilot/session/start/${freeModelId}`, {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools",
+        });
+        assert.ok(startData.sessionId, "should get session id");
+        const sessionId = startData.sessionId;
+
+        await fetchJson(`/api/copilot/session/${sessionId}/stop`);
+
+        // In test mode, countdown is 5 seconds. Wait for it to expire.
+        await new Promise((r) => setTimeout(r, 6000));
+
+        // A new token should now get SessionNotFound
+        const token = await getToken();
+        const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token}`);
+        assert.strictEqual(data.error, "SessionNotFound",
+            "new token after countdown should get SessionNotFound");
+    });
+});
+

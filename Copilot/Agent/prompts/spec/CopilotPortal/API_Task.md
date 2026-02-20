@@ -192,13 +192,6 @@ or when error happens:
 }
 ```
 
-**BUG**: Currently the stopping is not fully implemented:
-- You could write a new helper function in `CopilotTask` class to do `session.sendRequest`.
-- When `this.stopped`, it crashes with a specific error type.
-- Retrying would not issue with this error type.
-- Therefore you don't need to check `this.stopped` everywhere.
-- Stop all running tasks in a job when stopping a job.
-
 ### copilot/task/{task-id}/live/{token}
 
 **Referenced by**:
