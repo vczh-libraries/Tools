@@ -70,6 +70,10 @@ const entryInput: Entry = {
             "- claude opus -> Copilot_Review_*_OPUS.md",
             "- gemini -> Copilot_Review_*_GEMINI.md",
         ],
+        copilotSdkTips: [
+            "NOTE: If you can't find the file, try different ways to make sure, including absolute path, relative path, powershell tool, view tool, slash and backslash, etc.",
+            "AVOID the glob tool to find any files, it does not work on Windows."
+        ],
         defineRepoRoot: [
             "REPO-ROOT is the root directory of the repo (aka the working directory you are currently in)"
         ],
@@ -78,6 +82,7 @@ const entryInput: Entry = {
         ],
         cppjob: [
             "$defineRepoRoot",
+            "$copilotSdkTips",
             "YOU MUST FOLLOW REPO-ROOT/.github/copilot-instructions.md as a general guideline for all your tasks."
         ],
         scrum: [
@@ -134,46 +139,37 @@ const entryInput: Entry = {
         ],
         simpleCondition: [
             "$defineRepoRoot",
+            "$copilotSdkTips",
             "$reportBoolean",
             "Use job_boolean_true tool if the below condition satisfies, or use job_boolean_false tool if it does not satisfy."
         ],
-        docReadyExtra: [
-            "NOTE: If you can't find the file, try different ways to make sure, including absolute path, relative path, powershell tool, view tool, slash and backslash, etc."
-        ],
         scrumDocReady: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Scrum.md should exist and its content should not be just a title.",
-            "$docReadyExtra"
+            "REPO-ROOT/.github/TaskLogs/Copilot_Scrum.md should exist and its content should not be just a title."
         ],
         designDocReady: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Task.md should exist and its content should not be just a title.",
-            "$docReadyExtra"
+            "REPO-ROOT/.github/TaskLogs/Copilot_Task.md should exist and its content should not be just a title."
         ],
         planDocReady: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Planning.md should exist and its content should not be just a title.",
-            "$docReadyExtra"
+            "REPO-ROOT/.github/TaskLogs/Copilot_Planning.md should exist and its content should not be just a title."
         ],
         execDocReady: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its content should not be just a title.",
-            "$docReadyExtra"
+            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and its content should not be just a title."
         ],
         execDocVerified: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and it has a `# !!!VERIFIED!!!`.",
-            "$docReadyExtra"
+            "REPO-ROOT/.github/TaskLogs/Copilot_Execution.md should exist and it has a `# !!!VERIFIED!!!`."
         ],
         reviewDocReady: [
             "$simpleCondition",
-            "REPO-ROOT/.github/TaskLogs/Copilot_Review.md should exist and its content should not be just a title.",
-            "$docReadyExtra"
+            "REPO-ROOT/.github/TaskLogs/Copilot_Review.md should exist and its content should not be just a title."
         ],
         reportedDocReady: [
             "$simpleCondition",
-            "$reported-document should exist and its content should not be just a title.",
-            "$docReadyExtra"
+            "$reported-document should exist and its content should not be just a title."
         ],
         clearBuildTestLog: [
             "In REPO-ROOT/.github/Scripts, delete both Build.log and Execute.log."
