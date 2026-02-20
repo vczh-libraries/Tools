@@ -24,3 +24,8 @@ Data will be deleted after all guids drain all responses or 5 minutes after the 
 - List will be displayed in `/index.html` before clicking "Start" button and will not refresh.
   - This serves as an entry of opening existing jobs/session.
   - The name will be the time starting the job/session
+
+## /jobTracking.html
+
+When a `ChartNode` is selected, new sessions are supposed to be keep adding to the tab.
+But when the selected `ChartNode` is restarted, tabs should be cleared before adding for new sessions.
