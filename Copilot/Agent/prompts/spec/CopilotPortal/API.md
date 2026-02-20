@@ -58,8 +58,6 @@ Prints the following URL for shortcut:
 - Throw an error if `installJobsEntry` has not been called.
 - Return the installed entry.
 
-**BUG**: Currently `installedEntry` is passed to all helper functions instead of `ensureInstalledEntry`, this is incorrectly. The point is to ensure `installJobsEntry` is called when these APIs are used. So you should pass `ensureInstalledEntry` instead of `installedJobsEntry`, and all arguments accepting it should use `Entry` instead of `Entry | null`, and therefore fallbacks is unnecessary.
-
 ## Helpers (copilotApi.ts) --------------------------------------------------------------------------------------------------------------------------
 
 All helper functions and types are exported and API implementations should use them.

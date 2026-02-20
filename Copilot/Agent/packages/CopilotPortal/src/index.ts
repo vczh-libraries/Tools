@@ -201,14 +201,14 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
 
     // api/copilot/task (list all tasks)
     if (apiPath === "copilot/task") {
-        await apiTaskList(installedEntry, req, res);
+        await apiTaskList(ensureInstalledEntry(), req, res);
         return;
     }
 
     // api/copilot/task/start/{task-name}/session/{session-id}
     const taskStartMatch = apiPath.match(/^copilot\/task\/start\/([^\/]+)\/session\/([^\/]+)$/);
     if (taskStartMatch) {
-        await apiTaskStart(installedEntry, req, res, taskStartMatch[1], taskStartMatch[2]);
+        await apiTaskStart(ensureInstalledEntry(), req, res, taskStartMatch[1], taskStartMatch[2]);
         return;
     }
 
@@ -228,14 +228,14 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
 
     // api/copilot/job (list all jobs)
     if (apiPath === "copilot/job") {
-        await apiJobList(installedEntry, req, res);
+        await apiJobList(ensureInstalledEntry(), req, res);
         return;
     }
 
     // api/copilot/job/start/{job-name}
     const jobStartMatch = apiPath.match(/^copilot\/job\/start\/([^\/]+)$/);
     if (jobStartMatch) {
-        await apiJobStart(installedEntry, req, res, jobStartMatch[1]);
+        await apiJobStart(ensureInstalledEntry(), req, res, jobStartMatch[1]);
         return;
     }
 

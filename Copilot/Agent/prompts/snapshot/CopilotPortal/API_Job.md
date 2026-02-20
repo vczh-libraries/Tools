@@ -12,11 +12,15 @@ Read `README.md` to understand the whole picture of the project as well as speci
 Data structures about jobs and tasks are in `src/jobsDef.ts`.
 Its spec is in `JobsData.md`.
 
+If an api requires `Entry`:
+- The first argument of the api helper function must be `entry: Entry`.
+- `index.ts` will call `ensureInstalledEntry` for this argument.
+
 **TEST-NOTE-BEGIN**
 `yarn launch-for-test` will be used for unit testing therefore you have a chance to specify your own entry file.
 DO NOT use the default entry for testing.
 
-The free model "gpt-4.1" must be used in every `Entry.models`.
+The free model "gpt-5-mini" must be used in every `Entry.models`.
 If the model is no longer available, choose a new one and update both spec and custom entry JSON files.
 **TEST-NOTE-END**
 
@@ -91,7 +95,6 @@ The first line will be an absolute path for working directory
 The rest of the body will be user input.
 
 Start a new job and return in this schema.
-Call `ensureInstalledEntry` for the first argument of `startJob`.
 
 ```typescript
 {

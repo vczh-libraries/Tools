@@ -139,7 +139,6 @@ Driving session retries in this way:
   - This mean try all candidate models in each round, but pay attention to the retry budget as they are different per model.
 - Keep doing until `retryBudget` contains only zeros, which means all retyr budget trained.
 - Budget refreshes for every driving mission (which the current implementation is already doing but it follows the old retry budget design).
-- **TASK**: Handle this in `sendMonitoredPrompt` when `isDriving === true`.
 
 #### Managed Session Mode (single model)
 

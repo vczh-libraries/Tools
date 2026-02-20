@@ -224,6 +224,13 @@ export function validateEntry(entry: Entry, codePath: string): Entry {
         throw new Error(`${codePath}entry.models.driving: Should exist.`);
     }
 
+    // Validate drivingSessionRetries[0].modelId equals models.driving
+    if (entry.drivingSessionRetries && entry.drivingSessionRetries.length > 0) {
+        if (entry.drivingSessionRetries[0].modelId !== entry.models.driving) {
+            throw new Error(`${codePath}entry.drivingSessionRetries: The first modelId should equal to entry.models.driving.`);
+        }
+    }
+
     const modelKeys = Object.keys(entry.models).filter(k => k !== "reviewers");
     const gridKeywords = entry.grid.map(row => row.keyword);
     const jobKeys = entry.jobs ? Object.keys(entry.jobs) : [];

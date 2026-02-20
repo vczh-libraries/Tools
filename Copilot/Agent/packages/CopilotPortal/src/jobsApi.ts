@@ -56,14 +56,10 @@ let nextTaskId = 1;
 // ---- API Handlers ----
 
 export async function apiTaskList(
-    entry: Entry | null,
+    entry: Entry,
     req: http.IncomingMessage,
     res: http.ServerResponse,
 ): Promise<void> {
-    if (!entry) {
-        jsonResponse(res, 200, { tasks: [] });
-        return;
-    }
     const taskList = Object.entries(entry.tasks).map(([name, task]) => ({
         name,
         requireUserInput: task.requireUserInput,
@@ -72,7 +68,7 @@ export async function apiTaskList(
 }
 
 export async function apiTaskStart(
-    entry: Entry | null,
+    entry: Entry,
     req: http.IncomingMessage,
     res: http.ServerResponse,
     taskName: string,
@@ -82,10 +78,6 @@ export async function apiTaskStart(
     if (!session) {
         jsonResponse(res, 200, { error: "SessionNotFound" });
         return;
-    }
-
-    if (!entry) {
-        throw new Error("installJobsEntry has not been called.");
     }
 
     const body = await readBody(req);
@@ -429,14 +421,10 @@ export async function startJob(
 // ---- Job API Handlers ----
 
 export async function apiJobList(
-    entry: Entry | null,
+    entry: Entry,
     req: http.IncomingMessage,
     res: http.ServerResponse,
 ): Promise<void> {
-    if (!entry) {
-        jsonResponse(res, 200, { grid: [], jobs: {}, chart: {} });
-        return;
-    }
     // Build a combined chart from all jobs
     const chart: Record<string, ReturnType<typeof generateChartNodes>> = {};
     for (const [jobName, job] of Object.entries(entry.jobs)) {
@@ -446,12 +434,12 @@ export async function apiJobList(
 }
 
 export async function apiJobStart(
-    entry: Entry | null,
+    entry: Entry,
     req: http.IncomingMessage,
     res: http.ServerResponse,
     jobName: string,
 ): Promise<void> {
-    if (!entry || !(jobName in entry.jobs)) {
+    if (!(jobName in entry.jobs)) {
         jsonResponse(res, 200, { error: "JobNotFound" });
         return;
     }
