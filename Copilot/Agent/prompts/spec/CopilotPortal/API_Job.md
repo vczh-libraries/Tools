@@ -39,6 +39,8 @@ interface ICopilotJobCallback {
   jobSucceeded(): void;
   // Called when this job failed
   jobFailed(): void;
+  // Called when this job failed
+  jobCanceled(): void;
   // Called when a TaskWork started, taskId is the registered task for live polling
   workStarted(workId: number, taskId: string): void;
   // Called when a TaskWork stopped
@@ -84,6 +86,7 @@ Basically means it only keeps `grid` and `jobs` and drops all other fields, and 
 List all jobs that:
 - Running
 - Finished less than an hour
+  - **BUG**: Currently when a job is finished it disappears (at least in `/index.html`).
 
 in this schema:
 

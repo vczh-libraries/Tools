@@ -192,6 +192,13 @@ or when error happens:
 }
 ```
 
+**BUG**: In `CopilotTaskImpl.stop()` it does not report `taskFailed` immediately:
+- Ideally closing a task should cause `startTask` rushing to the end very soon.
+- By setting stopped to true and closing all running sessions, causing `guardedSendRequest` to throw soon, and since it should stops retrying.
+- But what I have observed is that, a task starts a second attempt after a job is stopped.
+- I have no idea what happened, please investigate.
+- DO NOT call `taskFailed` in `CopilotTaskImpl.stop()` to cover up the issue.
+
 ### copilot/task/{task-id}/live/{token}
 
 **Referenced by**:
