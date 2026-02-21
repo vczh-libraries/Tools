@@ -120,8 +120,25 @@ export function waitForLiveResponse(
 
     // Batch drain: return ALL available responses from current position
     if (tokenState.position < entity.responses.length) {
-        const responses = entity.responses.slice(tokenState.position);
+        const raw = entity.responses.slice(tokenState.position);
         tokenState.position = entity.responses.length;
+
+        // If onEndReasoning/onEndMessage for an id exists in the batch,
+        // skip all onReasoning/onMessage for that id (the end carries complete content).
+        const endReasoningIds = new Set<string>();
+        const endMessageIds = new Set<string>();
+        for (const r of raw) {
+            if (r.callback === "onEndReasoning") endReasoningIds.add(r.reasoningId as string);
+            if (r.callback === "onEndMessage") endMessageIds.add(r.messageId as string);
+        }
+        const responses = (endReasoningIds.size > 0 || endMessageIds.size > 0)
+            ? raw.filter(r => {
+                if (r.callback === "onReasoning" && endReasoningIds.has(r.reasoningId as string)) return false;
+                if (r.callback === "onMessage" && endMessageIds.has(r.messageId as string)) return false;
+                return true;
+            })
+            : raw;
+
         return Promise.resolve({ responses });
     }
 

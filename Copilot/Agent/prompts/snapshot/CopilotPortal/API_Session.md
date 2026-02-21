@@ -199,6 +199,7 @@ When the api comes, the current reading position needs to look up for the `token
 
 Each query returns **all** available responses from the current position to the end of the list in a single batch, and the position advances past all returned responses.
 This ensures that when multiple tokens poll the same entity, they drain buffered responses instantly and converge to the same pending position, so all tokens receive new responses simultaneously.
+In a single batch, if `onEndReasoning`/`onEndMessage` for an id presents, skip all `onReasoning`/`onMessage` for that id.
 
 If there is no response, do not reply the API. If there is no response after 5 seconds, send back a `HttpRequestTimeout`.
 Be aware of that api requests and session responses could happen in any order.
