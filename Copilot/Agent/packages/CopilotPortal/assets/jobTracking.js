@@ -200,8 +200,12 @@ async function pollLive(url, handler, shouldStop) {
             }
             // Terminal: Closed or NotFound — drain complete
             if (data.error && terminalPattern.test(data.error)) break;
-            // Non-terminal error without callback: pass to handler and continue draining
-            handler(data);
+            // Batch response: process all responses in the batch
+            if (data.responses) {
+                for (const r of data.responses) {
+                    handler(r);
+                }
+            }
         } catch (err) {
             console.error(`Poll error for ${url}:`, err);
             break;

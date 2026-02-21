@@ -193,16 +193,27 @@ Returns in this schema
 - API_Job.md: `### copilot/job/{job-id}/live/{token}`
 - Jobs.md: `### jobTracking.html`
 
-This is a query to wait for one response back for this session.
+This is a query to wait for responses back for this session.
 Each session generates many responses, storing in a list.
 When the api comes, the current reading position needs to look up for the `token`, if `token` is not used with this `session-id`, create a record and put 0.
-Each query returns the generated response in that position, and the position moves 1.
+
+Each query returns **all** available responses from the current position to the end of the list in a single batch, and the position advances past all returned responses.
+This ensures that when multiple tokens poll the same entity, they drain buffered responses instantly and converge to the same pending position, so all tokens receive new responses simultaneously.
+
 If there is no response, do not reply the API. If there is no response after 5 seconds, send back a `HttpRequestTimeout`.
 Be aware of that api requests and session responses could happen in any order.
 
 This api does not support parallel calling on the (`session-id`, `token`).
 If a call with a (`session-id`, `token`) is pending,
 the second call with the same (`session-id`, `token`) should return `ParallelCallNotSupported`.
+
+Returns in this schema when responses are available:
+
+```typescript
+{
+  responses: LiveResponse[]
+}
+```
 
 Returns in this schema if any error happens
 
@@ -255,7 +266,7 @@ Tips for implementation:
 
 #### Exception Handling
 
-Returns in this schema if an exception it thrown from inside the session
+An element in the `responses` array with this schema represents an exception thrown from inside the session
 
 ```typescript
 {
@@ -265,7 +276,7 @@ Returns in this schema if an exception it thrown from inside the session
 
 #### Response Format
 
-Other response maps to all methods in `ICopilotSessionCallbacks` in `src/copilotSession.ts` in this schema
+Each element in the `responses` array maps to a method in `ICopilotSessionCallbacks` in `src/copilotSession.ts` in this schema
 
 ```typescript
 {

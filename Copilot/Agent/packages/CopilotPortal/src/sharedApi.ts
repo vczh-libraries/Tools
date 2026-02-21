@@ -118,11 +118,11 @@ export function waitForLiveResponse(
         return Promise.resolve({ error: "ParallelCallNotSupported" });
     }
 
-    // Response available at current position?
+    // Batch drain: return ALL available responses from current position
     if (tokenState.position < entity.responses.length) {
-        const response = entity.responses[tokenState.position];
-        tokenState.position++;
-        return Promise.resolve(response);
+        const responses = entity.responses.slice(tokenState.position);
+        tokenState.position = entity.responses.length;
+        return Promise.resolve({ responses });
     }
 
     // Closed and fully drained?
@@ -145,7 +145,8 @@ export function waitForLiveResponse(
                     resolve({ error: "HttpRequestTimeout" });
                 }
             } else {
-                resolve(response);
+                // Single response from pushLiveResponse; wrap in batch format
+                resolve({ responses: [response] });
             }
         };
         setTimeout(() => {

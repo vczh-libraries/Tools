@@ -21,13 +21,20 @@ async function drainLive(livePath, targetCallback, timeoutMs = 120000) {
     const token = await getToken();
     const callbacks = [];
     const deadline = Date.now() + timeoutMs;
-    while (Date.now() < deadline) {
+    let done = false;
+    while (Date.now() < deadline && !done) {
         const data = await fetchJson(`${livePath}/${token}`);
         if (data.error === "HttpRequestTimeout") continue;
         if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
-        callbacks.push(data);
-        if (data.callback === targetCallback) break;
-        if (data.jobError) break;
+        if (data.responses) {
+            for (const r of data.responses) {
+                callbacks.push(r);
+                if (r.callback === targetCallback || r.jobError) {
+                    done = true;
+                    break;
+                }
+            }
+        }
     }
     return callbacks;
 }
@@ -44,13 +51,24 @@ async function runJob(jobName) {
     const token = await getToken();
     const callbacks = [];
     const deadline = Date.now() + 120000;
-    while (Date.now() < deadline) {
+    let done = false;
+    while (Date.now() < deadline && !done) {
         const data = await fetchJson(`/api/copilot/job/${startData.jobId}/live/${token}`);
         if (data.error === "HttpRequestTimeout") continue;
         if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
-        callbacks.push(data);
-        if (data.callback === "jobSucceeded" || data.callback === "jobFailed" || data.callback === "jobCanceled") break;
-        if (data.jobError) break;
+        if (data.responses) {
+            for (const r of data.responses) {
+                callbacks.push(r);
+                if (r.callback === "jobSucceeded" || r.callback === "jobFailed" || r.callback === "jobCanceled") {
+                    done = true;
+                    break;
+                }
+                if (r.jobError) {
+                    done = true;
+                    break;
+                }
+            }
+        }
     }
     return { jobId: startData.jobId, callbacks };
 }

@@ -171,8 +171,12 @@ describe("API: full session lifecycle", () => {
             const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token}`);
             if (data.error === "HttpRequestTimeout") continue;
             if (data.error) break;
-            callbacks.push(data);
-            if (data.callback === "onAgentEnd") gotAgentEnd = true;
+            if (data.responses) {
+                for (const r of data.responses) {
+                    callbacks.push(r);
+                    if (r.callback === "onAgentEnd") gotAgentEnd = true;
+                }
+            }
         }
 
         assert.ok(gotAgentEnd, "should receive onAgentEnd callback");
@@ -460,14 +464,21 @@ async function drainLive(livePath, targetCallback, timeoutMs = 120000) {
     const token = await getToken();
     const callbacks = [];
     const deadline = Date.now() + timeoutMs;
-    while (Date.now() < deadline) {
+    let done = false;
+    while (Date.now() < deadline && !done) {
         const data = await fetchJson(`${livePath}/${token}`);
         if (data.error === "HttpRequestTimeout") continue;
         if (data.error === "TaskNotFound" || data.error === "TaskClosed") break;
         if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
-        callbacks.push(data);
-        if (data.callback === targetCallback) break;
-        if (data.taskError || data.jobError) break;
+        if (data.responses) {
+            for (const r of data.responses) {
+                callbacks.push(r);
+                if (r.callback === targetCallback || r.taskError || r.jobError) {
+                    done = true;
+                    break;
+                }
+            }
+        }
     }
     return callbacks;
 }
@@ -769,8 +780,14 @@ describe("API: session lifecycle visibility - new token reads before SessionClos
                 const data = await fetchJson(`/api/copilot/session/${sessionId}/live/${token1}`);
                 if (data.error === "HttpRequestTimeout") continue;
                 if (data.error) break;
-                token1Callbacks.push(data);
-                if (data.callback === "onIdle") break;
+                if (data.responses) {
+                    let gotIdle = false;
+                    for (const r of data.responses) {
+                        token1Callbacks.push(r);
+                        if (r.callback === "onIdle") { gotIdle = true; break; }
+                    }
+                    if (gotIdle) break;
+                }
             }
             assert.ok(token1Callbacks.length > 0, "token1 should have received at least one response");
 
@@ -785,9 +802,9 @@ describe("API: session lifecycle visibility - new token reads before SessionClos
             assert.ok(!firstResponse.error || firstResponse.error === "SessionClosed",
                 `token2 should read a response or SessionClosed, got: ${JSON.stringify(firstResponse)}`);
 
-            // If we got a real response (not SessionClosed), verify it matches position 0
-            if (!firstResponse.error) {
-                assert.strictEqual(firstResponse.callback, token1Callbacks[0].callback,
+            // If we got a batch response (not SessionClosed), verify it starts with position 0
+            if (!firstResponse.error && firstResponse.responses) {
+                assert.strictEqual(firstResponse.responses[0].callback, token1Callbacks[0].callback,
                     "token2's first response should match token1's first response callback");
 
                 // Continue reading with token2 until SessionClosed
@@ -982,13 +999,18 @@ describe("API: jobCanceled callback on stop", () => {
         // Drain live responses - should eventually get jobCanceled
         const callbacks = [];
         const deadline = Date.now() + 30000;
-        while (Date.now() < deadline) {
+        let done = false;
+        while (Date.now() < deadline && !done) {
             const data = await fetchJson(`/api/copilot/job/${startData.jobId}/live/${token}`);
             if (data.error === "HttpRequestTimeout") continue;
             if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
-            callbacks.push(data);
-            if (data.callback === "jobCanceled" || data.callback === "jobFailed" || data.callback === "jobSucceeded") break;
-            if (data.jobError) break;
+            if (data.responses) {
+                for (const r of data.responses) {
+                    callbacks.push(r);
+                    if (r.callback === "jobCanceled" || r.callback === "jobFailed" || r.callback === "jobSucceeded") { done = true; break; }
+                    if (r.jobError) { done = true; break; }
+                }
+            }
         }
 
         const hasCanceled = callbacks.some(c => c.callback === "jobCanceled");

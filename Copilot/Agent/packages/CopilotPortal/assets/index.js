@@ -189,12 +189,17 @@ async function pollLive() {
                 livePollingActive = false;
                 break;
             }
-            if (data.sessionError) {
-                console.error("Session error:", data.sessionError);
-                continue;
-            }
-            if (data.callback) {
-                processCallback(data);
+            // Batch response: process all responses in the batch
+            if (data.responses) {
+                for (const r of data.responses) {
+                    if (r.sessionError) {
+                        console.error("Session error:", r.sessionError);
+                        continue;
+                    }
+                    if (r.callback) {
+                        processCallback(r);
+                    }
+                }
             }
         } catch (err) {
             if (!livePollingActive) break;
