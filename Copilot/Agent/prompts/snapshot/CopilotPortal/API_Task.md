@@ -201,6 +201,14 @@ It works like `copilot/session/{session-id}/live/{token}` but it reacts to `ICop
 They should be implemented in the same way, but only respond in schemas mentioned below.
 `token` can be obtained by `/token` but no checking needs to perform.
 
+Returns in this schema when responses are available (batched, same as session live API):
+
+```typescript
+{
+  responses: LiveResponse[]
+}
+```
+
 Returns in this schema if any error happens
 
 ```typescript
@@ -218,7 +226,7 @@ It requires the underlying copilot agent to not generate any response for 5 seco
 which is almost impossible.
 **TEST-NOTE-END**
 
-Returns in this schema if an exception it thrown from inside the session
+An element in the `responses` array with this schema represents an exception thrown from inside the session
 
 ```typescript
 {
@@ -226,6 +234,6 @@ Returns in this schema if an exception it thrown from inside the session
 }
 ```
 
-Other response maps to all methods in `ICopilotTaskCallback` in `src/taskApi.ts`.
+Each element in the `responses` array maps to a method in `ICopilotTaskCallback` in `src/taskApi.ts`.
 
 When a task is created by a job's `executeWork`, the `taskSessionStarted` response additionally includes `sessionId` (string) and `isDriving` (boolean) fields so the frontend can poll `copilot/session/{session-id}/live/{token}` and distinguish between driving and task sessions.
