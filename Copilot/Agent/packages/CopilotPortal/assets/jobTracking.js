@@ -229,7 +229,7 @@ function startSessionPolling(sessionId, workId) {
                 sessionInfo.renderer.processCallback(response);
             }
         },
-        () => jobStopped
+        () => false // Always drain to server terminal response
     );
 }
 
@@ -380,7 +380,7 @@ function startTaskPolling(taskId, workId) {
                 }
             }
         },
-        () => jobStopped
+        () => false // Always drain to server terminal response
     );
 }
 
@@ -454,7 +454,7 @@ function startJobPolling() {
                 updateStatusLabel();
             }
         },
-        () => jobStopped
+        () => false // Always drain to server terminal response
     );
 }
 
