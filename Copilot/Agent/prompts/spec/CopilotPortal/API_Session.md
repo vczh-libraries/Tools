@@ -199,7 +199,6 @@ When the api comes, the current reading position needs to look up for the `token
 
 Each query returns **all** available responses from the current position to the end of the list in a single batch, and the position advances past all returned responses.
 This ensures that when multiple tokens poll the same entity, they drain buffered responses instantly and converge to the same pending position, so all tokens receive new responses simultaneously.
-In a single batch, if `onEndReasoning`/`onEndMessage` for an id presents, skip all `onReasoning`/`onMessage` for that id.
 
 If there is no response, do not reply the API. If there is no response after 5 seconds, send back a `HttpRequestTimeout`.
 Be aware of that api requests and session responses could happen in any order.
@@ -207,6 +206,22 @@ Be aware of that api requests and session responses could happen in any order.
 This api does not support parallel calling on the (`session-id`, `token`).
 If a call with a (`session-id`, `token`) is pending,
 the second call with the same (`session-id`, `token`) should return `ParallelCallNotSupported`.
+
+#### Optimization
+
+When `onEndReasongin`/`onEndMessage` pushes to the responses list:
+- It should remove all `onReasoning`/`onMessage` for that id.
+- This would affect cached token positions. It is easy to fix by counting how many removed responses has been read.
+- **TASK**: The current design is done in `waitForLiveResponse` in another way, which is not optimal, I believe `pushLiveResponse` will be a better place.
+
+When a new response pushes to the responses list, causing a pending request to wake up:
+- The time of the last live api responding (not the requesting) needs to be recorded for the `token` and uses it as below.
+- Now the pending request will not return `HttpRequestTimeout`, but it will wait until 5 seconds after the last call.
+  - If it is already longer than 5 seconds, send new responses immediately.
+  - Whenever a live api request is responded, update the time for that `token`.
+- **TASK**: Therefore `pushLiveResponse` doesn't need to pass the new response to the handler. And `waitForLiveResponse` can do a small refactor so that multiple places of responding could use the same code to accumulate all new responses, fix the last response time and reading position.
+
+#### API Schema
 
 Returns in this schema when responses are available:
 
