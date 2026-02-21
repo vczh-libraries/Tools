@@ -62,6 +62,61 @@ html, body {
     cursor: not-allowed;
 }
 
+/* ---- Running Jobs List ---- */
+#running-jobs-list {
+    min-width: 400px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 8px;
+}
+
+.running-job-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.running-job-view-btn {
+    padding: 3px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid #888;
+    border-radius: 4px;
+    background: #f8f8f8;
+    flex-shrink: 0;
+}
+
+.running-job-view-btn:hover {
+    background: #e8e8e8;
+}
+
+.running-job-name {
+    font-weight: bold;
+    flex: 1;
+}
+
+.running-job-status {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.running-job-status-running { color: #0a0; }
+.running-job-status-succeeded { color: #080; }
+.running-job-status-failed { color: #c00; }
+.running-job-status-canceled { color: #888; }
+
+.running-job-time {
+    font-size: 12px;
+    color: #666;
+    flex-shrink: 0;
+}
+
 /* ---- Session UI ---- */
 #session-ui {
     display: none;

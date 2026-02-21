@@ -26,6 +26,8 @@ import {
 } from "./taskApi.js";
 import {
     apiJobList,
+    apiJobRunning,
+    apiJobStatus,
     apiJobStart,
     apiJobStop,
     apiJobLive,
@@ -246,10 +248,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse, ap
         return;
     }
 
+    // api/copilot/job/running
+    if (apiPath === "copilot/job/running") {
+        await apiJobRunning(req, res);
+        return;
+    }
+
     // api/copilot/job/start/{job-name}
     const jobStartMatch = apiPath.match(/^copilot\/job\/start\/([^\/]+)$/);
     if (jobStartMatch) {
         await apiJobStart(ensureInstalledEntry(), req, res, jobStartMatch[1]);
+        return;
+    }
+
+    // api/copilot/job/{job-id}/status
+    const jobStatusMatch = apiPath.match(/^copilot\/job\/([^\/]+)\/status$/);
+    if (jobStatusMatch) {
+        await apiJobStatus(req, res, jobStatusMatch[1]);
         return;
     }
 

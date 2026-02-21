@@ -36,8 +36,14 @@ When the webpage is loaded, it renders a UI in the middle to let me input:
   - `REPO-ROOT` is the root folder of the repo that the source code of this project is in (no hardcoding).
 
 There are a row of buttons:
-- "Jobs" on the very left.
+- "New Job" on the very left.
+- "Refresh".
 - "Start" on the very right.
+
+Below there is a list, displaying all running job's name, status, time.
+The list only refresh when the "Refresh" button is clicked.
+It can be listed by `copilot/job/running`.
+At the very left of each item, there is a "View" button. It starts `/jobTracking.html` to inspect into the job.
 
 ##### Start Button
 
@@ -51,7 +57,7 @@ Only after the model list is loaded, "Start" is enabled.
 **Referenced by**:
 - Jobs.md: `### jobs.html`
 
-When I hit the "Jobs" button, it jumps to `/jobs.html`.
+When I hit the "New Job" button, it jumps to `/jobs.html`.
 The selected model is ignored, but the working directory should be brought to `/jobs.html`.
 
 #### Session Interaction

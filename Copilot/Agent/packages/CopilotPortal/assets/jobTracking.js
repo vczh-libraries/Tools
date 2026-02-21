@@ -455,6 +455,44 @@ function startJobPolling() {
     );
 }
 
+// ---- Load initial job status ----
+async function loadInitialJobStatus() {
+    if (isPreviewMode || !jobId) return;
+    try {
+        const res = await fetch(`/api/copilot/job/${encodeURIComponent(jobId)}/status`);
+        const data = await res.json();
+        if (data.error) return;
+
+        // Update job status
+        if (data.status === "Succeeded") {
+            jobStatus = "SUCCEEDED";
+        } else if (data.status === "Failed") {
+            jobStatus = "FAILED";
+        } else if (data.status === "Canceled") {
+            jobStatus = "CANCELED";
+            jobStopped = true;
+        } else {
+            jobStatus = "RUNNING";
+        }
+        updateStatusLabel();
+
+        // Update task statuses on the chart
+        if (data.tasks && chartController) {
+            for (const task of data.tasks) {
+                if (task.status === "Running") {
+                    chartController.setRunning(task.workIdInJob);
+                } else if (task.status === "Succeeded") {
+                    chartController.setCompleted(task.workIdInJob);
+                } else if (task.status === "Failed") {
+                    chartController.setFailed(task.workIdInJob);
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load initial job status:", err);
+    }
+}
+
 // ---- Load job data and render chart ----
 async function loadJobData() {
     try {
@@ -491,6 +529,9 @@ async function loadJobData() {
 
         // Render with Mermaid
         chartController = await renderFlowChartMermaid(chart, chartContainer, isPreviewMode ? () => {} : onInspect);
+
+        // Load initial job status before starting live polling
+        await loadInitialJobStatus();
 
         // Start job live polling only when not in preview mode
         if (!isPreviewMode) {

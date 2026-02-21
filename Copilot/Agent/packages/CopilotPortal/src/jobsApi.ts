@@ -46,11 +46,21 @@ export interface ICopilotJobCallback {
 
 // ---- Job State ----
 
+interface JobTaskStatus {
+    workIdInJob: number;
+    taskId?: string;
+    status: "Running" | "Succeeded" | "Failed";
+}
+
 interface JobState {
     jobId: string;
+    jobName: string;
+    startTime: Date;
     job: ICopilotJob;
     entity: LiveEntityState;
     jobError: string | null;
+    canceledByStop: boolean;
+    taskStatuses: Map<number, JobTaskStatus>;
 }
 
 const jobs = new Map<string, JobState>();
@@ -315,9 +325,13 @@ export async function apiJobStart(
         });
         const state: JobState = {
             jobId,
+            jobName,
+            startTime: new Date(),
             job: null as unknown as ICopilotJob,
             entity,
             jobError: null,
+            canceledByStop: false,
+            taskStatuses: new Map(),
         };
 
         const jobCallback: ICopilotJobCallback = {
@@ -330,9 +344,17 @@ export async function apiJobStart(
                 closeLiveEntity(entity);
             },
             workStarted(workId: number, taskId: string) {
+                state.taskStatuses.set(workId, { workIdInJob: workId, taskId, status: "Running" });
                 pushLiveResponse(entity, { callback: "workStarted", workId, taskId });
             },
             workStopped(workId: number, succeeded: boolean) {
+                const existing = state.taskStatuses.get(workId);
+                if (existing) {
+                    existing.status = succeeded ? "Succeeded" : "Failed";
+                    delete existing.taskId;
+                } else {
+                    state.taskStatuses.set(workId, { workIdInJob: workId, status: succeeded ? "Succeeded" : "Failed" });
+                }
                 pushLiveResponse(entity, { callback: "workStopped", workId, succeeded });
             },
         };
@@ -357,6 +379,62 @@ export async function apiJobStart(
     }
 }
 
+export async function apiJobRunning(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+): Promise<void> {
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    const result: { jobId: string; jobName: string; startTime: Date; status: "Running" | "Succeeded" | "Failed" | "Canceled" }[] = [];
+    for (const [id, state] of jobs) {
+        let status: "Running" | "Succeeded" | "Failed" | "Canceled";
+        if (state.canceledByStop) {
+            status = "Canceled";
+        } else {
+            const s = state.job.status;
+            status = s === "Executing" ? "Running" : s;
+        }
+        if (status === "Running" || state.startTime >= oneHourAgo) {
+            result.push({ jobId: id, jobName: state.jobName, startTime: state.startTime, status });
+        }
+    }
+    jsonResponse(res, 200, { jobs: result });
+}
+
+export async function apiJobStatus(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    jobId: string,
+): Promise<void> {
+    const state = jobs.get(jobId);
+    if (!state) {
+        jsonResponse(res, 200, { error: "JobNotFound" });
+        return;
+    }
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    let status: "Running" | "Succeeded" | "Failed" | "Canceled";
+    if (state.canceledByStop) {
+        status = "Canceled";
+    } else {
+        const s = state.job.status;
+        status = s === "Executing" ? "Running" : s;
+    }
+    if (status !== "Running" && state.startTime < oneHourAgo) {
+        jsonResponse(res, 200, { error: "JobNotFound" });
+        return;
+    }
+    const tasks: { workIdInJob: number; taskId?: string; status: "Running" | "Succeeded" | "Failed" }[] = [];
+    for (const ts of state.taskStatuses.values()) {
+        const entry: { workIdInJob: number; taskId?: string; status: "Running" | "Succeeded" | "Failed" } = { workIdInJob: ts.workIdInJob, status: ts.status };
+        if (ts.taskId !== undefined) {
+            entry.taskId = ts.taskId;
+        }
+        tasks.push(entry);
+    }
+    jsonResponse(res, 200, { jobId, jobName: state.jobName, startTime: state.startTime, status, tasks });
+}
+
 export async function apiJobStop(
     req: http.IncomingMessage,
     res: http.ServerResponse,
@@ -367,6 +445,7 @@ export async function apiJobStop(
         jsonResponse(res, 200, { error: "JobNotFound" });
         return;
     }
+    state.canceledByStop = true;
     state.job.stop();
     closeLiveEntity(state.entity);
     jsonResponse(res, 200, { result: "Closed" });
