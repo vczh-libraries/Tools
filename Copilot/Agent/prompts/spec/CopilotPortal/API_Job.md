@@ -79,6 +79,51 @@ List all jobs passed to `installJobsEntry` in this schema:
 
 Basically means it only keeps `grid` and `jobs` and drops all other fields, and calculate `chart` with `generateChartNodes`.
 
+### copilot/job/running
+
+List all jobs that:
+- Running
+- Finished less than an hour
+
+in this schema:
+
+```typescript
+{
+  jobs: {
+    jobId: string;
+    jobName: string;
+    startTime: Date;
+    status: "Running" | "Succeeded" | "Failed" | "Canceled";
+  }[];
+}
+```
+
+### copilot/job/{job-id}/status
+
+If a job is running or finished less than an hour, return in this schema:
+
+```typescript
+{
+  jobId: string;
+  jobName: string;
+  startTime: Date;
+  status: "Running" | "Succeeded" | "Failed" | "Canceled";
+  tasks: {
+    workIdInJob: number;
+    taskId?: string; // available only when running
+    status: "Running" | "Succeeded" | "Failed";
+  }[];
+}
+```
+
+otherwise:
+
+```typescript
+{
+  error: "JobNotFound"
+}
+```
+
 ### copilot/job/start/{job-name}
 
 **Referenced by**:
@@ -101,6 +146,8 @@ The first line will be an absolute path for working directory
 The rest of the body will be user input.
 
 Start a new job and return in this schema.
+The job remembers its `job-name` and start time.
+It also remembers status of all tasks. When a task restarts, status overrides.
 
 ```typescript
 {

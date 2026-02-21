@@ -142,6 +142,10 @@ Render it like a flow chart expanding to fill the whole `job part`.
 
 #### Tracking Job Status
 
+When the webpage is loaded, call `api/copilot/job/{job-id}/status` and update job status and each `ChartNode`.
+The job could have been running for a long time. But the job live api will still response all history.
+When a task or session of notified started, it could already have been stopped, ignore the error when task/session api says the entity does not exist.
+
 Call `api/token` for a token, and it can be used in any live api call issued in thie webpage.
 When the status of a task running is changed,
 update the rendering of a `ChartNode` of which `hint` is `TaskNode` or `CondNode`:
