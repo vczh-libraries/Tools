@@ -449,6 +449,9 @@ function startJobPolling() {
             } else if (cb === "jobFailed") {
                 jobStatus = "FAILED";
                 updateStatusLabel();
+            } else if (cb === "jobCanceled") {
+                jobStatus = "CANCELED";
+                updateStatusLabel();
             }
         },
         () => jobStopped

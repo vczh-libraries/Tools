@@ -350,3 +350,4 @@ async function loadTasks() {
 loadModels();
 initWorkingDir();
 loadTasks();
+loadRunningJobs();

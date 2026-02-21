@@ -40,7 +40,7 @@ async function runJob(jobName) {
     });
     assert.ok(startData.jobId, `should return jobId for ${jobName}: ${JSON.stringify(startData)}`);
 
-    // Drain until jobSucceeded or jobFailed
+    // Drain until jobSucceeded, jobFailed, or jobCanceled
     const token = await getToken();
     const callbacks = [];
     const deadline = Date.now() + 120000;
@@ -49,7 +49,7 @@ async function runJob(jobName) {
         if (data.error === "HttpRequestTimeout") continue;
         if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
         callbacks.push(data);
-        if (data.callback === "jobSucceeded" || data.callback === "jobFailed") break;
+        if (data.callback === "jobSucceeded" || data.callback === "jobFailed" || data.callback === "jobCanceled") break;
         if (data.jobError) break;
     }
     return { jobId: startData.jobId, callbacks };

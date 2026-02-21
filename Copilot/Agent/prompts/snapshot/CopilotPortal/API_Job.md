@@ -39,6 +39,8 @@ interface ICopilotJobCallback {
   jobSucceeded(): void;
   // Called when this job failed
   jobFailed(): void;
+  // Called when this job failed
+  jobCanceled(): void;
   // Called when a TaskWork started, taskId is the registered task for live polling
   workStarted(workId: number, taskId: string): void;
   // Called when a TaskWork stopped

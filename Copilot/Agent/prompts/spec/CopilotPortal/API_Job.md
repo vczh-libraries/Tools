@@ -86,7 +86,6 @@ Basically means it only keeps `grid` and `jobs` and drops all other fields, and 
 List all jobs that:
 - Running
 - Finished less than an hour
-  - **BUG**: Currently when a job is finished it disappears (at least in `/index.html`).
 
 in this schema:
 

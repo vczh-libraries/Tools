@@ -35,15 +35,16 @@ When the webpage is loaded, it renders a UI in the middle to let me input:
   - When there is no `project` argument, it becomes `REPO-ROOT`.
   - `REPO-ROOT` is the root folder of the repo that the source code of this project is in (no hardcoding).
 
-There are a row of buttons:
-- "New Job" on the very left.
-- "Refresh".
-- "Start" on the very right.
+There are a row of buttons with proper margin:
+- On the very left: "New Job", "Refresh"
+- On the very right: "Start"
 
 Below there is a list, displaying all running job's name, status, time.
-The list only refresh when the "Refresh" button is clicked.
+The list only refresh when the webpage is loaded or the "Refresh" button is clicked.
 It can be listed by `copilot/job/running`.
 At the very left of each item, there is a "View" button. It starts `/jobTracking.html` to inspect into the job.
+
+The list must be in the same width with the above part.
 
 ##### Start Button
 

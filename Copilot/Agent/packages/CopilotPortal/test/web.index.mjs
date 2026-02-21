@@ -62,7 +62,7 @@ describe("Web: index.html setup UI", () => {
         assert.strictEqual(value, config.repoRoot, "working dir should default to REPO-ROOT");
     });
 
-    it("has New Job button on the left, Refresh button, and Start button on the right", async () => {
+    it("has New Job and Refresh buttons on the left, Start button on the right", async () => {
         const jobsButton = page.locator("#jobs-button");
         const refreshButton = page.locator("#refresh-button");
         const startButton = page.locator("#start-button");
@@ -72,6 +72,15 @@ describe("Web: index.html setup UI", () => {
         assert.strictEqual(await jobsButton.textContent(), "New Job");
         assert.strictEqual(await refreshButton.textContent(), "Refresh");
         assert.strictEqual(await startButton.textContent(), "Start");
+
+        // Verify grouping: New Job and Refresh in left div, Start on the right
+        const leftDiv = page.locator("#setup-buttons-left");
+        assert.ok(await leftDiv.count() > 0, "setup-buttons-left should exist");
+
+        // Verify button positions: left buttons should be left of Start
+        const jobsBox = await jobsButton.boundingBox();
+        const startBox = await startButton.boundingBox();
+        assert.ok(jobsBox.x < startBox.x, "New Job should be to the left of Start");
     });
 
     it("Start button is enabled after models load", async () => {

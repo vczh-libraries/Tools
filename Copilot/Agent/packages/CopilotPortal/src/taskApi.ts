@@ -329,6 +329,7 @@ class CopilotTaskImpl implements ICopilotTask {
             } catch (err) {
                 monitor.cleanup();
                 if (err instanceof TaskStoppedError) throw err;
+                if (this.stopped) throw new TaskStoppedError();
                 lastError = err;
                 this.callback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
             }
@@ -362,6 +363,7 @@ class CopilotTaskImpl implements ICopilotTask {
                 } catch (err) {
                     monitor.cleanup();
                     if (err instanceof TaskStoppedError) throw err;
+                    if (this.stopped) throw new TaskStoppedError();
                     lastError = err;
                     this.callback.taskDecision(`[SESSION CRASHED] ${errorToDetailedString(err)}`);
                 }

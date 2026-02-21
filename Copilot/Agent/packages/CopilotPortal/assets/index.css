@@ -41,7 +41,13 @@ html, body {
 #setup-buttons {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     min-width: 400px;
+}
+
+#setup-buttons-left {
+    display: flex;
+    gap: 8px;
 }
 
 #setup-ui button {
@@ -65,8 +71,6 @@ html, body {
 /* ---- Running Jobs List ---- */
 #running-jobs-list {
     min-width: 400px;
-    max-width: 600px;
-    width: 100%;
     max-height: 300px;
     overflow-y: auto;
     margin-top: 8px;

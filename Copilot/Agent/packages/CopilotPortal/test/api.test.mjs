@@ -962,3 +962,59 @@ describe("API: copilot/job/{job-id}/status", () => {
     });
 });
 
+describe("API: jobCanceled callback on stop", () => {
+    it("stopped job receives jobCanceled callback via live api", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/simple-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, "should return jobId");
+
+        // Get a live token before stopping
+        const token = await getToken();
+
+        // Give the job a moment to start
+        await new Promise(r => setTimeout(r, 200));
+
+        // Stop the job
+        await fetchJson(`/api/copilot/job/${startData.jobId}/stop`, { method: "POST" });
+
+        // Drain live responses - should eventually get jobCanceled
+        const callbacks = [];
+        const deadline = Date.now() + 30000;
+        while (Date.now() < deadline) {
+            const data = await fetchJson(`/api/copilot/job/${startData.jobId}/live/${token}`);
+            if (data.error === "HttpRequestTimeout") continue;
+            if (data.error === "JobNotFound" || data.error === "JobsClosed") break;
+            callbacks.push(data);
+            if (data.callback === "jobCanceled" || data.callback === "jobFailed" || data.callback === "jobSucceeded") break;
+            if (data.jobError) break;
+        }
+
+        const hasCanceled = callbacks.some(c => c.callback === "jobCanceled");
+        assert.ok(hasCanceled, `stopped job should emit jobCanceled callback, got: ${JSON.stringify(callbacks.map(c => c.callback))}`);
+    });
+});
+
+describe("API: finished job persists in running list", () => {
+    it("finished job appears in running list after live entity is drained", async () => {
+        const startData = await fetchJson("/api/copilot/job/start/simple-job", {
+            method: "POST",
+            body: "C:\\Code\\VczhLibraries\\Tools\ntest",
+        });
+        assert.ok(startData.jobId, "should return jobId");
+
+        // Drain all live responses to fully consume the entity
+        await drainLive(`/api/copilot/job/${startData.jobId}/live`, "jobSucceeded");
+
+        // Wait a moment for any cleanup to happen
+        await new Promise(r => setTimeout(r, 500));
+
+        // Job should still appear in the running list
+        const data = await fetchJson("/api/copilot/job/running");
+        const found = data.jobs.find(j => j.jobId === startData.jobId);
+        assert.ok(found, "finished job should still appear in running list after draining live responses");
+        assert.ok(["Succeeded", "Failed"].includes(found.status), `status should be terminal: ${found.status}`);
+    });
+});
+

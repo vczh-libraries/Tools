@@ -200,12 +200,6 @@ Each query returns the generated response in that position, and the position mov
 If there is no response, do not reply the API. If there is no response after 5 seconds, send back a `HttpRequestTimeout`.
 Be aware of that api requests and session responses could happen in any order.
 
-**BUG**: Currently reporting with multiple token is not working well:
-- When there is 10 responses, tokenA is waiting for the 11th, tokenB is just joined:
-  - It seems tokenB will get unblocked when tokenA get unblocked (aka 11th responses coming).
-- The correct behavior should be that, since tokenB is just joined, it should be able to pull 10 live apis without waiting.
-  - Therefore when tokenA is still waiting for the 11th response, tokenB can fire 10 live apis immediately and pending on the 11th.
-
 This api does not support parallel calling on the (`session-id`, `token`).
 If a call with a (`session-id`, `token`) is pending,
 the second call with the same (`session-id`, `token`) should return `ParallelCallNotSupported`.

@@ -40,6 +40,8 @@ export interface ICopilotJob {
 export interface ICopilotJobCallback {
     jobSucceeded(): void;
     jobFailed(): void;
+    // Called when this job failed
+    jobCanceled(): void;
     workStarted(workId: number, taskId: string): void;
     workStopped(workId: number, succeeded: boolean): void;
 }
@@ -232,12 +234,15 @@ export async function startJob(
     const runningIds = new Set<number>();
     const activeTasks: ICopilotTask[] = [];
 
+    let canceledByStop = false;
+
     const copilotJob: ICopilotJob = {
         get runningWorkIds() { return Array.from(runningIds); },
         get status() { return status; },
         stop() {
             if (stopped) return;
             stopped = true;
+            canceledByStop = true;
             status = "Failed";
             for (const task of activeTasks) {
                 task.stop();
@@ -257,7 +262,11 @@ export async function startJob(
                 callback.jobSucceeded();
             } else {
                 status = "Failed";
-                callback.jobFailed();
+                if (canceledByStop) {
+                    callback.jobCanceled();
+                } else {
+                    callback.jobFailed();
+                }
             }
         } catch (err) {
             if (status === "Executing") {
@@ -267,7 +276,11 @@ export async function startJob(
             for (const task of activeTasks) {
                 task.stop();
             }
-            callback.jobFailed();
+            if (canceledByStop) {
+                callback.jobCanceled();
+            } else {
+                callback.jobFailed();
+            }
             throw err; // Don't consume silently
         }
     })();
@@ -320,9 +333,7 @@ export async function apiJobStart(
 
     try {
         const jobId = `job-${nextJobId++}`;
-        const entity = createLiveEntityState(getCountDownMs(), () => {
-            jobs.delete(jobId);
-        });
+        const entity = createLiveEntityState(getCountDownMs());
         const state: JobState = {
             jobId,
             jobName,
@@ -341,6 +352,10 @@ export async function apiJobStart(
             },
             jobFailed() {
                 pushLiveResponse(entity, { callback: "jobFailed" });
+                closeLiveEntity(entity);
+            },
+            jobCanceled() {
+                pushLiveResponse(entity, { callback: "jobCanceled" });
                 closeLiveEntity(entity);
             },
             workStarted(workId: number, taskId: string) {
@@ -386,6 +401,7 @@ export async function apiJobRunning(
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
     const result: { jobId: string; jobName: string; startTime: Date; status: "Running" | "Succeeded" | "Failed" | "Canceled" }[] = [];
+    const toDelete: string[] = [];
     for (const [id, state] of jobs) {
         let status: "Running" | "Succeeded" | "Failed" | "Canceled";
         if (state.canceledByStop) {
@@ -396,8 +412,11 @@ export async function apiJobRunning(
         }
         if (status === "Running" || state.startTime >= oneHourAgo) {
             result.push({ jobId: id, jobName: state.jobName, startTime: state.startTime, status });
+        } else {
+            toDelete.push(id);
         }
     }
+    for (const id of toDelete) { jobs.delete(id); }
     jsonResponse(res, 200, { jobs: result });
 }
 
@@ -447,6 +466,7 @@ export async function apiJobStop(
     }
     state.canceledByStop = true;
     state.job.stop();
+    pushLiveResponse(state.entity, { callback: "jobCanceled" });
     closeLiveEntity(state.entity);
     jsonResponse(res, 200, { result: "Closed" });
 }
