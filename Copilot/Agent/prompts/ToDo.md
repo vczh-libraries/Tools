@@ -12,3 +12,7 @@
   - at most 2 incomplete message blocks exist
   - all tokens at the same position
   - so the algorithm should be optimal enough.
+- The response queue is too complex:
+  - Rewrite it as a class and export
+  - Run unit test without involving any actualt http request
+  - Do the above optimization
