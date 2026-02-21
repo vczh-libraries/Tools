@@ -32,7 +32,11 @@ export interface LiveResponse {
 
 export interface TokenState {
     position: number;
-    pendingResolve: ((response: LiveResponse | null) => void) | null;
+    lastResponseTime: number | undefined;
+    pendingResolve: ((response: LiveResponse) => void) | null;
+    pendingClosedError: string;
+    httpTimeout: ReturnType<typeof setTimeout> | null;
+    batchTimeout: ReturnType<typeof setTimeout> | null;
 }
 
 export interface LiveEntityState {
@@ -55,15 +59,79 @@ export function createLiveEntityState(countDownMs: number, onDelete?: () => void
     };
 }
 
+function tryCleanupEntity(entity: LiveEntityState, token: string): void {
+    entity.tokens.delete(token);
+    if (entity.tokens.size === 0 && entity.onDelete) {
+        entity.onDelete();
+    }
+}
+
+// Shared helper: drain all available responses, update position/lastResponseTime, and resolve.
+// Used by pushLiveResponse (immediate or via batchTimeout), httpTimeout, and closeLiveEntity.
+function resolveToken(entity: LiveEntityState, token: string, tokenState: TokenState): void {
+    if (!tokenState.pendingResolve) return;
+
+    if (tokenState.httpTimeout) { clearTimeout(tokenState.httpTimeout); tokenState.httpTimeout = null; }
+    if (tokenState.batchTimeout) { clearTimeout(tokenState.batchTimeout); tokenState.batchTimeout = null; }
+
+    const resolve = tokenState.pendingResolve;
+    tokenState.pendingResolve = null;
+
+    if (tokenState.position < entity.responses.length) {
+        const responses = entity.responses.slice(tokenState.position);
+        tokenState.position = entity.responses.length;
+        tokenState.lastResponseTime = Date.now();
+        resolve({ responses });
+    } else if (entity.closed) {
+        tryCleanupEntity(entity, token);
+        resolve({ error: tokenState.pendingClosedError });
+    } else {
+        resolve({ error: "HttpRequestTimeout" });
+    }
+}
+
 export function pushLiveResponse(entity: LiveEntityState, response: LiveResponse): void {
-    const index = entity.responses.length;
+    // Optimization: when onEndReasoning/onEndMessage arrives, remove all matching delta entries.
+    // The end response carries the complete content so deltas are redundant.
+    if (response.callback === "onEndReasoning" || response.callback === "onEndMessage") {
+        const isReasoning = response.callback === "onEndReasoning";
+        const deltaCallback = isReasoning ? "onReasoning" : "onMessage";
+        const idKey = isReasoning ? "reasoningId" : "messageId";
+        const id = response[idKey] as string;
+
+        for (let i = entity.responses.length - 1; i >= 0; i--) {
+            if (entity.responses[i].callback === deltaCallback && entity.responses[i][idKey] === id) {
+                entity.responses.splice(i, 1);
+                // Adjust token positions for the removed entry
+                for (const [, ts] of entity.tokens) {
+                    if (ts.position > i) {
+                        ts.position--;
+                    }
+                }
+            }
+        }
+    }
+
     entity.responses.push(response);
-    for (const [, tokenState] of entity.tokens) {
-        if (tokenState.position === index && tokenState.pendingResolve) {
-            const resolve = tokenState.pendingResolve;
-            tokenState.pendingResolve = null;
-            tokenState.position++;
-            resolve(response);
+
+    // Notify pending tokens that have unread data and no batchTimeout already scheduled
+    for (const [tok, ts] of entity.tokens) {
+        if (ts.pendingResolve && ts.position < entity.responses.length && !ts.batchTimeout) {
+            const now = Date.now();
+            if (ts.lastResponseTime === undefined || now - ts.lastResponseTime >= 5000) {
+                // No recent response or window elapsed — resolve immediately
+                resolveToken(entity, tok, ts);
+            } else {
+                // Schedule delayed batch to accumulate more responses
+                const remaining = 5000 - (now - ts.lastResponseTime);
+                const ent = entity;
+                const token = tok;
+                const tokenState = ts;
+                ts.batchTimeout = setTimeout(() => {
+                    tokenState.batchTimeout = null;
+                    resolveToken(ent, token, tokenState);
+                }, remaining);
+            }
         }
     }
 }
@@ -74,17 +142,8 @@ export function closeLiveEntity(entity: LiveEntityState): void {
     // Wake up all tokens that are waiting and fully drained
     for (const [token, tokenState] of entity.tokens) {
         if (tokenState.pendingResolve && tokenState.position >= entity.responses.length) {
-            const resolve = tokenState.pendingResolve;
-            tokenState.pendingResolve = null;
-            resolve(null); // null triggers closed check in waitForLiveResponse
+            resolveToken(entity, token, tokenState);
         }
-    }
-}
-
-function tryCleanupEntity(entity: LiveEntityState, token: string): void {
-    entity.tokens.delete(token);
-    if (entity.tokens.size === 0 && entity.onDelete) {
-        entity.onDelete();
     }
 }
 
@@ -109,7 +168,7 @@ export function waitForLiveResponse(
                 return Promise.resolve({ error: notFoundError });
             }
         }
-        tokenState = { position: 0, pendingResolve: null };
+        tokenState = { position: 0, lastResponseTime: undefined, pendingResolve: null, pendingClosedError: "", httpTimeout: null, batchTimeout: null };
         entity.tokens.set(token, tokenState);
     }
 
@@ -120,25 +179,9 @@ export function waitForLiveResponse(
 
     // Batch drain: return ALL available responses from current position
     if (tokenState.position < entity.responses.length) {
-        const raw = entity.responses.slice(tokenState.position);
+        const responses = entity.responses.slice(tokenState.position);
         tokenState.position = entity.responses.length;
-
-        // If onEndReasoning/onEndMessage for an id exists in the batch,
-        // skip all onReasoning/onMessage for that id (the end carries complete content).
-        const endReasoningIds = new Set<string>();
-        const endMessageIds = new Set<string>();
-        for (const r of raw) {
-            if (r.callback === "onEndReasoning") endReasoningIds.add(r.reasoningId as string);
-            if (r.callback === "onEndMessage") endMessageIds.add(r.messageId as string);
-        }
-        const responses = (endReasoningIds.size > 0 || endMessageIds.size > 0)
-            ? raw.filter(r => {
-                if (r.callback === "onReasoning" && endReasoningIds.has(r.reasoningId as string)) return false;
-                if (r.callback === "onMessage" && endMessageIds.has(r.messageId as string)) return false;
-                return true;
-            })
-            : raw;
-
+        tokenState.lastResponseTime = Date.now();
         return Promise.resolve({ responses });
     }
 
@@ -151,38 +194,26 @@ export function waitForLiveResponse(
     // Wait for next response or timeout
     const ts = tokenState;
     const ent = entity;
+    const tok = token;
     return new Promise((resolve) => {
-        ts.pendingResolve = (response: LiveResponse | null) => {
-            if (response === null) {
-                // Timeout or closed notification
-                if (ent.closed && ts.position >= ent.responses.length) {
-                    tryCleanupEntity(ent, token);
-                    resolve({ error: closedError });
-                } else {
-                    resolve({ error: "HttpRequestTimeout" });
-                }
-            } else {
-                // Single response from pushLiveResponse; wrap in batch format
-                resolve({ responses: [response] });
-            }
-        };
-        setTimeout(() => {
-            if (ts.pendingResolve) {
-                const pendingResolve = ts.pendingResolve;
-                ts.pendingResolve = null;
-                pendingResolve(null);
-            }
+        ts.pendingResolve = resolve;
+        ts.pendingClosedError = closedError;
+        ts.httpTimeout = setTimeout(() => {
+            ts.httpTimeout = null;
+            resolveToken(ent, tok, ts);
         }, timeoutMs);
     });
 }
 
 export function shutdownLiveEntity(entity: LiveEntityState): void {
-    // Resolve all pending token waits with not-found and clear
+    // Resolve all pending token waits and clear
     for (const [, tokenState] of entity.tokens) {
+        if (tokenState.httpTimeout) { clearTimeout(tokenState.httpTimeout); tokenState.httpTimeout = null; }
+        if (tokenState.batchTimeout) { clearTimeout(tokenState.batchTimeout); tokenState.batchTimeout = null; }
         if (tokenState.pendingResolve) {
             const resolve = tokenState.pendingResolve;
             tokenState.pendingResolve = null;
-            resolve(null);
+            resolve({ error: "HttpRequestTimeout" });
         }
     }
     entity.tokens.clear();
