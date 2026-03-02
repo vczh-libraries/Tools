@@ -316,12 +316,15 @@ const server = http.createServer((req, res) => {
     serveStaticFile(res, filePath);
 });
 
-// Install the jobs entry (only if not in test mode)
-if (!testMode) {
-    installJobsEntry(entry);
+// Install the jobs entry (only if not in test mode), then start server
+async function startServer(): Promise<void> {
+    if (!testMode) {
+        await installJobsEntry(entry);
+    }
+    server.listen(port, () => {
+        console.log(`http://localhost:${port}`);
+        console.log(`http://localhost:${port}/api/stop`);
+    });
 }
 
-server.listen(port, () => {
-    console.log(`http://localhost:${port}`);
-    console.log(`http://localhost:${port}/api/stop`);
-});
+startServer();
