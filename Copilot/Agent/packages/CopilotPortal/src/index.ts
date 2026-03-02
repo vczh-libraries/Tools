@@ -104,6 +104,12 @@ async function installJobsEntry(entryValue: Entry): Promise<void> {
             throw new Error(`entry.models["${category}"] refers to model "${modelId}" which is not a valid model.`);
         }
     }
+    for (let i = 0; i < entryValue.drivingSessionRetries.length; i++) {
+        const modelId = entryValue.drivingSessionRetries[i].modelId;
+        if (!validModelIds.has(modelId)) {
+            throw new Error(`entry.drivingSessionRetries[${i}].modelId refers to model "${modelId}" which is not a valid model.`);
+        }
+    }
     installedEntry = entryValue;
 }
 

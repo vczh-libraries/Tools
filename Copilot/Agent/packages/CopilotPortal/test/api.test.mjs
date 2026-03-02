@@ -333,6 +333,39 @@ describe("API: copilot/test/installJobsEntry", () => {
         }
     });
 
+    it("rejects entry with invalid drivingSessionRetries model IDs", async () => {
+        const invalidRetryEntryPath = path.join(__dirname, "invalidRetryEntry.json");
+        const fs = await import("node:fs");
+        const modelsData = await fetchJson("/api/copilot/models");
+        const freeModel = modelsData.models.find((m) => m.multiplier === 0);
+        // Use a valid model for entry.models but an invalid model in drivingSessionRetries
+        fs.writeFileSync(invalidRetryEntryPath, JSON.stringify({
+            models: { driving: freeModel.id },
+            drivingSessionRetries: [
+                { modelId: freeModel.id, retries: 1 },
+                { modelId: "nonexistent-retry-model-xyz", retries: 2 }
+            ],
+            promptVariables: {},
+            grid: [],
+            tasks: {
+                "dummy-task": { model: { category: "driving" }, prompt: ["hello"], requireUserInput: false }
+            },
+            jobs: {}
+        }));
+        try {
+            const data = await fetchJson("/api/copilot/test/installJobsEntry", {
+                method: "POST",
+                body: invalidRetryEntryPath,
+            });
+            assert.strictEqual(data.result, "Rejected", `should reject invalid drivingSessionRetries model: ${JSON.stringify(data)}`);
+            assert.ok(data.error, "should have error message about invalid model");
+            assert.ok(data.error.includes("nonexistent-retry-model-xyz"), "error should mention the invalid model name");
+            assert.ok(data.error.includes("drivingSessionRetries"), "error should mention drivingSessionRetries");
+        } finally {
+            fs.unlinkSync(invalidRetryEntryPath);
+        }
+    });
+
     it("rejects when session is running", async () => {
         const modelsData = await fetchJson("/api/copilot/models");
         const freeModel = modelsData.models.find((m) => m.multiplier === 0);
