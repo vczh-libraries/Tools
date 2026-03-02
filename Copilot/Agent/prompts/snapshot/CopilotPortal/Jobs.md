@@ -234,6 +234,8 @@ When the user holds **Ctrl** and scrolls the mouse wheel over the `#chart-contai
 - CSS `transform: scale(...)` with `transform-origin: top left` is applied to the SVG element.
 - The default browser scroll/zoom behavior is suppressed (`preventDefault`).
 
+User should be able to zoom in and zoom out also using two touch points (two fingers).
+
 #### Interaction with `ChartNode` which has a `TaskNode` or `CondNode` hint
 
 Clicking it select (exclusive) or unselect the text:
@@ -252,3 +254,13 @@ When a task is being inspected:
   - Each task session has its own tab.
 - Clicking a tab shows responses from a session using `Session Response Rendering` from `Shared.md`.
 - When the selected `ChartNode` is restarted, tabs should be cleared before adding new sessions.
+
+### Phone Specific Layout/Behavior
+
+**IMPORTANT** This session only applies when the web page is running in a phone.
+
+- The `Session Response Part` is not visible at the beginning.
+- There is also no draggable bar between it and the `Job Part`.
+- When a `ChartNode` is clicked, the `Session Response Part` becomes visible and occupy the whole window.
+- At the very right of the tab header of the `Session Response Part`, there should be a "Back" button.
+  - Clicking the button hide the `Session Response Part` and the `Job Part` becomes available again.
