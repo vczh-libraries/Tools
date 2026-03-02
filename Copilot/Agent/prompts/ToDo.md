@@ -9,9 +9,7 @@
   - `jobs.html`
 - `report_intent` tool should apply `RESULT.intent` with the title (not just `Tool (INTENT)` but `INTENT` itself).
 - Replace gemini with sonnet in review prompt.
-- More precise file names under `Reviewer Board Files` instead of just saying `*`.
 - Verify if all models exists when loading a job description file.
-- Use bullet points in `prompt` array.
 
 - **TODO**L
   - `API_Session.md`
