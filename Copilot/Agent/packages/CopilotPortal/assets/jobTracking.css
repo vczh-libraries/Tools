@@ -211,7 +211,7 @@ html, body {
         width: 100% !important;
         height: 100%;
         z-index: 1000;
-        background: #1e1e1e;
+        background: #ffffff;
     }
 
     #right-part.phone-visible {
