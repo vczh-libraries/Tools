@@ -21,10 +21,6 @@ let chartController = null; // returned from renderFlowChartMermaid
 let jobStatus = isPreviewMode ? "PREVIEW" : "RUNNING"; // PREVIEW | RUNNING | SUCCEEDED | FAILED | CANCELED
 let jobStopped = false;
 
-// Phone detection
-function isPhoneLayout() {
-    return window.matchMedia("(max-width: 768px)").matches;
-}
 
 // Map: workId -> { taskId, sessions: Map<sessionId, { name, renderer, div, active }>, attemptCount }
 const workIdData = {};
@@ -164,16 +160,17 @@ function showTaskSessionTabs(workId) {
         tabContent.appendChild(sessionInfo.div);
     }
 
-    // Add "Back" button for phone layout
-    if (isPhoneLayout()) {
-        const backBtn = document.createElement("button");
-        backBtn.className = "phone-back-btn";
-        backBtn.textContent = "Back";
-        backBtn.addEventListener("click", () => {
-            hidePhoneSessionResponse();
-        });
-        tabHeaders.appendChild(backBtn);
-    }
+    // Add "Back" button (visible only in phone mode via CSS)
+    const backBtn = document.createElement("button");
+    backBtn.className = "phone-back-btn";
+    backBtn.textContent = "Back";
+    backBtn.addEventListener("click", () => {
+        // Unselect the inspected node
+        inspectedWorkId = null;
+        rightPart.classList.remove("phone-visible");
+        showJsonView();
+    });
+    tabHeaders.appendChild(backBtn);
 
     // Activate the first tab
     const firstEntry = sortedEntries[0];
@@ -190,32 +187,14 @@ function refreshSessionResponsePart() {
     }
 }
 
-// ---- Phone-specific session response show/hide ----
-
-function showPhoneSessionResponse() {
-    if (isPhoneLayout()) {
-        rightPart.classList.add("phone-visible");
-    }
-}
-
-function hidePhoneSessionResponse() {
-    if (isPhoneLayout()) {
-        rightPart.classList.remove("phone-visible");
-        // Unselect the node in the chart
-        inspectedWorkId = null;
-        if (chartController) {
-            // Reset selection visually by triggering onInspect(null) path
-            // The chart controller doesn't expose unselect, but we track inspectedWorkId
-        }
-        showJsonView();
-    }
-}
-
 function onInspect(workId) {
     inspectedWorkId = workId;
     refreshSessionResponsePart();
-    if (workId !== null && isPhoneLayout()) {
-        showPhoneSessionResponse();
+    if (workId !== null) {
+        // In phone mode CSS makes this a full-screen overlay; on desktop it has no effect
+        rightPart.classList.add("phone-visible");
+    } else {
+        rightPart.classList.remove("phone-visible");
     }
 }
 
@@ -357,7 +336,7 @@ function startTaskPolling(taskId, workId) {
                                     div.style.display = "none";
                                     tabContent.insertBefore(div, tabContent.firstChild);
                                 }
-                                // Ensure phone Back button stays at the end
+                                // Ensure Back button stays at the end
                                 const existingBackBtn = tabHeaders.querySelector(".phone-back-btn");
                                 if (existingBackBtn) tabHeaders.appendChild(existingBackBtn);
                             }

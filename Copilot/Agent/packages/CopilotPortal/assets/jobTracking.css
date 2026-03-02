@@ -175,7 +175,9 @@ html, body {
 
 /* ---- Phone-specific layout ---- */
 
+/* Back button: hidden on desktop, visible only in phone mode */
 .phone-back-btn {
+    display: none;
     padding: 8px 16px;
     border: 1px solid #444;
     border-bottom: none;
@@ -193,6 +195,10 @@ html, body {
 }
 
 @media (max-width: 768px) {
+    .phone-back-btn {
+        display: block;
+    }
+
     #resize-bar {
         display: none !important;
     }
