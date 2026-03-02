@@ -17,6 +17,7 @@ import {
     apiCopilotSessionQuery,
     apiCopilotSessionLive,
     hasRunningSessions,
+    helperGetModels,
 } from "./copilotApi.js";
 import {
     apiTaskList,
@@ -95,6 +96,13 @@ let installedEntry: Entry | null = null;
 async function installJobsEntry(entryValue: Entry): Promise<void> {
     if (hasRunningSessions()) {
         throw new Error("Cannot call installJobsEntry while sessions are running.");
+    }
+    const models = await helperGetModels();
+    const validModelIds = new Set(models.map(m => m.id));
+    for (const [category, modelId] of Object.entries(entryValue.models)) {
+        if (!validModelIds.has(modelId)) {
+            throw new Error(`entry.models["${category}"] refers to model "${modelId}" which is not a valid model.`);
+        }
     }
     installedEntry = entryValue;
 }
