@@ -257,7 +257,10 @@ When a task is being inspected:
 
 ### Phone Specific Layout/Behavior
 
-**IMPORTANT** This session only applies when the web page is running in a phone.
+**IMPORTANT**:
+- Phone mode is defined by `max=width: 768px`. The session only applies when the webpage is in phone mode.
+- On a PC browser while resizing, it should be able to switch between phone mode and PC mode in any status.
+- Build the webpage fully reactive, which means it is not allowed to save the "mode" in anyway even temporarily.
 
 - The `Session Response Part` is not visible at the beginning.
 - There is also no draggable bar between it and the `Job Part`.
