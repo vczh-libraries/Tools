@@ -34,7 +34,7 @@
 
 - Check out `# AFFECTED PROJECTS` in `Copilot_Execution.md` to find out what solutions you need to build.
 - Find out if there is any warning or error.
-  - `External Tools Environment and Context` has the instruction about how to check compile result.
+  - `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` has the instruction about how to check compile result.
 
 #### Fix Compile Errors
 
