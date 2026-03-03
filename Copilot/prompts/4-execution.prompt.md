@@ -48,7 +48,7 @@ I am going to propose some change to the source code.
 - Check out `External Tools Environment and Context` in `REPO-ROOT/.github/copilot-instructions.md` for accessing scripts for building.
   - Strictly follow the instruction above as this repo does not use ordinary tools.
 - Each attempt of build-fix process should be executed in a sub agent.
-  - One build-fix process includes one attempt following `Build the Solution` and `Fix Compile Errors`.
+  - One build-fix process includes one attempt with the following instructions.
   - The main agent should call different sub agent for each build-fix process.
   - Do not build and retrieve build results in the main agent.
 
@@ -70,9 +70,6 @@ I am going to propose some change to the source code.
     - Explain what you need to do.
     - Explain why you think it would solve the build break.
     - Log these in `Copilot_Execution.md`, with section `## Fixing attempt No.<attempt_number>` in `# FIXING ATTEMPTS`.
-- After finishing fixing, exit the current sub agent and tell the main agent to go back to `Step 2. Make Sure the Code Compiles but DO NOT Run Unit Test`.
-- When the code compiles:
-  - DO NOT run any tests, the code will be verified in future tasks.
 
 ### Code Generation
 
