@@ -93,6 +93,7 @@
   - Say the function name, and if the function is big, a little bit more to locate the code in it.
   - Do not use line number as source codes are subject to change rapidly.
   - The document is for understanding the source code, so you must keep mentioning names instead of using a too high-level abstraction language.
+  - Avoid doing pure code translation, focus more on the design and the logic, focus more on why and how.
 
 ## Steps for Ask
 
