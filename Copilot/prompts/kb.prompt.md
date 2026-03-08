@@ -15,11 +15,11 @@
 - The phrasing of the request may look like asking for code change, but your actual work is to write the design document.
 - Code references must be wrapped in either `single-line` or ```multi-line``` quotes.
 
-## Copilot_Scrum.md Structure
+## Copilot_KB.md Structure
 
 - `# !!!KNOWLEDGE BASE!!!`: This file always begins with this title.
 - `# DESIGN REQUEST`: The exact copy of the problem description i gave you.
-- `# INSIGHT`:: Your insight about the topic after deep research.
+- `# INSIGHT`: Your insight about the topic after deep research.
 - `# ASKS`:
   - `## QUESTION`: The exact copy of the question I gave you.
   - `### ANSWER`: Your insight about the question after deep research.
