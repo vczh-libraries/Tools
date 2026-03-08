@@ -87,20 +87,23 @@ else {
     Write-Host "Copying: copilot-instructions.md"
     Copy-Item -Path (Join-Path $PSScriptRoot "copilot-instructions.md") -Destination (Join-Path $targetFolder "copilot-instructions.md") -Force
 
-    $projectMdTarget = Join-Path $targetFolder "Project.md"
+    # Copy from $PSScriptRoot to $targetFolder\..
+    $projectRoot = Split-Path -Path $targetFolder -Parent
+    $projectMdSource = Join-Path $PSScriptRoot "Project.md"
+    $projectMdTarget = Join-Path $projectRoot "Project.md"
+    $agentsMdSource = Join-Path $PSScriptRoot "AGENTS.md"
+    $agentsMdTarget = Join-Path $projectRoot "AGENTS.md"
+
     if (-not (Test-Path -Path $projectMdTarget)) {
         Write-Host "Copying: Project.md"
-        Copy-Item -Path (Join-Path $PSScriptRoot "Project.md") -Destination $projectMdTarget -Force
+        Copy-Item -Path $projectMdSource -Destination $projectMdTarget -Force
     }
     else {
         Write-Host "Skipping: Project.md (already exists)"
     }
 
-    # Copy from $PSScriptRoot to $targetFolder\..
-    $projectRoot = Split-Path -Path $targetFolder -Parent
-    $agentsSource = Join-Path $PSScriptRoot "AGENTS.md"
     Write-Host "Copying: AGENTS.md"
-    Copy-Item -Path $agentsSource -Destination (Join-Path $projectRoot "AGENTS.md") -Force
+    Copy-Item -Path $agentsMdSource -Destination $agentsMdTarget -Force
     Write-Host "Copying: CLAUDE.md"
-    Copy-Item -Path $agentsSource -Destination (Join-Path $projectRoot "CLAUDE.md") -Force
+    Copy-Item -Path $agentsMdSource -Destination $agentsMdTarget -Force
 }
