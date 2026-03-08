@@ -1,49 +1,79 @@
 # Update Knowledge Base
 
+- Check out `Accessing Task Documents` and `Accessing Script Files` in `REPO-ROOT/.github/copilot-instructions.md` for context about mentioned `*.md` and `*.ps1` files.
+- All `*.md` and `*.ps1` files should exist; you should not create any new files unless explicitly instructed.
+  - The `Copilot_KB.md` file should already exist, it may or may not contain content from the last knowledge base writing.
+  - If you cannot find the file, you are looking at a wrong folder.
+- Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
+  - `Index.md` below means this file.
+
 ## Goal and Constraints
 
 - Your goal is to draft a document for the knowledge base in `Copilot_KB.md`.
 - You are only allowed to update `Copilot_KB.md` and the knowledge base.
 - You are not allowed to modify any other files.
+- The phrasing of the request may look like asking for code change, but your actual work is to write the design document.
 - Code references must be wrapped in either `single-line` or ```multi-line``` quotes.
-- Check out `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md`, read the entry file and understand how it is organized: `REPO-ROOT/.github/KnowledgeBase/Index.md`.
-  - `Index.md` below means this file.
+
+## Copilot_Scrum.md Structure
+
+- `# !!!KNOWLEDGE BASE!!!`: This file always begins with this title.
+- `# DESIGN REQUEST`: The exact copy of the problem description i gave you.
+- `# INSIGHT`:: Your insight about the topic after deep research.
+- `# ASKS`:
+  - `## QUESTION`: The exact copy of the question I gave you.
+  - `### ANSWER`: Your insight about the question after deep research.
+- `# DRAFT`:
+  - `## DRAFT REQUEST`: The exact copy of the draft request I have you.
+  - `## IMPROVEMENTS`:
+    - `### IMPROVEMENT`: The exact copy of the improvement request I have you.
+  - `## (API|DESIGN) EXPLANATION`: The title of the drafting KB document, and where to put the document in `Index.md` and surrounding anchors.
+  - `## DOCUMENT`: The drafting KB document.
 
 ## Identify the Problem
 
 - Your goal is to draft a document for the knowledge base, about the topic I just give you.
 - Find `# Topic` or `# Ask` or `# Draft` or `# Improve` or `# Execute` in the LATEST chat message.
 - Ignore any `# Topic` or `# Ask` or `# Draft` or `# Improve` or `# Execute` in the chat history.
+  - Ignore any of these titles in the chat history.
+  - If there is nothing:
+    - It means you are accidentally stopped. Please continue your work.
+    - Read `Copilot_KB.md` thoroughly, it is highly possible that you were working on the request described in the last section in `# DOCUMENT REQUEST`.
 
-- If there is a `# Topic` section: it means you are on a fresh start.
-  - You should override `Copilot_KB.md` with only one title `# !!!KNOWLEDGE BASE!!!`.
-  - After overriding, copy precisely my problem description in `# Topic` from the LATEST chat message under a `# DOCUMENT REQUEST`, with a new sub-section `## TOPIC`.
-  - Find `Steps for Topic` section for the complete instructions.
+### Research on a Topic (only when "# Topic" appears in the latest chat message)
 
-- If there is an `# Ask` section: it means I want you to clarify your findings.
-  - Copy precisely my problem description in `# Ask` from the LATEST chat message to the `# DOCUMENT REQUEST` section, with a new sub-section `## ASK`.
-  - Find `Steps for Ask` section for the complete instructions.
+- You should override `Copilot_KB.md` with only one title `# !!!KNOWLEDGE BASE!!!`.
+- After overriding, copy precisely my problem description in `# Topic` from the LATEST chat message under `# DOCUMENT REQUEST`.
+- Add another title `# INSIGHT`.
+- Add another title `# ASKS`.
+- Add another title `# DRAFT`, with all sub-sections under it without content.
+- Find `Steps for Topic` section for the complete instructions for filling `# INSIGHT`.
 
-- If there is a `# Draft` section: it means I think you are ready to draft the document based on information you found.
-  - Copy precisely my problem description in `# Draft` from the LATEST chat message to the `# DOCUMENT REQUEST` section, with a new sub-section `## DRAFT`.
-  - Find `Steps for Draft` section for the complete instructions.
+### Answer a Question (only when "# Ask" appears in the latest chat message)
 
-- If there is an `# Improve` section: it means I want you to improve the draft.
-  - Copy precisely my problem description in `# Improve` from the LATEST chat message to the `# DOCUMENT REQUEST` section, with a new sub-section `## IMPROVE`.
-  - Find `Steps for Improve` section for the complete instructions.
+- Copy precisely my question in `# Ask` from the LATEST chat message to a new sub-section `## QUESTION` under `# ASKS`.
+- The new `## QUESTION` and `### ANSWER` should be added before `# DRAFT` as it is the latest question.
+- Find `Steps for Ask` section for the complete instructions for filling `### ANSWER`.
 
-- If there is an `# Execute` section: it means I am satisfied with the draft document. You are going to add it to the knowledge base.
-  - Find `Steps for Execute` section for the complete instructions.
+### Draft the KB Document (only when "# Draft" appears in the latest chat message)
 
-- If there is nothing: it means you are accidentally stopped. Please continue your work.
-  - Read `Copilot_KB.md` thoroughly, it is highly possible that you were working on the request described in the last section in `# DOCUMENT REQUEST`.
+- Copy precisely my draft request in `# Draft` from the LATEST chat message to the `## DRAFT REQUEST` section.
+- Find `Steps for Draft` section for the complete instructions for filling `## (API|DESIGN) EXPLANATION` and `## DOCUMENT`.
 
-- Existing content in `# DOCUMENT REQUEST` should be frozen, you can change it only when you find out the analysis is incorrect during my clarification (try to limit the scope to `## TOPIC`).
+### Improve the KB Document (only when "# Improve" appears in the latest chat message)
+
+- Copy precisely my improvement request in a new `# Improve` from the LATEST chat message to a new sub-section `### IMPROVEMENT` section under `## IMPROVEMENTS`.
+  - The new `### IMPROVEMENT` should be added before `## DOCUMENT` as it is the latest improvement.
+- Find `Steps for Improve` section for the complete instructions for updating `## DOCUMENT`.
+
+### Add the KB Document to KB (only when "# Execute" appears in the latest chat message)
+
+- Find `Steps for Execute` section for the complete instructions.
 
 ## Steps for Topic
 
-- Your goal is to complete a `### Insight` section in the `## TOPIC` of the `# DOCUMENT REQUEST` section.
-- The topic I would like you to research about is in the `# Topic` section in the LATEST chat message.
+- Your goal is to complete the `# INSIGHT`.
+- The topic I would like you to research about is already copied to `# DESIGN REQUEST`.
 - The topic is around a feature of the project. It involves multiple places of the source code across many components.
 - You need to find out the details of the code logic about:
   - The entry point.
@@ -66,40 +96,62 @@
 
 ## Steps for Ask
 
-- Your goal is to complete a `### Insight` section in the `## ASK` of the `# DOCUMENT REQUEST` section.
-- The finding I would like you to clarify is in the `# Ask` section in the LATEST chat message.
+- Your goal is to complete the `### ANSWER` section in the `## QUESTION` section.
+- The finding I would like you to clarify is already copied to the last `## QUESTION`.
 - I will point out that what you are wrong about, what I still do not understand, where you should need to go deeper.
-- You will have to answer my question in `### Insight` of `## ASK`, and fix `## TOPIC` under `# DOCUMENT REQUEST` if there is anything wrong.
+- You will have to answer my question in `### ANSWER`.
+- Fix `# INSIGHT` if there is anything wrong, the insight to update is between `# INSIGHT` and `# ASKS`.
 
 ## Steps for Draft
 
-- Your goal is to complete a draft document for the knowledge base in `Copilot_KB.md`, append the draft after the file.
-- Keep `# DOCUMENT REQUEST` unchanged, do not edit anything in it. Instead, you have to read `# DOCUMENT REQUEST` carefully.
-- Extra information is provided in the `# Draft` section in the LATEST chat message.
-- Make a `# DRAFT-LOCATION` section, you need to describe which part you would like to update in the knowledge base.
-  - It will be a new topic under the `Design Explanation` section of a project in `Index.md` of the knowledge base.
-  - But at the moment only edit `Copilot_KB.md`, do not edit `Index.md`. You are drafting a document, it will be implemented in `Index.md` only after my approval.
-- Make a `# DRAFT-TITLE` section, you need to make a comprehensive but short title for the draft document.
-- Make a `# DRAFT-CONTENT` section, you need to complete the content of the draft document here.
-- The draft document is completely based on the source code of the project, and all findings in the `# DOCUMENT REQUEST` section.
+- Your goal is to complete the `## (API|DESIGN) EXPLANATION` and `## DOCUMENT` section.
+- Keep everything before `# DRAFT` unchanged, DO NOT edit anything in it.
+- Read everything before `# DRAFT` carefully, you are going to draft the document based on every information there, including necessary supporting materials mentioned there.
+- Extra information is already copied to `## DRAFT REQUEST` if any.
+- You are not going to edit `Index.md` at the moment, you are only editing `Copilot_KB.md`.
+
+### Decide the Type of the Document
+
+- You are going to decide which project this document belongs to.
+- You are going to decide the type of the document.
+- Change `## (API|DESIGN) EXPLANATION` to `## API EXPLANATION (PROJECT)` if it is more about the usage and contract of APIs.
+  - It means eventually a new section will be added under `### Choosing APIs` under the specified project in `Index.md`.
+- Change `## (API|DESIGN) EXPLANATION` to `## DESIGN EXPLANATION (PROJECT)` if it is more about how a set of APIs are working together and the design and implementation of the source code.
+  - It means eventually a new section will be added under `### Design Explanation` under the specified project in `Index.md`.
+- Fill the section to describe which part you would like to update in the knowledge base.
+
+### Draft the Document
+
+- You are going to draft the document under `## DOCUMENT`.
+- The draft document is completely based on the source code of the project, and all findings before `# DRAFT`.
   - You must not miss any details, you must use every single point mentioned in the document.
   - Since `# DOCUMENT REQUEST` is organized as multiple rounds of questions and answers, it cannot be just directly used as a document. You must reorganize them.
   - Similar knowledge under the same categories might be spread in different answers, pay attention to them, bring a well-organized document.
 - Quality of the draft:
   - The document is for understanding the source code, so you must keep mentioning names instead of using a too high-level abstraction language.
-  - You must use everything in `# DOCUMENT REQUEST`. Do not just make a summary, `# DOCUMENT REQUEST` is already a summary.
+  - You must use everything before `# DRAFT` with details. Do not just make a summary, `# DOCUMENT REQUEST` is already a summary.
   - Multiple levels of `#` markdown topic containing bullet points are favored.
 
 ## Steps for Improve
 
-- Your goal is to update `# DRAFT-*` based on my suggestion.
-- The suggestion is in the `# Improve` section in the LATEST chat message.
+- Your goal is to update `## DOCUMENT` based on my suggestion.
+- The finding I would like you to clarify is already copied to the last `### IMPROVEMENT`.
+- You are not going to edit `Index.md` at the moment, you are only editing `Copilot_KB.md`.
 
 ## Steps for Execute
 
-- Follow `# DRAFT-LOCATION` to add a new topic under the `Design Explanation` section of a project in `Index.md` of the knowledge base.
-- Use bullet points for the description of the topic to cover the most important points so that it will be easy to identify in the future if this topic is relevant to a work to do.
-- Create a file according to the hyperlink and add it to the `KnowledgeBase` project.
-- The title of the document is in the `# DRAFT-TITLE` section.
-- The content must be exactly and precisely the content under `# DRAFT-CONTENT`. But do not copy the `# DRAFT-CONTENT` title itself.
+- There is `## API EXPLANATION (PROJECT)` or `## DESIGN EXPLANATION (PROJECT)` section filled with the title and content of the document you drafted.
+  - If it is `## API EXPLANATION (PROJECT)`:
+    - A new section will be added under `### Choosing APIs` under the specified project in `Index.md`.
+    - At the end of the new section, a `[API Explanation]()` link is expected.
+  - If it is `## DESIGN EXPLANATION (PROJECT)`:
+    - A new section will be added under `### Design Explanation` under the specified project in `Index.md`.
+    - At the end of the new section, a `[Design Explanation]()` link is expected.
+- Create a new section in `Index.md`.
+  - Following `Leveraging the Knowledge Base` in `REPO-ROOT/.github/copilot-instructions.md` to figure out the expected format.
+  - The document is super long, you have to carefully figure out where is the exact place to add the new section.
+  - Use bullet points for the description of the topic to cover the most important points so that it will be easy to identify in the future if this topic is relevant to a work to do.
+  - Create a document file according to the hyperlink.
+  - The title of the new document file should follow `## API EXPLANATION (PROJECT)` or `## DESIGN EXPLANATION (PROJECT)`.
+  - The content must be exactly and precisely the content under `## DOCUMENT`. But do not copy the `## DOCUMENT` title itself.
 - Keep `Copilot_KB.md` unchanged.
