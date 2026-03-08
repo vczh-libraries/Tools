@@ -43,6 +43,8 @@
 ### Research on a Topic (only when "# Topic" appears in the latest chat message)
 
 - You should override `Copilot_KB.md` with only one title `# !!!KNOWLEDGE BASE!!!`.
+  - DO clear the content of the file before researching.
+  - DO NOT do researching and then fix each section one by one.
 - After overriding, copy precisely my problem description in `# Topic` from the LATEST chat message under `# DOCUMENT REQUEST`.
 - Add another title `# INSIGHT`.
 - Add another title `# ASKS`.
