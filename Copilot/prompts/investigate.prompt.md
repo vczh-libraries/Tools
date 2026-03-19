@@ -19,8 +19,8 @@
 - `# PROBLEM DESCRIPTION`: An exact copy of the problem description I gave you.
 - `# TEST`: Test cases to confirm or define the problem.
 - `# PROPOSALS`: A list of proposed solutions, followed by details about each proposal.
-  - `- TITLE OF PROPOSAL`, with `[CONFIRMED]` or `[DENIED]` after the proposal is tested and proven to be correct or incorrect.
-  - `## TITLE OF PROPOSAL`: Details of the proposal.
+  - `- No.X TITLE OF PROPOSAL`, with `[CONFIRMED]` or `[DENIED]` after the proposal is tested and proven to be correct or incorrect. X is a increasing number starting from 1.
+  - `## No.X TITLE OF PROPOSAL`: Details of the proposal.
     - `### CODE CHANGE`: The change you have done to the source code to implement the proposal.
     - `### (CONFIRMED|DENIED|DENIED BY USER)`: Appear after the proposal is tested and proven to be correct or incorrect, with a comprehensive explanation about why.
 
@@ -104,8 +104,8 @@ Propose any solution you can think of and write them down in the document, you m
   - You are recommended to debug the test cases.
   - Try your best to collect any useful information.
 - It is fine to have multiple proposals, when you come out of any, record it under `# PROPOSALS`, a new list item and a new section should be added for each proposal:
-  - Add a new proposal with `- TITLE OF PROPOSAL`
-  - Add a new proposal with `## TITLE OF PROPOSAL` for details, you are going to add it at the end of the `# PROPOSALS`.
+  - Add a new proposal with `- No.X TITLE OF PROPOSAL`
+  - Add a new proposal with `## No.X TITLE OF PROPOSAL` for details, you are going to add it at the end of the `# PROPOSALS`.
     - With an empty section `### CODE CHANGE` at the end of the proposal.
   - Confirmation of the proposal will be finished later, so do not include any mark for now.
 - Save your progress by:
@@ -124,7 +124,7 @@ Propose any solution you can think of and write them down in the document, you m
   - Ensure all test cases passed.
     - If related test cases failed, it means the proposal is denied.
     - If unrelated test cases failed, it means the proposal introduce regression issues:
-      - Try to work out a fix, remember to update the current `## TITLE OF PROPOSAL` with the fix details.
+      - Try to work out a fix, remember to update the current `## No.X TITLE OF PROPOSAL` with the fix details.
       - Re-run the test cases until you come to a conclusion.
   - Ensure all condition verified.
     - You need to carefully read the `# TEST` section.
