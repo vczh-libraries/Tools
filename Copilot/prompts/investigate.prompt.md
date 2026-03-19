@@ -128,3 +128,4 @@ Propose any solution you can think of and write them down in the document, you m
   - You need to record what you have done to confirm the problem under `### CONFIRMED` or `### DENIED`.
   - Revert all changes to the source code so you can continue for the next one. That is why it is important to record your change.
   - You must save the document after trying each proposal. DO NOT do batch update to the document.
+  - Jump back to `Step 5` to try the next proposal.
