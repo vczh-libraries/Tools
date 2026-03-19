@@ -103,7 +103,7 @@ Propose any solution you can think of and write them down in the document, you m
   - You are recommended to check logs from the test cases.
   - You are recommended to debug the test cases.
   - Try your best to collect any useful information.
-- It is fine to have multiple proposals, when you come out of any, record it under `# PROPOSALS`:
+- It is fine to have multiple proposals, when you come out of any, record it under `# PROPOSALS`, a new list item and a new section should be added for each proposal:
   - Add a new proposal with `- TITLE OF PROPOSAL`
   - Add a new proposal with `## TITLE OF PROPOSAL` for details, you are going to add it at the end of the `# PROPOSALS`.
     - With an empty section `### CODE CHANGE` at the end of the proposal.
