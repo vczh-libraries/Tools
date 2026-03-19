@@ -21,7 +21,8 @@
 - `# PROPOSALS`: A list of proposed solutions, followed by details about each proposal.
   - `- TITLE OF PROPOSAL`, with `[CONFIRMED]` or `[DENIED]` after the proposal is tested and proven to be correct or incorrect.
   - `## TITLE OF PROPOSAL`: Details of the proposal.
-    - `### (CONFIRMED|DENIED|DENIED BY USER)`: appear after the proposal is tested and proven to be correct or incorrect, with a comprehensive explanation about why.
+    - `### CODE CHANGE`: The change you have done to the source code to implement the proposal.
+    - `### (CONFIRMED|DENIED|DENIED BY USER)`: Appear after the proposal is tested and proven to be correct or incorrect, with a comprehensive explanation about why.
 
 ## Step 1. Identify the Problem
 
@@ -87,8 +88,10 @@ If `N/A` is written under `# TEST`, it means the problem is not possible to repr
 If the title is `# TEST [CONFIRMED]`, it means the problem is already proven confirmable by the test cases, skip this step.
 
 - Run the test cases and confirm that the problem is reproed.
-- If you can confirm, you need to update the title to `# TEST [CONFIRMED]`.
 - If you cannot confirm, you need to figure out why, and jump back to `Step 2.` to adjust the test case.
+- If you can confirm, you need to update the title to `# TEST [CONFIRMED]`. Save your progress by:
+  - git commit all changes
+  - git push to the current branch, but if it fails because of needing to pull/merge or network issue, skip pushing.
 
 ## Step 4. Propose Solutions
 
@@ -103,7 +106,11 @@ Propose any solution you can think of and write them down in the document, you m
 - It is fine to have multiple proposals, when you come out of any, record it under `# PROPOSALS`:
   - Add a new proposal with `- TITLE OF PROPOSAL`
   - Add a new proposal with `## TITLE OF PROPOSAL` for details, you are going to add it at the end of the `# PROPOSALS`.
+    - With an empty section `### CODE CHANGE` at the end of the proposal.
   - Confirmation of the proposal will be finished later, so do not include any mark for now.
+- Save your progress by:
+  - git commit all changes
+  - git push to the current branch, but if it fails because of needing to pull/merge or network issue, skip pushing.
 
 ## Step 5. Confirm the Proposal
 
@@ -111,6 +118,7 @@ Propose any solution you can think of and write them down in the document, you m
   - Check out the list under `# PROPOSALS`, pick the first proposal that without `[CONFIRMED]` or `[DENIED]`.
   - If every proposal is marked `[DENIED]`, you need to work out new proposals, jumpt to `Step 4`.
   - If every proposal is marked, but some is `[CONFIRMED]`, you are good and stop here.
+    - If there is only one `[CONFIRMED]` proposal, reapply the change according to its `### CODE CHANGE` section, run the test cases to confirm all test cases passed and extra condition satisfied.
 - Understand and implement the proposal.
 - Run the test cases to confirm the proposal.
   - Ensure all test cases passed.
@@ -124,8 +132,10 @@ Propose any solution you can think of and write them down in the document, you m
 - If the proposal is proven to be useful, mark the proposal with `[CONFIRMED]`, and write a comprehensive explanation in `### CONFIRMED`.
 - If the proposal is proven to be denied, mark the proposal with `[DENIED]`, and write a comprehensive explanation in `### DENIED`.
 - After trying a proposal:
-  - You need to record what is your updating to the source code under `### CONFIRMED` or `### DENIED`.
-  - You need to record what you have done to confirm the problem under `### CONFIRMED` or `### DENIED`.
-  - Revert all changes to the source code so you can continue for the next one. That is why it is important to record your change.
-  - You must save the document after trying each proposal. DO NOT do batch update to the document.
+  - You need to record what is your updating to the source code under `### CODE CHANGE` of the proposal.
+  - You need to record what you have done to confirm the problem under `### CONFIRMED` or `### DENIED` of the proposal.
+  - Save your progress by:
+    - git commit `Copilot_Investigate.md`.
+    - revert all other changes, so that you can continue for the next one, this is why it is important to record your change.
+    - git push to the current branch, but if it fails because of needing to pull/merge or network issue, skip pushing.
   - Jump back to `Step 5` to try the next proposal.
