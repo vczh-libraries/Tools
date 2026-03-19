@@ -17,6 +17,8 @@
 
 - `# !!!INVESTIGATE!!!`: This file always begins with this title.
 - `# PROBLEM DESCRIPTION`: An exact copy of the problem description I gave you.
+- `# UPDATES`
+  - `# (CONTINUE|REPORT)`: There could be multiple occurrences. Each one has an exact copy of the update description I gave you.
 - `# TEST`: Test cases to confirm or define the problem.
 - `# PROPOSALS`: A list of proposed solutions, followed by details about each proposal.
   - `- No.X TITLE OF PROPOSAL`, with `[CONFIRMED]` or `[DENIED]` after the proposal is tested and proven to be correct or incorrect. X is a increasing number starting from 1.
@@ -27,7 +29,7 @@
 ## Step 1. Identify the Problem
 
 - The problem I would like to solve is in the chat messages sent with this request.
-- Find `# Repro` or `# Continue`.
+- Find `# Repro` or `# Continue` or `# Report`.
   - Ignore any of these titles in the chat history.
   - If there is nothing: it means `# Continue`.
 
@@ -39,24 +41,35 @@ I am starting a fresh new request.
 - You should override `Copilot_Investigate.md` with only one title `# !!!INVESTIGATE!!!`.
   - At the moment, `Copilot_Investigate.md` may contain the last investigation, even it may look like the document is already finished for the current investigation, always clean it up.
 - After overriding, copy precisely my problem description in `# Repro` from the LATEST chat message under `# PROBLEM DESCRIPTION`.
-- Add an empty `# TEST` and `# PROPOSALS`.
+- Add empty `# UPDATES`, `# TEST` and `# PROPOSALS` sections.
 - Jump to `Step 2` directly.
 
 ### Continue Investigation (only when "# Continue" appears in the LATEST chat message)
 
-Ignore this section if there is "# Repro" in the LATEST chat message
-I am going to propose some change to `Copilot_Scrum.md`.
+Ignore this section if there is no "# Continue" in the LATEST chat message (or when the LATEST chat message has no content)
+I am going to propose some change to `Copilot_Investigate.md`.
 
-- Copy precisely my problem description in `# Update` from the LATEST chat message to the `# DESIGN REQUEST` section, with a new sub-section `## UPDATE`.
-- The new `## UPDATE` should be appended to the end of the existing `# UPDATES` section (aka before `# TASKS`).
-- When the number of tasks needs to be changed, due to inserting/removing/splitting/merging tasks:
-  - Adjust task number of unaffected tasks accordingly, throughout the document.
-  - Replace the affected tasks with new content, DO NOT TOUCH unaffected tasks.
-- Follow my update to change the design document.
-- If all proposals are marked and some are `[CONFIRMED]`:
-  - It means I am not satisfied with these proposals.
-  - Mark all of them with `[DENIED]`, change related `### CONFIRMED` in those proposals to `### DENIED BY USER`, and write a comprehensive explanation in each proposal about why.
+- When there is any content under `# Continue` in the LATEST chat message:
+  - Copy precisely my problem description in `# Continue` from the LATEST chat message to the `# UPDATES` section, with a new sub-section `## UPDATE`.
+  - The new `## UPDATE` should be appended to the end of the existing `# UPDATES` section (aka before `# TEST`).
+  - If I am not agree with any proposal marked with `[CONFIRMED]`:
+    - Mark these proposals with `[DENIED]`, change related `### CONFIRMED` in those proposals to `### DENIED BY USER`, and write a comprehensive explanation in each proposal about why.
 - Jump to `Step 5` directly.
+
+### Generate Report (only when "# Report" appears in the LATEST chat message)
+
+Ignore this section if there is no "# Report" in the LATEST chat message
+I am going to propose some change to `Copilot_Investigate.md`.
+
+- When there is any content under `# Report` in the LATEST chat message:
+  - Copy precisely my problem description in `# Report` from the LATEST chat message to the `# UPDATES` section, with a new sub-section `## UPDATE`.
+  - The new `## UPDATE` should be appended to the end of the existing `# UPDATES` section (aka before `# TEST`).
+  - If I am not agree with any proposal marked with `[CONFIRMED]`:
+    - Mark these proposals with `[DENIED]`, change related `### CONFIRMED` in those proposals to `### DENIED BY USER`, and write a comprehensive explanation in each proposal about why.
+- Add a `# REPORT` at the end of the document:
+  - You are going to explain all `[COMFIRMED]` proposals about why it work, how does it solve the issue.
+  - You are going to compare between any `[CONFIRMED]` proposals, explain how each one is better (pros) or worse (cons) than the others.
+- Skip all remaining steps, you are good from here.
 
 ## Step 2. Construct Test Cases
 
