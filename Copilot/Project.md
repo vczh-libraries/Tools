@@ -2,8 +2,8 @@
 
 ## Solution to Work On
 
-You are working on the solution `REPO-ROOT\Test\UnitTest\UnitTest.sln`,
-therefore `SOLUTION-ROOT` is `REPO-ROOT\Test\UnitTest`.
+You are working on the solution `REPO-ROOT/Test/UnitTest/UnitTest.sln`,
+therefore `SOLUTION-ROOT` is `REPO-ROOT/Test/UnitTest`.
 
 ## Files not Allowed to Modify
 
@@ -18,10 +18,21 @@ These files are prepared for foreign dependencies.
 
 ## Projects for Verification
 
-The `REPO-ROOT\Test\UnitTest\UnitTest\UnitTest.vcxproj` is the unit test project.
+The `REPO-ROOT/Test/UnitTest/UnitTest/UnitTest.vcxproj` is the unit test project.
 When any *.h or *.cpp file is changed, unit test is required to run.
 
 When any test case fails, you must fix the issue immediately, even those errors are unrelated to the issue you are working on.
+
+### Code Generation Tools
+
+#### REPO-ROOT/../Tools/Tools/GlrParserGen.exe
+
+This executable needs to run if any file in the following folders are changed:
+<!--List of folders-->
+
+There is a `Parser.xml` file in these folder.
+You need to offer the absolute path of `Parser.xml` to the tool as a command-line argument.
+Only run necessary `Parser.xml` in folders that are changed.
 
 ### Code Generation Projects
 
