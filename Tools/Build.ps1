@@ -156,6 +156,15 @@ function Task-Check-Unsubmitted-Repos {
     & $PSScriptRoot\CheckRepo.ps1 CheckAll
 }
 
+# Verify UseMultiToolTask environment variable
+$useMultiToolTask = [System.Environment]::GetEnvironmentVariable('UseMultiToolTask')
+if ($null -eq $useMultiToolTask) {
+    throw "Environment variable 'UseMultiToolTask' does not exist. Please set it to 'true'."
+}
+if ($useMultiToolTask -ne 'true') {
+    throw "Environment variable 'UseMultiToolTask' is '$useMultiToolTask', expected 'true'."
+}
+
 # Prevent from displaying "Debug or Close Application" dialog on crash
 $dontshowui_key = "HKCU:\Software\Microsoft\Windows\Windows Error Reporting"
 $dontshowui_value = (Get-ItemProperty $dontshowui_key).DontShowUI
