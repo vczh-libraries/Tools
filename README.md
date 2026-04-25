@@ -29,3 +29,24 @@ To update only one repo, open PowerShell in folder `repo\Release` and run:
 Run `Copilot\copilotInit.ps1` in that repo.
 
 Run `Copilot\copilotUpdateKB.ps1` to copy updated documents back to `Tools` repo.
+
+## Local Development Environment
+
+### Windows
+
+- github desktop
+- Visual Studio 2026
+- Visual Studio Code
+- [cdb](https://vczh.net/Blog/CDB/)
+
+### Ubuntu
+
+See [Ubuntu/README.md](./Ubuntu/README.md)
+
+### macOS
+
+- github desktop
+- git
+- cmake
+- clang
+- Visual Studio Code
