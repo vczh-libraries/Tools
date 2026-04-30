@@ -28,11 +28,14 @@ for CPP_ADD in "${CPP_ADDS[@]}"; do
     CPP_FILES=(${CPP_FILES[@]} $CPP_ADD)
 done
 
-printf -v CPP_FILES "%s\n" "${CPP_FILES[@]}"
+CPP_FILE_LIST=("${CPP_FILES[@]}")
+printf -v CPP_FILES "%s\n" "${CPP_FILE_LIST[@]}"
 CPP_FILES=${CPP_FILES%?}
 
 O_FILES=`echo "${CPP_FILES}" | sed -r -e 's%([^/]*/)*([^/]+).cpp%./Obj/\2.o%g'`
 O_FILES=`echo ${O_FILES}`
+
+printf "%s\n" "${CPP_FILE_LIST[@]}" > vmake.txt
 #>
 .PHONY: all clean pre-build
 .DEFAULT_GOAL := all

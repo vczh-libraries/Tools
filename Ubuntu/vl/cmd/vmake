@@ -3,7 +3,7 @@
 function Help {
     echo "Usage:"
     echo "--make"
-    echo "    Update ./makefile from ./vmake."
+    echo "    Update ./makefile and ./vmake.txt from ./vmake."
 }
 
 function Make {
