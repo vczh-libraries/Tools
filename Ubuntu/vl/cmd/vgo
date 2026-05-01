@@ -61,9 +61,48 @@ function UpdateMaster {
         git remote prune origin
         git checkout master
         git pull origin master
+        if IsCppRepo $1; then
+            RefreshGithubUbuntu $1
+        fi
 
         popd > /dev/null
     fi
+}
+
+function IsCppRepo {
+    for REPO in "${GITHUB_REPOS_CPP[@]}"; do
+        if [ "${REPO}" == "$1" ]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+function RefreshGithubUbuntu {
+    local TARGET_ROOT="${VROOT}/$1/.github/Ubuntu"
+    local FILES=(
+        "build.sh"
+        "vl/cmd/vbuild"
+        "vl/cmd/vmake"
+        "vl/cmd/vt4"
+        "vl/cmd/vutil_CppDependencies"
+        "vl/cmd/vutil_CppFromVcxproj"
+        "vl/makefile-cpp"
+        "vl/vmake-cpp"
+    )
+
+    for FILE in "${FILES[@]}"; do
+        mkdir -p "$(dirname "${TARGET_ROOT}/${FILE}")"
+        cp "${VCPROOT}/${FILE}" "${TARGET_ROOT}/${FILE}"
+    done
+
+    chmod u+x "${TARGET_ROOT}/build.sh"
+    chmod u+x "${TARGET_ROOT}/vl/cmd/vbuild"
+    chmod u+x "${TARGET_ROOT}/vl/cmd/vmake"
+    chmod u+x "${TARGET_ROOT}/vl/cmd/vt4"
+    chmod u+x "${TARGET_ROOT}/vl/cmd/vutil_CppDependencies"
+    chmod u+x "${TARGET_ROOT}/vl/cmd/vutil_CppFromVcxproj"
 }
 
 function Update {
