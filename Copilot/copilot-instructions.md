@@ -106,12 +106,21 @@ If you need to find any script files, they are in the `REPO-ROOT/.github/Ubuntu`
 - The project only uses a very minimal subset of the standard library. I have substitutions for most of the STL constructions. Always use mine if possible:
   - Always use `vint` instead of `int`.
   - Always use `L'x'`, `L"x"`, `wchar_t`, `const wchar_t` and `vl::WString`, instead of `std::string` or `std::wstring`.
+  - Always use `FilePath` for file path operations.
   - Use my own collection types vl::collections::* instead of std::*
   - Regular expression utilities are offered by `vl::regex::Regex`, here are important syntax differences with other regular expression implementation:
     - "." means the dot character, "/." or "\." (or "\\." in C++ string literal) means any character.
     - Both "/" and "\" escape characters, you are recommended to use "/" in C++ string literals.
     - Therefore you need "//" for the "/" character and "/\\" or "/\\\\" for the "\" character in C++ string literals.
+    - Constructing a `Regex` object is expensive. If a regular expression is used multiple times or multiple places, make a variable to reuse it, but it should not be a global variable.
   - Check out `REPO-ROOT/.github/KnowledgeBase/Index.md` for more information of how to choose correct C++ data types.
+- Rules for expression inavailability of values:
+  - If any number is expected to be valid only when non-negative, you could use `-1` to represent invalid value.
+  - If an object is expected to be valid only when non-null, you could use `nullptr` on `T*` or `Ptr<T>` to represent invalid value.
+  - Use `Nullable<T>` to represent any invalid value if possible.
+    - DO NOT use `Nullable<T*>`, `Nullable<Ptr<T>>` or `Nullable<Nullable<T>>`, this is too confusing.
+  - Only when there is no other choice, use an extra `bool` variable.
+    - This could happen when "null" semantic is valid.
 - Rules for C++ header files:
   - Guard them with macros instead of `#pragma once`.
   - In a class/struct/union declaration, member names must be aligned in the same column at least in the same public, protected or private section.
@@ -121,6 +130,32 @@ If you need to find any script files, they are in the `REPO-ROOT/.github/Ubuntu`
 - Rules for cpp files:
   - Use `using namespace` statement if necessary to prevent from repeating namespace everywhere.
   - `vl::stream::` is an exception, always use `stream::` with `using namespace vl;`, DO NOT use `using namespace vl::stream;`.
+
+### Advanced C++ Coding Rules
+
+- DO NOT make helper functions that only used once, especially it is only called in one destructor.
+- When generating Workflow script, avoid building text, you should always build the AST. The AST type for a complete Workflow script module is `WfModule`.
+
+You are always recommended to debug the compiled binary if you find it difficult to figure out what is going on, or after several failed attemps of "read and guess".
+
+### Advanced C++ Coding Rules for Reflectable Types
+
+- DO NOT make global variables with types that carry constructors or destructors, even when they are implicit.
+  - This could mess up the order of initialization, finalization or memory leak detector.
+  - One exception will be `WString` which is initialized using `WString::Unmanaged`, such constructor and destructor does not do memory management.
+  - Another exception will be `Pair`, `Nullable` or `Tuple` with valid types here.
+  - If pointers are needed, you could only use `T*` and do initialization or finalization explicitly. All such objects should be destroyed in `main`, `wmain`, `WinMain` or `GuiMain`, before memory leak detector runs.
+- Prefer latest C++ features (up to C++ 20).
+- Prefer template variadic arguments, over hard-coded-counting solutions.
+- Any interface or class `X` should inherit from `vl::reflection::Description<X>`.
+  - If such class (not including interface) should be inheritable in Workflow script, use `AggregatableDescription` instead of `Description`.
+- No `const` is allowed for methods or reference types.
+- Prefer `IValue*` interfaces for container types on interfaces.
+- Container types and some other types supports range-based for loop. Always prefer range-based for loop over other loops.
+  - You can used `indexed(container)` to convert a container of type `T` to `Pair<T, vint>`, to read the corrent index.
+  - Avoid using expression, which creates temporary objects, in `for(... : HERE)` or `for(... : indexed(HERE))`. The current C++ destroys the temporary object too early therefore this becomes UB.
+- Prefer Inverse of Control (IoC) and other design patterns, over trivial virtual functions, over switch-case on types, over if-else on types.
+- Prefer static dispatching over dynamic dispatching when possible and reasonable.
 
 ## Leveraging the Knowledge Base
 

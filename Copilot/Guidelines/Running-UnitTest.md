@@ -89,3 +89,5 @@ The unit test project supports following command line options:
 Compiled binary might have bug causing it to trap in a dead looping. DO NOT just wait for it to complete.
 If you feel suspicious, you are recommended to kill the process and run it again with the debugger.
 When `/D` or `/C` is specified, the unit test binary stops at the first failure, causing it not able to summary how many test cases pass or fail at the end. This would be an obvious signal to tell that it fails.
+
+Only the "debug x64" configuration is supported on Linux. If you are instructed to build and run other configuration, ignore it.

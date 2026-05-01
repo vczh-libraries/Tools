@@ -41,3 +41,5 @@ If you can'f find it, first check if the build succeeded, and then read `makefil
 **IMPORTANT**: Always run it async, read terminal output and its return code.
 Compiled binary might have bug causing it to trap in a dead looping. DO NOT just wait for it to complete.
 If you feel suspicious, you are recommended to kill the process and run it again with the debugger.
+
+Only the "debug x64" configuration is supported on Linux. If you are instructed to build and run other configuration, ignore it.

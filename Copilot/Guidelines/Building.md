@@ -58,3 +58,5 @@ Call `REPO-ROOT/.github/Ubuntu/build.sh` for incremental build.
 Call `REPO-ROOT/.github/Ubuntu/build.sh -f` for full rebuild.
 `build.sh` will read the local `vmake` configuration file and generate a `makefile` in the same folder before building.
 `build.sh` will also run other script files in that folder, run `chmod +x` if any script file is blocked.
+
+Only the "debug x64" configuration is supported on Linux. If you are instructed to build and run other configuration, ignore it.
