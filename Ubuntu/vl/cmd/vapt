@@ -6,6 +6,7 @@ function Help {
     echo "    Install all required softwares for Vczh Libraries development:"
     echo "        htop"
     echo "        cgdb"
+    echo "        lldb"
     echo "        manpages-posix-dev"
     echo "        git"
     echo "        apt-file"
@@ -41,6 +42,7 @@ function AptGetAutoRemove {
 APTGET_TARGETS=(
     htop
     cgdb
+    lldb
     manpages-posix-dev
     git
     apt-file
