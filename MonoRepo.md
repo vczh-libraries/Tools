@@ -6,7 +6,7 @@ The repos covered are: Vlpp, VlppRegex, VlppReflection, VlppParser2, VlppOS, Wor
 ## Must-Read Files
 
 `Project.md` and `.github\copilot-instructions.md` in each repo are must-read before editing them.
-Other contents (including instructions and documents) in each `.github` folder are the same across all repos.
+`.github\copilot-instructions.md` and other contents (including instructions and documents) in each `.github` folder are the same across all repos.
 
 ## Import and Release Folders
 
