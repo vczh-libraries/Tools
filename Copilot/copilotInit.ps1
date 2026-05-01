@@ -71,8 +71,20 @@ else {
     Pop-Location
     New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 
-    SyncFolder "Agent"         "$PSScriptRoot" "$targetFolder" $False
-    FixAgentFiles (Join-Path $targetFolder "Agent")
+    if ($projectName -eq "Release") {
+        SyncFolder "Agent" "$PSScriptRoot" "$targetFolder" $False
+        FixAgentFiles (Join-Path $targetFolder "Agent")
+    }
+    else {
+        $agentTargetPath = Join-Path $targetFolder "Agent"
+        if (Test-Path -Path $agentTargetPath) {
+            Write-Host "Deleting: Agent"
+            Remove-Item -Path $agentTargetPath -Recurse -Force
+        }
+        else {
+            Write-Host "Skipping: Agent (not present)"
+        }
+    }
 
     SyncFolder "Guidelines"    "$PSScriptRoot" "$targetFolder" $False
     SyncFolder "KnowledgeBase" "$PSScriptRoot" "$targetFolder" $False
