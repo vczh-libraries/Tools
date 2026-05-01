@@ -20,15 +20,16 @@
 ## (Linux Specific) External Tools Environment and Context
 
 - DO NOT run any powershell script file as they are for Windows only.
-- There are multiple bash script files in `REPO-ROOT/.github/Ubuntu`, if they cannot be executed you can `chmod +x` them.
-- `REPO-ROOT/.github/Ubuntu/build.sh` is usable in `REPO-ROOT/Test/Linux` or `REPO-ROOT/Test/Linux/PROJECT-NAME`, it converts the local `vmake` to `makefile` and build it.
+- The bash script `REPO-ROOT/.github/Ubuntu/build.sh` is the only script you should call for building any project. `build.sh` will also run other script files in that folder, run `chmod +x` if any script file is blocked.
+- `build.sh` is usable in `REPO-ROOT/Test/Linux` or `REPO-ROOT/Test/Linux/PROJECT-NAME`. It reads the local `vmake` configuration file, generates a `makefile`, and builds it.
   - Call `build.sh -f` for full rebuild.
   - Call `build.sh` for incremental build.
-  - `vmake.txt` and `makefile` are generated files, you are not allowed to modify them.
+  - `vmake`, `vmake.txt` and `makefile` all live in the same `Test/Linux` (or `Test/Linux/PROJECT-NAME`) folder:
+    - `vmake` is the configuration file derived from MSBuild project files. When the source file list changes, the MSBuild project files are expected to be modified, and `build.sh` will regenerate the rest.
+    - `vmake.txt` and `makefile` are generated files, you are not allowed to modify them.
   - Unlike offered powershell scripts, `build.sh` does not produce `Build.log` or equivalent log file, running unit test does not produce `Execute.log` or equivalent log file.
 - Always use `lldb` and other interactable tools in PTY-backed tool session.
 - DO NOT call `cmake`, `make`, `clang++`, `g++`, `gdb` directly. `build.sh` and `lldb` are for building and debugging.
-- `vmake` is a configuration file converting multiple MSBuild project files to makefile. When updating file list, MSBuild project files are expected to modify.
 
 ## Coding Guidelines and Tools
 

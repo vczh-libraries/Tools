@@ -87,6 +87,12 @@ You can also use `dv -rX` to expand "X" levels of fields, the default option is 
 
 ## Linux Specific
 
+Like building and running, debugging must be performed from the same folder that contains `vmake`:
+- If the repo has only one project, it is in `REPO-ROOT/Test/Linux`.
+- If the repo has multiple projects, it is in `REPO-ROOT/Test/Linux/PROJECT-NAME`.
+  - `PROJECT-NAME` naming is following `PROJECT-NAME.vcxproj`.
+You are required to `cd` to such folder before launching `lldb`, otherwise relative paths to the binary and source files will be wrong.
+
 `lldb` is going to block the terminal and wait for interaction, you should always start `lldb` in a PTY-backed tool session, for example:
 
 ```bash

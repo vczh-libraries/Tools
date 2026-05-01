@@ -54,6 +54,7 @@ Building only happens on a folder that has a `vmake` file.
   - `PROJECT-NAME` naming is following `PROJECT-NAME.vcxproj`.
 You are required to `cd` to such folder before running `build.sh`, otherwise it will fail.
 
-Call `REPO-ROOT/.github/Ubuntu/Build.sh` for incremental build.
-Call `REPO-ROOT/.github/Ubuntu/Build.sh -f` for full rebuild.
-`Build.sh` will execute the local `vmake` and generate `makefile` in the same folder before building.
+Call `REPO-ROOT/.github/Ubuntu/build.sh` for incremental build.
+Call `REPO-ROOT/.github/Ubuntu/build.sh -f` for full rebuild.
+`build.sh` will read the local `vmake` configuration file and generate a `makefile` in the same folder before building.
+`build.sh` will also run other script files in that folder, run `chmod +x` if any script file is blocked.
