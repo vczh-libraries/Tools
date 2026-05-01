@@ -6,33 +6,29 @@
 - Following `Leveraging the Knowledge Base`, find knowledge and documents for this project in `REPO-ROOT/.github/KnowledgeBase/Index.md`.
 - Before writing to a source file, read it again and make sure you respect my parallel editing.
 - If any `*.prompt.md` file is referenced, take immediate action following the instructions in that file.
+- **DO NOT ASK ANY QUESTION** if you are not explicitly instructed to make questions. Run the user's task to the end.
+  - The only exception will be there are serious conflict information in user's task. This is rare, try your best effort to resolve the ambiguity by yourself, and only ask when you are totally stuck.
 
-## External Tools Environment and Context
+## (Windows Specific) External Tools Environment and Context
 
-- If you are on Windows OS:
-  - Always prefer the offered script files instead of direct CLI commands.
-  - DO NOT call `msbuild` or other executable files directly.
-  - DO NOT create or delete any file unless explicitly directed.
-  - MUST run any PowerShell script in this format: `& absolute-path.ps1 parameters...`.
-  - Multiple powershell commands are concatenated with `;` to be executed in one line.
+- Always prefer the offered script files instead of direct CLI commands.
+- DO NOT call `msbuild` or other executable files directly.
+- DO NOT create or delete any file unless explicitly directed.
+- MUST run any PowerShell script in this format: `& absolute-path.ps1 parameters...`.
+- Multiple powershell commands are concatenated with `;` to be executed in one line.
 
-- If you are on Linux, offered powershell script files won't work and here are replacements:
-  - You still need to maintain `*.sln`, `*.slnx`, `*.vcxitems`, `*.vcxproj`, `*.vcxproj.filters`.
-  - DO NOT call `cmake` (as cmake is not in use), `make`, `clang++`, `g++`.
-  - DO NOT call `gdb` or `lldb` unless you can interact with it, otherwise a running debugger will cause subsequent building to fail.
-  - All `makefile` files are generated out of these solution and project files.
-  - All `vmake` files are in `REPO-ROOT/Test/Linux` or its sub folders.
-    - If `vmake` is directly in that folder, that is the only project you can and need to work on.
-    - Otherwise, any important `*.vcxproj` will have a corresponding folder containing the `vmake` for that project.
-  - DO NOT modify `makefile` as they will be re-generated and your modification will be lost. Modify `vmake` instead. In `vmake` you can:
-    - Add a `*.vcxitems` or `*.vcxproj` project to add every file they use
-    - Remove C++ source files added from projects that only work for Windows
-    - Add new C++ source files for Linux replacement, etc.
-  - All following commands should run in the folder containing the `vmake` file:
-    - `vmake --make` to generate `makefile` according to the latest content in solution and project files.
-    - `vbuild --build` to incrementally build the project.
-    - `vbuild --full-build` to fully rebuild the project.
-    - An executable file `./Bin/UnitTest` is generated after a successful `vbuild`.
+## (Linux Specific) External Tools Environment and Context
+
+- DO NOT run any powershell script file as they are for Windows only.
+- There are multiple bash script files in `REPO-ROOT/.github/Ubuntu`, if they cannot be executed you can `chmod +x` them.
+- `REPO-ROOT/.github/Ubuntu/build.sh` is usable in `REPO-ROOT/Test/Linux` or `REPO-ROOT/Test/Linux/PROJECT-NAME`, it converts the local `vmake` to `makefile` and build it.
+  - Call `build.sh -f` for full rebuild.
+  - Call `build.sh` for incremental build.
+  - `vmake.txt` and `makefile` are generated files, you are not allowed to modify them.
+  - Unlike offered powershell scripts, `build.sh` does not produce `Build.log` or equivalent log file, running unit test does not produce `Execute.log` or equivalent log file.
+- Always use `lldb` and other interactable tools in PTY-backed tool session.
+- DO NOT call `cmake`, `make`, `clang++`, `g++`, `gdb` directly. `build.sh` and `lldb` are for building and debugging.
+- `vmake` is a configuration file converting multiple MSBuild project files to makefile. When updating file list, MSBuild project files are expected to modify.
 
 ## Coding Guidelines and Tools
 
@@ -78,7 +74,7 @@ If you need to find any document for the current working task, they are in the `
   - If it is defined in the standard C++ library or third-party library, use the full name.
   - If it is defined in the source code, use the full name if there is ambiguity, and then mention the file containing its definition.
 
-## Accessing Script Files
+## (Windows Specific) Accessing Script Files
 
 If you need to find any script or log files, they are in the `REPO-ROOT/.github/Scripts` folder:
 - `copilotPrepare.ps1`
@@ -90,6 +86,11 @@ If you need to find any script or log files, they are in the `REPO-ROOT/.github/
 - `copilotDebug_RunCommand.ps1`
 - `Build.log`
 - `Execute.log`
+
+## (Linux Specific) Accessing Script Files
+
+If you need to find any script files, they are in the `REPO-ROOT/.github/Ubuntu` folder:
+- `build.sh`
 
 ## Writing C++ Code
 
