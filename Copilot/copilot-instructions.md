@@ -143,7 +143,7 @@ You are always recommended to debug the compiled binary if you find it difficult
 - DO NOT make global variables with types that carry constructors or destructors, even when they are implicit.
   - This could mess up the order of initialization, finalization or memory leak detector.
   - One exception will be `WString` which is initialized using `WString::Unmanaged`, such constructor and destructor does not do memory management.
-  - Another exception will be `Pair`, `Nullable` or `Tuple` with valid types here.
+  - Another exception will be `Pair`, `Nullable`, `Variabt` or `Tuple` with valid types here.
   - If pointers are needed, you could only use `T*` and do initialization or finalization explicitly. All such objects should be destroyed in `main`, `wmain`, `WinMain` or `GuiMain`, before memory leak detector runs.
 - Prefer latest C++ features (up to C++ 20).
 - Prefer template variadic arguments, over hard-coded-counting solutions.
