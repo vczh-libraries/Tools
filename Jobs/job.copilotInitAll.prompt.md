@@ -53,3 +53,10 @@ Run `Tools\Copilot\copilotInit.ps1 -UpdateKB` in the repos listed in `Order of P
 ## Sync Back Knowledge Base and Instructions
 
 Run `Tools\Copilot\copilotInitAll.ps1` followed by `Tools\Tools\CheckRepo.ps1 CheckAll`, and you will find many other repos are also updated. Run `git commit` and push all changes in affected repos.
+
+## Report
+
+Report how many repos:
+- Updated learnings.
+- Have new learnings comparing to `Tools`.
+- git pushed.
