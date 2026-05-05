@@ -8,21 +8,36 @@
 ## Step 1
 
 Read the first word of the request, and read an additional instruction file when it is:
+- "scrum": REPO-ROOT/.github/prompts/0-scrum.prompt.md
+- "design": REPO-ROOT/.github/prompts/1-design.prompt.md
+- "plan": REPO-ROOT/.github/prompts/2-planning.prompt.md
+- "summarize": REPO-ROOT/.github/prompts/3-summarizing.prompt.md
+- "execute": REPO-ROOT/.github/prompts/4-execution.prompt.md
+- "verify": REPO-ROOT/.github/prompts/5-verifying.prompt.md
 - "ask": REPO-ROOT/.github/prompts/ask.prompt.md
 - "investigate": REPO-ROOT/.github/prompts/investigate.prompt.md
-- "refine": REPO-ROOT/.github/prompts/refine.prompt.md
+- "code": REPO-ROOT/.github/prompts/code.prompt.md
 - "kb": REPO-ROOT/.github/prompts/kb.prompt.md
-- "kb-sync": REPO-ROOT/.github/prompts/kb.prompt.md
+- "refine": REPO-ROOT/.github/prompts/refine.prompt.md
+- "review": REPO-ROOT/.github/prompts/review.prompt.md
 
 ### Exceptions
 
 - If the latest chat message is simply "execute and verify", it means do `execute` followed by `verify`.
-- If the first word is not in the list, treat the request as if it begins with "investigate repro"
+- If the first word is not in the list:
+  - Follow REPO-ROOT/.github/prompts/code.prompt.md
+  - Skip `Step 2`
 
 ## Step 2
 
 - Only applies when the first word is:
+  - "scrum"
+  - "design"
+  - "plan"
+  - "summary"
+  - "execute"
   - "investigate"
+  - "review"
   - "kb"
 - Read the second word if it exists, convert it to a title `# THE-WORD`.
 
@@ -41,21 +56,20 @@ you need to carefully consider possible words with similar pronunciation.
 
 ## Examples
 
-When the request is `kb-sync`, follow `kb-sync.prompt.md` and "the LATEST chat message" becomes empty.
+When the request is `scrum`, follow `0-scrum.prompt.md` and "the LATEST chat message" becomes empty.
 
-When the request is `kb execute`, follow `kb.prompt.md` and "the LATEST chat message" becomes
+When the request is `scrum learn`, follow `0-scrum.prompt.md` and "the LATEST chat message" becomes
 ```
-# Execute
-```
-
-When the request is `investigate repro this issue`, follow `investigate.prompt.md` and "the LATEST chat message" becomes
-```
-# Repro
-this issue
+# Learn
 ```
 
-When the request is `do this and do that`, since the first word is not in the list, so follow `investigate.prompt.md` "the LATEST chat message" becomes
+When the request is `design problem next`, follow `1-design.prompt.md` and "the LATEST chat message" becomes
 ```
-# Repro
+# Problem
+next
+```
+
+When the request is `do this and do that`, since the first word is not in the list, so follow `code.prompt.md`, skipping `Step 2` and "the LATEST chat message" becomes
+```
 do this and do that
 ```

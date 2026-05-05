@@ -71,19 +71,21 @@ else {
     Pop-Location
     New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 
-    if ($projectName -eq "Release") {
-        SyncFolder "Agent" "$PSScriptRoot" "$targetFolder" $False
-        FixAgentFiles (Join-Path $targetFolder "Agent")
+    # SyncFolder "Agent" "$PSScriptRoot" "$targetFolder" $False
+    # FixAgentFiles (Join-Path $targetFolder "Agent")
+    # Write-Host "Copying: bot.ps1"
+    # Copy-Item -Path (Join-Path $PSScriptRoot "bot.ps1") -Destination (Join-Path $targetFolder "bot.ps1") -Force
+
+    # Remove bot if installed
+    $agentTargetPath = Join-Path $targetFolder "Agent"
+    if (Test-Path -Path $agentTargetPath) {
+        Write-Host "Deleting: Agent"
+        Remove-Item -Path $agentTargetPath -Recurse -Force
     }
-    else {
-        $agentTargetPath = Join-Path $targetFolder "Agent"
-        if (Test-Path -Path $agentTargetPath) {
-            Write-Host "Deleting: Agent"
-            Remove-Item -Path $agentTargetPath -Recurse -Force
-        }
-        else {
-            Write-Host "Skipping: Agent (not present)"
-        }
+    $agentBotPath = Join-Path $targetFolder "bot.ps1"
+    if (Test-Path -Path $agentTargetPath) {
+        Write-Host "Deleting: bot.ps1"
+        Remove-Item -Path $agentTargetPath -Recurse -Force
     }
 
     SyncFolder "Guidelines"    "$PSScriptRoot" "$targetFolder" $False
@@ -94,8 +96,6 @@ else {
     SyncFolder "Learning"      "$PSScriptRoot" "$targetFolder" $True
 
     # Copy from $PSScriptRoot to $targetFolder
-    Write-Host "Copying: bot.ps1"
-    Copy-Item -Path (Join-Path $PSScriptRoot "bot.ps1") -Destination (Join-Path $targetFolder "bot.ps1") -Force
     Write-Host "Copying: copilot-instructions.md"
     Copy-Item -Path (Join-Path $PSScriptRoot "copilot-instructions.md") -Destination (Join-Path $targetFolder "copilot-instructions.md") -Force
 
