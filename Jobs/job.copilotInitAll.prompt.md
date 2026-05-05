@@ -42,7 +42,7 @@ Run `Tools\Copilot\copilotInit.ps1 -UpdateKB` in the repos listed in `Order of P
         - One in the `orders copy`, called `scoreA`.
         - One in the `Learning.md` before current change, called `scoreB`.
         - One in the `Learning.md` after current change, called `scoreC`.
-        - The new score will be `scoreA` + (`scoreC` - `scoreB`), which means the change of score in the current repo should be added to the original score in `orders copy`.
+        - The new score will be `scoreB` + `scoreC` - `scoreA`, which means changing of a score to the same item from multiple scores sould be added together. This is a simple three-way merging of scores.
       - Reorder items in `# Orders` in descending order of scores.
         - Make sure all items in `Learning.md` are in the `# Orders` section, and all items in the `# Orders` section are in `Learning.md`. Otherwise, you have messed up the file.
     - Any detail documents are supposed to be owned by only one repo so there should be no conflict, but if there is any, you need to carefully merge them.
