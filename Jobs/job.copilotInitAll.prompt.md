@@ -7,6 +7,15 @@ In `Learning.md`, each section is an item of knowledge, and all knowledge items 
 
 ## Order of Processing Repos
 
+The order of processing repos is important, because there are dependencies between repos:
+- Vlpp
+- VlppOS
+- VlppRegex
+- VlppReflection
+- VlppParser2
+- Workflow
+- GacUI
+
 ## Consume Unlearned Materials
 
 Run `REPO-ROOT/.github/prompts/refine.prompt.md` in the repos listed in `Order of Processing Repos`:
