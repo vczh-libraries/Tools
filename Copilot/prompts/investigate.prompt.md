@@ -11,7 +11,7 @@
 ## Goal and Constraints
 
 - Your goal is to finish an investigation document in `Copilot_Investigate.md` to address a problem.
-- You are recommended to modify unit test, build, run, debug to understand the problem, or verify your root cause analysis during tracing a bug.
+- You are recommended to modify unit tests, build, run, and debug to understand the problem, or verify your root cause analysis while tracing a bug.
 
 ## Copilot_Investigate.md Structure
 
@@ -75,7 +75,7 @@ I am going to propose a change to `Copilot_Investigate.md`.
 
 ## Step 2. Construct Test Cases
 
-Only when I suggest that the problem is impossible to repro with test cases, write `N/A` under `# TEST` and skip `Step 2.`.
+Only when I suggest that the problem is impossible to reproduce with test cases, write `N/A` under `# TEST` and skip `Step 2.`.
 
 - You are going to construct proper test cases to address the problem.
 - If I suggest a way to confirm the issue:
@@ -99,7 +99,7 @@ Only when I suggest that the problem is impossible to repro with test cases, wri
 
 ## Step 3. Confirm the Problem
 
-If `N/A` is written under `# TEST`, it means the problem is not possible to repro with test cases, skip this step.
+If `N/A` is written under `# TEST`, it means the problem is not possible to reproduce with test cases, skip this step.
 If the title is `# TEST [CONFIRMED]`, it means the problem is already proven confirmable by the test cases, skip this step.
 
 - Run the test cases and confirm that the problem is reproduced.
