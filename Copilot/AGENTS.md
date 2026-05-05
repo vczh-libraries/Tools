@@ -1,18 +1,18 @@
 - Read through `REPO-ROOT/.github/copilot-instructions.md` before performing any work.
   - `copilot-instructions.md` is the guideline you should follow.
   - MUST READ `Coding Guidelines and Tools` before touching the source code.
-  - MUST READ `Leveraging the Knowledge Base` and find knowledge you may need before making any decision.
+  - MUST READ `Leveraging the Knowledge Base` and find the knowledge you may need before making any decision.
 - Read through `REPO-ROOT/Project.md` before performing any work.
 - Interpret the request (in the latest chat message, not including conversation history) following the steps:
 
 ## Step 1
 
-Read the first word of the request, and read an additional instruction file when it is:
+Read the first word of the request, and read an additional instruction file if it is:
 - "ask": REPO-ROOT/.github/prompts/ask.prompt.md
 - "investigate": REPO-ROOT/.github/prompts/investigate.prompt.md
 - "refine": REPO-ROOT/.github/prompts/refine.prompt.md
 - "kb": REPO-ROOT/.github/prompts/kb.prompt.md
-- "kb-sync": REPO-ROOT/.github/prompts/kb.prompt.md
+- "kb-sync": REPO-ROOT/.github/prompts/kb-sync.prompt.md
 
 ### Exceptions
 
@@ -54,7 +54,7 @@ When the request is `investigate repro this issue`, follow `investigate.prompt.m
 this issue
 ```
 
-When the request is `do this and do that`, since the first word is not in the list, so follow `investigate.prompt.md` "the LATEST chat message" becomes
+When the request is `do this and do that`, because the first word is not in the list, follow `investigate.prompt.md`; "the LATEST chat message" becomes
 ```
 # Repro
 do this and do that

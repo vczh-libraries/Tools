@@ -66,9 +66,9 @@ if ($UpdateKB) {
     SyncFolder "KnowledgeBase" "$targetFolder" "$PSScriptRoot" $False
 }
 else {
-    Push-Location $PSScriptRoot\Agent
-    git clean -xdf
-    Pop-Location
+    # Push-Location $PSScriptRoot\Agent
+    # git clean -xdf
+    # Pop-Location
     New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 
     # SyncFolder "Agent" "$PSScriptRoot" "$targetFolder" $False
@@ -83,9 +83,9 @@ else {
         Remove-Item -Path $agentTargetPath -Recurse -Force
     }
     $agentBotPath = Join-Path $targetFolder "bot.ps1"
-    if (Test-Path -Path $agentTargetPath) {
+    if (Test-Path -Path $agentBotPath) {
         Write-Host "Deleting: bot.ps1"
-        Remove-Item -Path $agentTargetPath -Recurse -Force
+        Remove-Item -Path $agentBotPath -Force
     }
 
     SyncFolder "Guidelines"    "$PSScriptRoot" "$targetFolder" $False

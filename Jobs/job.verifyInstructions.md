@@ -1,4 +1,4 @@
-You are going to verify instructions in the Copilot folder.
+You are going to verify scripts and instructions in the Copilot folder.
 
 ## Context
 
