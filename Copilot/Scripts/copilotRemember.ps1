@@ -1,5 +1,23 @@
 # Remember Copilot investigation notes
 
+param(
+    [switch]$Earliest
+)
+
+if ($Earliest) {
+    $learningRoot = Resolve-Path -LiteralPath "$PSScriptRoot\..\Learning"
+    $earliestFolder = Get-ChildItem -LiteralPath $learningRoot -Directory |
+        Sort-Object -Property Name |
+        Select-Object -First 1
+
+    if ($null -eq $earliestFolder) {
+        throw "No folder is found in '$learningRoot'."
+    }
+
+    Write-Output $earliestFolder.FullName
+    exit 0
+}
+
 $filePath = "$PSScriptRoot\..\TaskLogs\Copilot_Investigate.md"
 
 if (Test-Path $filePath) {

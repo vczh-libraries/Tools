@@ -24,7 +24,7 @@
 
 ## Step 1. Find the Earliest Backup Folder
 
-- Find and execute `copilotPrepare.ps1 -Earliest` to get the absolute path to the earliest backup folder in `Learning`.
+- Find and execute `copilotRemember.ps1 -Earliest` to get the absolute path to the earliest backup folder in `Learning`.
 - If the script fails, it means there is no material to learn from, stop. Otherwise continue to process this folder.
 
 ## Step 2. Read All Documents
