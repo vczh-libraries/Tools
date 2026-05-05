@@ -1,4 +1,5 @@
 You are going to sync context for coding agents across different repos.
+**IMPORTANT** If you are instructed to "skip learning", you should start from `## Sync Back Knowledge Base and Instructions`.
 
 ## Understanding Learning
 
