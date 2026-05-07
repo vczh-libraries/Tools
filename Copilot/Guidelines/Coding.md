@@ -28,11 +28,6 @@ In general, here is my preference for any languages:
   - Always use `L'x'`, `L"x"`, `wchar_t`, `const wchar_t` and `vl::WString`, instead of `std::string` or `std::wstring`.
   - Always use `FilePath` for file path operations.
   - Use my own collection types vl::collections::* instead of std::*
-  - Regular expression utilities are offered by `vl::regex::Regex`, here are important syntax differences from other regular expression implementations:
-    - "." means the dot character, "/." or "\." (or "\\." in C++ string literal) means any character.
-    - Both "/" and "\" escape characters, you are recommended to use "/" in C++ string literals.
-    - Therefore you need "//" for the "/" character and "/\\" or "/\\\\" for the "\" character in C++ string literals.
-    - Constructing a `Regex` object is expensive. If a regular expression is used multiple times or multiple places, make a variable to reuse it, but it should not be a global variable.
   - Check out `REPO-ROOT/.github/KnowledgeBase/Index.md` for more information on how to choose the correct C++ data types.
 - Rules for expressing unavailable values:
   - If any number is expected to be valid only when non-negative, you could use `-1` to represent invalid value.
@@ -50,6 +45,28 @@ In general, here is my preference for any languages:
 - Rules for cpp files:
   - Use `using namespace` statement if necessary to prevent from repeating namespace everywhere.
   - `vl::stream::` is an exception, always use `stream::` with `using namespace vl;`, DO NOT use `using namespace vl::stream;`.
+
+### Regular Expression
+
+Regular expression utilities are offered by `vl::regex::Regex`, here are important syntax differences from other regular expression implementations:
+- "." means the dot character, "/." or "\." (or "\\." in C++ string literal) means any character.
+- Both "/" and "\" escape characters, you are recommended to use "/" in C++ string literals.
+- Therefore you need "//" for the "/" character and "/\\" or "/\\\\" for the "\" character in C++ string literals.
+- Constructing a `Regex` object is expensive. If a regular expression is used multiple times or multiple places, make a variable to reuse it, but it should not be a global variable.
+
+### Creating and Using Parsers
+
+When `VlppParser2` is available to the current project, complex parsers always require to use `VlppParser2`. There are already existing parsers, especially XML and JSON.
+- Each parser has a generated `Parser` class, you are always required to use the last piece of namespace with it, e.g. `xml::Parser` and `json::Parser`. `glr::xml::Parser` and `glr::json::Parser` is also equally good.
+- Some parsers like XML has its own parse function `XmlParseDocument` and `XmlParseElement`, it has extra preprocessing, they are always required to use instead of using `xml::Parser` directly.
+- Some parser like JSON does not have its own parse function, therefore `json::Parser` can be used directly.
+- Creating a `Parser` class is super expensive, you must do your best to share it across the project:
+  - Any `Parser` class is re-entrant, you can run it parallelly in multiple threads.
+  - Any unit test project should already have a way to share involved parsers. You are recommended to follow the pattern if you need to use a new parser.
+    - The usual pattern would be having a pointer to that parser as a global variable, and a pair of functions for lazy initialization or finalization. And the main function will explicitly call the finalize function to avoid messing up memory leak detection.
+  - `GacUI` project has a mechanism to register parsers dynamically.
+- Each parser should already provide functions for converting AST back to string, you should not invent it by your own, unless you are making a new parser.
+- Each parser should already provide multiple visitors, try to reuse them. To invent your own algorithm, especially recursive algorithm, you should always try to create visitors.
 
 ## Advanced C++ Coding Rules
 
