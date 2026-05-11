@@ -151,7 +151,7 @@ function VMake {
         local VMAKE_FOLDERS=()
         while IFS= read -r -d '' VMAKE_FILE; do
             VMAKE_FOLDERS+=("$(dirname "${VMAKE_FILE}")")
-        done < <(find . -type f -name vmake -print0 2>/dev/null)
+        done < <(find . \( -path './.github/Ubuntu/vl/cmd' -prune \) -o \( -type f -name vmake -print0 \) 2>/dev/null)
 
         IFS=$'\n' VMAKE_FOLDERS=($(printf '%s\n' "${VMAKE_FOLDERS[@]}" | sort -u))
         unset IFS
@@ -225,7 +225,7 @@ function VBuild {
         local VMAKE_FOLDERS=()
         while IFS= read -r -d '' VMAKE_FILE; do
             VMAKE_FOLDERS+=("$(dirname "${VMAKE_FILE}")")
-        done < <(find . -type f -name vmake -print0 2>/dev/null)
+        done < <(find . \( -path './.github/Ubuntu/vl/cmd' -prune \) -o \( -type f -name vmake -print0 \) 2>/dev/null)
 
         IFS=$'\n' VMAKE_FOLDERS=($(printf '%s\n' "${VMAKE_FOLDERS[@]}" | sort -u))
         unset IFS
