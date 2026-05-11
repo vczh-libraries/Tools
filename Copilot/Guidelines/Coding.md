@@ -95,6 +95,11 @@ When `VlppParser2` is available to the current project, complex parsers always r
   - Avoid using an expression that creates temporary objects in `for(... : HERE)` or `for(... : indexed(HERE))`. The current C++ destroys the temporary object too early; therefore this becomes UB.
 - Prefer Inversion of Control (IoC) and other design patterns, over trivial virtual functions, over switch-case on types, over if-else on types.
 - Prefer static dispatching over dynamic dispatching when possible and reasonable.
+- Unless explicitly instructed:
+  - You are not allowed to test if `VCZH_DEBUG_NO_REFLECTION` is defined.
+  - You are not allowed to test if `VCZH_DEBUG_METAONLY_REFLECTION` is defined.
+  - You are not allowed to call any function that does not work with `VCZH_DEBUG_NO_REFLECTION`.
+  - Reflection registration is an exception follow the document for recommended patterns.
 
 ## Workflow Script Coding Convention
 
