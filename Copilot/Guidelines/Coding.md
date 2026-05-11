@@ -43,7 +43,7 @@ In general, here is my preference for any languages:
   - Always use `FilePath` for file path operations.
   - Use my own collection types vl::collections::* instead of std::*
   - Check out `REPO-ROOT/.github/KnowledgeBase/Index.md` for more information on how to choose the correct C++ data types.
-- Rules for expressing unavailable values:
+- To attach availability semantic to a value:
   - If any number is expected to be valid only when non-negative, you could use `-1` to represent invalid value.
   - If an object is expected to be valid only when non-null, you could use `nullptr` on `T*` or `Ptr<T>` to represent invalid value.
   - Use `Nullable<T>` to represent any invalid value if possible.
@@ -100,6 +100,11 @@ When `VlppParser2` is available to the current project, complex parsers always r
   - You are not allowed to test if `VCZH_DEBUG_METAONLY_REFLECTION` is defined.
   - You are not allowed to call any function that does not work with `VCZH_DEBUG_NO_REFLECTION`.
   - Reflection registration is an exception follow the document for recommended patterns.
+
+## Keep C++ Code Cross Platform
+
+- All source files must aim for cross platform unless the file name has `.Windows` or `.Linux.`.
+- Use FilePath to normalize file path, for file path operations and delimiter access.
 
 ## Workflow Script Coding Convention
 
