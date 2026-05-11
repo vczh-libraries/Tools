@@ -16,6 +16,14 @@ Execute monorepo script `Tools/Tools/Build.ps1` to run CI for all repos in their
 Execute single repo script `Tools/Tools/Build.ps1 <repo-name>` to run CI for a specific repo.
 Execute `Tools/Tools/CheckRepo.ps1 CheckAll` to find out how many repos have local changes.
 
+Only `Build.ps1` can release a repo for downstream repos.
+Multiple C++ files will be merged into just a few pair of header and cpp files for release.
+It is possible that the repo is good but merged files cause problems, and such problems may only be found in downstream repos.
+In this way you are going to organize affected declarations in header and cpp files so that they both work in merged and unmerged versions.
+It is possible that duplicated functions appear in merged files, you are recommended to create shared header files (or cpp files if necessary) to solve the sharing issue.
+
+Pay attention to the `REPO-ROOT/Release` folder, because of some `.gitignore` issues, new files are not automatically tracked in this folder. You have to be careful about that.
+
 ## Linux Specific
 
 Execute monorepo script `vgo vmake` followed by `vgo vbuild` to run CI for all repos in their dependency order until the first failure.
