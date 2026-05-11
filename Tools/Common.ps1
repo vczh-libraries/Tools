@@ -10,10 +10,12 @@ function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir"
         throw "$MESSAGE_1\r\n$MESSAGE_2"
     }
     if ($OutputFolder.IndexOf(":\") -eq -1) {
-        $output_dir = "$OutputVar=`"$PSScriptRoot\.Output\$OutputFolder"
+        $outputFolderValue = "$PSScriptRoot\.Output\$OutputFolder"
     } else {
-        $output_dir = "$OutputVar=`"$OutputFolder"
+        $outputFolderValue = "$OutputFolder"
     }
+    $outputFolderValue = $outputFolderValue.Replace("\", "/").TrimEnd("/") + "/"
+    $output_dir = "$OutputVar=`"$outputFolderValue`""
 
     $rebuildControl = ""
     if ($Rebuild) {
@@ -55,4 +57,19 @@ function Update-Parser($FileName) {
 function Update-Parser2($FileName) {
     Write-Host "Updating Parser: $FileName ..."
     Start-Process-And-Wait (,("$PSScriptRoot\GlrParserGen.exe", "$FileName"))
+}
+
+function Build-TypeScript-Package($ProjectName) {
+    $typeScriptPath = Resolve-Path "$PSScriptRoot\..\..\$ProjectName\Test\TypeScript"
+    Write-Host "Building TypeScript package: $typeScriptPath ..."
+
+    Push-Location $typeScriptPath | Out-Null
+    try {
+        & "$typeScriptPath\prepare.ps1"
+        Start-Process-And-Wait (,($env:ComSpec, "/c npm install")) $true $typeScriptPath
+        Start-Process-And-Wait (,($env:ComSpec, "/c npm run build")) $true $typeScriptPath
+    }
+    finally {
+        Pop-Location | Out-Null
+    }
 }

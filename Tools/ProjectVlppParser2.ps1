@@ -9,6 +9,7 @@ function Build-VlppParser2 {
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Json"
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Workflow"
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Xml"
+    Build-TypeScript-Package "VlppParser2"
 }
 
 function Import-VlppParser2 {

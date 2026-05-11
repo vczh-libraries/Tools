@@ -7,6 +7,7 @@ function Build-Workflow {
     Test-Vlpp-SubProject "Workflow" "CppTest_Metaonly"
     Test-Vlpp-SubProject "Workflow" "CppTest_Reflection"
     Test-Vlpp-SubProject "Workflow" "RuntimeTest"
+    Build-TypeScript-Package "Workflow"
 }
 
 function Import-Workflow {
