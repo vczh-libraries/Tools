@@ -10,19 +10,22 @@ Repos are ordered in Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppPa
 If the monorepo script succeeds directly, or if all repos are covered by the single repo script, full CI is done.
 Find out how many repos have local changes, commit and push them.
 
-## Windows Specific
+## Fixing Cross-Repo Issues
 
-Execute monorepo script `Tools/Tools/Build.ps1` to run CI for all repos in their dependency order until the first failure.
-Execute single repo script `Tools/Tools/Build.ps1 <repo-name>` to run CI for a specific repo.
-Execute `Tools/Tools/CheckRepo.ps1 CheckAll` to find out how many repos have local changes.
-
-Only `Build.ps1` can release a repo for downstream repos.
 Multiple C++ files will be merged into just a few pair of header and cpp files for release.
 It is possible that the repo is good but merged files cause problems, and such problems may only be found in downstream repos.
 In this way you are going to organize affected declarations in header and cpp files so that they both work in merged and unmerged versions.
 It is possible that duplicated functions appear in merged files, you are recommended to create shared header files (or cpp files if necessary) to solve the sharing issue.
 
 Pay attention to the `REPO-ROOT/Release` folder, because of some `.gitignore` issues, new files are not automatically tracked in this folder. You have to be careful about that.
+
+## Windows Specific
+
+Execute monorepo script `Tools/Tools/Build.ps1` to run CI for all repos in their dependency order until the first failure.
+Execute single repo script `Tools/Tools/Build.ps1 <repo-name>` to run CI for a specific repo.
+Execute `Tools/Tools/CheckRepo.ps1 CheckAll` to find out how many repos have local changes.
+
+`Build.ps1` can pickup release from upstream repos and prepare release for downstream repos.
 
 ## Linux Specific
 
@@ -31,5 +34,10 @@ Execute single repo script `vgo vmake <repo-name>` (only when you updated MSBuil
 Execute `vsync --check` to find out how many repos have local changes.
 
 Guidelines for each repo will tell you to run `build.sh` to build any test project, but when you are in monorepo context, you can run `vmake` (only when you updated MSBuild project files) followed by `vbuild -b` to achieve the same goal. Both way require you to be in the test project folder.
+
+Linux build scripts do not prepare release. If any cross-repo issues are found (probably Linux specific issues), you can do manual release by:
+- Build `VlppParser2/Tools/CodePack`.
+- Run `VlppParser2/Tools/CodePack/Bin/CodePack`, feeding any `REPO-ROOT/Release/CodegenConfig.xml`, it creates a release for that repo.
+- Copy released header and cpp files to a downstream repo. You are able to figure out what files to copy to what repos by checking if `DOWNSTREAM-REPO-ROOT/Release` has any files from `UPSTREAM-REPO-ROOT/Release`.
 
 Usually Linux CI runs after Windows CI completes, so most of the time your job is to fix makefiles or C++ compatibility issues.
