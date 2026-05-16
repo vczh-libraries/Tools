@@ -102,7 +102,7 @@ start <GacUI>\Test\GacUISrc\x64\Debug\RemotingTest_Core.exe /FCT /Http
 
 The server prints:
 ```
-> HTTP server created, waiting on: localhost:8888
+> HTTP server created, waiting on: http://localhost:8888/GacUIRemoteProtocolHttp
 ```
 
 ### Stopping the Server
