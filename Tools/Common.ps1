@@ -9,21 +9,25 @@ function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir"
         local MESSAGE_2 = "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat"
         throw "$MESSAGE_1\r\n$MESSAGE_2"
     }
+    $OutputFolder = $OutputFolder.Trim()
+    if ($OutputFolder.StartsWith('"') -and $OutputFolder.EndsWith('"')) {
+        $OutputFolder = $OutputFolder.Substring(1, $OutputFolder.Length - 2)
+    }
     if ($OutputFolder.IndexOf(":\") -eq -1) {
         $outputFolderValue = "$PSScriptRoot\.Output\$OutputFolder"
     } else {
-        $outputFolderValue = "$OutputFolder"
+    $outputFolderValue = "$OutputFolder"
     }
     $outputFolderValue = $outputFolderValue.Replace("\", "/").TrimEnd("/") + "/"
-    $output_dir = "$OutputVar=`"$outputFolderValue`""
+    $output_dir = "$OutputVar=$outputFolderValue"
 
     $rebuildControl = ""
     if ($Rebuild) {
         $rebuildControl = "/t:Rebuild"
     }
-    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 $rebuildControl /p:Configuration=`"$Configuration`";Platform=`"$Platform`";$($output_dir)"
-    $cmd_arguments = "`"`"$vsdevcmd`" & $msbuild_arguments"
-    Start-Process-And-Wait (,($env:ComSpec, "/c $cmd_arguments")) $false "" $ThrowOnCrash
+    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 $rebuildControl `"/p:Configuration=$Configuration;Platform=$Platform;$($output_dir)`""
+    $cmd_arguments = "/c `"call `"$vsdevcmd`" && $msbuild_arguments`""
+    Start-Process-And-Wait (,($env:ComSpec, $cmd_arguments)) $false "" $ThrowOnCrash
 }
 
 function Test-Single-Binary($FileName) {
