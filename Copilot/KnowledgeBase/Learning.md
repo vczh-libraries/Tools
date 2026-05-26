@@ -12,10 +12,10 @@
 - Prefer simple calls before interface casts [2]
 - Validate expectations against implementation and existing tests [2]
 - Use `vl::Exception` for expected semantic failures and `CHECK_ERROR` for invariants [2]
+- Port fixes from imports to source repositories [2]
 - Do not assume async callback owners are heap allocated [1]
 - Extract abstractions only for real shared behavior [1]
 - Make `Stop()` drain asynchronous work before returning [1]
-- Port fixes from imports to source repositories [1]
 - Prefer well-defined tests over ambiguous edge cases [1]
 - Prefer `operator<=> = default` for lexicographic key structs [1]
 - Prefer two-pointer merge for sorted range maps [1]
@@ -82,6 +82,8 @@ If an API exposes `Stop()`, callers should be able to rely on it as the shutdown
 ## Port fixes from imports to source repositories
 
 Do not treat files copied into `Import` or generated release files as the source of truth. When a fix affects imported `Vlpp` files, make the upstream change in `Vlpp`, regenerate its release output, and then copy the generated files downstream. When a `.github` instruction or script fix is needed, port it through `Tools/Copilot`.
+
+When a downstream repo such as `GacUI` exposes a bug in imported `VlppOS` inter-process code, fix and verify it in `VlppOS`, regenerate `VlppOS\Release`, and then import the generated release files downstream.
 
 ## Validate expectations against implementation and existing tests
 
