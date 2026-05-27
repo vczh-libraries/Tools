@@ -43,10 +43,7 @@ Read these documents before starting any work:
 
 Follow the guidelines in `<GacUI>/.github/Guidelines/Building.md`.
 
-1. Stop any running debugger first:
-   ```powershell
-   & <GacUI>\.github\Scripts\copilotDebug_Stop.ps1
-   ```
+1. Stop any running debugger first: See `<GacUI>/.github/Guidelines/Debugging.md`
 
 2. Build the solution:
    ```powershell
@@ -136,12 +133,7 @@ Follow the guidelines in `<GacUI>/.github/Guidelines/Debugging.md`.
 3. Useful debugger commands: `g` (continue), `kn` (call stack), `dv` (variables),
    `bp FILE:LINE` (breakpoint), `p` (step over), `t` (step in), `pt` (step out).
 
-4. Stop the debugger:
-   ```powershell
-   & <GacUI>\.github\Scripts\copilotDebug_Stop.ps1
-   ```
-
-**Important:** Never use `q`/`qd`/`qq` — always use `copilotDebug_Stop.ps1`.
+4. Stop the debugger.
 
 ---
 
