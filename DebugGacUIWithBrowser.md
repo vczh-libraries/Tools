@@ -11,19 +11,13 @@ accessible as siblings.
 
 ## Which GacUI to Use
 
-There are **two** copies of GacUI in this workspace:
+Use the GacUI repository that sits next to GacJS in the workspace:
 
 | Path | Role |
 |------|------|
-| `../GacUI/` | **Primary** — the sibling clone. Always use this when it exists. |
-| `GacUI/` | **Fallback submodule** — use only when `../GacUI` is not available. **DO NOT modify files in this submodule.** |
+| `../GacUI/` | Sibling GacUI checkout used for C++ source, resources, builds, and debugging. |
 
-**Rule:** If `(repo-root)\..\GacUI` exists, always use it. All build, run, and debug
-commands below assume the sibling `../GacUI`. The submodule `GacUI/` is a read-only
-fallback.
-
-Throughout this document, `<GacUI>` refers to the resolved path (sibling first,
-submodule second).
+Throughout this document, `<GacUI>` refers to `../GacUI` from the GacJS repo root.
 
 ---
 
@@ -194,11 +188,8 @@ repos are required.
 |------|------|
 | `../GacUI/` | Normal git repository (sibling clone) |
 | `./` (GacJS) | Normal git repository |
-| `GacUI/` | **Git submodule** inside GacJS, pointing at a specific commit of the GacUI repo |
 
-### Working with the Sibling `../GacUI`
-
-This is a normal repository. The standard workflow applies:
+### Working with GacUI
 
 ```powershell
 cd ../GacUI
@@ -206,44 +197,3 @@ git add -A
 git commit -m "your message"
 git push origin <current-branch-name-for-GacUI>
 ```
-
-### Working with the Submodule `GacUI/`
-
-**WARNING**: You should not work on this submodule when `../GacUI` is available.
-
-The submodule `GacUI/` tracks a specific commit. After cloning or pulling GacJS,
-bring it up to date with the latest `master` of the remote GacUI repo:
-
-```powershell
-cd GacJS
-git submodule update --init --remote
-```
-
-- `--init` initializes the submodule if it hasn't been set up yet.
-- `--remote` fetches the latest commit from the remote tracking branch (typically `master`).
-
-**Detached HEAD warning:** After `git submodule update`, the submodule is always in
-**detached HEAD** state — it checks out a specific commit, not a branch. If you need
-to make changes inside the submodule, you must checkout `master` first:
-
-```powershell
-cd GacUI                          # enter the submodule
-git checkout master               # attach to the master branch
-# ... make your changes ...
-git add -A
-git commit -m "your message"
-git push origin master            # push to the remote GacUI repo
-```
-
-Then go back to GacJS and record the updated submodule commit:
-
-```powershell
-cd ..                             # back to GacJS root
-git add GacUI                     # record the new submodule commit
-git commit -m "update GacUI submodule"
-git push origin <current-branch-name-for-GacJS>
-```
-
-**Important:** If you commit while in detached HEAD without checking out a branch
-first, your commits will be orphaned and eventually garbage-collected. Always
-`git checkout master` inside the submodule before committing.
