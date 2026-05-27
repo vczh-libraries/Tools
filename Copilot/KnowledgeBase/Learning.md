@@ -31,6 +31,7 @@
 - Dereference `Ptr<T>` via `.Obj()` (not `*ptr`) [1]
 - `vl::regex` separator regex: `L"[\\/\\\\]+"` [1]
 - Use 2-space indentation in embedded XML/JSON literals [1]
+- Verify generated artifacts with downstream consumer checks [1]
 - `collections::List` has deleted copy constructor; use `std::move()` for structs with `List` members [1]
 
 # Refinements
@@ -162,6 +163,10 @@ Objects that dispatch asynchronous callbacks should not begin listening or queue
 ## Use 2-space indentation in embedded XML/JSON literals
 
 When writing XML or JSON inside a C++ string literal (e.g. `LR"GacUISrc(... )GacUISrc"` resources), indent the XML/JSON with 2 spaces (not tabs) to match the repo’s formatting rules for embedded structured text.
+
+## Verify generated artifacts with downstream consumer checks
+
+When a generator produces artifacts for another language or toolchain, validate the generated output with that downstream consumer instead of only checking that the generator runs. For example, generated TypeScript declarations for JSON output should be type-checked against real generated JSON examples with `tsc --noEmit`.
 
 ## `vl::regex` separator regex: `L"[\\/\\\\]+"`
 
