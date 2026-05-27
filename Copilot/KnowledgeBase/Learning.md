@@ -2,20 +2,20 @@
 
 # Orders
 
-- Process staged tasks one by one with verification [13]
+- Process staged tasks one by one with verification [14]
 - Crash early instead of adding error-tolerance fallbacks [6]
+- Make `Stop()` drain asynchronous work before returning [4]
 - Use `WString::IndexOf` with `wchar_t` (not `const wchar_t*`) [4]
 - Use `collections::BinarySearchLambda` on contiguous buffers (guard empty) [4]
 - Capture dependent lambdas explicitly [2]
 - Don't assume observable changes are batched [2]
+- Do not assume async callback owners are heap allocated [2]
+- Extract abstractions only for real shared behavior [2]
 - Use `ERROR_MESSAGE_PREFIX` for meaningful `CHECK_ERROR` / `CHECK_FAIL` messages [2]
 - Prefer simple calls before interface casts [2]
 - Validate expectations against implementation and existing tests [2]
 - Use `vl::Exception` for expected semantic failures and `CHECK_ERROR` for invariants [2]
 - Port fixes from imports to source repositories [2]
-- Do not assume async callback owners are heap allocated [1]
-- Extract abstractions only for real shared behavior [1]
-- Make `Stop()` drain asynchronous work before returning [1]
 - Prefer well-defined tests over ambiguous edge cases [1]
 - Prefer `operator<=> = default` for lexicographic key structs [1]
 - Prefer two-pointer merge for sorted range maps [1]
@@ -71,13 +71,19 @@ When a scenario’s expected behavior is unclear or undocumented (e.g. calling a
 
 Asynchronous callbacks and handle-close paths must not rely on the owning object being allocated with `new` or outliving callbacks by convention. Track active operations explicitly and make shutdown drain or detach every callback path that can reference the object.
 
+When registered waits or async request callbacks can race with `Stop()`, give each wait/request its own context and use atomics to transfer ownership between registration, callback execution, and stop. Do not close handles or buffers until the owner path has either unregistered a not-yet-started callback or waited for a started callback to finish.
+
 ## Extract abstractions only for real shared behavior
 
 When refactoring client/server or similar paired implementations, extract common state and helper behavior only when it genuinely simplifies both sides. Preserve intentional differences in small derived redirects or callbacks instead of forcing an abstraction just to increase reuse.
 
+For role-specific implementations, extract a base that contains only truly shared state and operations. Keep transport-only or role-only members in the concrete subtype so no implementation inherits fields that do not apply to it.
+
 ## Make `Stop()` drain asynchronous work before returning
 
 If an API exposes `Stop()`, callers should be able to rely on it as the shutdown boundary: after it returns, no pending action, wait callback, overlapped I/O, or async completion should still touch the object. Do not paper over a broken `Stop()` with sleeps in tests; fix the stop path.
+
+Use the platform's final callback boundary when available. For WinHTTP async requests, `WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING` is the point to release pending request tracking for successfully submitted requests; release immediately only for failures before submission. For registered wait handles, `Stop()` should unregister not-started waits or wait for active callbacks, then close dependent handles and state.
 
 ## Port fixes from imports to source repositories
 
