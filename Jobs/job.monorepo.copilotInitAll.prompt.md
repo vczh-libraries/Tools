@@ -19,6 +19,8 @@ The order of processing repos is important, because there are dependencies betwe
 
 ## Consume Unlearned Materials
 
+Run `REPO-ROOT/.github/Scripts/copilotRemember.ps1` in the repos listed in `Order of Processing Repos`:
+- This script picks up documents that are not archived and turn them into learning materials.
 Run `REPO-ROOT/.github/prompts/refine.prompt.md` in the repos listed in `Order of Processing Repos`:
 - You should keep executing the `refine.prompt.md` until all folders in `REPO-ROOT/.github/Learning` are processed.
 - If there are any empty folders in `REPO-ROOT/.github/Learning`, just delete them.
