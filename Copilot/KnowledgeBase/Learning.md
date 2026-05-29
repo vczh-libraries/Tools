@@ -4,11 +4,11 @@
 
 - Process staged tasks one by one with verification [15]
 - Crash early instead of adding error-tolerance fallbacks [6]
+- Port fixes from imports to source repositories [6]
 - Make `Stop()` drain asynchronous work before returning [5]
+- Verify generated artifacts with downstream consumer checks [5]
 - Use `WString::IndexOf` with `wchar_t` (not `const wchar_t*`) [4]
 - Use `collections::BinarySearchLambda` on contiguous buffers (guard empty) [4]
-- Port fixes from imports to source repositories [4]
-- Verify generated artifacts with downstream consumer checks [3]
 - Capture dependent lambdas explicitly [2]
 - Don't assume observable changes are batched [2]
 - Do not assume async callback owners are heap allocated [2]
