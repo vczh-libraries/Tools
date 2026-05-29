@@ -33,6 +33,7 @@
 - Use 2-space indentation in embedded XML/JSON literals [1]
 - Verify generated artifacts with downstream consumer checks [1]
 - `collections::List` has deleted copy constructor; use `std::move()` for structs with `List` members [1]
+- Compare type descriptors by pointer when descriptor identity is available [1]
 
 # Refinements
 
@@ -187,3 +188,7 @@ When a C++ struct contains `vl::collections::List` fields, the struct's implicit
 ## Use `vl::Exception` for expected semantic failures and `CHECK_ERROR` for invariants
 
 When a failure is part of the public or script-visible semantics and tests are expected to catch it as a recoverable error, throw `vl::Exception`. Reserve `CHECK_ERROR` / `CHECK_FAIL` / `vl::Error` for internal invariant violations and states that indicate implementation corruption. For example, duplicate RPC registration can remain a catchable semantic exception when samples intentionally verify it, while impossible local type ids should fail as invariants.
+
+## Compare type descriptors by pointer when descriptor identity is available
+
+`GetTypeDescriptor<T>()` and `GetTypeDescriptor(typeName)` guarantee one descriptor instance per type in a loaded type manager, so prefer direct `ITypeDescriptor*` pointer comparison over comparing type-name strings. Use `TypeInfo<T>::content.typeName` only where the type manager cannot be loaded yet; if a name lookup is unavoidable, resolve the descriptor once and compare pointers inside hot or repeated paths.
