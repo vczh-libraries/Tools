@@ -183,7 +183,7 @@ Propose any solution you can think of and write them down in the document, you m
   - Limit side effects so that you don't have to deal with massive of issues at the same time.
   - `git commit` and `git push` should happen after every single `## Task X`, and before the next `## Task X`:
     - Unless there are explicit instructions to override this.
-    - **DO NOT** finish multiple `## Task X` and then separate changes in commits for them. Even when they are related.
+    - **DO NOT** wait until all `## Task X` are finished and the do git commit and push. Even when they are related.
     - By doing this you are able to secure the result of the previous `## Task X`, and when you mess up the current one, you are able to easily revert to the last successful state of the source code.
   - When different `## Task X` happens in different repos, you are going to change the `Copilot_Investigate.md` in that repo.
     - If multiple repos are involved, for all involved repos that has the `Copilot_Investigate.md` file, decide which repo is the main repo for the task and update that file in the main repo.
