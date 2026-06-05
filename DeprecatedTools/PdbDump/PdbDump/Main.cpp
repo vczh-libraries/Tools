@@ -1,3 +1,4 @@
+#define _WINSOCKAPI_
 #include <Windows.h>
 #include "dia2.h"
 #include "diacreate.h"

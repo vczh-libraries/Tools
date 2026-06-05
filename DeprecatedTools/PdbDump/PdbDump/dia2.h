@@ -27,6 +27,7 @@
 #endif // __RPCNDR_H_VERSION__
 
 #ifndef COM_NO_WINDOWS_H
+#define _WINSOCKAPI_
 #include "windows.h"
 #include "ole2.h"
 #endif /*COM_NO_WINDOWS_H*/
