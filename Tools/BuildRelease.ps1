@@ -42,10 +42,7 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.cpp .\Tools\Executables\GacGen
 
         # Build Tools
-        Build-Sln .\Tools\Executables\CodePack\CodePack.vcxproj         Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
-        Build-Sln .\Tools\Executables\GlrParserGen\GlrParserGen.vcxproj Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
-        Build-Sln .\Tools\Executables\CppMerge\CppMerge.vcxproj         Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
-        Build-Sln .\Tools\Executables\GacGen\GacGen.vcxproj             Release x86 -OutputFolder $PSScriptRoot\..\..\Release\Tools\Executables\Release
+        Build-Sln .\Tools\Executables\Executables.sln Release x86
 
         # Deploy
         Write-Host "Deploying Binaries ..."
@@ -82,14 +79,14 @@ function Build-Release-Verify-Workflow {
     try {
         # Debug Build
         Write-Host "Create Debug Builds ..."
-        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\Tutorial\Console_Workflow\Debug\
+        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86
 
         # Codegen
         .\Tutorial\Console_Workflow\Debug\W05_Compile.exe
         
         # Debug Build After Codegen
         Write-Host "Create Debug Builds After Codegen..."
-        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86 -OutputFolder $PSScriptRoot\..\..\Release\Tutorial\Console_Workflow\Debug\
+        Build-Sln .\Tutorial\Console_Workflow\Console_Workflow.sln Debug x86
     }
     catch {
         throw
@@ -129,7 +126,7 @@ function Build-Release-Verify-GacUI-Cpp([Bool] $PopupFolders) {
         Write-Host "Create Debug Builds ..."
         Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
             if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\Console_Workflow\") -eq -1)) {
-                Build-Sln $_.FullName "Debug" "Win32" "OutDir" "$($_.DirectoryName)\Debug\"
+                Build-Sln $_.FullName "Debug" "Win32"
             }
         }
 
@@ -153,18 +150,10 @@ function Build-Release-Verify-GacUI-Cpp([Bool] $PopupFolders) {
         Write-Host "Create Release Builds ..."
         Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
             if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\Console_Workflow\") -eq -1)) {
-                Build-Sln $_.FullName "Release" "Win32" "OutDir" "$($_.DirectoryName)\Release\"
+                Build-Sln $_.FullName "Release" "Win32"
             }
         }
 
-        if ($PopupFolders) {
-            start .\Tutorial\GacUI_HelloWorlds\Release
-            start .\Tutorial\GacUI_Layout\Release
-            start .\Tutorial\GacUI_Controls\Release
-            start .\Tutorial\GacUI_ControlTemplate\Release
-            start .\Tutorial\GacUI_Xml\Release
-            start .\Tutorial\GacUI_Windows\Release
-        }
     }
     catch {
         throw

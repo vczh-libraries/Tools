@@ -1,33 +1,59 @@
 . $PSScriptRoot\StartProcess.ps1
 
-function Build-Sln($SolutionFile, $Configuration, $Platform, $OutputVar="OutDir", [String]$OutputFolder="", [Boolean]$ThrowOnCrash = $true, [Boolean]$Rebuild = $true) {
+function Resolve-Sln-Platform($SolutionFile, $Configuration, $Platform) {
+    $solutionPath = Resolve-Path -LiteralPath $SolutionFile -ErrorAction SilentlyContinue
+    if (($solutionPath -eq $null) -or ([System.IO.Path]::GetExtension($solutionPath.Path) -ne ".sln")) {
+        return $Platform
+    }
+
+    $content = Get-Content -LiteralPath $solutionPath.Path -Raw
+    $hasConfig = {
+        param($Candidate)
+        $pattern = "(?m)^\s*" + [regex]::Escape("$Configuration|$Candidate") + "\s*="
+        return $content -match $pattern
+    }
+
+    if (& $hasConfig $Platform) {
+        return $Platform
+    }
+    if (($Platform -eq "Win32") -and (& $hasConfig "x86")) {
+        return "x86"
+    }
+    if (($Platform -eq "x86") -and (& $hasConfig "Win32")) {
+        return "Win32"
+    }
+    return $Platform
+}
+
+function Build-Sln($SolutionFile, $Configuration, $Platform, [Boolean]$ThrowOnCrash = $true, [Boolean]$Rebuild = $true) {
     Write-Host "Building $SolutionFile ..."
 
     $vsdevcmd = $env:VLPP_VSDEVCMD_PATH
     if ($vsdevcmd -eq $null) {
-        local MESSAGE_1 = "You have to add an environment variable named VLPP_VSDEVCMD_PATH and set its value to the path of VsDevCmd.bat, e.g.:"
-        local MESSAGE_2 = "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat"
+        $MESSAGE_1 = "You have to add an environment variable named VLPP_VSDEVCMD_PATH and set its value to the path of VsDevCmd.bat, e.g.:"
+        $MESSAGE_2 = "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat"
         throw "$MESSAGE_1\r\n$MESSAGE_2"
     }
-    $OutputFolder = $OutputFolder.Trim()
-    if ($OutputFolder.StartsWith('"') -and $OutputFolder.EndsWith('"')) {
-        $OutputFolder = $OutputFolder.Substring(1, $OutputFolder.Length - 2)
-    }
-    if ($OutputFolder.IndexOf(":\") -eq -1) {
-        $outputFolderValue = "$PSScriptRoot\.Output\$OutputFolder"
-    } else {
-    $outputFolderValue = "$OutputFolder"
-    }
-    $outputFolderValue = $outputFolderValue.Replace("\", "/").TrimEnd("/") + "/"
-    $output_dir = "$OutputVar=$outputFolderValue"
 
     $rebuildControl = ""
     if ($Rebuild) {
         $rebuildControl = "/t:Rebuild"
     }
-    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 $rebuildControl `"/p:Configuration=$Configuration;Platform=$Platform;$($output_dir)`""
+    $buildPlatform = Resolve-Sln-Platform $SolutionFile $Configuration $Platform
+    $msbuild_arguments = "MSBUILD `"$SolutionFile`" /m:8 $rebuildControl `"/p:Configuration=$Configuration;Platform=$buildPlatform`""
     $cmd_arguments = "/c `"call `"$vsdevcmd`" && $msbuild_arguments`""
     Start-Process-And-Wait (,($env:ComSpec, $cmd_arguments)) $false "" $ThrowOnCrash
+}
+
+function Copy-Tool-Binary($src, $dst) {
+    if (Test-Path -LiteralPath $dst) {
+        Remove-Item -LiteralPath $dst -Force
+    }
+    if (Test-Path -LiteralPath $src) {
+        $parent = Split-Path -Parent $dst
+        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+        Copy-Item -LiteralPath $src -Destination $dst -Force
+    }
 }
 
 function Test-Single-Binary($FileName) {

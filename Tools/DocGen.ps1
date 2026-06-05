@@ -41,8 +41,8 @@ function DocGen-Update {
 }
 
 function DocGen-Build-Index {
-    Build-Sln "$PSScriptRoot\..\..\Document\Tools\CppDoc\UnitTest_Cases\UnitTest_Cases.vcxproj" Debug Win32 OutDir "$PSScriptRoot\..\..\Document\Tools\CppDoc\Debug" $false
-    Build-Sln "$PSScriptRoot\..\..\Document\Tools\CppDoc\DocIndex\DocIndex.vcxproj" Release x64 OutDir "$DocIndexOutputFolder"
+    Build-Sln "$PSScriptRoot\..\..\Document\Tools\CppDoc\CppDoc.sln" Debug Win32 $false
+    Build-Sln "$PSScriptRoot\..\..\Document\Tools\CppDoc\CppDoc.sln" Release x64
     if (!(Test-Path "$DocIndexExe")) {
         throw "Failed to build DocIndex.vcxproj"
     }
@@ -54,7 +54,7 @@ function DocGen-Index {
 
 function DocGen-Verify {
     $ExampleOutput = "$PSScriptRoot\..\..\Document\Tools\Examples\Debug"
-    Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Lib\Lib.vcxproj" Debug Win32 OutDir $ExampleOutput $true $false
+    Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Examples.sln" Debug Win32 -Rebuild $false
 
     $projects = @(@("VLPP", "Vlpp"), @("VLPPOS", "VlppOS"), @("VLPPREGEX", "VlppRegex"), @("VLPPREFLECTION", "VlppReflection"), @("VLPPPARSER", "VlppParser"), @("VLPPPARSER2", "VlppParser2"), @("WORKFLOW", "Workflow"), @("GACUI", "GacUI"));
     foreach ($projectPair in $projects) {
@@ -78,7 +78,7 @@ function DocGen-Verify {
                     Remove-Item -Path "$ExampleOutput\$projectName.exe" | Out-Null
                 }
                 
-                Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\$projectName\$projectName.vcxproj" Debug Win32 OutDir $ExampleOutput $false $false
+                Build-Sln "$PSScriptRoot\..\..\Document\Tools\Examples\Examples.sln" Debug Win32 $false $false
                 if ((Test-Path "$ExampleOutput\$projectName.exe")) {
                     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
                     $startInfo.FileName = "$ExampleOutput\$projectName.exe"

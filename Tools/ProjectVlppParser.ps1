@@ -1,5 +1,6 @@
 function Build-VlppParser {
     # Run test cases
+    Test-Vlpp-Init "VlppParser"
     Test-Vlpp-SubProject "VlppParser" "UnitTest"
     Test-Vlpp-SubProject "VlppParser" "UnitTest_Generated"
     Test-Vlpp-SubProject "VlppParser" "UnitTest_Generated_Metaonly"
@@ -12,7 +13,8 @@ function Import-VlppParser {
 }
 
 function Build-Tool-ParserGen {
-    Build-Sln $PSScriptRoot\..\..\VlppParser\Tools\ParserGen\ParserGen\ParserGen.vcxproj Release x86
+    Build-Sln $PSScriptRoot\..\..\VlppParser\Tools\ParserGen\ParserGen.sln Release Win32
+    Copy-Tool-Binary $PSScriptRoot\..\..\VlppParser\Tools\ParserGen\Release\ParserGen.exe $PSScriptRoot\.Output\ParserGen.exe
     Test-Single-Binary ParserGen.exe
 }
 

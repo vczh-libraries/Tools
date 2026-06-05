@@ -1,5 +1,6 @@
 function Build-VlppParser2 {
     # Run test cases
+    Test-Vlpp-Init "VlppParser2"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_AstGen"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_AstParserGen"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_LexerAndParser"
@@ -18,12 +19,14 @@ function Import-VlppParser2 {
 }
 
 function Build-Tool-GlrParserGen {
-    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\GlrParserGen\GlrParserGen.vcxproj Release x86
+    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\GlrParserGen.sln Release x86
+    Copy-Tool-Binary $PSScriptRoot\..\..\VlppParser2\Tools\GlrParserGen\Release\GlrParserGen.exe $PSScriptRoot\.Output\GlrParserGen.exe
     Test-Single-Binary GlrParserGen.exe
 }
 
 function Build-Tool-CodePack {
-    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\CodePack\CodePack\CodePack.vcxproj Release x86
+    Build-Sln $PSScriptRoot\..\..\VlppParser2\Tools\CodePack\CodePack.sln Release x86
+    Copy-Tool-Binary $PSScriptRoot\..\..\VlppParser2\Tools\CodePack\Release\CodePack.exe $PSScriptRoot\.Output\CodePack.exe
     Test-Single-Binary CodePack.exe
 }
 

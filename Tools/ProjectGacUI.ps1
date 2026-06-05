@@ -1,5 +1,9 @@
+function Test-GacUI-Platform-Init($platform) {
+    Build-Sln $PSScriptRoot\..\..\GacUI\Test\GacUISrc\GacUISrc.sln Release $platform
+}
+
 function Test-GacUI-Platform($subProjectName, $platform, $outDir) {
-    Build-Sln $PSScriptRoot\..\..\GacUI\Test\GacUISrc\$subProjectName\$subProjectName.vcxproj Release $platform OutDir "`"$outDir\`""
+    Build-Sln $PSScriptRoot\..\..\GacUI\Test\GacUISrc\GacUISrc.sln Release $platform -Rebuild $false
     if (!(Test-Path "$outDir\$subProjectName.exe")) {
         throw "Failed"
     }
@@ -13,8 +17,14 @@ function Test-GacUI-SubProject($subProjectName) {
     Test-GacUI-Platform $subProjectName x64 "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\x64\Release"
 }
 
+function Test-GacUI-Init {
+    Test-GacUI-Platform-Init Win32
+    Test-GacUI-Platform-Init x64
+}
+
 function Build-GacUI {
     # Update metadata
+    Test-GacUI-Init
     Test-GacUI-SubProject "Metadata_Generate"
     Test-GacUI-SubProject "Metadata_Test"
 
@@ -32,7 +42,8 @@ function Import-GacUI {
 }
 
 function Build-Tool-GacGen {
-    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen\GacGen.vcxproj Release Win32
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacGen\GacGen.sln Release Win32
+    Copy-Tool-Binary $PSScriptRoot\..\..\GacUI\Tools\GacGen\Bin\GacGen.exe $PSScriptRoot\.Output\GacGen.exe
     Test-Single-Binary GacGen.exe
 }
 

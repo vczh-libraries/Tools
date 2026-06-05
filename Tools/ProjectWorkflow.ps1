@@ -1,5 +1,6 @@
 function Build-Workflow {
     # Run test cases
+    Test-Vlpp-Init "Workflow"
     Test-Vlpp-SubProject "Workflow" "LibraryTest"
     Test-Vlpp-SubProject "Workflow" "CompilerTest_GenerateMetadata"
     Test-Vlpp-SubProject "Workflow" "CompilerTest_LoadAndCompile"
@@ -19,7 +20,8 @@ function Import-Workflow {
 }
 
 function Build-Tool-CppMerge {
-    Build-Sln $PSScriptRoot\..\..\Workflow\Tools\CppMerge\CppMerge\CppMerge.vcxproj Release x86
+    Build-Sln $PSScriptRoot\..\..\Workflow\Tools\CppMerge\CppMerge.sln Release x86
+    Copy-Tool-Binary $PSScriptRoot\..\..\Workflow\Tools\CppMerge\Release\CppMerge.exe $PSScriptRoot\.Output\CppMerge.exe
     Test-Single-Binary CppMerge.exe
 }
 

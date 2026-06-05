@@ -1,5 +1,9 @@
+function Test-Vlpp-Platform-Init($projectName, $platform) {
+    Build-Sln $PSScriptRoot\..\..\$projectName\Test\UnitTest\UnitTest.sln Release $platform
+}
+
 function Test-Vlpp-Platform($projectName, $subProjectName, $platform, $outDir) {
-    Build-Sln $PSScriptRoot\..\..\$projectName\Test\UnitTest\$subProjectName\$subProjectName.vcxproj Release $platform OutDir "`"$outDir\`""
+    Build-Sln $PSScriptRoot\..\..\$projectName\Test\UnitTest\UnitTest.sln Release $platform -Rebuild $false
     if (!(Test-Path "$outDir\$subProjectName.exe")) {
         throw "Failed"
     }
@@ -13,7 +17,13 @@ function Test-Vlpp-SubProject($projectName, $subProjectName) {
     Test-Vlpp-Platform "$projectName" $subProjectName x64 "$PSScriptRoot\..\..\$projectName\Test\UnitTest\x64\Release"
 }
 
+function Test-Vlpp-Init($projectName) {
+    Test-Vlpp-Platform-Init $projectName Win32
+    Test-Vlpp-Platform-Init $projectName x64
+}
+
 function Test-Vlpp($projectName) {
+    Test-Vlpp-Init $projectName
     Test-Vlpp-SubProject $projectName "UnitTest"
 }
 
