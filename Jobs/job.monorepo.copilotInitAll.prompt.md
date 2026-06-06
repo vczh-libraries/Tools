@@ -1,4 +1,7 @@
 You are going to sync context for coding agents across different repos.
+If `git push` is blocked because of needing to merge, you are allowed to rebase by yourself:
+  - Always rebase to the latest change of the remote branch, instead of making a rebase commit.
+  - This is a pure document maintenance job so no testing is needed.
 **IMPORTANT** If you are instructed to "skip learning", you should start from `## Sync Back Knowledge Base and Instructions`.
 
 ## Understanding Learning

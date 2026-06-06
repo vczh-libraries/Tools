@@ -1,4 +1,7 @@
 You are going to run full CI for the whole monorepo.
+If `git push` is blocked because of needing to merge, you are allowed to rebase by yourself:
+  - Always rebase to the latest change of the remote branch, instead of making a rebase commit.
+  - Only when the source code is changed from remote you should re-run the test process. If there is only document or instruction changes from remote, skip the test process.
 
 ## Instructions
 
