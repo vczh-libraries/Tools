@@ -8,10 +8,15 @@ If `git push` is blocked because of needing to merge, you are allowed to rebase 
 Run monorepo script and it will stops at the first failure.
 When any repo fails, you need to identify which test project fails, find information from the repo's `AGENTS.md` and `Project.md`, figure out how to build, test and debug that specific test project.
 To ensure if that repo is good, run the single repo script.
-And after the first failure, you need to script to single repo script for the rest of the repos, because running CI on succeeded repos is a waste of time up to several hours, it is unacceptable.
+And after the first failure, you need to switch to single repo script for the rest of the repos, because running CI on succeeded repos is a waste of time up to several hours, it is unacceptable.
 Repos are ordered in Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Release.
 If the monorepo script succeeds directly, or if all repos are covered by the single repo script, full CI is done.
 Find out how many repos have local changes, commit and push them.
+
+### Qualify for Success
+
+The goal of this job is to ensure the source code of this monorepo is qualified for release.
+You are required to solve every errors, no matter who causes them.
 
 ## Fixing Cross-Repo Issues
 
