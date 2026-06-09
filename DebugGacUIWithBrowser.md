@@ -197,3 +197,31 @@ git add -A
 git commit -m "your message"
 git push origin <current-branch-name-for-GacUI>
 ```
+
+---
+
+## Checking Core Exit Exception Rendering
+
+To verify browser-side exception rendering, run the Remote Protocol Test variant:
+
+```powershell
+start <GacUI>\Test\GacUISrc\x64\Debug\RemotingTest_Core.exe /Http /RPT
+```
+
+Open `http://localhost:8896/index.html`. The browser should render
+`Remote Protocol Test`. Open the `File` menu, click
+`self.Close() (InvokeInMainThread)`, and confirm the `Do you want to exit?`
+dialog with `OK`.
+
+After the core exits, the web page should render a visible exception message. For
+the verified `/Http /RPT` exit path, the expected text is:
+
+```text
+IGacUIRenderer exited due to receiving RequestControllerConnectionStopped.
+```
+
+To check for any rendered exception, inspect the page text after confirming the
+exit dialog and search for visible exception or exit text. In browser automation,
+take a fresh DOM snapshot after the click and look for `IGacUIRenderer exited`
+or another visible error line. Console logs can be empty; the rendered page text
+is the authoritative signal for this check.
