@@ -55,7 +55,16 @@ http://localhost:8888/Automation/RemotingTest_Rendering_Win32/Dom
 ```
 
 `Controls` returns JSON with element text and bounds. Search the JSON for the
-visible text you want, then use the nearest enclosing control bounds. Send input
+visible text you want, then read the nearest enclosing object's `bounds` object.
+The bounds object has `x1`, `y1`, `x2`, and `y2` fields. Click the center point:
+
+```text
+x = (x1 + x2) / 2
+y = (y1 + y2) / 2
+```
+
+If the visible text is inside an `elementText` label, walk upward to the nearest
+enclosing node that has a `control` field and use that node's bounds. Send input
 commands by posting to `IO` with content type `application/json; charset=utf8`.
 
 Example:
@@ -67,7 +76,7 @@ Invoke-WebRequest `
   -Uri http://localhost:8888/Automation/RemotingTest_Core/IO `
   -ContentType 'application/json; charset=utf8' `
   -SkipHeaderValidation `
-  -Body '!LeftClick:29,50'
+  -Body '!LeftClick:<x>,<y>'
 ```
 
 The coordinates are logical GacUI coordinates. Re-read `Controls` after opening
@@ -85,23 +94,23 @@ The verified `/RPT` sequence is:
 5. Confirm both `RemotingTest_Core` and `RemotingTest_Rendering_Win32` have
    exited.
 
-On the current Remote Protocol Test layout, these coordinates perform the same
-sequence:
+Use the automation service to calculate every click point from the current
+`Controls` response:
+
+1. Read `Controls` and search for the `File` menu text.
+2. Use the nearest enclosing control bounds and post `!LeftClick:<x>,<y>` to
+   open the menu.
+3. Read `Controls` again and search for
+   `self.Close() (InvokeInMainThread)`.
+4. Use that menu item's enclosing control bounds and post its center point.
+5. Read `Controls` again and search for the `OK` button in the
+   `Do you want to exit?` dialog.
+6. Use that button's enclosing control bounds and post its center point.
 
 ```powershell
 $io = 'http://localhost:8888/Automation/RemotingTest_Core/IO'
-Invoke-WebRequest -UseBasicParsing -Method Post -Uri $io -ContentType 'application/json; charset=utf8' -SkipHeaderValidation -Body '!LeftClick:29,50'
-Invoke-WebRequest -UseBasicParsing -Method Post -Uri $io -ContentType 'application/json; charset=utf8' -SkipHeaderValidation -Body '!LeftClick:138,235'
-Invoke-WebRequest -UseBasicParsing -Method Post -Uri $io -ContentType 'application/json; charset=utf8' -SkipHeaderValidation -Body '!LeftClick:277,293'
+Invoke-WebRequest -UseBasicParsing -Method Post -Uri $io -ContentType 'application/json; charset=utf8' -SkipHeaderValidation -Body '!LeftClick:<x>,<y>'
 ```
-
-The known current bounds are:
-
-| Control | Bounds | Click |
-|---------|--------|-------|
-| `File` menu | `(10,39)-(48,61)` | `29,50` |
-| `self.Close() (InvokeInMainThread)` | `(13,223)-(264,248)` | `138,235` |
-| Exit dialog `OK` | `(237,281)-(317,305)` | `277,293` |
 
 For `/Http /RPT`, both processes should exit after the exit dialog `OK`.
 
