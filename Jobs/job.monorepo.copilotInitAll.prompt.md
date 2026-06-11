@@ -4,6 +4,14 @@ If `git push` is blocked because of needing to merge, you are allowed to rebase 
   - This is a pure document maintenance job so no testing is needed.
 **IMPORTANT** If you are instructed to "skip learning", you should start from `## Sync Back Knowledge Base and Instructions`.
 
+## Preparing
+
+- Run `Tools/Tools/CheckRepo.ps1 CheckAll` to find how if there are any uncommitte local changes in any repo, commit but no need to push.
+- Run `Tools/Tools/CheckRepo.ps1 SyncAll` to pull the latest changes from remotes, pay attention to pull failure, which means you need to resolve conflicts manually.
+- Resolve all conflicts.
+  - No need to run tests as this job is pure document maintenance
+  - No need to push as they will be covered in the subsequent steps.
+
 ## Understanding Learning
 
 Read the `# Orders` section in `Learning.md` of the knowledge base, remember it in a temporary file or by any means that is more convenient for you. `orders copy` below refers to this.

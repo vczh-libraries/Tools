@@ -3,6 +3,13 @@ If `git push` is blocked because of needing to merge, you are allowed to rebase 
   - Always rebase to the latest change of the remote branch, instead of making a rebase commit.
   - Only when the source code is changed from remote you should re-run the test process. If there is only document or instruction changes from remote, skip the test process.
 
+## Preparing
+
+- Run `Tools/Tools/CheckRepo.ps1 CheckAll` to find how if there are any uncommitte local changes in any repo, commit but no need to push.
+- Run `Tools/Tools/CheckRepo.ps1 SyncAll` to pull the latest changes from remotes, pay attention to pull failure, which means you need to resolve conflicts manually.
+- Resolve all conflicts.
+  - No need to run tests and push as they will be covered in the subsequent steps.
+
 ## Instructions
 
 Run monorepo script and it will stops at the first failure.
