@@ -6,7 +6,7 @@
 - Port fixes from imports to source repositories [7]
 - Verify generated artifacts with downstream consumer checks [7]
 - Crash early instead of adding error-tolerance fallbacks [6]
-- Make `Stop()` drain asynchronous work before returning [5]
+- Make `Stop()` drain asynchronous work before returning [6]
 - Proactively remove code made redundant by refactoring [5]
 - Use `WString::IndexOf` with `wchar_t` (not `const wchar_t*`) [4]
 - Use `collections::BinarySearchLambda` on contiguous buffers (guard empty) [4]
@@ -94,6 +94,8 @@ If an API exposes `Stop()`, callers should be able to rely on it as the shutdown
 Use the platform's final callback boundary when available. For WinHTTP async requests, `WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING` is the point to release pending request tracking for successfully submitted requests; release immediately only for failures before submission. For registered wait handles, `Stop()` should unregister not-started waits or wait for active callbacks, then close dependent handles and state.
 
 Renderer clients should explicitly stop their network transport before stack-owned channel wrappers are destroyed, so callback shutdown completes before local wrapper storage goes out of scope.
+
+Named-pipe shutdown should cancel pending overlapped pipe I/O before waiting for read callbacks to drain, especially when the remote side closes the pipe first. Channel-client destruction should also avoid stopping an already-disconnected transport connection.
 
 ## Port fixes from imports to source repositories
 
