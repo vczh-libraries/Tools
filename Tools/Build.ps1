@@ -33,6 +33,7 @@ function Update-Binaries-Prepare-CodePack {
 
 function Update-Binaries-And-Bundle {
     Write-Title "    Cleaning ..."
+    Remove-Item .\CodePack.backup.exe -Force | Out-Null
     Remove-Item .\CodePack.exe -Force | Out-Null
     Remove-Item .\CppMerge.exe -Force | Out-Null
     Remove-Item .\ParserGen.exe -Force | Out-Null
