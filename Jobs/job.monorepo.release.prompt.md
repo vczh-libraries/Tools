@@ -5,10 +5,20 @@ If `git push` is blocked because of needing to merge, you are allowed to rebase 
 
 ## Preparing
 
-- Run `Tools/Tools/CheckRepo.ps1 CheckAll` to find how if there are any uncommitte local changes in any repo, commit but no need to push.
+- Run `Tools/Tools/CheckRepo.ps1 CheckAll` to find how if there are any uncommitted local changes in any repo, commit but no need to push.
 - Run `Tools/Tools/CheckRepo.ps1 SyncAll` to pull the latest changes from remotes, pay attention to pull failure, which means you need to resolve conflicts manually.
 - Resolve all conflicts.
   - No need to run tests and push as they will be covered in the subsequent steps.
+- **IMPORTANT** only nmake sure nothing is uncommitted in the following repos, run `git clean -xdf` to remove any temporary files:
+  - Vlpp
+  - VlppOS
+  - VlppRegex
+  - VlppReflection
+  - VlppParser
+  - VlppParser2
+  - Workflow
+  - GacUI
+  - Release
 
 ## Instructions
 
