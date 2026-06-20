@@ -26,6 +26,13 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Release\Gac*.h .\Import
         Copy-Item ..\GacUI\Release\Gac*.cpp .\Import
         Copy-Item ..\GacUI\Release\DarkSkin* .\Import\Skins\DarkSkin
+
+        # Copy Metadata
+        Copy-Item ..\VlppParser2\Source\Json\Generated\*.d.ts .\Import\Metadata\
+        Copy-Item ..\VlppParser2\Source\Xml\Generated\*.d.ts .\Import\Metadata\
+        Copy-Item ..\Workflow\Release\*.d.ts .\Import\Metadata\
+        Copy-Item ..\Workflow\Source\Parser\Generated\*.d.ts .\Import\Metadata\
+        Copy-Item ..\GacUI\Source\Compiler\RemoteProtocol\Generated\*.d.ts .\Import\Metadata\
         Copy-Item ..\GacUI\Source\PlatformProviders\Remote\Protocol\Protocol*.txt .\Import\Metadata\RemoteProtocol
         Copy-Item ..\GacUI\Source\PlatformProviders\Remote\Protocol\Metadata\*.json .\Import\Metadata\RemoteProtocol.json
 
