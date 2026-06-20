@@ -39,6 +39,7 @@ otherwise it won't work properly.
 
 - **SUPER IMPORTANT** Your should always follow the coding convention when coding:
   - `REPO-ROOT/.github/Guidelines/Coding.md`
+  - `REPO-ROOT/.github/Guidelines/Coding_MultiThreading.md`
   - `REPO-ROOT/.github/KnowledgeBase/Learning.md`
   - `REPO-ROOT/.github/Learning/Learning_Coding.md`
   - `REPO-ROOT/.github/Learning/Learning_Testing.md`
