@@ -93,11 +93,11 @@ When `VlppParser2` is available to the current project, complex parsers always r
 
 - Any interface or class `X` should inherit from `vl::reflection::Description<X>`.
   - If such a class (not including interface) should be inheritable in Workflow script, use `AggregatableDescription` instead of `Description`.
-  - If a class actually implements multiple registered interfaces, one of the following rules should obey:
-    - (1) This class or any base class in its inheritance tree is registered, and one of the registered class implements all interfaces directly or indirectly.
-    - (2) An interface directly or indirectly inheriting all interfaces should be registered, and this class implements such interface, the class itself does not need to register.
-    - The reason is that, when such object needs to be used as instances of different interfaces, its metadata will be check to make sure it actually implements these interfaces. If there is no single metadata containing all necessary information, only one would be used (no guarantee of which).
-      - If a class is not registered but multiple base classes are registered, only a metadata of these base classes will be brought along with the object.
+  - If a class inherits directly or indirectly from multiple registered classes/interfaces:
+    - Either register this class.
+    - Or if multiple registered base types are all interfaces, another valid option would be to create a registered interface inheriting all of them, and let the class inherits from this new interface.
+    - The reason is that, an object only has one pointer to a piece of reflection metadata. If a class is not registered but it inherits from multiple registered types, only a metadata from one of these base types will be brought along with the actual
+object, causing missing of a complete picture.
 - No `const` is allowed for methods or reference types.
 - Prefer `IValue*` interfaces for container types on interfaces.
 - Container types and some other types support range-based for loop. Always prefer range-based for loop over other loops.
