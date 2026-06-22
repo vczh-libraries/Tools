@@ -93,6 +93,11 @@ When `VlppParser2` is available to the current project, complex parsers always r
 
 - Any interface or class `X` should inherit from `vl::reflection::Description<X>`.
   - If such a class (not including interface) should be inheritable in Workflow script, use `AggregatableDescription` instead of `Description`.
+  - If a class actually implements multiple interfaces, one of the following rules should obey:
+    - (1) This class or any base class in its inheritance tree is registered, and one of the registered class implements all interfaces directly or indirectly.
+    - (2) An interface directly or indirectly inheriting all interfaces should be registered, and this class implements such interface, the class itself does not need to register.
+    - The reason is that, when such object needs to be used as instances of different interfaces, its metadata will be check to make sure it actually implements these interfaces. If there is no single metadata containing all necessary information, only one would be used (no guarantee of which).
+      - If a class is not registered but multiple base classes are registered, only a metadata of these base classes will be brought along with the object.
 - No `const` is allowed for methods or reference types.
 - Prefer `IValue*` interfaces for container types on interfaces.
 - Container types and some other types support range-based for loop. Always prefer range-based for loop over other loops.
