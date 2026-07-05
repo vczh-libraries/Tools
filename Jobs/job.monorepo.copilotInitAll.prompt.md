@@ -31,11 +31,13 @@ The order of processing repos is important, because there are dependencies betwe
 
 ## Consume Unlearned Materials
 
-Run `REPO-ROOT/.github/Scripts/copilotRemember.ps1` in the repos listed in `Order of Processing Repos`:
-- This script picks up documents that are not archived and turn them into learning materials.
-Run `REPO-ROOT/.github/prompts/refine.prompt.md` in the repos listed in `Order of Processing Repos`:
-- You should keep executing the `refine.prompt.md` until all folders in `REPO-ROOT/.github/Learning` are processed.
-- If there are any empty folders in `REPO-ROOT/.github/Learning`, just delete them.
+- Run `REPO-ROOT/.github/Scripts/copilotRemember.ps1` in the repos listed in `Order of Processing Repos`:
+  - This script picks up documents that are not archived and turn them into learning materials.
+- Run `REPO-ROOT/.github/prompts/kb-refine.prompt.md` in the repos listed in `Order of Processing Repos`.
+  - `kb-refine.prompt.md` must be run before running `refine.prompt.md`, since `refine.prompt.md` instructs you to eventually delete all materials that are supposed to be processed by `kb-refine.prompt.md`.
+- Run `REPO-ROOT/.github/prompts/refine.prompt.md` in the repos listed in `Order of Processing Repos`:
+  - You should keep executing the `refine.prompt.md` until all folders in `REPO-ROOT/.github/Learning` are processed.
+  - If there are any empty folders in `REPO-ROOT/.github/Learning`, just delete them.
 `REPO-ROOT` means each repo to process. Be aware that instructions in different repos might be in different versions; follow each instruction file separately.
 - After finishing processing one repo, commit and push changes before moving to the next repo.
 
