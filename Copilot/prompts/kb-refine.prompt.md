@@ -31,6 +31,7 @@ You need to identify source changes in both the following two ways, in order to 
   - You need to update any items that have been changed.
 - Otherwise, when there is a complete new feature or topic that is not in the knowledge base:
   - Ignore them, we only update existing knowledges, we do not add new stuff.
+- This instruction is supposed to be executed very frequently, so most of the time you will find that nothing needs to update, this is completely normal.
 
 ## Updating Knowledge Base
 
