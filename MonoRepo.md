@@ -42,7 +42,13 @@ If you can't find this file, the source code is in `VlppParser2\Tools\Codepack`.
 ### Debugging GacUI in Browser
 
 Some GacUI issues can be addressed by running the GacUI core with UI in a browser using the website in the GacJS repo.
-Check out `Tools\DebugGacUIWithBrowser.md` for details.
+GacJS is also part of the release, Check out `Tools\DebugGacUIWithBrowser.md` for details.
+
+### Debugging GacUI with Remote Protocol
+
+Remote Protocol is a feature that enables a remote rendering process connecting to headless a GacUI app.
+It is the foundation of GacJS, and of future non-C++ renderers.
+Check out `Tools\DebugGacUIWithRemoteProtocol.md` for details.
 
 ## Linux Specific
 
