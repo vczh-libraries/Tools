@@ -58,7 +58,16 @@ Execute monorepo script `vgo vmake` followed by `vgo vbuild` to run CI for all r
 Execute single repo script `vgo vmake <repo-name>` (only when you updated MSBuild project files) followed by `vgo vbuild <repo-name>` to run CI for a specific repo.
 Execute `vsync --check` to find out how many repos have local changes.
 
-### Reverting Platform-Only Generated Resource Changes
+Guidelines for each repo will tell you to run `build.sh` to build any test project, but when you are in monorepo context, you can run `vmake --make` (only when you updated MSBuild project files) followed by `vbuild -b` to achieve the same goal. Both way require you to be in the test project folder.
+
+Linux build scripts do not prepare release. If any cross-repo issues are found (probably Linux specific issues), you can do manual release by:
+- Build `VlppParser2/Tools/CodePack`.
+- Run `VlppParser2/Tools/CodePack/Bin/CodePack`, feeding any `REPO-ROOT/Release/CodegenConfig.xml`, it creates a release for that repo.
+- Copy released header and cpp files to a downstream repo. You are able to figure out what files to copy to what repos by checking if `DOWNSTREAM-REPO-ROOT/Release` has any files from `UPSTREAM-REPO-ROOT/Release`.
+
+Usually Linux CI runs after Windows CI completes, so most of the time your job is to fix makefiles or C++ compatibility issues.
+
+### Reverting Platform-Only Generated Resource Changes in GacUI repo before `git commit`
 
 Linux GacUI CI can rewrite tracked generated `*.bin` and `*.cpp` resource files only because Windows and Linux check out text with different line endings. Serialized source positions and embedded text then change even when the resource has no functional change. Do not decode the binary format merely to decide whether these changes are valid.
 
@@ -69,12 +78,3 @@ Use Git history to identify platform-only changes:
 - Corroborating signs include identical changes in x86 and x64 counterparts, unchanged resource inputs, unchanged or nearly unchanged binary sizes, and generated `*.cpp` payload differences limited to `CRLF` versus `LF` and the resulting byte counts.
 
 When this historical toggle is proven, revert only those CI-created generated `*.bin` and `*.cpp` changes and do not commit them. Keep and commit independent valid changes, such as makefile updates or refreshed snapshots. If the regenerated blobs do not match a known Linux generation, or their inputs changed, treat them as potentially valid and investigate instead of reverting them.
-
-Guidelines for each repo will tell you to run `build.sh` to build any test project, but when you are in monorepo context, you can run `vmake --make` (only when you updated MSBuild project files) followed by `vbuild -b` to achieve the same goal. Both way require you to be in the test project folder.
-
-Linux build scripts do not prepare release. If any cross-repo issues are found (probably Linux specific issues), you can do manual release by:
-- Build `VlppParser2/Tools/CodePack`.
-- Run `VlppParser2/Tools/CodePack/Bin/CodePack`, feeding any `REPO-ROOT/Release/CodegenConfig.xml`, it creates a release for that repo.
-- Copy released header and cpp files to a downstream repo. You are able to figure out what files to copy to what repos by checking if `DOWNSTREAM-REPO-ROOT/Release` has any files from `UPSTREAM-REPO-ROOT/Release`.
-
-Usually Linux CI runs after Windows CI completes, so most of the time your job is to fix makefiles or C++ compatibility issues.
