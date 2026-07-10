@@ -24,11 +24,11 @@ Instead, identify the original repo where the bug originates, fix the bug there,
 Then copy the generated C++ source files (but not the `IncludeOnly` folder) to the `Import` folder of the downstream repo,
 and recompile the solution to test it with downstream code.
 
-## Updating Knowledge Base Pages
+## When Updating Knowledge Base Pages
 
 Knowledge base pages are grouped by projects, you should only update pages beloning to a project in its own repo.
 
-## Updating Document Website
+## When Updating Document Website
 
 Checkout `WebsiteSource/AGENTS.md` for more details.
 
