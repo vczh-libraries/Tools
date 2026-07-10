@@ -5,6 +5,8 @@ The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Wor
 
 Read `Tools/MonoRepo.md` and compare the content with this file, it anything is changed, override this file with `Tools/MonoRepo.md`.
 
+Use `git` to access repos, `gh` is generally not available.
+
 ## Must-Read Files
 
 `Project.md` and `.github\copilot-instructions.md` in each repo are must-read before editing the source code.
