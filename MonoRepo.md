@@ -1,7 +1,9 @@
 # MonoRepo Guide
 
 This document describes the relationship between repos and how to work with them.
-The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Workflow, and GacUI.
+The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Workflow, GacUI, Release and WebsiteSource.
+
+Read `Tools/MonoRepo.md` and compare the content with this file, it anything is changed, override this file with `Tools/MonoRepo.md`.
 
 ## Must-Read Files
 
@@ -21,6 +23,14 @@ Do not fix bugs directly in the `Import` folder.
 Instead, identify the original repo where the bug originates, fix the bug there, and update its `Release` folder.
 Then copy the generated C++ source files (but not the `IncludeOnly` folder) to the `Import` folder of the downstream repo,
 and recompile the solution to test it with downstream code.
+
+## Updating Knowledge Base Pages
+
+Knowledge base pages are grouped by projects, you should only update pages beloning to a project in its own repo.
+
+## Updating Document Website
+
+Checkout `WebsiteSource/AGENTS.md` for more details.
 
 ## Windows Specific
 
