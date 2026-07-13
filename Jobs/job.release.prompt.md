@@ -52,7 +52,7 @@ Execute `Tools/Tools/CheckRepo.ps1 CheckAll` to find out how many repos have loc
 
 `Build.ps1` can pickup release from upstream repos and prepare release for downstream repos.
 
-## Linux Specific
+## Linux/macOS Specific
 
 Execute monorepo script `vgo vmake` followed by `vgo vbuild` to run CI for all repos in their dependency order until the first failure.
 Execute single repo script `vgo vmake <repo-name>` (only when you updated MSBuild project files) followed by `vgo vbuild <repo-name>` to run CI for a specific repo.
