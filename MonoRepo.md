@@ -52,9 +52,18 @@ Remote Protocol is a feature that enables a remote rendering process connecting 
 It is the foundation of GacJS, and of future non-C++ renderers.
 Check out `Tools\DebugGacUIWithRemoteProtocol.md` for details.
 
-## Linux Specific
+## Linux/macOS Specific
 
 ### Updating Release Folder
 
 To update the `Release` folder, run `VlppParser2/Tools/Codepack/Bin/Codepack` on each `Release` folder's `CodegenConfig.xml`.
 If you can't find this file, the source code is in `VlppParser2/Tools/Codepack`.
+
+### Maintaining Build Scripts
+
+Build scripts are in `Tools/Ubuntu`, and `<EACH-REPO>/.github/Ubuntu`.
+When fixing build tools, fix `Tools/Ubuntu` and run `Tools/Ubuntu/vl/cmd/vgo uci` to spread the change to all other C++ repos.
+These build tools are expected to run in Ubuntu and macOS, if anything is different leading to backward compatibility code:
+- Firstly detech bash version, use higher version solution if possible.
+- Secondly detech macOS, use macOS solution if cross-platform way cannot achieve.
+- Assume we are running on Ubuntu, no further detection needs to do.
