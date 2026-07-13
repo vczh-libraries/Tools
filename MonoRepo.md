@@ -5,7 +5,7 @@ The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Wor
 
 Read `Tools/MonoRepo.md` and compare the content with this file, it anything is changed, override this file with `Tools/MonoRepo.md`.
 
-Use `git` to access repos, `gh` is generally not available.
+Use `git` to access repos, `gh` is generally not available. Unless explicitly instructed by me, you are going to work directly on the current branch, which is usually the `master` branch.
 
 ## Must-Read Files
 
