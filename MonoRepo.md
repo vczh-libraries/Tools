@@ -54,6 +54,8 @@ Check out `Tools\DebugGacUIWithRemoteProtocol.md` for details.
 
 ## Linux/macOS Specific
 
+If any script reporting `VCPROOT` is missing, it should point to `Tools/Ubuntu`.
+
 ### Updating Release Folder
 
 To update the `Release` folder, run `VlppParser2/Tools/Codepack/Bin/Codepack` on each `Release` folder's `CodegenConfig.xml`.
