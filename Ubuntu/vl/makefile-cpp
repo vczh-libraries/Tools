@@ -9,11 +9,11 @@ CPP_PLATFORM_LINK_OPTIONS=-framework CoreFoundation
 endif
 
 ifeq ($(USE_GCC), YES)
-CPP_LINK=g++ -std=c++20 -g -pthread $(CPP_LINK_OPTIONS) $(CPP_PLATFORM_LINK_OPTIONS) -o $@ $^
+CPP_LINK=g++ -std=c++20 -g -pthread -o $@ $^ $(CPP_LINK_OPTIONS) $(CPP_PLATFORM_LINK_OPTIONS)
 else ifeq ($(COVERAGE),NO)
-CPP_LINK=clang++ -std=c++20 -pthread -g $(CPP_COMPILE_OPTIONS) $(CPP_LINK_OPTIONS) $(CPP_PLATFORM_LINK_OPTIONS) -o $@ $^
+CPP_LINK=clang++ -std=c++20 -pthread -g $(CPP_COMPILE_OPTIONS) -o $@ $^ $(CPP_LINK_OPTIONS) $(CPP_PLATFORM_LINK_OPTIONS)
 else
-CPP_LINK=clang++ -std=c++20 -pthread -g --coverage $(CPP_LINK_OPTIONS) $(CPP_PLATFORM_LINK_OPTIONS) -o $@ $^
+CPP_LINK=clang++ -std=c++20 -pthread -g --coverage -o $@ $^ $(CPP_LINK_OPTIONS) $(CPP_PLATFORM_LINK_OPTIONS)
 endif
 
 ifeq ($(USE_GCC), YES)
