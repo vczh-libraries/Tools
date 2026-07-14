@@ -2,20 +2,20 @@
 
 # Orders
 
-- Process staged tasks one by one with verification [15]
-- Verify generated artifacts with downstream consumer checks [9]
-- Port fixes from imports to source repositories [8]
+- Process staged tasks one by one with verification [16]
+- Verify generated artifacts with downstream consumer checks [10]
+- Port fixes from imports to source repositories [9]
 - Crash early instead of adding error-tolerance fallbacks [6]
 - Proactively remove code made redundant by refactoring [6]
 - Make `Stop()` drain asynchronous work before returning [6]
+- Keep design documentation aligned with code after refactoring [5]
 - Use `WString::IndexOf` with `wchar_t` (not `const wchar_t*`) [4]
 - Use `collections::BinarySearchLambda` on contiguous buffers (guard empty) [4]
 - Use `vl::Exception` for expected semantic failures and `CHECK_ERROR` for invariants [3]
-- Keep design documentation aligned with code after refactoring [3]
+- Extract abstractions only for real shared behavior [3]
 - Capture dependent lambdas explicitly [2]
 - Don't assume observable changes are batched [2]
 - Do not assume async callback owners are heap allocated [2]
-- Extract abstractions only for real shared behavior [2]
 - Use `ERROR_MESSAGE_PREFIX` for meaningful `CHECK_ERROR` / `CHECK_FAIL` messages [2]
 - Prefer simple calls before interface casts [2]
 - Validate expectations against implementation and existing tests [2]
@@ -89,6 +89,8 @@ When refactoring client/server or similar paired implementations, extract common
 
 For role-specific implementations, extract a base that contains only truly shared state and operations. Keep transport-only or role-only members in the concrete subtype so no implementation inherits fields that do not apply to it.
 
+When several platform implementations must satisfy the same behavioral contract, define and register each scenario once in a platform-neutral runner and parameterize only the concrete types and genuine platform seams. Duplicating test registrations per platform invites feature drift.
+
 ## Make `Stop()` drain asynchronous work before returning
 
 If an API exposes `Stop()`, callers should be able to rely on it as the shutdown boundary: after it returns, no pending action, wait callback, overlapped I/O, or async completion should still touch the object. Do not paper over a broken `Stop()` with sleeps in tests; fix the stop path.
@@ -112,6 +114,8 @@ For dependency release syncs, copy generated files from the upstream `Release` f
 When importing multiple dependency releases into GacUI, keep the chain explicit: regenerate and import `VlppOS` and `Workflow` release artifacts, then validate the GacUI remoting scenarios that consume both imported APIs.
 
 If a Workflow task exposes a `VlppReflection` collection-wrapper issue, fix the wrapper behavior in `VlppReflection`, regenerate and verify its release output, then update the Workflow import from that release instead of patching Workflow's imported copy.
+
+When a VlppOS public namespace refactor changes released APIs, regenerate the VlppOS release and update Workflow and GacUI from that release before repairing downstream build breaks; do not patch imported copies.
 
 ## Validate expectations against implementation and existing tests
 
@@ -209,6 +213,8 @@ When a generator produces runnable sample applications, verify the generated out
 
 When a shared dispatcher schema such as `Rpc.d.ts` changes, type-check the shared schema itself as well as generated fixtures so envelope changes are caught even before concrete generated values instantiate every request shape.
 
+For a released VlppOS namespace change, validate Workflow through the ChatBot SOP and validate GacUI through `RemotingTest_Core` and `RemotingTest_Rendering_Win32` with `/RCP /HTTP`, plus GacJS against `RemotingTest_Core`. An upstream build alone does not prove the imported public surface works.
+
 ## `vl::regex` separator regex: `L"[\\/\\\\]+"`
 
 In `vl::regex::Regex`, both `/` and `\\` are escaping characters, and incorrect escaping inside `[]` can throw errors like `Illegal character set definition.`
@@ -254,6 +260,10 @@ For application refactors, remove helper wrappers that only duplicate an already
 ## Keep design documentation aligned with code after refactoring
 
 When a refactoring changes architecture or behavior, update the corresponding design documents in the same task rather than deferring it. After a structural change, re-read the related documents and reconcile anything that became misaligned (for example, descriptions of a transport path that no longer exists). Treat documentation drift left by a previous refactoring as part of the current cleanup.
+
+Public namespace refactors require corresponding knowledge-base and documentation-site updates; publish the site when its generated or documented surface actually changes.
+
+Once a shared behavioral suite already exists, follow-up platform implementation task documents should point to binding and running that suite rather than requesting duplicate test cases. Reuse authoritative platform details from existing design documents and preserve explicit out-of-scope sections.
 
 ## Fix behavior at the owning state instead of patching symptoms
 
