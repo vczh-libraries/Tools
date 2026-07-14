@@ -113,6 +113,7 @@ clang++ --std=c++20 ${CPP_COMPILE_OPTIONS} -MM <cpp-file>
 ```
 
 This means `CPP_COMPILE_OPTIONS` must also be accepted by clang during dependency generation, even when `make USE_GCC=YES` is used for the actual build.
+If clang dependency generation fails, `vutil_CppDependencies` preserves the nonzero exit status and `vmake-cpp` stops instead of emitting an incomplete object rule.
 
 ## vmake.txt
 

@@ -1,3 +1,9 @@
 #!/bin/bash
 
-echo `clang++ --std=c++20 $1 -MM $2` | sed -E -e 's%\\[[:space:]]*%%g'
+DEPENDENCIES="$(clang++ --std=c++20 $1 -MM "$2")"
+RESULT=$?
+if [ ${RESULT} -ne 0 ]; then
+    exit ${RESULT}
+fi
+
+printf "%s\n" "${DEPENDENCIES}" | sed -E -e 's%\\[[:space:]]*%%g'

@@ -85,7 +85,8 @@ all:pre-build <#= ${TARGETS[@]} #>
 <#= $CPP_TARGET #>:<#= ${O_FILES} #>
 	$(CPP_LINK)
 <#echo "${CPP_FILES}" | while read -r CPP_FILE; do#>
+<#CPP_DEPENDENCIES="$(vutil_CppDependencies "${CPP_COMPILE_OPTIONS}" "${CPP_FILE}")" || exit $?#>
 
-./Obj/<#= `vutil_CppDependencies "${CPP_COMPILE_OPTIONS}" ${CPP_FILE}` #>
+./Obj/<#= ${CPP_DEPENDENCIES} #>
 	$(CPP_COMPILE)
 <#done#>
