@@ -13,15 +13,15 @@
 - Use `collections::BinarySearchLambda` on contiguous buffers (guard empty) [4]
 - Use `vl::Exception` for expected semantic failures and `CHECK_ERROR` for invariants [3]
 - Extract abstractions only for real shared behavior [3]
+- Validate expectations against implementation and existing tests [3]
 - Capture dependent lambdas explicitly [2]
 - Don't assume observable changes are batched [2]
 - Do not assume async callback owners are heap allocated [2]
 - Use `ERROR_MESSAGE_PREFIX` for meaningful `CHECK_ERROR` / `CHECK_FAIL` messages [2]
 - Prefer simple calls before interface casts [2]
-- Validate expectations against implementation and existing tests [2]
 - Treat Debug memory leak dumps as required failures [2]
+- Fix behavior at the owning state instead of patching symptoms [2]
 - Prefer well-defined tests over ambiguous edge cases [1]
-- Fix behavior at the owning state instead of patching symptoms [1]
 - Prefer `operator<=> = default` for lexicographic key structs [1]
 - Prefer two-pointer merge for sorted range maps [1]
 - Use named sentinel constants instead of raw values [1]
@@ -122,6 +122,8 @@ When a VlppOS public namespace refactor changes released APIs, regenerate the Vl
 Before encoding expectations (especially for return value conventions and error semantics), read the relevant implementation and check existing tests for established patterns. This reduces churn from mismatched assumptions (e.g. public API returning a normalized error value even if internals use different sentinel codes).
 
 This also applies to enums and API surface: verify that enum values and method names/signatures actually exist before using them.
+
+For regression tests, verify that the proposed case actually distinguishes broken and fixed behavior. A positive control can pass under both implementations, so retain a root-cause-sensitive reproduction and assert the relevant observable boundary, such as callback count and range, rather than only a coarse aggregate result.
 
 ## Prefer `operator<=> = default` for lexicographic key structs
 
@@ -268,3 +270,5 @@ Once a shared behavioral suite already exists, follow-up platform implementation
 ## Fix behavior at the owning state instead of patching symptoms
 
 When a bug is caused by state attached to a temporary or overly broad owner, move the state to the object or region that semantically owns it. Avoid compensating fixes such as forcing override values on every affected descendant, duplicating a template/resource just to mask inherited state, or adding side-channel code that only makes the symptom disappear. If a proposed fix looks like a patch, revisit the ownership boundary and preserve naturally correct inherited/default behavior for unaffected parts.
+
+When an incremental API receives encoded code units but downstream logic consumes complete logical values, keep partial assembly or decoding state in the stream-processing object. Do not change the public input unit or force every caller to assemble complete values merely to fit an internal helper.
