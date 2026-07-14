@@ -2,13 +2,13 @@
 
 # Orders
 
-- Process staged tasks one by one with verification [17]
-- Verify generated artifacts with downstream consumer checks [11]
-- Port fixes from imports to source repositories [10]
+- Process staged tasks one by one with verification [18]
+- Verify generated artifacts with downstream consumer checks [12]
+- Port fixes from imports to source repositories [11]
+- Keep design documentation aligned with code after refactoring [7]
 - Crash early instead of adding error-tolerance fallbacks [6]
 - Proactively remove code made redundant by refactoring [6]
 - Make `Stop()` drain asynchronous work before returning [6]
-- Keep design documentation aligned with code after refactoring [6]
 - Use `WString::IndexOf` with `wchar_t` (not `const wchar_t*`) [4]
 - Use `collections::BinarySearchLambda` on contiguous buffers (guard empty) [4]
 - Use `vl::Exception` for expected semantic failures and `CHECK_ERROR` for invariants [3]
