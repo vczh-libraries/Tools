@@ -88,8 +88,7 @@ all:pre-build <#= ${TARGETS[@]} #>
 <#for CPP_FILE_INDEX in "${!CPP_FILE_LIST[@]}"; do#>
 <#CPP_FILE="${CPP_FILE_LIST[$CPP_FILE_INDEX]}"#>
 <#O_FILE="${O_FILE_LIST[$CPP_FILE_INDEX]}"#>
-<#vutil_CppDependencies "${CPP_COMPILE_OPTIONS}" "${CPP_FILE}" > /dev/null || exit $?#>
 
-<#= ${O_FILE} #>: <#= ${CPP_FILE} #> $(VCPROOT)/vl/makefile-cpp
+<#= ${O_FILE} #>: <#= ${CPP_FILE} #>
 	$(CPP_COMPILE)
 <#done#>

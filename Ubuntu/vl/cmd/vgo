@@ -85,7 +85,6 @@ function RefreshGithubUbuntu {
                 "vl/cmd/vbuild"
                 "vl/cmd/vmake"
                 "vl/cmd/vt4"
-                "vl/cmd/vutil_CppDependencies"
                 "vl/cmd/vutil_CppFromVcxproj"
                 "vl/makefile-cpp"
                 "vl/vmake-cpp"
@@ -100,7 +99,6 @@ function RefreshGithubUbuntu {
             chmod u+x "${TARGET_ROOT}/vl/cmd/vbuild"
             chmod u+x "${TARGET_ROOT}/vl/cmd/vmake"
             chmod u+x "${TARGET_ROOT}/vl/cmd/vt4"
-            chmod u+x "${TARGET_ROOT}/vl/cmd/vutil_CppDependencies"
             chmod u+x "${TARGET_ROOT}/vl/cmd/vutil_CppFromVcxproj"
         fi
 
