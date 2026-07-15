@@ -9,7 +9,7 @@ This file documents the Linux `vmake` flow for future script maintenance.
 - `../vmake-cpp`: shared V4 template included by project-local `vmake` files.
 - `../makefile-cpp`: shared make macros for compile/link commands.
 - `cmd/vutil_CppFromVcxproj`: extracts `.cpp` files from `.vcxproj` and `.vcxitems`.
-- `cmd/vutil_CppDependencies`: calls `clang++ -MM` to expand header dependencies.
+- `cmd/vutil_CppDependencies`: calls `clang++ -MM` to validate active translation-unit dependencies.
 - `cmd/vbuild`: wrapper around generated makefiles.
 
 ## vmake --make Pipeline
@@ -76,8 +76,8 @@ Useful variables:
 - `CPP_ADDS`: extra `.cpp` paths or globs to append after removals.
 - `FOLDERS`: extra output folders created by `pre-build` and deleted by `clean`.
 - `TARGETS`: make `all` dependencies, normally `("${CPP_TARGET}")`.
-- `CPP_COMPILE_OPTIONS`: extra compiler flags for compile and dependency scan.
-- `CPP_LINK_OPTIONS`: extra linker flags. Supported by `../vmake-cpp`; not currently used by existing samples.
+- `CPP_COMPILE_OPTIONS`: extra compiler flags for compile and dependency validation.
+- `CPP_LINK_OPTIONS`: extra linker flags for project-specific libraries.
 
 There is no `IMPORTS` variable in the current samples. Imports are done by the V4 include directive.
 
@@ -100,9 +100,10 @@ Current sample usage under `${VROOT}/*/Test/Linux*/vmake`:
 3. Remove duplicate `.cpp` paths while preserving the first occurrence.
 4. Remove items listed in `CPP_REMOVES`.
 5. Append items listed in `CPP_ADDS`; globs are expanded here.
-6. Write the final `CPP_FILES` list to `vmake.txt`, one path per line.
-7. Convert each `.cpp` basename to `./Obj/<basename>.o`.
-8. Emit the generated `makefile` to standard output.
+6. Validate every selected translation unit with `vutil_CppDependencies`.
+7. Write the final `CPP_FILES` list to `vmake.txt`, one path per line.
+8. Convert each `.cpp` basename to `./Obj/<basename>.o`.
+9. Emit stable source-only rules in the generated `makefile`.
 
 `vutil_CppFromVcxproj` extracts `<ClCompile Include="...cpp">`, converts Windows separators to `/`, resolves paths from the current folder, and prints paths relative to the current folder.
 
@@ -112,8 +113,10 @@ Current sample usage under `${VROOT}/*/Test/Linux*/vmake`:
 clang++ --std=c++20 ${CPP_COMPILE_OPTIONS} -MM <cpp-file>
 ```
 
-This means `CPP_COMPILE_OPTIONS` must also be accepted by clang during dependency generation, even when `make USE_GCC=YES` is used for the actual build.
-If clang dependency generation fails, `vutil_CppDependencies` preserves the nonzero exit status and `vmake-cpp` stops instead of emitting an incomplete object rule.
+This means `CPP_COMPILE_OPTIONS` must also be accepted by clang during dependency validation, even when `make USE_GCC=YES` is used for the actual build.
+If validation fails, `vutil_CppDependencies` preserves the nonzero exit status and `vmake-cpp` stops instead of emitting an incomplete object rule. Its host-specific output is intentionally discarded so tracked makefiles stay stable across Linux and macOS.
+
+Actual compilation uses `-MMD -MP` to write active header dependencies beside each object as `Obj/*.d`. `../makefile-cpp` includes existing dependency files on incremental builds. These ignored build artifacts keep header tracking host-correct without baking host preprocessor results into the generated makefile.
 
 ## vmake.txt
 
@@ -146,7 +149,7 @@ all:pre-build $(TARGETS)
 $(CPP_TARGET): $(O_FILES)
         $(CPP_LINK)
 
-./Obj/File.o: source.cpp headers...
+./Obj/File.o: source.cpp $(VCPROOT)/vl/makefile-cpp
         $(CPP_COMPILE)
 ```
 
@@ -155,6 +158,12 @@ $(CPP_TARGET): $(O_FILES)
 - Default: clang++.
 - `make USE_GCC=YES`: g++.
 - `make COVERAGE=YES`: clang++ with coverage flags.
+
+At make execution time, shared platform options are selected without changing the generated makefile:
+
+- Darwin enables Clang Blocks and links CoreFoundation and Network.framework.
+- Linux links liburing.
+- Every compiler variant writes `Obj/*.d` dependency files for incremental header rebuilds.
 
 ## Adding Compiler or Linker Arguments
 
@@ -175,7 +184,7 @@ Add link flags with:
 CPP_LINK_OPTIONS="-L ./Lib -lSomeLibrary"
 ```
 
-`CPP_LINK_OPTIONS` is emitted into the generated `makefile`. In the current `../makefile-cpp`, it is used by the GCC link command and coverage clang link command. The default non-coverage clang link command currently uses `CPP_COMPILE_OPTIONS` instead.
+`CPP_LINK_OPTIONS` is emitted into the generated `makefile` and is used by every linker variant in addition to the shared platform libraries. The default non-coverage clang linker also receives `CPP_COMPILE_OPTIONS` for backward compatibility.
 
 ## Batch Commands
 
