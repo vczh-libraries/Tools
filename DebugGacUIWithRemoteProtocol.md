@@ -1,132 +1,159 @@
-# Debugging GacUI With Remote Protocol Tests
+# Operating GacUI With a Native Remote Renderer
 
-This document describes the verified manual workflow for running
-`RemotingTest_Core.exe` with `RemotingTest_Rendering_Win32.exe`, finding controls
-through the automation service, and exiting cleanly.
+This guide explains how to start a native renderer, inspect its remote UI, and
+send real renderer-side input. The required transport matrix, shared UI
+operations, and pass/fail criteria are defined in
+[`Jobs/job.verifyRemoteProtocol.prompt.md`](Jobs/job.verifyRemoteProtocol.prompt.md).
+Use this document as the native-renderer operation entry point on every
+platform; its platform section states the currently available implementation.
 
-## Start The Processes
+The core must start before the renderer. The application selector (`/FCT` or
+`/RPT`) belongs only to the core, while the renderer receives the matching
+transport selector. Run one core/renderer pair at a time and retain both process
+identifiers for cleanup.
 
-Build GacUI first:
+## Windows
 
-```powershell
-cd C:\Code\VczhLibraries\GacUI\Test\GacUISrc
-& C:\Code\VczhLibraries\GacUI\.github\Scripts\copilotBuild.ps1
-```
-
-For HTTP transport:
-
-```powershell
-start C:\Code\VczhLibraries\GacUI\Test\GacUISrc\x64\Debug\RemotingTest_Core.exe /Http /RPT
-start C:\Code\VczhLibraries\GacUI\Test\GacUISrc\x64\Debug\RemotingTest_Rendering_Win32.exe /Http
-```
-
-For named-pipe transport:
+Read `GacUI/Project.md`, `GacUI/.github/copilot-instructions.md`, and the linked
+build, run, debugging, and computer-use guidelines before starting. Build only
+through the supported script:
 
 ```powershell
-start C:\Code\VczhLibraries\GacUI\Test\GacUISrc\x64\Debug\RemotingTest_Core.exe /Pipe /RPT
-start C:\Code\VczhLibraries\GacUI\Test\GacUISrc\x64\Debug\RemotingTest_Rendering_Win32.exe /Pipe
+Push-Location GacUI\Test\GacUISrc
+try {
+    & ..\..\.github\Scripts\copilotBuild.ps1
+}
+finally {
+    Pop-Location
+}
 ```
 
-Start the core first. The core console should print either:
+The executables are:
 
 ```text
-> HTTP server created, waiting on: http://localhost:8888/GacUIRemoteProtocolHttp
+GacUI\Test\GacUISrc\x64\Debug\RemotingTest_Core.exe
+GacUI\Test\GacUISrc\x64\Debug\RemotingTest_Rendering_Win32.exe
+```
+
+Start a pair from the monorepo root. These examples use `/RPT`; substitute
+`/FCT` when required by the verification job.
+
+```powershell
+$bin = (Resolve-Path GacUI\Test\GacUISrc\x64\Debug).Path
+
+# Full Windows HTTP implementation
+$core = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Core.exe') -ArgumentList '/Http','/RPT' -PassThru
+$renderer = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Rendering_Win32.exe') -ArgumentList '/Http' -PassThru
+
+# Async-socket MiniHTTP implementation
+$core = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Core.exe') -ArgumentList '/MiniHTTP','/RPT' -PassThru
+$renderer = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Rendering_Win32.exe') -ArgumentList '/MiniHTTP' -PassThru
+
+# Named pipe implementation
+$core = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Core.exe') -ArgumentList '/Pipe','/RPT' -PassThru
+$renderer = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Rendering_Win32.exe') -ArgumentList '/Pipe' -PassThru
+```
+
+The examples are separate runs, not one script. Start the selected core, wait
+for its server-created message, and only then start the matching renderer. A
+successful connection prints:
+
+```text
 > Waiting for a renderer ...
 > Renderer connected: 2
 ```
 
-or:
+HTTP creation reports
+`http://localhost:8888/GacUIRemoteProtocolHttp`; MiniHTTP reports the same URL
+with `Mini HTTP server created`; named pipe reports
+`GacUIRemoteProtocolNamedPipe`.
+
+### HTTP Automation for `/Http` and `/Pipe`
+
+The Windows HTTP automation service is available during `/Http` and `/Pipe`
+runs:
 
 ```text
-> Named pipe created, waiting on: GacUIRemoteProtocolNamedPipe
-> Waiting for a renderer ...
-> Renderer connected: 2
+GET  http://localhost:8888/Automation/RemotingTest_Core/Controls
+POST http://localhost:8888/Automation/RemotingTest_Core/IO
+GET  http://localhost:8888/Automation/RemotingTest_Rendering_Win32/Dom
+POST http://localhost:8888/Automation/RemotingTest_Rendering_Win32/IO
 ```
 
-## Find Controls
-
-When `/RPT` is enabled, the core exposes an automation service on port `8888`.
-Use these endpoints:
+`Controls` describes logical GacUI controls; `Dom` describes what the native
+renderer received. Search the latest JSON for the visible text, walk upward to
+the nearest enclosing interactive object with bounds, and click the integer
+center:
 
 ```text
-http://localhost:8888/Automation/RemotingTest_Core/Controls
-http://localhost:8888/Automation/RemotingTest_Core/IO
-http://localhost:8888/Automation/RemotingTest_Rendering_Win32/Dom
+x = floor((x1 + x2) / 2)
+y = floor((y1 + y2) / 2)
 ```
 
-`Controls` returns JSON with element text and bounds. Search the JSON for the
-visible text you want, then read the nearest enclosing object's `bounds` object.
-The bounds object has `x1`, `y1`, `x2`, and `y2` fields. Click the center point:
-
-```text
-x = (x1 + x2) / 2
-y = (y1 + y2) / 2
-```
-
-If the visible text is inside an `elementText` label, walk upward to the nearest
-enclosing node that has a `control` field and use that node's bounds. Send input
-commands by posting to `IO` with content type `application/json; charset=utf8`.
-
-Example:
+Post commands as `application/json; charset=utf8`:
 
 ```powershell
 Invoke-WebRequest `
   -UseBasicParsing `
   -Method Post `
-  -Uri http://localhost:8888/Automation/RemotingTest_Core/IO `
+  -Uri http://localhost:8888/Automation/RemotingTest_Rendering_Win32/IO `
   -ContentType 'application/json; charset=utf8' `
   -SkipHeaderValidation `
-  -Body '!LeftClick:<x>,<y>'
+  -Body '!LeftClick:<integer-x>,<integer-y>'
 ```
 
-The coordinates are logical GacUI coordinates. Re-read `Controls` after opening
-menus or dialogs, because their bounds are only present after they are visible.
+Use renderer `/IO`, or actual native mouse and keyboard input, for the shared
+verification scenario. Renderer-side input crosses the network to the core;
+Core `/IO` alone bypasses that half of the path. Core `/IO` remains useful for
+diagnosis and for deliberately checking the opposite direction.
 
-## Exit The Remote Protocol Test
+Re-read both trees after opening a tab, menu, or dialog. A response of `Queued`
+only means the input was accepted; require the expected state change. The
+renderer response can retain hidden entries in its `Elements` catalog, so also
+require the matching element to be reachable from the active `Dom` tree.
 
-The verified `/RPT` sequence is:
+### Native Input for `/MiniHTTP`
 
-1. Open the File menu.
-2. Click the first close item: `self.Close() (InvokeInMainThread)`.
-3. Confirm the `Do you want to exit?` dialog with `OK`.
-4. If the renderer shows a native `ERROR from GacUI Core` dialog, click its `OK`
-   button too.
-5. Confirm both `RemotingTest_Core` and `RemotingTest_Rendering_Win32` have
-   exited.
+MiniHTTP's raw socket server exclusively owns port `8888`. Both processes
+therefore disable the Windows HTTP automation listener in this mode, and none of
+the `/Automation/...` endpoints above are available.
 
-Use the automation service to calculate every click point from the current
-`Controls` response:
+Keep the renderer window visible and drive it with actual Win32 mouse and
+keyboard input, using the computer-use tooling described by the GacUI
+guidelines. Locate the window by the retained renderer PID and current title,
+bring it to the foreground, capture a fresh screenshot, and derive click points
+from the current UI instead of reusing fixed coordinates. Re-inspect after each
+tab, menu, or modal transition. Native message boxes, including a transport
+error shown during shutdown, also require native input.
 
-1. Read `Controls` and search for the `File` menu text.
-2. Use the nearest enclosing control bounds and post `!LeftClick:<x>,<y>` to
-   open the menu.
-3. Read `Controls` again and search for
-   `self.Close() (InvokeInMainThread)`.
-4. Use that menu item's enclosing control bounds and post its center point.
-5. Read `Controls` again and search for the `OK` button in the
-   `Do you want to exit?` dialog.
-6. Use that button's enclosing control bounds and post its center point.
+### Debugging and Cleanup
+
+Keep both consoles available when investigating connection or shutdown errors.
+If a debugger is needed, use the scripts in `GacUI/.github/Scripts` as directed
+by `GacUI/.github/Guidelines/Debugging.md`.
+
+After a normal close, `/Pipe` can show an `ERROR from GacUI Core` dialog saying
+that `ReadFile` failed because the named pipe was closed. Dismiss it and confirm
+the renderer exits. Do not treat any earlier disconnect or dialog as success.
+
+Clean up only the processes retained for the run:
 
 ```powershell
-$io = 'http://localhost:8888/Automation/RemotingTest_Core/IO'
-Invoke-WebRequest -UseBasicParsing -Method Post -Uri $io -ContentType 'application/json; charset=utf8' -SkipHeaderValidation -Body '!LeftClick:<x>,<y>'
+if ($renderer -and -not $renderer.HasExited) { Stop-Process -Id $renderer.Id -Force }
+if ($core -and -not $core.HasExited) { Stop-Process -Id $core.Id -Force }
 ```
 
-For `/Http /RPT`, both processes should exit after the exit dialog `OK`.
+If process identifiers were lost, first inspect all matching processes and their
+start times before using a name-based fallback.
 
-For `/Pipe /RPT`, `RemotingTest_Rendering_Win32` may show a native error dialog
-titled `ERROR from GacUI Core` with the message:
+## Linux Specific
 
-```text
-ReadFile failed because the named pipe was closed.
-```
+Native remote rendering is not supported yet. The equivalent renderer will be
+provided by another repository. Do not attempt to run
+`RemotingTest_Rendering_Win32` on Linux.
 
-Click `OK` in that native dialog. The renderer should then close.
+## macOS Specific
 
-## Cleanup
-
-If a run is interrupted, stop both processes:
-
-```powershell
-Get-Process RemotingTest_Core,RemotingTest_Rendering_Win32 -ErrorAction SilentlyContinue | Stop-Process -Force
-```
+Native remote rendering is not supported yet. The equivalent renderer will be
+provided by another repository. Do not attempt to run
+`RemotingTest_Rendering_Win32` on macOS.
