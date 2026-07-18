@@ -12,6 +12,18 @@ The core must start before the renderer. The application selector (`/FCT` or
 transport selector. Run one core/renderer pair at a time and retain both process
 identifiers for cleanup.
 
+The native-renderer transport contract is:
+
+| Platform | Transport arguments | Current implementation status |
+| --- | --- | --- |
+| Windows | `/MiniHTTP`, `/Http`, `/Pipe` | Available |
+| Linux | `/MiniHTTP` | Native renderer not implemented yet |
+| macOS | `/MiniHTTP` | Native renderer not implemented yet |
+
+This guide reports current implementation status honestly. The verification job
+is deliberately forward-looking and keeps the Linux and macOS `/MiniHTTP` rows
+in its required matrix even though their native renderers are not available yet.
+
 ## Windows
 
 Read `GacUI/Project.md`, `GacUI/.github/copilot-instructions.md`, and the linked
@@ -148,12 +160,16 @@ start times before using a name-based fallback.
 
 ## Linux Specific
 
-Native remote rendering is not supported yet. The equivalent renderer will be
-provided by another repository. Do not attempt to run
-`RemotingTest_Rendering_Win32` on Linux.
+The planned native-renderer transport for Linux is `/MiniHTTP`; `/Http` and
+`/Pipe` are not part of the planned platform contract. Native remote rendering is
+not implemented yet, so the equivalent renderer and its concrete
+start/inspection procedure must be provided by another repository before the job
+can run. Do not attempt to run `RemotingTest_Rendering_Win32` on Linux.
 
 ## macOS Specific
 
-Native remote rendering is not supported yet. The equivalent renderer will be
-provided by another repository. Do not attempt to run
-`RemotingTest_Rendering_Win32` on macOS.
+The planned native-renderer transport for macOS is `/MiniHTTP`; `/Http` and
+`/Pipe` are not part of the planned platform contract. Native remote rendering is
+not implemented yet, so the equivalent renderer and its concrete
+start/inspection procedure must be provided by another repository before the job
+can run. Do not attempt to run `RemotingTest_Rendering_Win32` on macOS.

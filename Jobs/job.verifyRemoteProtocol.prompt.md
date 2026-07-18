@@ -1,22 +1,24 @@
 You are going to perform an end-to-end, monorepo/cross-repository verification
-of the GacUI remote protocol. Exercise every renderer-compatible transport that
-the current platform provides, operate real application features through the
-renderer, run the complete applicable automated suites, fix any root cause, and
-repeat affected downstream verification.
+of the GacUI remote protocol. Exercise every renderer and transport combination
+required for the current platform by the matrix, operate real application
+features through the renderer, run the complete applicable automated suites, fix
+any root cause, and repeat affected downstream verification.
 
 Starting processes or receiving HTTP 200 is not success. A run passes only when
 its applicable scenario proves that renderer-side input reaches the core and the
 resulting core state is rendered back. Every `/RPT` run must also prove renderer
 replacement, state transfer, and the specified intentional shutdown path.
 
-Treat every supported renderer, application, and transport tuple as a separate
+Treat every required renderer, application, and transport tuple as a separate
 run. Every readiness, interaction, and applicable replacement or shutdown
 checkpoint in that run must pass. If a checkpoint fails, capture the first wrong
 observable state, diagnose and fix the root cause, rerun the failed run, and
 rerun every downstream run or automated suite that the fix could affect.
 
-Use canonical, case-sensitive `/MiniHTTP` in every command and test. Do not rely
-on the legacy `/MiniHttp` compatibility spelling.
+Use the executable's canonical, case-sensitive `/MiniHTTP`, `/Http`, and `/Pipe`
+arguments in every command and test. Do not rely on the legacy `/MiniHttp`
+compatibility spelling. HTTP and named pipe may be capitalized as protocol names
+in prose, but `/HTTP` and `/PIPE` are not the command-line arguments.
 
 ## Authority and Workspace
 
@@ -35,10 +37,13 @@ Libraries repositories are siblings. Read before acting:
 Treat both `DebugGacUIWith*.md` documents as the operation entry points. They own
 executable paths, build/start/serve commands, browser selection, UI-driving and
 inspection tools, readiness mechanisms, transport-specific close handling, and
-current platform support. This job owns the shared matrix, operations, and
-success criteria. Do not duplicate or invent platform procedures here. If a
-guide says a renderer or scenario is unavailable, record a documented skip; do
-not report it as a pass.
+current implementation status. This job owns the required forward-looking
+matrix, shared operations, and success criteria. Do not duplicate or invent
+platform procedures here. Include every renderer entry point in the current
+platform's matrix rows, including the forward-looking native remote renderer on
+Linux and macOS. A guide that documents a required renderer as not implemented
+yet identifies a preflight blocker; it does not remove the row from the matrix
+and must not be reported as a pass or a documented skip.
 
 The job authorizes fixes needed to make this verification pass. Respect repository
 boundaries: never fix generated code or a downstream `Import` copy directly. Fix
@@ -53,19 +58,38 @@ and push each current branch to its configured upstream.
 
 ## Required Coverage
 
-Discover availability from the two operation guides, then construct the run
-matrix before testing:
+Select every row for the current platform, then expand each listed transport
+into a separate run:
 
-| Renderer entry point | Compatible transports to exercise |
-| --- | --- |
-| GacJS browser renderer | Every `/Http` and `/MiniHTTP` entry provided by the browser guide; never `/Pipe`. |
-| Native remote renderer | Every `/Pipe`, `/Http`, and `/MiniHTTP` entry provided by the native-renderer guide. |
+| Platform | Renderer entry point | Required transport arguments |
+| --- | --- | --- |
+| Linux | GacJS browser renderer | `/MiniHTTP` |
+| Linux | Native remote renderer | `/MiniHTTP` |
+| macOS | GacJS browser renderer | `/MiniHTTP` |
+| macOS | Native remote renderer | `/MiniHTTP` |
+| Windows | GacJS browser renderer | `/MiniHTTP`, `/Http` |
+| Windows | Native remote renderer | `/MiniHTTP`, `/Http`, `/Pipe` |
+
+This cross-platform matrix is normative and does not shrink to match today's
+implementation status. In particular, a Linux or macOS run must retain its
+native `/MiniHTTP` row even while the corresponding native renderer remains
+future work. `/Pipe` is Windows-only, and the full `/Http` implementation is used
+only by the Windows rows above.
 
 Use the exact browser selected by the operation guide and record its actual name;
 do not relabel an engine-compatible substitute as a different browser. Run the
-shared `/RPT` scenario for every matrix entry. Run the shared `/FCT` scenario for
-every entry whose guide does not declare FullControlTest or general text input
-unavailable.
+shared `/RPT` manual scenario unchanged and in full for every transport in every
+selected current-platform matrix row. Do not substitute a transport-specific
+smoke test or omit an action. The identical scenario has two simultaneous
+purposes: it proves that the GacUI remote protocol round trip works, and, by
+repeating it over each transport, that each selected network protocol
+implementation works. Only platform-specific startup, readiness, UI-driving,
+state-inspection, and shutdown mechanics may differ as directed by the operation
+guides.
+
+The shared `/FCT` scenario is additional coverage. Run it for every transport in
+every selected current-platform row whose guide does not declare FullControlTest
+or general text input unavailable.
 
 Each core invocation has exactly one application argument (`/FCT` or `/RPT`)
 and one transport argument. The native renderer receives only the same transport
@@ -92,9 +116,10 @@ created by the core; it has no browser-side transport switch.
 5. Require port `8888` to be free before each new core run. Confirm that no old
    renderer can take over the single-renderer session. For browser runs, confirm
    that port `8896` serves the intended GacJS build rather than a different site.
-6. Record the exact matrix, including the platform, renderer, actual browser when
-   applicable, application, transport, and documented skips, before the first
-   run. Prepare a place to retain the evidence and result of every checkpoint.
+6. Record the exact current-platform matrix, including the renderer, actual
+   browser when applicable, application, transport, preflight blockers, and
+   supplementary scenario skips before the first run. Prepare a place to retain
+   the evidence and result of every checkpoint.
 
 Wrong preflight state includes an unknown owner of port `8888`, multiple stale
 core or renderer processes, a stale browser renderer, an unintended site on port
@@ -200,7 +225,7 @@ alive is never sufficient. The expected live state transition is the proof.
 
 ## Shared `/RPT` Manual Scenario
 
-Perform every subsection for every supported renderer/transport combination. The
+Perform every subsection for every required renderer/transport combination. The
 same UI operations and observable criteria apply to GacJS and native renderers;
 only the driving and inspection mechanics come from their operation guides.
 
@@ -486,8 +511,9 @@ Before committing:
 
 Report:
 
-- A matrix row for every planned run: platform, actual browser when applicable,
-  renderer, application, transport, readiness, result, and documented skip.
+- A matrix row for every required current-platform run: platform, actual browser
+  when applicable, renderer, application, transport, readiness, result, preflight
+  blocker, and any supplementary scenario skip.
 - Each shared manual checkpoint and its observed state, including button update,
   collection add/clear, modal handling, text input/persistence, renderer
   replacement, exact terminal state, and shutdown.

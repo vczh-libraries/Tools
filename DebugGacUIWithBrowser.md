@@ -38,6 +38,18 @@ requires one transport selector:
 | `/MiniHTTP` | The async-socket MiniHTTP transport. Use this exact spelling. |
 | `/Pipe` | Named-pipe transport. A fetch-based browser cannot use it. |
 
+The GacJS transport contract is platform-specific:
+
+| Platform | Compatible transport arguments | Core implementation status |
+| --- | --- | --- |
+| Windows | `/MiniHTTP`, `/Http` | Available |
+| Linux | `/MiniHTTP` | Future core assumed by this guide |
+| macOS | `/MiniHTTP` | Future core assumed by this guide |
+
+`/Pipe` is not compatible with GacJS on any platform. This table describes the
+transport contract and current implementation status; the verification job
+defines the required applications and shared manual scenario for each transport.
+
 `/FCT` and `/RPT` are exclusive. The transport arguments are also exclusive.
 Start the core before opening `http://localhost:8896/index.html`.
 
@@ -130,11 +142,17 @@ process so cleanup targets only the process started for the run:
 
 ```powershell
 $coreExe = '<GacUI>\Test\GacUISrc\x64\Debug\RemotingTest_Core.exe'
+
+# Async-socket MiniHTTP implementation
 $core = Start-Process -FilePath $coreExe -ArgumentList '/MiniHTTP','/RPT' -PassThru
+
+# Full Windows HTTP implementation, as a separate run
+$core = Start-Process -FilePath $coreExe -ArgumentList '/Http','/RPT' -PassThru
 ```
 
-Replace `/MiniHTTP` and `/RPT` with the combination required by the verification
-job. Do not call MSBuild directly.
+The examples are separate runs; start only one core at a time. Substitute `/FCT`
+for `/RPT` when required by the verification job. Exercise both `/MiniHTTP` and
+`/Http` as separate Windows GacJS runs. Do not call MSBuild directly.
 
 After `yarn build`, IIS normally serves the website at `localhost:8896`. If it
 does not, serve `<GacJS>\Gaclib\website\entry\lib\dist` with a local static-file
@@ -171,8 +189,8 @@ site_pid=$!
 
 If Playwright Firefox is used, install its browser runtime from the GacJS
 workspace with `npx playwright install firefox`. Kill only the retained
-`core_pid` and `site_pid` after the run. MiniHTTP is the available browser
-transport on this platform.
+`core_pid` and `site_pid` after the run. `/MiniHTTP` is the browser transport for
+the assumed future core on this platform.
 
 ## macOS Specific
 
@@ -192,5 +210,5 @@ open -a Safari http://localhost:8896/index.html
 Use actual Safari for Safari verification; Playwright WebKit is useful WebKit
 coverage, but it is not Safari. The current GacUI project plan limits macOS
 coverage to `/RPT` until general text-box support is available. Kill only the
-retained `core_pid` and `site_pid` after the run. MiniHTTP is the available
-browser transport on this platform.
+retained `core_pid` and `site_pid` after the run. `/MiniHTTP` is the browser
+transport for the assumed future core on this platform.
