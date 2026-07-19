@@ -56,6 +56,27 @@ and review pre-existing local changes. At completion, commit all intended local
 changes in every affected repository with honest repository-specific messages
 and push each current branch to its configured upstream.
 
+## HTTP Disconnection Contract
+
+The HTTP remote protocol consists of `/Connect`, `/Request`, and `/Response`.
+Do not add a reverse `/Disconnect` endpoint, renderer-to-core shutdown marker,
+or any requirement that the core wait for renderer acknowledgement.
+
+A renderer may close independently while the core remains available. A later
+renderer can connect to the same core and replace the old renderer; accepting
+the new renderer drops the old connection and token. HTTP 404 on an old renderer
+request means that connection is no longer active. It is a normal disconnection
+outcome: the old renderer must stop emitting new requests and settle or exit
+without a fatal transport prompt.
+
+After intentional core shutdown, an error from an outstanding or subsequent
+renderer request is also a normal disconnection outcome. Requests that reach the
+core while it is still serving should receive their normal protocol response
+when possible, but verification must not require successful renderer requests
+after the core has stopped. This allowance applies only after replacement or the
+confirmed shutdown action; an earlier 404, transport error, disconnect, or exit
+still fails the active scenario.
+
 ## Required Coverage
 
 Select every row for the current platform, then expand each listed transport
@@ -279,21 +300,30 @@ cell strings does not mean the rows are still rendered.
 5. Require the `Document` view to be active and responsive again, with the core
    and renderer still connected.
 
-### E. Prove Renderer Replacement and State Transfer
+### E. Prove Renderer Reconnection, Replacement, and State Transfer
 
-1. Keep the same core alive. Start a second renderer of the same kind and
-   transport by following its operation guide: another `index.html` renderer for
-   GacJS or another native-renderer instance.
-2. With bounded fresh-state reads, require the second renderer to take over the
-   session, show `Remote Protocol Test`, and render live application content.
-3. In the second renderer, activate `Home` and require
-   `You have clicked!`. This must be transferred state from subsection B, not a
-   newly repeated click.
-4. Confirm through the guide's connection evidence or the old surface's detached
-   state that the first renderer is no longer active. Exactly one renderer may
+1. Close the first renderer while keeping the same core alive. Do not send a
+   renderer-to-core disconnect request or restart the core. Require the core to
+   remain alive and available for another renderer.
+2. Start a second renderer of the same kind and transport by following its
+   operation guide: another `index.html` renderer for GacJS or another native-
+   renderer instance. With bounded fresh-state reads, require it to connect,
+   show `Remote Protocol Test`, and render live application content.
+3. In the second renderer, activate `Home` and require `You have clicked!`. This
+   must be transferred state from subsection B, not a newly repeated click. This
+   close-then-reconnect sequence proves that renderer lifetime is independent of
+   core lifetime.
+4. Keep the second renderer active and start a third renderer of the same kind
+   and transport. Require the third renderer to take over the session and retain
+   `You have clicked!` without repeating the click.
+5. Confirm through the guide's connection evidence or the old surface's detached
+   state that the second renderer is no longer active. Exactly one renderer may
    drive the core; two live-looking surfaces are not proof of successful takeover.
-5. Re-read all active state and recompute all interaction targets in the second
-   renderer. Never reuse coordinates or handles from the first renderer.
+   For an HTTP renderer, 404 on a request from the replaced renderer is the
+   expected invalid-token signal and must make that renderer stop issuing work
+   without presenting a fatal transport error.
+6. Re-read all active state and recompute all interaction targets in the third
+   renderer. Never reuse coordinates or handles from an earlier renderer.
 
 ### F. Prove Menu, Confirmation, and Intentional Shutdown
 
@@ -312,21 +342,26 @@ Perform the shutdown through the replacement renderer:
 5. Require the core to exit within a bounded deadline.
 
 For GacJS, require the active replacement page to enter a visible terminal state.
-The full HTTP implementation must render exactly:
-
-```text
-IGacUIRenderer exited due to receiving RequestControllerConnectionStopped.
-```
-
-MiniHTTP may render `Failed to fetch` only after the confirmed close has shut down
-its socket server. Record the exact terminal text. A silently frozen application,
-missing terminal state, different unclassified exception, alert, or core that
+If the renderer receives the clean core notification before shutdown completes,
+it may render
+`IGacUIRenderer exited due to receiving RequestControllerConnectionStopped.`.
+If the confirmed close shuts down the server first, an outstanding request may
+instead surface 404, `Failed to fetch`, or another transport failure. Record the
+exact terminal state. Require the page to settle and stop issuing requests without
+a fatal alert or retry loop. A silently frozen active application or a core that
 remains alive is wrong; a quiet browser console does not override visible failure.
 
 For a native renderer, require the core and active renderer to exit. Follow the
 operation guide for any explicitly documented transport-specific post-close
 handling. Such handling is acceptable only after the confirmed close; any error,
 disconnect, or renderer exit before confirmation is a protocol failure.
+
+For HTTP transports, do not require a reverse shutdown handshake. After the
+confirmed close has caused the core to exit, an outstanding renderer request may
+receive 404 or a transport failure because the server is already gone. The
+renderer must treat that result as disconnection, stop emitting new requests,
+and exit without a fatal transport dialog. Record the observed result; do not
+classify the expected post-core-exit request failure itself as a protocol defect.
 
 The complete `/RPT` run proves initial rendering, renderer-to-core input,
 core-to-renderer updates, collection mutation, modal operation, reconnection and
