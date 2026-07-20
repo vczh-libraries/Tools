@@ -80,17 +80,23 @@ HTTP creation reports
 with `Mini HTTP server created`; named pipe reports
 `GacUIRemoteProtocolNamedPipe`.
 
-### HTTP Automation for `/Http` and `/Pipe`
+### HTTP Automation
 
-The Windows HTTP automation service is available during `/Http` and `/Pipe`
-runs:
+Automation endpoints are available in every Windows transport mode:
 
 ```text
 GET  http://localhost:8888/Automation/RemotingTest_Core/Controls
 POST http://localhost:8888/Automation/RemotingTest_Core/IO
-GET  http://localhost:8888/Automation/RemotingTest_Rendering_Win32/Dom
-POST http://localhost:8888/Automation/RemotingTest_Rendering_Win32/IO
+GET  http://localhost:8889/Automation/RemotingTest_Rendering_Win32/Dom
+POST http://localhost:8889/Automation/RemotingTest_Rendering_Win32/IO
 ```
+
+During `/Http` and `/Pipe` runs, the projects use the Windows HTTP automation
+service. During a `/MiniHTTP` run, `RemotingTest_Core` registers its automation
+prefix with the exact same `IAsyncSocketServer` that hosts the remote protocol
+on port `8888`; it does not create another listener. The renderer is a separate
+process and cannot share that server instance, so it starts a separate MiniHTTP
+automation server on port `8889`.
 
 `Controls` describes logical GacUI controls; `Dom` describes what the native
 renderer received. Search the latest JSON for the visible text, walk upward to
@@ -108,7 +114,7 @@ Post commands as `application/json; charset=utf8`:
 Invoke-WebRequest `
   -UseBasicParsing `
   -Method Post `
-  -Uri http://localhost:8888/Automation/RemotingTest_Rendering_Win32/IO `
+  -Uri http://localhost:8889/Automation/RemotingTest_Rendering_Win32/IO `
   -ContentType 'application/json; charset=utf8' `
   -SkipHeaderValidation `
   -Body '!LeftClick:<integer-x>,<integer-y>'
@@ -123,20 +129,6 @@ Re-read both trees after opening a tab, menu, or dialog. A response of `Queued`
 only means the input was accepted; require the expected state change. The
 renderer response can retain hidden entries in its `Elements` catalog, so also
 require the matching element to be reachable from the active `Dom` tree.
-
-### Native Input for `/MiniHTTP`
-
-MiniHTTP's raw socket server exclusively owns port `8888`. Both processes
-therefore disable the Windows HTTP automation listener in this mode, and none of
-the `/Automation/...` endpoints above are available.
-
-Keep the renderer window visible and drive it with actual Win32 mouse and
-keyboard input, using the computer-use tooling described by the GacUI
-guidelines. Locate the window by the retained renderer PID and current title,
-bring it to the foreground, capture a fresh screenshot, and derive click points
-from the current UI instead of reusing fixed coordinates. Re-inspect after each
-tab, menu, or modal transition. Native message boxes, including a transport
-error shown during shutdown, also require native input.
 
 ### Debugging and Cleanup
 

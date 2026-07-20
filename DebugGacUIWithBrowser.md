@@ -53,11 +53,12 @@ defines the required applications and shared manual scenario for each transport.
 `/FCT` and `/RPT` are exclusive. The transport arguments are also exclusive.
 Start the core before opening `http://localhost:8896/index.html`.
 
-The core protocol endpoint is fixed at port `8888`. The GacJS files are served
-separately on port `8896`; `RemotingTest_Core` is not a static-file server. In
-MiniHTTP mode the socket server exclusively owns port `8888`. This does not
-prevent Playwright or browser tools from operating the page served on port
-`8896`.
+The core protocol endpoint is fixed at port `8888`. In MiniHTTP mode, the core
+registers its `/Automation/RemotingTest_Core/...` routes with the exact same
+socket server on port `8888`; no additional listener is created. The GacJS files
+are served separately on port `8896`; `RemotingTest_Core` is not a static-file
+server. This does not prevent Playwright or browser tools from operating the
+page served on port `8896`.
 
 Only one remote renderer is active at a time. Opening another `index.html` tab
 or browser transfers the existing application state to the new renderer and
@@ -159,8 +160,11 @@ does not, serve `<GacJS>\Gaclib\website\entry\lib\dist` with a local static-file
 server. The checked-in automated protocol harness currently uses the Windows
 Debug x64 core executable and Playwright Chromium.
 
-The optional Windows HTTP automation service also uses port `8888`; it is
-unavailable while MiniHTTP owns that port.
+Core automation is available at
+`http://localhost:8888/Automation/RemotingTest_Core/...` for both `/Http` and
+`/MiniHTTP`. In MiniHTTP mode, those routes share the existing core listener.
+Port `8889` is reserved for `RemotingTest_Rendering_Win32` automation during
+native-renderer runs and is not used by the GacJS browser renderer.
 
 Stop the retained core process after closing the page:
 
