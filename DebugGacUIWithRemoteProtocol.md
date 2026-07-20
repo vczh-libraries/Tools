@@ -16,12 +16,12 @@ The native-renderer transport contract is:
 
 | Platform | Transport arguments | Current implementation status |
 | --- | --- | --- |
-| Windows | `/MiniHTTP`, `/Http`, `/Pipe` | Available |
-| Linux | `/MiniHTTP` | Native renderer not implemented yet |
-| macOS | `/MiniHTTP` | Native renderer not implemented yet |
+| Windows | `/MiniHttp`, `/Http`, `/Pipe` | Available |
+| Linux | `/MiniHttp` | Native renderer not implemented yet |
+| macOS | `/MiniHttp` | Native renderer not implemented yet |
 
 This guide reports current implementation status honestly. The verification job
-is deliberately forward-looking and keeps the Linux and macOS `/MiniHTTP` rows
+is deliberately forward-looking and keeps the Linux and macOS `/MiniHttp` rows
 in its required matrix even though their native renderers are not available yet.
 
 ## Windows
@@ -58,8 +58,8 @@ $core = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Core.exe') -Argume
 $renderer = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Rendering_Win32.exe') -ArgumentList '/Http' -PassThru
 
 # Async-socket MiniHTTP implementation
-$core = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Core.exe') -ArgumentList '/MiniHTTP','/RPT' -PassThru
-$renderer = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Rendering_Win32.exe') -ArgumentList '/MiniHTTP' -PassThru
+$core = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Core.exe') -ArgumentList '/MiniHttp','/RPT' -PassThru
+$renderer = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Rendering_Win32.exe') -ArgumentList '/MiniHttp' -PassThru
 
 # Named pipe implementation
 $core = Start-Process -FilePath (Join-Path $bin 'RemotingTest_Core.exe') -ArgumentList '/Pipe','/RPT' -PassThru
@@ -92,7 +92,7 @@ POST http://localhost:8889/Automation/RemotingTest_Rendering_Win32/IO
 ```
 
 During `/Http` and `/Pipe` runs, the projects use the Windows HTTP automation
-service. During a `/MiniHTTP` run, `RemotingTest_Core` registers its automation
+service. During a `/MiniHttp` run, `RemotingTest_Core` registers its automation
 prefix with the exact same `IAsyncSocketServer` that hosts the remote protocol
 on port `8888`; it does not create another listener. The renderer is a separate
 process and cannot share that server instance, so it starts a separate MiniHTTP
@@ -152,7 +152,7 @@ start times before using a name-based fallback.
 
 ## Linux Specific
 
-The planned native-renderer transport for Linux is `/MiniHTTP`; `/Http` and
+The planned native-renderer transport for Linux is `/MiniHttp`; `/Http` and
 `/Pipe` are not part of the planned platform contract. Native remote rendering is
 not implemented yet, so the equivalent renderer and its concrete
 start/inspection procedure must be provided by another repository before the job
@@ -160,7 +160,7 @@ can run. Do not attempt to run `RemotingTest_Rendering_Win32` on Linux.
 
 ## macOS Specific
 
-The planned native-renderer transport for macOS is `/MiniHTTP`; `/Http` and
+The planned native-renderer transport for macOS is `/MiniHttp`; `/Http` and
 `/Pipe` are not part of the planned platform contract. Native remote rendering is
 not implemented yet, so the equivalent renderer and its concrete
 start/inspection procedure must be provided by another repository before the job

@@ -41,11 +41,11 @@ If anything in the upstream repo needs to fix, the fix should be first done in t
 ### Windows Specific
 
 You are going to verify the remote protocol with the following network protocols in order:
-- `/PIPE`, using Named Pipes
-- `/HTTP`, using http.sys with WinHttp
-- `/MiniHTTP`, using the mini http protocol implemented in `VlppOS` repo
+- `/Pipe`, using Named Pipes
+- `/Http`, using http.sys with WinHttp
+- `/MiniHttp`, using the mini http protocol implemented in `VlppOS` repo
 
-`/Http` and `/MiniHTTP` are supposed to be compatible with each other, which means the core and the renderer does not need to start with the same HTTP configuration, but such scenario is not required in the verification. Their compatibility is verified in the unit test in `VlppOS`.
+`/Http` and `/MiniHttp` are supposed to be compatible with each other, which means the core and the renderer does not need to start with the same HTTP configuration, but such scenario is not required in the verification. Their compatibility is verified in the unit test in `VlppOS`.
 
 The native renderer means the `RemotingTest_Renderer_Win32` project in GacUI.
 
@@ -62,8 +62,8 @@ Not supported yet.
 
 You are going to verify the remote protocol with the following network protocols in order:
 - `/HTTP`, using http.sys with WinHttp
-- `/MiniHTTP`, using the mini http protocol implemented in `VlppOS` repo
-GacJS is generally a website, it is compatible with both `/HTTP` and `/MiniHTTP`.
+- `/MiniHttp`, using the mini http protocol implemented in `VlppOS` repo
+GacJS is generally a website, it is compatible with both `/HTTP` and `/MiniHttp`.
 
 ### Linux/macOS Specific
 

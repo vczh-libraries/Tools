@@ -35,16 +35,16 @@ requires one transport selector:
 | `/FCT` | FullControlTest. This is the default application. |
 | `/RPT` | RemoteProtocolTest. |
 | `/Http` | The full HTTP transport, when supplied by the current platform. |
-| `/MiniHTTP` | The async-socket MiniHTTP transport. Use this exact spelling. |
+| `/MiniHttp` | The async-socket MiniHTTP transport. Use this exact spelling. |
 | `/Pipe` | Named-pipe transport. A fetch-based browser cannot use it. |
 
 The GacJS transport contract is platform-specific:
 
 | Platform | Compatible transport arguments | Core implementation status |
 | --- | --- | --- |
-| Windows | `/MiniHTTP`, `/Http` | Available |
-| Linux | `/MiniHTTP` | Future core assumed by this guide |
-| macOS | `/MiniHTTP` | Future core assumed by this guide |
+| Windows | `/MiniHttp`, `/Http` | Available |
+| Linux | `/MiniHttp` | Future core assumed by this guide |
+| macOS | `/MiniHttp` | Future core assumed by this guide |
 
 `/Pipe` is not compatible with GacJS on any platform. This table describes the
 transport contract and current implementation status; the verification job
@@ -145,14 +145,14 @@ process so cleanup targets only the process started for the run:
 $coreExe = '<GacUI>\Test\GacUISrc\x64\Debug\RemotingTest_Core.exe'
 
 # Async-socket MiniHTTP implementation
-$core = Start-Process -FilePath $coreExe -ArgumentList '/MiniHTTP','/RPT' -PassThru
+$core = Start-Process -FilePath $coreExe -ArgumentList '/MiniHttp','/RPT' -PassThru
 
 # Full Windows HTTP implementation, as a separate run
 $core = Start-Process -FilePath $coreExe -ArgumentList '/Http','/RPT' -PassThru
 ```
 
 The examples are separate runs; start only one core at a time. Substitute `/FCT`
-for `/RPT` when required by the verification job. Exercise both `/MiniHTTP` and
+for `/RPT` when required by the verification job. Exercise both `/MiniHttp` and
 `/Http` as separate Windows GacJS runs. Do not call MSBuild directly.
 
 After `yarn build`, IIS normally serves the website at `localhost:8896`. If it
@@ -162,7 +162,7 @@ Debug x64 core executable and Playwright Chromium.
 
 Core automation is available at
 `http://localhost:8888/Automation/RemotingTest_Core/...` for both `/Http` and
-`/MiniHTTP`. In MiniHTTP mode, those routes share the existing core listener.
+`/MiniHttp`. In MiniHTTP mode, those routes share the existing core listener.
 Port `8889` is reserved for `RemotingTest_Rendering_Win32` automation during
 native-renderer runs and is not used by the GacJS browser renderer.
 
@@ -180,7 +180,7 @@ Assume the future core project is available at
 ```bash
 cd <GacUI>/Test/Linux/RemotingTest_Core
 ../../../.github/Ubuntu/build.sh
-./Bin/RemotingTest_Core /MiniHTTP /RPT &
+./Bin/RemotingTest_Core /MiniHttp /RPT &
 core_pid=$!
 ```
 
@@ -193,7 +193,7 @@ site_pid=$!
 
 If Playwright Firefox is used, install its browser runtime from the GacJS
 workspace with `npx playwright install firefox`. Kill only the retained
-`core_pid` and `site_pid` after the run. `/MiniHTTP` is the browser transport for
+`core_pid` and `site_pid` after the run. `/MiniHttp` is the browser transport for
 the assumed future core on this platform.
 
 ## macOS Specific
@@ -204,7 +204,7 @@ Assume the future core project is available at
 ```bash
 cd <GacUI>/Test/Linux/RemotingTest_Core
 ../../../.github/Ubuntu/build.sh
-./Bin/RemotingTest_Core /MiniHTTP /RPT &
+./Bin/RemotingTest_Core /MiniHttp /RPT &
 core_pid=$!
 python3 -m http.server 8896 --bind 127.0.0.1 --directory <GacJS>/Gaclib/website/entry/lib/dist &
 site_pid=$!
@@ -214,5 +214,5 @@ open -a Safari http://localhost:8896/index.html
 Use actual Safari for Safari verification; Playwright WebKit is useful WebKit
 coverage, but it is not Safari. The current GacUI project plan limits macOS
 coverage to `/RPT` until general text-box support is available. Kill only the
-retained `core_pid` and `site_pid` after the run. `/MiniHTTP` is the browser
+retained `core_pid` and `site_pid` after the run. `/MiniHttp` is the browser
 transport for the assumed future core on this platform.
