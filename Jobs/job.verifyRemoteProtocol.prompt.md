@@ -47,6 +47,8 @@ You are going to verify the remote protocol with the following network protocols
 
 `/Http` and `/MiniHTTP` are supposed to be compatible with each other, which means the core and the renderer does not need to start with the same HTTP configuration, but such scenario is not required in the verification. Their compatibility is verified in the unit test in `VlppOS`.
 
+The native renderer means the `RemotingTest_Renderer_Win32` project in GacUI.
+
 ### Linux/macOS Specific
 
 Not supported yet.
