@@ -28,6 +28,11 @@ The verification is usually required to execute when the following thing is chan
 - Remote Protocol design
 - `INetworkProtocol(Server|Client)` implementation
 
+The overall target is to make sure GacUI is doing remote protocol right. This part is supposed to have production quality.
+But any actual network protocol implementation is fine with demo quality, it is used to live demo the remote protocol. So no need to ensure perfection in this part in terms or dealing with any networking corner case, etc. But we need to at least make sure all required remote protocol features can run with them.
+
+If anything in the upstream repo needs to fix, the fix should be first done in the upstream repo, and then release to GacUI for further verification.
+
 ## Step 1. Verify Remote Protocol with Native Renderer
 
 - Follow `Tools/DebugGacUIWithRemoteProtocol.md` to understand how to start the native renderer with GacUI's `RemotingTest_Core` project, and how to operate the UI in the renderer.
