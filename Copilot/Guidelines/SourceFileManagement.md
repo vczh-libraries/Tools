@@ -48,6 +48,7 @@ Platform guard macros should be used even when in platform specific source files
 - `#ifdef VCZH_GCC` for Linux and macOS shared source.
 - `#if defined VCZH_MSVC && !defined VCZH_APPLE` for Linuc only.
 - `#if defined VCZH_MSVC && defined VCZH_APPLE` for macOS only.
+
 Be awared that during releasing a repo, Linux and macOS source files will be CodePack-ed into a single source file, which is the reason for the above rule.
 
 ## Working on Linux/macOS
