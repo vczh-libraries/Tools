@@ -36,17 +36,17 @@ Knowledge base pages are grouped by projects; update each page only in its ownin
 
 Checkout `WebsiteSource/AGENTS.md` for more details.
 
+## Debugging GacUI in Browser
+
+Some GacUI issues can be addressed by running the GacUI core with UI in a browser using the website in the GacJS repo.
+GacJS is also part of the release, Check out `Tools\DebugGacUIWithGacJS.md` for details.
+
 ## Windows Specific
 
 ### Updating Release Folder
 
 To update the `Release` folder, run `Tools\Tools\Codepack.backup.exe` on each `Release` folder's `CodegenConfig.xml`.
 If you can't find this file, the source code is in `VlppParser2\Tools\Codepack`.
-
-### Debugging GacUI in Browser
-
-Some GacUI issues can be addressed by running the GacUI core with UI in a browser using the website in the GacJS repo.
-GacJS is also part of the release, Check out `Tools\DebugGacUIWithBrowser.md` for details.
 
 ### Debugging GacUI with Remote Protocol
 

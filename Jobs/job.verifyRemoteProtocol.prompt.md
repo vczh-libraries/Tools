@@ -1,70 +1,98 @@
-# Step 1. Verify Remote Protocol with Native Renderer
+# Verify Remote Protocol
 
-- Follow `Tools/DebugGacUIWithRemoteProtocol.md` to understand how to start the native renderer with GacUI's `RemotingTest_Core` project, and how to operate the UI in the renderer.
-- Follow `Tools/DebugGacUISop.md` to perform a series of manual testing on the UI to make sure everything is working.
+The remote protocol allows one renderer at a time to connect exclusively to a
+headless GacUI core application. Run the native-renderer and GacJS sections
+below when remote-protocol design or `INetworkProtocol(Server|Client)` changes.
 
-## Using the Native/GacJS Renderer 
+If an upstream repository needs a fix, make the fix there, update its `Release`
+folder, and then update GacUI's imported copy before continuing.
 
-The remote protocol is designed to let multiple renderers exclusively connecting to one core GacUI application starting with remote protocol:
-- When the core shutdown, the network protocol client in the renderer is supposed to inform an error of losing the network connection, which is expected, at this point the renderer is going to report a fatal error and exit.
-- When the renderer is killed, the core is supposed to continue executing, waiting for the next renderer to connect.
-  - Being killed means the renderer process exits without sending a proper shutdown message via the remote protocol, usually by terminating the process directly.
-  - Proper way to exit a renderer together with the core process can be done by and not limited to:
-    - Clicking the "X" button to close the window. This could also be achieved by pressing expected shortcut key, or in Windows, sending the `WM_CLOSE` message.
-    - Doing any UI operation that causing the core to call main window's `Close` or `Hide`.
-- When the renderer is alive, and another renderer is executed, the new renderer is supposed to take over the connection.
-- "Renderer" in this section includes both native renderer and GacJS, which means a native renderer or GacJS running in a browser could take over each other by running new instances of them, but such scenario is not required in the verification.
+## Shared Renderer Behavior
 
-## Quality Control
+- When a renderer is killed without a protocol shutdown, the core must continue
+  waiting for another renderer.
+- When another renderer connects, it must take over the application session and
+  preserve its state. The old renderer must detach.
+- Closing the application through its UI may end both the core and renderer.
+- An intentional core shutdown or renderer replacement causes a terminal
+  disconnect. The detached renderer must settle without an uncontrolled fatal
+  alert or retry loop.
+- Replacing a native renderer with GacJS, or the reverse, is supported but is
+  not required by this verification.
 
-- `RemotingTest_Core` and any native renderers are designed to be a demo.
-- Any network protocol used here is for test only, they are not part of the product code, no need to pursue production quality.
-- The `Stop` function of `INetworkProtocol(Server|Client)` is just running a callback if there is any, to tell the core/renderer to run finalization works, and shutdown the network directly to unblock `main` or `GuiMain`. No need to pursue an elegant shutdown process inside the network protocol.
-- Since the renderer is designed in that way (mentioned in `Using the Native Renderer` section), so terminating the core in any way does not need inform the renderer. The renderer is going to sense that the network connection is lost, and report a fatal error.
+`RemotingTest_Core` and the transport-specific renderer programs are demos.
+Their network shutdown paths do not need production-quality recovery. The
+remote-protocol implementation and all required protocol features do.
 
-## Goal of the Verification
+## Step 1. Verify with the Native Renderer
 
-The verification is usually required to execute when the following thing is changed:
-- Remote Protocol design
-- `INetworkProtocol(Server|Client)` implementation
+Follow `Tools/DebugGacUIWithRemoteProtocol.md` to build, start, replace, and
+stop the native renderer. Follow `Tools/DebugGacUISop.md` for the required UI
+operations and observable results.
 
-The overall target is to make sure GacUI is doing remote protocol right. This part is supposed to have production quality.
-But any actual network protocol implementation is fine with demo quality, it is used to live demo the remote protocol. So no need to ensure perfection in this part in terms or dealing with any networking corner case, etc. But we need to at least make sure all required remote protocol features can run with them.
+### Windows
 
-If anything in the upstream repo needs to fix, the fix should be first done in the upstream repo, and then release to GacUI for further verification.
+Use `RemotingTest_Core` with `RemotingTest_Rendering_Win32`. Verify these
+transports in order, using a fresh core for each run:
 
-## Step 1. Verify Remote Protocol with Native Renderer
+1. `/Pipe`, using Windows named pipes.
+2. `/Http`, using http.sys with WinHTTP.
+3. `/MiniHttp`, using the portable MiniHTTP implementation in VlppOS.
 
-- Follow `Tools/DebugGacUIWithRemoteProtocol.md` to understand how to start the native renderer with GacUI's `RemotingTest_Core` project, and how to operate the UI in the renderer.
-- Follow `Tools/DebugGacUISop.md` to perform a series of manual testing on the UI to make sure everything is working.
+`/Http` and `/MiniHttp` are wire-compatible, so the core and renderer can use
+different HTTP implementations. That cross-combination is covered by VlppOS
+unit tests and is not required here.
 
-### Windows Specific
+### Linux and macOS
 
-You are going to verify the remote protocol with the following network protocols in order:
-- `/Pipe`, using Named Pipes
-- `/Http`, using http.sys with WinHttp
-- `/MiniHttp`, using the mini http protocol implemented in `VlppOS` repo
+The native remote renderer is not implemented on Linux or macOS. Do not count a
+GacJS run as native-renderer coverage.
 
-`/Http` and `/MiniHttp` are supposed to be compatible with each other, which means the core and the renderer does not need to start with the same HTTP configuration, but such scenario is not required in the verification. Their compatibility is verified in the unit test in `VlppOS`.
+## Step 2. Verify with GacJS
 
-The native renderer means the `RemotingTest_Renderer_Win32` project in GacUI.
+Follow `Tools/DebugGacUIWithGacJS.md` to build and host GacJS, start the core,
+select a browser engine, and clean up retained processes. Follow
+`Tools/DebugGacUISop.md` for the required UI operations and observable results.
 
-### Linux/macOS Specific
+For every transport and browser combination below, run both the `/RPT` and
+`/FCT` sections of the SOP. Start a fresh core for each application.
 
-Not supported yet.
+GacJS is the browser renderer; it is not the native Win32 renderer. `/Pipe`
+cannot be used by a fetch-based browser.
 
-## Step 2. Verify Remote Protocol with GacJS
+Run `npm run test` from `GacJS/Gaclib` before live browser verification. On
+Linux and macOS, the website-entry package skips its Windows-only protocol E2E
+tests while the portable unit-test packages still run. That skip is expected,
+but it does not count as live GacJS coverage.
 
-- Follow `Tools/DebugGacUIWithBrowser.md` to understand how to start the native renderer with GacJS, and how to operate the UI in the renderer.
-- Follow `Tools/DebugGacUISop.md` to perform a series of manual testing on the UI to make sure everything is working.
+### Windows
 
-### Windows Specific
+Verify these transports in order, using a fresh core for each run:
 
-You are going to verify the remote protocol with the following network protocols in order:
-- `/HTTP`, using http.sys with WinHttp
-- `/MiniHttp`, using the mini http protocol implemented in `VlppOS` repo
-GacJS is generally a website, it is compatible with both `/HTTP` and `/MiniHttp`.
+1. `/Http`, using http.sys with WinHTTP.
+2. `/MiniHttp`, using the portable MiniHTTP implementation in VlppOS.
 
-### Linux/macOS Specific
+GacJS is compatible with both `/Http` and `/MiniHttp`.
 
-Not supported yet.
+### macOS
+
+Use `/MiniHttp` and the portable
+`GacUI/Test/Linux/RemotingTest_Core/Bin/RemotingTest_Core`:
+
+1. Run both application scenarios with Playwright Chromium.
+2. Repeat both application scenarios with Playwright WebKit.
+3. Repeat both application scenarios in actual Safari when interactive browser
+   permissions are available.
+
+Playwright WebKit is WebKit compatibility coverage, not actual Safari
+verification. Do not report it as Safari.
+
+### Linux
+
+Use `/MiniHttp`, the portable
+`GacUI/Test/Linux/RemotingTest_Core/Bin/RemotingTest_Core`, and the static
+hosting instructions in `Tools/DebugGacUIWithGacJS.md`. Run the complete GacJS
+scenario in an installed Playwright browser.
+
+The Linux path shares the portable build and hosting design with macOS, but it
+must be executed on Linux before Linux support is reported as verified.

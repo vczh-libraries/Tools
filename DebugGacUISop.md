@@ -2,7 +2,7 @@
 
 This document contains only the renderer-independent UI actions and observable
 results used to catch end-to-end regressions. Use
-[`DebugGacUIWithBrowser.md`](DebugGacUIWithBrowser.md) or
+[`DebugGacUIWithGacJS.md`](DebugGacUIWithGacJS.md) or
 [`DebugGacUIWithRemoteProtocol.md`](DebugGacUIWithRemoteProtocol.md) to
 establish, drive, inspect, replace, and close the renderer session.
 
