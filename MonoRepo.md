@@ -1,15 +1,15 @@
 # MonoRepo Guide
 
 This document describes the relationship between repos and how to work with them.
-The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Workflow, GacUI, Release and WebsiteSource.
+The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Workflow, GacUI, GacJS, iGac, Release and WebsiteSource.
 
-Read `Tools/MonoRepo.md` and compare the content with this file, it anything is changed, override this file with `Tools/MonoRepo.md`.
+Read `Tools/MonoRepo.md` and compare the content with this file. If anything is changed, replace this file with `Tools/MonoRepo.md`.
 
 Use `git` to access repos, `gh` is generally not available. Unless explicitly instructed by me, you are going to work directly on the current branch, which is usually the `master` branch.
 
 ## Must-Read Files
 
-`Project.md` and `.github\copilot-instructions.md` in each repo are must-read before editing the source code.
+`Project.md` and `.github\copilot-instructions.md` in each repo that provides them are must-read before editing the source code. Follow repository-specific `AGENTS.md` instructions as well.
 `.github\copilot-instructions.md` and other contents (including instructions and documents) in each `.github` folder are the same across all repos.
 `Project.md` contains repo specific instructions.
 
@@ -18,6 +18,8 @@ Use `git` to access repos, `gh` is generally not available. Unless explicitly in
 Each repo has an `Import` folder and a `Release` folder.
 The `Import` folder contains files copied from the `Release` folders of depended repos.
 The `Release` folder contains C++ source files that are concatenated from the `Source` folder to largely decrease the number of files.
+
+`Release` is a downstream packaging repository. Maintenance projects should depend on the owning upstream repositories instead of reading framework sources back from `Release`. In particular, iGac assembles its committed `Import` snapshot from `GacUI/Import` and `GacUI/Release`; this keeps iGac eligible to be published into `Release` without a dependency cycle.
 
 ## Fixing Bugs in the Import Folder
 
@@ -28,7 +30,7 @@ and recompile the solution to test it with downstream code.
 
 ## When Updating Knowledge Base Pages
 
-Knowledge base pages are grouped by projects, you should only update pages beloning to a project in its own repo.
+Knowledge base pages are grouped by projects; update each page only in its owning repository. GacUI framework guidance is maintained under `GacUI/.github/KnowledgeBase`.
 
 ## When Updating Document Website
 
@@ -65,7 +67,7 @@ If you can't find this file, the source code is in `VlppParser2/Tools/Codepack`.
 
 Build scripts are in `Tools/Ubuntu`, and `<EACH-REPO>/.github/Ubuntu`.
 When fixing build tools, fix `Tools/Ubuntu` and run `Tools/Ubuntu/vl/cmd/vgo uci` to spread the change to all other C++ repos.
-These build tools are expected to run in Ubuntu and macOS, if anything is different leading to backward compatibility code:
-- Firstly detech bash version, use higher version solution if possible.
-- Secondly detech macOS, use macOS solution if cross-platform way cannot achieve.
+These build tools are expected to run in Ubuntu and macOS. If platform differences require compatibility code:
+- First detect the Bash version and use the newer solution when possible.
+- Then detect macOS if a cross-platform solution is unavailable.
 - Assume we are running on Ubuntu, no further detection needs to do.
