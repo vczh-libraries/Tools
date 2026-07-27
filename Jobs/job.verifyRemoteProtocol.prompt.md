@@ -79,20 +79,21 @@ GacJS is compatible with both `/Http` and `/MiniHttp`.
 Use `/MiniHttp` and the portable
 `GacUI/Test/Linux/RemotingTest_Core/Bin/RemotingTest_Core`:
 
-1. Run both application scenarios with Playwright Chromium.
-2. Repeat both application scenarios with Playwright WebKit.
-3. Repeat both application scenarios in actual Safari when interactive browser
-   permissions are available.
+Run both application scenarios with Playwright WebKit. It is the only required
+Playwright engine on macOS and is the Safari-family automated target. Do not add
+Chromium or Firefox to this platform's verification matrix.
 
-Playwright WebKit is WebKit compatibility coverage, not actual Safari
-verification. Do not report it as Safari.
+Playwright WebKit is not the installed Safari application. Actual Safari is a
+separate manual compatibility check when interactive browser permissions are
+available; do not report the Playwright result as actual Safari verification.
 
 ### Linux
 
 Use `/MiniHttp`, the portable
 `GacUI/Test/Linux/RemotingTest_Core/Bin/RemotingTest_Core`, and the static
-hosting instructions in `GacUI/DebugRemoteProtocolWithGacUI.md`. Run the complete GacJS
-scenario in an installed Playwright browser.
+hosting instructions in `GacUI/DebugRemoteProtocolWithGacUI.md`. Run the
+complete GacJS scenario with Playwright Firefox. Firefox is the only required
+Playwright engine on Linux; do not substitute Chromium or WebKit.
 
 The Linux path shares the portable build and hosting design with macOS, but it
 must be executed on Linux before Linux support is reported as verified.
