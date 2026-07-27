@@ -2,8 +2,8 @@
 
 This document contains only the renderer-independent UI actions and observable
 results used to catch end-to-end regressions. Use
-[`DebugGacUIWithGacJS.md`](DebugGacUIWithGacJS.md) or
-[`DebugGacUIWithRemoteProtocol.md`](DebugGacUIWithRemoteProtocol.md) to
+[`DebugRemoteProtocolWithGacUI.md`](../GacUI/DebugRemoteProtocolWithGacUI.md) or
+[`DebugRemoteProtocolWithNativeRenderer.md`](../GacUI/DebugRemoteProtocolWithNativeRenderer.md) to
 establish, drive, inspect, replace, and close the renderer session.
 
 ## Rules for Every Operation

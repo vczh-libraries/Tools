@@ -26,7 +26,7 @@ remote-protocol implementation and all required protocol features do.
 
 ## Step 1. Verify with the Native Renderer
 
-Follow `Tools/DebugGacUIWithRemoteProtocol.md` to build, start, replace, and
+Follow `GacUI/DebugRemoteProtocolWithNativeRenderer.md` to build, start, replace, and
 stop the native renderer. Follow `Tools/DebugGacUISop.md` for the required UI
 operations and observable results.
 
@@ -50,7 +50,7 @@ GacJS run as native-renderer coverage.
 
 ## Step 2. Verify with GacJS
 
-Follow `Tools/DebugGacUIWithGacJS.md` to build and host GacJS, start the core,
+Follow `GacUI/DebugRemoteProtocolWithGacUI.md` to build and host GacJS, start the core,
 select a browser engine, and clean up retained processes. Follow
 `Tools/DebugGacUISop.md` for the required UI operations and observable results.
 
@@ -91,7 +91,7 @@ verification. Do not report it as Safari.
 
 Use `/MiniHttp`, the portable
 `GacUI/Test/Linux/RemotingTest_Core/Bin/RemotingTest_Core`, and the static
-hosting instructions in `Tools/DebugGacUIWithGacJS.md`. Run the complete GacJS
+hosting instructions in `GacUI/DebugRemoteProtocolWithGacUI.md`. Run the complete GacJS
 scenario in an installed Playwright browser.
 
 The Linux path shares the portable build and hosting design with macOS, but it

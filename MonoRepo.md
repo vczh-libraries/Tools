@@ -39,7 +39,7 @@ Checkout `WebsiteSource/AGENTS.md` for more details.
 ## Debugging GacUI in Browser
 
 Some GacUI issues can be addressed by running the GacUI core with UI in a browser using the website in the GacJS repo.
-GacJS is also part of the release, Check out `Tools\DebugGacUIWithGacJS.md` for details.
+GacJS is also part of the release, Check out `GacUI\DebugRemoteProtocolWithGacUI.md` for details.
 
 ## Windows Specific
 
@@ -52,7 +52,7 @@ If you can't find this file, the source code is in `VlppParser2\Tools\Codepack`.
 
 Remote Protocol is a feature that enables a remote rendering process connecting to headless a GacUI app.
 It is the foundation of GacJS, and of future non-C++ renderers.
-Check out `Tools\DebugGacUIWithRemoteProtocol.md` for details.
+Check out `GacUI\DebugRemoteProtocolWithNativeRenderer.md` for details.
 
 ## Linux/macOS Specific
 
