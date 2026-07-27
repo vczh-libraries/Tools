@@ -78,4 +78,4 @@ Wayland platform implementation for `GacUI` is in `wGac` repo. This repo is dedi
 
 ## macOS Specific (iGac repo)
 
-Wayland platform implementation for `GacUI` is in `iGac` repo. This repo is dedicated for running GacUI applications as actual UI applications on Linux. `iGac/AGENTS.md` must be read before doing any change on this repo.
+macOS platform implementation for `GacUI` is in `iGac` repo. This repo is dedicated for running GacUI applications as actual UI applications on macOS. `iGac/AGENTS.md` must be read before doing any change on this repo.
