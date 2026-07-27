@@ -43,10 +43,16 @@ transports in order, using a fresh core for each run:
 different HTTP implementations. That cross-combination is covered by VlppOS
 unit tests and is not required here.
 
-### Linux and macOS
+### macOS
 
-The native remote renderer is not implemented on Linux or macOS. Do not count a
-GacJS run as native-renderer coverage.
+Use `RemotingTest_Core` from GacUI with `RemotingTest_Renderer_macOS` from iGac.
+Verify `/MiniHttp` with a fresh core for each application scenario. `/Http` and
+`/Pipe` are not part of the macOS native-renderer contract.
+
+### Linux
+
+The native remote renderer is not implemented on Linux. Do not count a GacJS
+run as native-renderer coverage.
 
 ## Step 2. Verify with GacJS
 

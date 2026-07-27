@@ -392,4 +392,76 @@ Do not panic or wait indefinitely. Once a native window is suspected, switch to 
 
 ## macOS Specific
 
-(to be editing...)
+`CocoaAutomationService` handles GacUI windows in a normal application,
+`CocoaAutomationServiceHosted` handles hosted mode, and
+`CocoaAutomationServiceRenderer` handles a native remote renderer. Use their
+HTTP `Controls`/`Dom` and `IO` endpoints for all GacUI-owned UI. Computer use is
+needed only for OS-native modal dialogs.
+
+Full Control Test without `--hosted` deliberately uses native AppKit dialogs.
+A native modal dialog blocks the application's UI thread, so an automation
+request that needs that thread can time out until the dialog is dismissed.
+Stop polling the GacUI endpoint when this happens and inspect the target process
+from a separate `osascript` process.
+
+The terminal, IDE, or agent host running `osascript` needs Accessibility
+permission under **System Settings > Privacy & Security > Accessibility**.
+Do not work around a permission error by repeatedly polling the blocked
+application. Grant permission to the actual host process, then retry the
+read-only inspection.
+
+First list the target application's top-level windows:
+
+```bash
+osascript -e \
+  'tell application "System Events" to tell process "Test_FullControlTest" to return name of every window'
+```
+
+An `NSOpenPanel` or `NSSavePanel` can be a separate top-level window rather
+than a sheet. Its title can also be the application-supplied dialog title, not
+`Open` or `Save`. Inspect every window and its recursively nested controls:
+
+```bash
+osascript <<'APPLESCRIPT'
+tell application "System Events"
+  tell process "Test_FullControlTest"
+    repeat with targetWindow in windows
+      log "WINDOW: " & (name of targetWindow)
+      try
+        log entire contents of targetWindow
+      end try
+    end repeat
+  end tell
+end tell
+APPLESCRIPT
+```
+
+The resulting object descriptions include the exact hierarchy needed for the
+next command. For example, the Full Control Test open-file panel exposes
+`Cancel` and `Open` under its first splitter group. Prefer the least destructive
+action when the goal is only to unblock the test:
+
+```bash
+osascript -e \
+  'tell application "System Events" to tell process "Test_FullControlTest" to click button "Cancel" of splitter group 1 of window "The Title"'
+```
+
+Do not assume that hierarchy for another macOS version or dialog type. Re-read
+`entire contents`, identify the button by its visible name, and use the exact
+reported containment path. For a message dialog, choose the button after
+reading its prompt. For file, color, and font panels, use the named controls
+reported by Accessibility; canceling is preferable unless the scenario
+requires accepting a specific value.
+
+If a visual check is necessary, take a screenshot without interacting with the
+dialog:
+
+```bash
+screencapture -x /tmp/gacui-native-dialog.png
+```
+
+After dismissing or accepting the native dialog, require the top-level dialog
+window to disappear, then return to the GacUI automation endpoint and verify
+the resulting application state. Hosted Full Control Test uses
+`FakeDialogService`; those dialogs remain inside the GacUI control tree and do
+not require this native-dialog procedure.
