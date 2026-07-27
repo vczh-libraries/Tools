@@ -51,8 +51,14 @@ Verify `/MiniHttp` with a fresh core for each application scenario. `/Http` and
 
 ### Linux
 
-The native remote renderer is not implemented on Linux. Do not count a GacJS
-run as native-renderer coverage.
+Use `RemotingTest_Core` from GacUI with `RemotingTest_Renderer_Wayland` from
+wGac. Verify `/MiniHttp` with a fresh core for each `/RPT` and `/FCT`
+application scenario. `/Http` and `/Pipe` are not part of the Linux
+native-renderer contract.
+
+Complete the shared renderer replacement, takeover, state-continuity, and
+shutdown checks for `/RPT`. Complete the full `/FCT` UI scenario with its own
+fresh core. A GacJS run does not count as Linux native-renderer coverage.
 
 ## Step 2. Verify with GacJS
 
