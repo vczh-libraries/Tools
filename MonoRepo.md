@@ -71,3 +71,11 @@ These build tools are expected to run in Ubuntu and macOS. If platform differenc
 - First detect the Bash version and use the newer solution when possible.
 - Then detect macOS if a cross-platform solution is unavailable.
 - Assume we are running on Ubuntu, no further detection needs to do.
+
+## Linux Specific (wGac repo)
+
+Wayland platform implementation for `GacUI` is in `wGac` repo. This repo is dedicated for running GacUI applications as actual UI applications on Linux. `wGac/AGENTS.md` must be read before doing any change on this repo.
+
+## macOS Specific (iGac repo)
+
+Wayland platform implementation for `GacUI` is in `iGac` repo. This repo is dedicated for running GacUI applications as actual UI applications on Linux. `iGac/AGENTS.md` must be read before doing any change on this repo.
