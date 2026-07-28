@@ -27,7 +27,7 @@ remote-protocol implementation and all required protocol features do.
 ## Step 1. Verify with the Native Renderer
 
 Follow `GacUI/DebugRemoteProtocolWithNativeRenderer.md` to build, start, replace, and
-stop the native renderer. Follow `GacUI/DebugGacUISop.md` for the required UI
+stop the native renderer. Follow `GacUI/DebugRemoteProtocolSop.md` for the required UI
 operations and observable results.
 
 ### Windows
@@ -64,7 +64,7 @@ fresh core. A GacJS run does not count as Linux native-renderer coverage.
 
 Follow `GacUI/DebugRemoteProtocolWithGacUI.md` to build and host GacJS, start the core,
 select a browser engine, and clean up retained processes. Follow
-`GacUI/DebugGacUISop.md` for the required UI operations and observable results.
+`GacUI/DebugRemoteProtocolSop.md` for the required UI operations and observable results.
 
 For every transport and browser combination below, run both the `/RPT` and
 `/FCT` sections of the SOP. Start a fresh core for each application.
