@@ -3,8 +3,8 @@
 # Orders
 
 - Process staged tasks one by one with verification [19]
-- Verify generated artifacts with downstream consumer checks [15]
-- Port fixes from imports to source repositories [13]
+- Verify generated artifacts with downstream consumer checks [16]
+- Port fixes from imports to source repositories [14]
 - Crash early instead of adding error-tolerance fallbacks [9]
 - Keep design documentation aligned with code after refactoring [8]
 - Proactively remove code made redundant by refactoring [8]
@@ -25,6 +25,7 @@
 - Prefer well-defined tests over ambiguous edge cases [2]
 - Prefer raw pointers unless shared ownership is required [2]
 - Start async callbacks after most-derived construction [2]
+- Sort serialization metadata by deterministic keys, not pointer addresses [2]
 - Prefer `operator<=> = default` for lexicographic key structs [1]
 - Prefer two-pointer merge for sorted range maps [1]
 - Use named sentinel constants instead of raw values [1]
@@ -32,7 +33,6 @@
 - Avoid references into containers when mutating them [1]
 - Prefer designated initializers for aggregate-like structs [1]
 - Construct `Nullable<WString>` explicitly in function calls [1]
-- Sort serialization metadata by deterministic keys, not pointer addresses [1]
 - Do not rely on `Event<T>` handler invocation order [1]
 - Use RAII scope cleanup instead of manual catch cleanup [1]
 - `collections::Dictionary` copy assignment is deleted (use move/swap) [1]
