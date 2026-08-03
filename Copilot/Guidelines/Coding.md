@@ -30,6 +30,10 @@ Check out [Coding_MultiThreading.md](./Coding_MultiThreading.md).
 
 ## C++ Coding Convention
 
+- Anonymouse namespace `namespace{}` is not welcomed:
+  - DO NOT generate such construction.
+  - When you edit any existing code and see this, remove that anonymouse namespace and fix the indentation of the content.
+  - The reason is that, moust of cpp files will be merged into one single file apon release, all benefits are gone meanwhile the code looks messy.
 - Although C++ does not require this but we want to have `extern` on all function forward declarations.
   - In general we don't use `inline` in header files unless such function is performance critical, e.g. very simple comparison operators.
 - Rules for C++ header files:
