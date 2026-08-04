@@ -17,6 +17,10 @@ When the model `gpt-5.3-codex-spark` is available:
   - When it is crashed, sometimes (but not always) a native dialog would show and block the process.
   - Native dialogs could be proactivately called from a GacUI application, even when `FakeDialogService` is not used.
   - If you believe the processing is blocked or is running too long, you are going to check out `Running-ComputerUse.md` and deal with it.
+- While polling automation endpoints or waiting for application processes, repeatedly inspect the target processes for a top-level window titled exactly `Microsoft Visual C++ Runtime Library`.
+  - Treat this window as a blocking crash signal immediately. Do not keep retrying the application-level endpoint, because the modal dialog can block the UI thread and make a crash look like an ordinary timeout.
+  - Capture the dialog text and buttons with the Win32 procedure in `Running-ComputerUse.md`, dismiss it deliberately, and record the process exit code.
+  - Check again after every automation timeout and before declaring a run successful.
 
 ### Automation Service via HTTP
 
@@ -36,6 +40,7 @@ When `StartWindowsHttpAutomationService` is used during startup up a GacUI appli
 - GET `.../Dom`, for remote protocol renderer, exposing the DOM tree.
   - Read comment for DumpRemoteProtocolRenderingDom` for the schema.
 - POST `.../IO` or `IO/<WINDOW-ID>`
+  - Set `Content-Type` to exactly `application/json; charset=utf8`. The Windows HTTP implementation validates this value before reading the UTF-8 command body.
   - IRead comment for `RunIOCommandOnNativeWindow` for the schema.
   - `<WINDOW-ID>` is the window id returning from `.../Controls`.
   - The window ID can be comitted for the main window.
