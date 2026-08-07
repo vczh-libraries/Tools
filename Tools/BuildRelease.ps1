@@ -26,6 +26,12 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Release\Gac*.h .\Import
         Copy-Item ..\GacUI\Release\Gac*.cpp .\Import
         Copy-Item ..\GacUI\Release\DarkSkin* .\Import\Skins\DarkSkin
+        Remove-Item -Path @(
+            ".\Import\Test.RemotingHelpers.h",
+            ".\Import\Test.RemotingHelpers.cpp",
+            ".\Import\Test.RemotingHelpers.Windows.h",
+            ".\Import\Test.RemotingHelpers.Windows.cpp"
+        ) -Force -ErrorAction SilentlyContinue
 
         # Copy Metadata
         Copy-Item ..\VlppParser2\Source\Json\Generated\*.d.ts .\Import\Metadata\
