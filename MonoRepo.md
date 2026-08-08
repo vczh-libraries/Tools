@@ -2,10 +2,9 @@
 
 This document describes the relationship between repos and how to work with them.
 The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Workflow, GacUI, GacJS, iGac, Release and WebsiteSource.
-
 Read `Tools/MonoRepo.md` and compare the content with this file. If anything is changed, replace this file with `Tools/MonoRepo.md`.
-
 Use `git` to access repos, `gh` is generally not available. Unless explicitly instructed by me, you are going to work directly on the current branch, which is usually the `master` branch.
+When `job:*` is mentioned, it means either `Tools/Jobs/job.*.prompt.md` or `Tools/Jobs/job.Windows.*.prompt.md`.
 
 ## Must-Read Files
 
