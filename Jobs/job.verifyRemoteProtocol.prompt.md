@@ -45,9 +45,15 @@ unit tests and is not required here.
 
 ### macOS
 
-Use `RemotingTest_Core` from GacUI with `RemotingTest_Renderer_macOS` from iGac.
-Verify `/MiniHttp` with a fresh core for each application scenario. `/Http` and
-`/Pipe` are not part of the macOS native-renderer contract.
+Use `RemotingTest_Core` from GacUI with `RemotingTest_Rendering_macOS` from
+iGac. Verify `/MiniHttp` with a fresh core for each `/RPT`, `/FCT`, and `/RVMT`
+application scenario. `/Http` and `/Pipe` are not part of the macOS
+native-renderer contract. The renderer automation port defaults to 8889. Keep
+the active renderer on 8889 and launch the takeover renderer with
+`iGac/test.sh --app:renderer --port:8890`; the option changes only its
+automation listener, not its `/MiniHttp` connection to Core on port 8888. For
+`/RVMT`, start `RemotingTest_RvmHost /MiniHttp` after Core and before the
+renderer.
 
 ### Linux
 
@@ -65,7 +71,7 @@ fresh core. A GacJS run does not count as Linux native-renderer coverage.
 
 ## Step 2. Verify with GacJS
 
-Follow `GacUI/DebugRemoteProtocolWithGacUI.md` to build and host GacJS, start the core,
+Follow `GacUI/DebugRemoteProtocolWithGacJS.md` to build and host GacJS, start the core,
 select a browser engine, and clean up retained processes. Follow
 `GacUI/DebugRemoteProtocolSop.md` for the required UI operations and observable results.
 
@@ -106,7 +112,7 @@ available; do not report the Playwright result as actual Safari verification.
 
 Use `/MiniHttp`, the portable
 `GacUI/Test/Linux/RemotingTest_Core/Bin/RemotingTest_Core`, and the static
-hosting instructions in `GacUI/DebugRemoteProtocolWithGacUI.md`. Run the
+hosting instructions in `GacUI/DebugRemoteProtocolWithGacJS.md`. Run the
 complete GacJS scenario with Playwright Firefox. Firefox is the only required
 Playwright engine on Linux; do not substitute Chromium or WebKit.
 
