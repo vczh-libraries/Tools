@@ -51,7 +51,7 @@ Verify `/MiniHttp` with a fresh core for each application scenario. `/Http` and
 
 ### Linux
 
-Use `RemotingTest_Core` from GacUI with `RemotingTest_Renderer_Wayland` from
+Use `RemotingTest_Core` from GacUI with `RemotingTest_Rendering_Wayland` from
 wGac. Verify `/MiniHttp` with a fresh core for each `/RPT` and `/FCT`
 application scenario. `/Http` and `/Pipe` are not part of the Linux
 native-renderer contract. The renderer automation port defaults to 8889. Keep
