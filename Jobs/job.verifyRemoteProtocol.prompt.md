@@ -54,7 +54,10 @@ Verify `/MiniHttp` with a fresh core for each application scenario. `/Http` and
 Use `RemotingTest_Core` from GacUI with `RemotingTest_Renderer_Wayland` from
 wGac. Verify `/MiniHttp` with a fresh core for each `/RPT` and `/FCT`
 application scenario. `/Http` and `/Pipe` are not part of the Linux
-native-renderer contract.
+native-renderer contract. The renderer automation port defaults to 8889. Keep
+the active renderer on 8889 and launch the takeover renderer with
+`wGac/test.sh --app:renderer --port:8890`; the option changes only its
+automation listener, not its `/MiniHttp` connection to Core on port 8888.
 
 Complete the shared renderer replacement, takeover, state-continuity, and
 shutdown checks for `/RPT`. Complete the full `/FCT` UI scenario with its own
