@@ -30,7 +30,9 @@ function Build-Release-Update() {
             ".\Import\Test.RemotingHelpers.h",
             ".\Import\Test.RemotingHelpers.cpp",
             ".\Import\Test.RemotingHelpers.Windows.h",
-            ".\Import\Test.RemotingHelpers.Windows.cpp"
+            ".\Import\Test.RemotingHelpers.Windows.cpp",
+            ".\Import\Test.RemotingHelpers.Linux.h",
+            ".\Import\Test.RemotingHelpers.Linux.cpp"
         ) -Force -ErrorAction SilentlyContinue
 
         # Copy Metadata
