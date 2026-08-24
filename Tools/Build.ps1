@@ -112,6 +112,12 @@ function Task-Workflow {
     Write-Title Build-Workflow
     Import-Workflow
     Build-Workflow
+    $rpcStdioScript = Resolve-Path $PSScriptRoot\..\..\Workflow\Test\StartRpcStdio.ps1
+    $powerShell = (Get-Process -Id $PID).Path
+    Start-Process-And-Wait (,(
+        $powerShell,
+        "-NoProfile -ExecutionPolicy Bypass -File `"$rpcStdioScript`" -Configuration Release -Platform x64"
+    )) $true
     Release-Workflow
 }
 

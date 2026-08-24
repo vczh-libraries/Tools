@@ -306,6 +306,24 @@ function VBuild {
             popd > /dev/null
         done
 
+        if [ "$1" == "Workflow" ]; then
+            printf "${VC_LIGHTGREEN}  ./Test/StartRpcStdio.sh${VC_DEFAULT}\n"
+            local RPC_STDIO_OUT
+            RPC_STDIO_OUT="$( (./Test/StartRpcStdio.sh) 2>&1 )"
+            local RPC_STDIO_RC=$?
+            if [ ${RPC_STDIO_RC} -ne 0 ]; then
+                {
+                    printf "RPC Stdio Test Failed\n"
+                    printf "Project: %s\n" "$1"
+                    printf "ExitCode: %s\n" "${RPC_STDIO_RC}"
+                    printf "%s\n" "${RPC_STDIO_OUT}"
+                    printf "\n"
+                } >> "${LOG_FILE}"
+                printf "${VC_RED}  FAILED (crashed)${VC_DEFAULT}\n"
+                LOG_WRITTEN=1
+            fi
+        fi
+
         # if nothing needs to be written to the log, delete that log file, ignore deletion failure
         if [ ${LOG_WRITTEN} -eq 0 ]; then
             rm -f "${LOG_FILE}" 2>/dev/null || true
