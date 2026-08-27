@@ -307,9 +307,9 @@ function VBuild {
         done
 
         if [ "$1" == "Workflow" ]; then
-            printf "${VC_LIGHTGREEN}  ./Test/StartRpcStdio.sh${VC_DEFAULT}\n"
+            printf "${VC_LIGHTGREEN}  ./Test/StartRpcStdio.sh ./Test/StartRpcStdio_SharedMemspSkipList.txt${VC_DEFAULT}\n"
             local RPC_STDIO_OUT
-            RPC_STDIO_OUT="$( (./Test/StartRpcStdio.sh) 2>&1 )"
+            RPC_STDIO_OUT="$( (./Test/StartRpcStdio.sh ./Test/StartRpcStdio_SharedMemspSkipList.txt) 2>&1 )"
             local RPC_STDIO_RC=$?
             if [ ${RPC_STDIO_RC} -ne 0 ]; then
                 {
