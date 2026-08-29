@@ -10,6 +10,8 @@ function Build-Release-Update() {
         New-Item .\Import\Skins\DarkSkin -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         New-Item .\Import\Metadata -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         New-Item .\Import\Metadata\RemoteProtocol -ItemType directory -ErrorAction SilentlyContinue | Out-Null
+        Remove-Item .\Import-Test -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item .\Import-Test -ItemType directory | Out-Null
         Copy-Item ..\Vlpp\Release\*.h .\Import
         Copy-Item ..\Vlpp\Release\*.cpp .\Import
         Copy-Item ..\Vlpp\Release\*.natvis .\Import
@@ -34,6 +36,9 @@ function Build-Release-Update() {
             ".\Import\Test.RemotingHelpers.Linux.h",
             ".\Import\Test.RemotingHelpers.Linux.cpp"
         ) -Force -ErrorAction SilentlyContinue
+        Copy-Item ..\GacUI\Release\Test.RemotingHelpers.h .\Import-Test
+        Copy-Item ..\GacUI\Release\Test.RemotingHelpers.cpp .\Import-Test
+        Copy-Item ..\GacUI\Test\RemotingHelpers\README.md .\Import-Test
 
         # Copy Metadata
         Copy-Item ..\VlppParser2\Source\Json\Generated\*.d.ts .\Import\Metadata\
