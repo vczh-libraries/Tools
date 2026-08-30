@@ -6,6 +6,7 @@ You are going to add tags to all these repos:
 - VlppParser2
 - Workflow
 - GacUI
+- Release
 - GacJS
 - wGac
 - iGac
@@ -26,6 +27,7 @@ Go through each repos
 ## Tag Label
 
 The following repos will use `Release TAG` as its description:
+- Release
 - GacJS
 - wGac
 - iGac
