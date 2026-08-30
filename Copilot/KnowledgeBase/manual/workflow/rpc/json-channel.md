@@ -190,7 +190,7 @@ public:
 	WaitForClientResult OnClientConnected(
 		vint clientId,
 		const JsonChannelClient::ChannelNameList& availableChannels,
-		JsonChannelClient* localClient) override
+		Ptr<JsonChannelClient> localClient) override
 	{
 		if (!availableChannels.Contains(WString::Unmanaged(RpcChannelName)))
 		{

@@ -43,7 +43,7 @@ protected:
     inter_process::WaitForClientResult OnClientConnected(
         vint clientId,
         const IJsonChannelClient::ChannelNameList& availableChannels,
-        IJsonChannelClient* localClient) override
+        Ptr<IJsonChannelClient> localClient) override
     {
         if (localClient)
         {

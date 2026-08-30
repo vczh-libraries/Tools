@@ -128,7 +128,7 @@ Implement these interfaces for a new transport:
 - **INetworkProtocolConnection**: install or uninstall one callback, start the asynchronous read loop, send one string message and stop the connection.
 - **INetworkProtocolCallback**: receive strings, remote errors, local errors, connected and disconnected events. Callback methods may run on any thread, so implementations and users must be thread-safe.
 - **INetworkProtocolClient**: own one connection, block in **WaitForServer** until the connection is established or fails, and report **ClientStatus**.
-- **INetworkProtocolServer**: start accepting, call **OnClientConnected** for accepted transport connections, stop all owned connections and report stopped state.
+- **INetworkProtocolServer**: start accepting, call **OnClientConnected** with the producer's existing **Ptr<INetworkProtocolConnection>**, stop all owned connections and report stopped state.
 
 **InstallCallback** should call **OnInstalled** with the connection. Passing **nullptr** uninstalls the callback. **BeginReadingLoopUnsafe** starts receiving messages asynchronously, but callers must tolerate implementations that have already received data after the callback was installed. **Stop** is the shutdown boundary; after it returns, pending transport callbacks should no longer touch the stopped object.
 
@@ -192,7 +192,7 @@ public:
     WaitForClientResult OnClientConnected(
         vint clientId,
         const IChannelClient<WString>::ChannelNameList& availableChannels,
-        IChannelClient<WString>* localClient) override
+        Ptr<IChannelClient<WString>> localClient) override
     {
         return availableChannels.Contains(ChatChannelName)
             ? WaitForClientResult::Accept
