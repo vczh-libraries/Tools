@@ -24,6 +24,10 @@ Go through each repos
     - If this is not a "force" request, skip this repo and continue to the next one.
     - If this is a "force" request, run `git tag --force -a TAG -m "TAG-LABEL"` followed by `git push --force origin --tags`.
 
+## Release
+
+Update `Release/README.md` in the `Synchronized latest releases` section with the new tag.
+
 ## Tag Label
 
 The following repos will use `Release TAG` as its description:
