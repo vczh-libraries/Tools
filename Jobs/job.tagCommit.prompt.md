@@ -26,8 +26,10 @@ Go through each repos
 
 ## Release
 
-Update `Release/README.md` in the `Synchronized latest releases` section with the new tag.
-Make sure to commit and push this file.
+Update `Release/README.md` in the `Synchronized latest releases` section with the new tag:
+- Replace the latest release section instead of adding a new one.
+- Make sure to commit and push this file.
+- This is the commit that must be tagged.
 
 ## Tag Label
 
