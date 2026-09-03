@@ -27,6 +27,7 @@ Go through each repos
 ## Release
 
 Update `Release/README.md` in the `Synchronized latest releases` section with the new tag.
+Make sure to commit and push this file.
 
 ## Tag Label
 
