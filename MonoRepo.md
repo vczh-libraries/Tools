@@ -5,6 +5,7 @@ The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Wor
 Read `Tools/MonoRepo.md` and compare the content with this file. If anything is changed, replace this file with `Tools/MonoRepo.md`.
 Use `git` to access repos, `gh` is generally not available. Unless explicitly instructed by me, you are going to work directly on the current branch, which is usually the `master` branch.
 When `job:*` is mentioned, it means either `Tools/Jobs/job.*.prompt.md` or `Tools/Jobs/job.Windows.*.prompt.md`.
+When commit and/or push are required, you should always commit and push once finishing a request, no matter whatever is pending or not. Github repos and clones are more for the backup purpose, there is no strong requirement of completeness of tasks before committing.
 
 ## Must-Read Files
 
