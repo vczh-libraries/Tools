@@ -237,6 +237,10 @@ The client uses two physical `async_tcp_socket::SocketHttpClientApi` lanes for o
 
 The server maps the token to its logical connection, queues server messages when no receive request is available, and dispatches client messages through `INetworkProtocolCallback::OnReadString`. A successful nonempty `/Request` response starts a five-second acknowledgement deadline. The client submits its replacement `/Request` before delivering the message to its callback, and that replacement is the implicit acknowledgement that cancels the deadline. If the response cannot be delivered, the server first restores its message to the FIFO head; if the replacement poll does not arrive in time, the server treats the logical connection as lost. Both cases report a nonfatal local error. A raw callback may decline promotion, while an admitted `NetworkProtocolChannelServer` connection promotes the error, stops, unregisters the token and causes any late `/Request` carrying that token to receive 404. There is no heartbeat or explicit disconnect exchange, so an idle HTTP peer loss remains unknown until the server first attempts to deliver a message.
 
+### Windows HTTP Callback Responses
+
+The Windows `windows_http::HttpServerConnection` in `Source/InterProcess/Windows/HttpServer.Windows.cpp` can return the first message generated during an inbound `/Response` callback in that HTTP response. Extra messages are queued for `/Request` delivery. When `SubmitResponse` finishes, it must also send the queue head through any poll already waiting; otherwise the client can wait on an open poll while the server waits for a reply to its unsent message. The normal poll-delivery error and acknowledgement handling applies to this send.
+
 ## Starting on Windows, Linux and macOS
 
 High-level Socket HTTP construction and startup are identical on all supported platforms:
