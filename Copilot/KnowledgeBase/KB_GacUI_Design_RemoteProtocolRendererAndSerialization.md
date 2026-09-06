@@ -133,7 +133,7 @@ Remote-view-model remoting support is organized in `Test/RemotingHelpers/Rvmt/`.
 
 ### RemotingTest_Core (Console Application)
 
-Located at `Test/GacUISrc/RemotingTest_Core/`. Accepts `/Pipe` or `/Http` arguments to start either a named-pipe server or HTTP server.
+Located at `Test/GacUISrc/RemotingTest_Core/`. Accepts `/Pipe`, `/Http`, or `/MiniHttp` arguments to start a named-pipe, Windows HTTP, or portable MiniHTTP server.
 
 **Protocol stack setup** (`StartServer<TServerBase>` in `GuiMain.cpp`):
 1. `StartNamedPipeServer`, `StartHttpServer`, or `StartMiniHttpServer` constructs the matching `RemotingChannelServer<TServerBase>`. `/RVMT` constructs `RemoteViewModelChannelServer<TServerBase>`, which adds exact RVM-host admission while preserving the base renderer behavior.
@@ -147,7 +147,7 @@ Located at `Test/GacUISrc/RemotingTest_Core/`. Accepts `/Pipe` or `/Http` argume
 
 ### RemotingTest_Rendering_Win32 (Windows Application)
 
-Located at `Test/GacUISrc/RemotingTest_Rendering_Win32/`. Accepts `/Pipe` or `/Http` arguments to start as a named-pipe or HTTP client.
+Located at `Test/GacUISrc/RemotingTest_Rendering_Win32/`. Accepts `/Pipe`, `/Http`, or `/MiniHttp` arguments to start as a named-pipe, Windows HTTP, or portable MiniHTTP client.
 
 **Protocol stack setup** (`StartClient` in `GuiMain.cpp`; this function is not a template):
 1. Receives a named-pipe, Windows HTTP, or MiniHTTP `INetworkProtocolClient` and creates the shared `RemoteProtocolRendererClient`, derived from `GuiRemoteProtocolChannelClient`, over it.
@@ -170,12 +170,12 @@ SetupRemoteNativeController
         → GuiRemoteProtocolAsyncJsonChannel
           → GuiRemoteProtocolLocalChannelClient / IJsonChannel
             → GuiRemoteProtocolNetworkChannelServer<TServerBase>
-              → Named pipe or HTTP transport
+              → Named pipe, Windows HTTP, or MiniHTTP transport
 ```
 
 **Renderer side** (messages flow inward):
 ```
-Named pipe or HTTP transport
+Named pipe, Windows HTTP, or MiniHTTP transport
   → GuiRemoteProtocolChannelClient / IJsonChannel
     → GuiRemoteProtocolAsyncJsonChannelRenderer
       → GuiRemoteProtocolRendererChannel

@@ -128,7 +128,7 @@ public:
     {
         try
         {
-            Stop();
+            this->Stop();
         }
         catch (...)
         {

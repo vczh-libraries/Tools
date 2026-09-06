@@ -2,7 +2,7 @@
 
 `vl::console::TUI`, declared in [TUI.h](../../Source/TUI/TUI.h), provides a cross-platform terminal takeover, owner-thread event loop, cell buffer, and drawing API. It is intended for applications that redraw the visible terminal as a complete user interface instead of using sequential `vl::console::Console` input and output.
 
-All names on this page are in the `vl::console` namespace unless another namespace is shown.
+All names on this page are in the `vl::console` namespace unless another namespace is shown. The shared input types `WindowMouseInfo`, `NativeMouseButton`, `NativeWindowKeyInfo`, `NativeWindowCharInfo` and `VKEY` are in `vl::presentation`, declared in [TUITypes.h](../../Source/TUI/TUITypes.h).
 
 ## Starting and Stopping TUI
 
@@ -22,7 +22,7 @@ public:
 		Redraw();
 	}
 
-	void Char(const TuiCharInfo& info) override
+	void Char(const vl::presentation::NativeWindowCharInfo& info) override
 	{
 		if (info.code == L'\x1B')
 		{
@@ -150,7 +150,7 @@ All `ITuiCallback` methods have default no-op implementations, so a listener onl
 
 ### Mouse Events
 
-`TuiMouseInfo` reports terminal-cell coordinates, wheel information, best-effort modifier state, and current left, middle, and right button state. `TuiMouseButton` identifies the button for down, up, and double-click callbacks.
+`WindowMouseInfo` reports terminal-cell coordinates, wheel information, best-effort modifier state, and current left, middle, and right button state. `NativeMouseButton` identifies the button for down, up, and double-click callbacks.
 
 Available callbacks are:
 
@@ -163,13 +163,13 @@ Available callbacks are:
 
 ### Key Events
 
-`TuiKeyInfo` carries modifier and repeat information, but `TuiKeyInfo::code` is reserved for future key-code translation. Do not depend on a portable nonzero key code. Use `ITuiCallback::Char` for text and character controls.
+`NativeWindowKeyInfo` carries modifier and repeat information, and its `code` is a `VKEY` value. `ITuiCallback::KeyDown` and `KeyUp` receive this type; the Windows backend emits both, while the current POSIX decoder emits key-down events only. Untranslated keys use `VKEY::KEY_UNKNOWN`. Use `ITuiCallback::Char` for text and character controls.
 
 Modifier fields are best effort. A terminal protocol that cannot distinguish Shift or Caps Lock from the resulting character reports the unobservable fields as false.
 
 ### Character Events Use Native `wchar_t` Units
 
-`TuiCharInfo::code` is exactly one platform-native `wchar_t` code unit, not necessarily one complete Unicode scalar.
+`NativeWindowCharInfo::code` is exactly one platform-native `wchar_t` code unit, not necessarily one complete Unicode scalar.
 
 - On Windows, `wchar_t` is UTF-16. A supplementary scalar arrives as separate high- and low-surrogate `Char` callbacks in native order. Other event types may occur between them, and a stop requested after the high surrogate suppresses the queued low surrogate.
 - On Linux and macOS, `wchar_t` is UTF-32. A decoded scalar normally arrives in one `Char` callback.
@@ -198,7 +198,7 @@ The timer:
 
 `TuiPixel` represents one terminal cell. Its `glyph` selects the active union member:
 
-- `TuiPixelGlyph::Char` stores an empty cell (`c == 0`) or one Unicode scalar.
+- `TuiPixelGlyph::Char` stores a `TuiCharPixel` in `character`, containing an empty cell (`character.c == 0`) or one Unicode scalar and its `TuiTextStyle`.
 - `TuiPixelGlyph::Mergeable` stores four independently styled box-drawing arms.
 - `TuiPixelGlyph::Unmergeable` stores a rounded corner and its direction.
 - `TuiPixelGlyph::WideCharContinuation` marks the second cell occupied by a width-two scalar.
@@ -225,7 +225,7 @@ Each arm in `TuiMergeablePixel` is independently `None`, `ThinLine`, `ThickLine`
 - `1` means one terminal cell.
 - `2` means two terminal cells.
 
-This API works with Unicode scalars, while `TuiCharInfo::code` works with native `wchar_t` units. Convert character input before measuring it when the native encoding can use multiple units.
+This API works with Unicode scalars, while `NativeWindowCharInfo::code` works with native `wchar_t` units. Convert character input before measuring it when the native encoding can use multiple units.
 
 The cell model intentionally does not perform grapheme shaping, combining sequences, variation sequences, emoji ZWJ sequences, bidirectional layout, or complex-script layout. Each printable scalar is measured and stored independently.
 
@@ -259,7 +259,7 @@ Buffer-explicit overloads require a non-null buffer and positive dimensions.
 
 ### Printing Characters
 
-`TuiPrintOptions` supplies foreground and background colors.
+`TuiPrintOptions` supplies foreground and background colors and a `TuiTextStyle` with `bold`, `italic`, `underline` and `strikeline` flags. The style applies to nonempty character cells; its visible effect depends on the terminal and font.
 
 `TUI::PrintChar`:
 
