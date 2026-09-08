@@ -69,6 +69,29 @@ function Release-GacUI {
         Pop-Location
     }
 
+    # Update TuiSkin from the same authored resources used by GacUI_Compiler.
+    Write-Host "Update GacUI::TuiSkin ..."
+    $tuiSkinRoot = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Source\Skins\TuiSkin")
+    $tuiSkinSource = Join-Path $tuiSkinRoot "Source"
+    [System.IO.Directory]::CreateDirectory($tuiSkinSource) | Out-Null
+    Get-ChildItem -LiteralPath $tuiSkinRoot -Filter *.xml -File | ForEach-Object {
+        Remove-Item -LiteralPath $_.FullName
+    }
+    Copy-Item "$PSScriptRoot\..\..\GacUI\Test\Resources\App\TuiSkin\*.xml" $tuiSkinRoot
+    Push-Location $tuiSkinRoot
+    try {
+        & $PSScriptRoot\GacGen.ps1 -FileName Resource.xml
+    }
+    finally {
+        Pop-Location
+    }
+    foreach ($extension in @("h", "cpp")) {
+        $config = [System.IO.File]::ReadAllText("$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Generated_TuiSkin\TuiSkinConfig.$extension")
+        $config = $config.Replace('../../../Source/GacUI.h', '../../../GacUI.h')
+        $config = $config.Replace('Source_x64/TuiSkin.h', 'TuiSkin.h').Replace('Source_x86/TuiSkin.h', 'TuiSkin.h')
+        [System.IO.File]::WriteAllText((Join-Path $tuiSkinSource "TuiSkinConfig.$extension"), $config)
+    }
+
     # Release again
     Release-Project GacUI
 }
