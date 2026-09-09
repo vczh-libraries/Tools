@@ -8,6 +8,7 @@ function Build-Release-Update() {
         Write-Host "Copying Source Code ..."
         New-Item .\Import\Skins -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         New-Item .\Import\Skins\DarkSkin -ItemType directory -ErrorAction SilentlyContinue | Out-Null
+        New-Item .\Import\Skins\TuiSkin -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         New-Item .\Import\Metadata -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         New-Item .\Import\Metadata\RemoteProtocol -ItemType directory -ErrorAction SilentlyContinue | Out-Null
         Remove-Item .\Import-Test -Recurse -Force -ErrorAction SilentlyContinue
@@ -28,6 +29,7 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Release\Gac*.h .\Import
         Copy-Item ..\GacUI\Release\Gac*.cpp .\Import
         Copy-Item ..\GacUI\Release\DarkSkin* .\Import\Skins\DarkSkin
+        Copy-Item ..\GacUI\Release\TuiSkin* .\Import\Skins\TuiSkin
         Remove-Item -Path @(
             ".\Import\Test.RemotingHelpers.h",
             ".\Import\Test.RemotingHelpers.cpp",
@@ -84,6 +86,38 @@ function Build-Release-Update() {
         Remove-Item .\FullControlTest -Force -Recurse | Out-Null
         Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\App\FullControlTest . -Recurse | Out-Null
         Pop-Location
+
+        # ControlTemplate\TuiSkin
+        Write-Host "Deploying Tutorial\GacUI_ControlTemplate\TuiSkin ..."
+        $tuiTutorial = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\TuiSkin")
+        $tuiResources = Join-Path $tuiTutorial "UI\TuiControlTest"
+        if (-not $tuiResources.StartsWith($tuiTutorial + "\", [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Unexpected TuiControlTest resource target: $tuiResources"
+        }
+        if (Test-Path -LiteralPath $tuiResources) {
+            Remove-Item -LiteralPath $tuiResources -Recurse -Force
+        }
+        New-Item -Path (Join-Path $tuiTutorial "UI") -ItemType Directory -Force | Out-Null
+        Copy-Item -LiteralPath "$PSScriptRoot\..\..\GacUI\Test\Resources\App\TuiControlTest" -Destination $tuiResources -Recurse
+
+        # Reapply packaged includes and the non-code resource path after every copy.
+        $tuiResourceFile = Join-Path $tuiResources "Resource.xml"
+        $tuiResource = [xml](Get-Content -LiteralPath $tuiResourceFile -Raw)
+        $tuiCpp = $tuiResource.SelectSingleNode("/Resource/Folder[@name='GacGenConfig']/Folder[@name='Cpp']")
+        $tuiSettings = [ordered]@{
+            NormalInclude = "GacUI.h;Skins/TuiSkin/TuiSkin.h"
+            Resource = "../../../UIRes/TuiSkin.bin"
+        }
+        foreach ($name in $tuiSettings.Keys) {
+            $setting = $tuiCpp.SelectSingleNode("Text[@name='$name']")
+            if (-not $setting) {
+                $setting = $tuiResource.CreateElement("Text")
+                $setting.SetAttribute("name", $name)
+                $tuiCpp.AppendChild($setting) | Out-Null
+            }
+            $setting.InnerText = $tuiSettings[$name]
+        }
+        $tuiResource.Save($tuiResourceFile)
     }
     catch {
         throw
