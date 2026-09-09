@@ -29,6 +29,7 @@ function RepoCheckAllDirty([String]$name) {
 }
 
 function RepoSyncVersioned([String]$name, [bool]$oldVersions) {
+    Write-Host "========================================"
     Write-Host "Pulling repo: $name ..."
 
     Set-Location $PSScriptRoot\..\..\$name | Out-Null
@@ -41,6 +42,7 @@ function RepoSyncVersioned([String]$name, [bool]$oldVersions) {
 }
 
 function RepoSyncUnversioned([String]$name) {
+    Write-Host "========================================"
     Write-Host "Pulling repo: $name ..."
 
     Set-Location $PSScriptRoot\..\..\$name | Out-Null
