@@ -47,51 +47,36 @@ function Build-Tool-GacGen {
     Test-Single-Binary GacGen.exe
 }
 
-function Release-GacUI {
-    # Release
-    Release-Project GacUI
-    Build-Tool-GacGen
+function Update-GacUI-Skins {
+    foreach ($skin in @("DarkSkin", "TuiSkin")) {
+        Write-Host "Update GacUI::$skin ..."
+        $skinRoot = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Source\Skins\$skin")
+        Get-ChildItem -LiteralPath $skinRoot -Filter *.xml -File | ForEach-Object {
+            Remove-Item -LiteralPath $_.FullName
+        }
+        Copy-Item "$PSScriptRoot\..\..\GacUI\Test\Resources\App\$skin\*.xml" $skinRoot
+        Push-Location $skinRoot
+        try {
+            & $PSScriptRoot\GacGen.ps1 -FileName Resource.xml
+        }
+        finally {
+            Pop-Location
+        }
+    }
+}
 
+function Release-GacUI {
     Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore32.bin $PSScriptRoot
     Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\ReflectionCore64.bin $PSScriptRoot
     Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection32.bin $PSScriptRoot
     Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection64.bin $PSScriptRoot
 
-    # Update DarkSkin
-    Write-Host "Update GacUI::DarkSkin ..."
-    Push-Location $PSScriptRoot\..\..\GacUI\Source\Skins\DarkSkin | Out-Null
-    try {
-        Remove-Item *.xml
-        Copy-Item ..\..\..\Test\Resources\App\DarkSkin\*.xml .
-        & $PSScriptRoot\GacGen.ps1 -FileName Resource.xml
-    }
-    finally {
-        Pop-Location
-    }
+    # Refresh skin types with the bootstrap tool before packing configuration dependencies.
+    Update-GacUI-Skins
+    Release-Project GacUI
+    Build-Tool-GacGen
 
-    # Update TuiSkin from the same authored resources used by GacUI_Compiler.
-    Write-Host "Update GacUI::TuiSkin ..."
-    $tuiSkinRoot = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Source\Skins\TuiSkin")
-    $tuiSkinSource = Join-Path $tuiSkinRoot "Source"
-    [System.IO.Directory]::CreateDirectory($tuiSkinSource) | Out-Null
-    Get-ChildItem -LiteralPath $tuiSkinRoot -Filter *.xml -File | ForEach-Object {
-        Remove-Item -LiteralPath $_.FullName
-    }
-    Copy-Item "$PSScriptRoot\..\..\GacUI\Test\Resources\App\TuiSkin\*.xml" $tuiSkinRoot
-    Push-Location $tuiSkinRoot
-    try {
-        & $PSScriptRoot\GacGen.ps1 -FileName Resource.xml
-    }
-    finally {
-        Pop-Location
-    }
-    foreach ($extension in @("h", "cpp")) {
-        $config = [System.IO.File]::ReadAllText("$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Generated_TuiSkin\TuiSkinConfig.$extension")
-        $config = $config.Replace('../../../Source/GacUI.h', '../../../GacUI.h')
-        $config = $config.Replace('Source_x64/TuiSkin.h', 'TuiSkin.h').Replace('Source_x86/TuiSkin.h', 'TuiSkin.h')
-        [System.IO.File]::WriteAllText((Join-Path $tuiSkinSource "TuiSkinConfig.$extension"), $config)
-    }
-
-    # Release again
+    # Verify the skin output with the rebuilt tool, then publish both skin configurations.
+    Update-GacUI-Skins
     Release-Project GacUI
 }
