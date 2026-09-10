@@ -3,15 +3,15 @@
 # Orders
 
 - Verify generated artifacts with downstream consumer checks [24]
-- Process staged tasks one by one with verification [19]
-- Proactively remove code made redundant by refactoring [17]
-- Keep design documentation aligned with code after refactoring [17]
-- Port fixes from imports to source repositories [16]
+- Keep design documentation aligned with code after refactoring [21]
+- Process staged tasks one by one with verification [20]
+- Proactively remove code made redundant by refactoring [19]
+- Port fixes from imports to source repositories [18]
 - Crash early instead of adding error-tolerance fallbacks [15]
+- Verify and localize portability on every target OS [15]
+- Extract abstractions only for real shared behavior [13]
 - Fix behavior at the owning state instead of patching symptoms [12]
-- Extract abstractions only for real shared behavior [11]
-- Verify and localize portability on every target OS [11]
-- Validate expectations against implementation and existing tests [9]
+- Validate expectations against implementation and existing tests [11]
 - Make `Stop()` drain asynchronous work before returning [8]
 - Do not assume async callback owners are heap allocated [5]
 - Use `WString::IndexOf` with `wchar_t` (not `const wchar_t*`) [4]
@@ -323,6 +323,8 @@ Public namespace refactors require corresponding knowledge-base and documentatio
 Once a shared behavioral suite already exists, follow-up platform implementation task documents should point to binding and running that suite rather than requesting duplicate test cases. Reuse authoritative platform details from existing design documents and preserve explicit out-of-scope sections.
 
 Keep API comments and sample handler names synchronized with refactored event signatures and names; mechanically working examples can still teach an obsolete public model.
+
+When a defect or user correction exposes misleading authoring guidance, correct the owning guidance along with the implementation. Keep historical verification records labeled as historical instead of rewriting them to claim that a later behavior was already tested.
 
 ## Fix behavior at the owning state instead of patching symptoms
 
