@@ -63,7 +63,7 @@ function Update-Repo-Commit-Records {
         $content += "$record`n"
     }
 
-    Set-Content -Path "$PSScriptRoot\..\..\Release\Import\README.md" -Value $content
+    Set-Content -Path "$PSScriptRoot\..\..\Release\Import\README.md" -Value $content -NoNewline
 }
 
 function Task-Vlpp {
