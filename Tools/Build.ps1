@@ -49,23 +49,6 @@ function Update-Binaries-And-Bundle {
     Update-Binaries-Prepare-CodePack
 }
 
-function Update-Repo-Commit-Records {
-    $projects = @("Vlpp","VlppOS","VlppRegex","VlppReflection","VlppParser","VlppParser2","Workflow","GacUI")
-    $content = "# Vczh Library++`n`n";
-    $content += "Please [read the document](http://vczh-libraries.github.io/doc/current/home/download.html) before using source files under this folder.`n`n"
-    $content += "## Commits associated with this release`n`n";
-
-    Write-Title "    Updating Commit Records ..."
-    foreach ($project in $projects) {
-        Set-Location $PSScriptRoot\..\..\$project
-        $commit = $(git rev-parse HEAD)
-        $record = "- **$project**: [$commit](https://github.com/vczh-libraries/$project/tree/$commit)"
-        $content += "$record`n"
-    }
-
-    Set-Content -Path "$PSScriptRoot\..\..\Release\Import\README.md" -Value $content -NoNewline
-}
-
 function Task-Vlpp {
     Write-Title Build-Vlpp
     Import-Vlpp
@@ -266,11 +249,6 @@ try {
         "Update-Prepare-CodePack" {
             Update-Binaries-Prepare-CodePack
         }
-        "UpdateCommits" {
-            Write-Title Update-Repo-Commit-Records
-            Update-Repo-Commit-Records
-            Task-Check-Unsubmitted-Repos
-        }
         "Release" {
             Task-Update-ReleaseRepo
             Task-Verify-Workflow
@@ -301,7 +279,7 @@ try {
             Task-Check-Unsubmitted-Repos
         }
         default {
-            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update-Prepare-CodePack, UpdateCommits, Release(UpdateRelease + VerifyRelease(VerifyReleaseWorkflow + VerifyReleaseXml + VerifyReleaseCpp))."
+            throw "Unknown project `"$Project`". Project can be either unspecified or one of the following value: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser, VlppParser2, Workflow, GacUI, Update-Prepare-CodePack, Release(UpdateRelease + VerifyRelease(VerifyReleaseWorkflow + VerifyReleaseXml + VerifyReleaseCpp))."
         }
     }
 }
