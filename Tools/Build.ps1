@@ -307,8 +307,10 @@ try {
 }
 catch {
     Write-Host $_.Exception.Message -ForegroundColor Red
+    throw
 }
-
-Pop-Location | Out-Null
-Set-ItemProperty $dontshowui_key -Name DontShowUI -Value $dontshowui_value
-[Console]::ResetColor()
+finally {
+    Pop-Location | Out-Null
+    Set-ItemProperty $dontshowui_key -Name DontShowUI -Value $dontshowui_value
+    [Console]::ResetColor()
+}

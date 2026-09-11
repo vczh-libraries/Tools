@@ -71,12 +71,11 @@ function Release-GacUI {
     Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection32.bin $PSScriptRoot
     Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\Metadata\Reflection64.bin $PSScriptRoot
 
-    # Refresh skin types with the bootstrap tool before packing configuration dependencies.
-    Update-GacUI-Skins
+    # GacGen uses the packed core, compiler and reflection code, but no skins.
     Release-Project GacUI
     Build-Tool-GacGen
 
-    # Verify the skin output with the rebuilt tool, then publish both skin configurations.
+    # Generate skins with the current tool, then publish both skin configurations.
     Update-GacUI-Skins
     Release-Project GacUI
 }
