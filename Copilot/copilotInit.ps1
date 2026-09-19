@@ -105,7 +105,6 @@ else {
     $projectMdTarget = Join-Path $projectRoot "Project.md"
     $agentsMdSource = Join-Path $PSScriptRoot "AGENTS.md"
     $agentsMdTarget = Join-Path $projectRoot "AGENTS.md"
-    $claudeMdTarget = Join-Path $projectRoot "CLAUDE.md"
 
     if (-not (Test-Path -Path $projectMdTarget)) {
         Write-Host "Copying: Project.md"
@@ -117,6 +116,4 @@ else {
 
     Write-Host "Copying: AGENTS.md"
     Copy-Item -Path $agentsMdSource -Destination $agentsMdTarget -Force
-    Write-Host "Copying: CLAUDE.md"
-    Copy-Item -Path $agentsMdSource -Destination $claudeMdTarget -Force
 }
