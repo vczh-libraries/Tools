@@ -1,11 +1,18 @@
 # MonoRepo Guide
 
-This document describes the relationship between repos and how to work with them.
-The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Workflow, GacUI, GacJS, iGac, Release and WebsiteSource.
-Read `Tools/MonoRepo.md` and compare the content with this file. If anything is changed, replace this file with `Tools/MonoRepo.md`.
-Use `git` to access repos, `gh` is generally not available. Unless explicitly instructed by me, you are going to work directly on the current branch, which is usually the `master` branch.
-When `job:*` is mentioned, it means either `Tools/Jobs/job.*.prompt.md` or `Tools/Jobs/job.Windows.*.prompt.md`.
-When commit and/or push are required, you should always commit and push once finishing a request, no matter whatever is pending or not. Github repos and clones are more for the backup purpose, there is no strong requirement of completeness of tasks before committing.
+- This document describes the relationship between repos and how to work with them.
+- The repos covered are: Vlpp, VlppOS, VlppRegex, VlppReflection, VlppParser2, Workflow, GacUI, GacJS, iGac, Release and WebsiteSource.
+- Read `Tools/MonoRepo.md` and compare the content with this file. If anything is changed, replace this file with `Tools/MonoRepo.md`.
+- Use `git` to access repos, `gh` is generally not available. Unless explicitly instructed by me, you are going to work directly on the current branch, which is usually the `master` branch.
+- When `job:*` is mentioned, it means either `Tools/Jobs/job.*.prompt.md` or `Tools/Jobs/job.Windows.*.prompt.md`.
+  - When `job:* in REPO-NAME` is mentioned, it means either `REPO-NAME/.github/Jobs/job.*.prompt.md` or `REPO-NAME/.github/Jobs/job.Windows.*.prompt.md`.
+- When commit and/or push are required, you should always commit and push once finishing a request, no matter whatever is pending or not. Github repos and clones are more for the backup purpose, there is no strong requirement of completeness of tasks before committing.
+- Computer Use:
+  - You are most of the time running in a locked session, or a remote desktop session when the host machine is locked. Deny of computer use is very common, this should not become a reason to avoid any request.
+  - For any GacUI app, the first choise is always automation service, then UI Automation, then general computer use.
+  - For any CLI app, the first choise is always starting it in an interactive CLI session.
+  - For any TUI app, when interacting with OS terminal host is not doable due to computer use failure, you can still start it in an interactive CLI session.
+  - Checkout `Tools/Copilot/Guidelines/Running-*.md` for details.
 
 ## Must-Read Files
 
