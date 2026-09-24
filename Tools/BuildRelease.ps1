@@ -63,6 +63,46 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.h .\Tools\Executables\GacGen
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.cpp .\Tools\Executables\GacGen
 
+        # Keep each application's relative includes within its packaged source tree.
+        $executablesRoot = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tools\Executables")
+        $toolSources = [ordered]@{
+            "UiaList\UiaList\Source" = "UiaListApp\UiaList\Source"
+            "UiaList\UiaList\ViewModel" = "UiaListApp\UiaList\ViewModel"
+            "UiaList\UiaListApp" = "UiaListApp\Source"
+            "GitView\GitView\Source" = "GitTui\GitView\Source"
+            "GitView\GitView\Model" = "GitTui\GitView\Model"
+            "GitView\GitView\ViewModel" = "GitTui\GitView\ViewModel"
+            "GitView\GitTui" = "GitTui\Source"
+        }
+        foreach ($source in $toolSources.Keys) {
+            $sourcePath = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Tools\$source")
+            $sourceFiles = @(Get-ChildItem -Path "$sourcePath\*" -Include *.h, *.cpp -File -ErrorAction Stop)
+            if ($sourceFiles.Count -eq 0) {
+                throw "No tool sources found in $sourcePath"
+            }
+            $targetPath = [System.IO.Path]::GetFullPath((Join-Path $executablesRoot $toolSources[$source]))
+            if (-not $targetPath.StartsWith($executablesRoot + "\", [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw "Unexpected tool source target: $targetPath"
+            }
+            if (Test-Path -LiteralPath $targetPath) {
+                Remove-Item -LiteralPath $targetPath -Recurse -Force -ErrorAction Stop
+            }
+            New-Item -Path $targetPath -ItemType Directory -Force -ErrorAction Stop | Out-Null
+            $sourceFiles | Copy-Item -Destination $targetPath -ErrorAction Stop
+        }
+
+        $uiaSource = Join-Path $executablesRoot "UiaListApp\Source"
+        Copy-Item -LiteralPath "$PSScriptRoot\..\..\GacUI\Tools\UiaList\UiaListApp\app.manifest" -Destination $uiaSource -ErrorAction Stop
+        Copy-Item -LiteralPath "$PSScriptRoot\..\..\GacUI\Test\GacUISrc\SharedArguments.h" -Destination $uiaSource -ErrorAction Stop
+        $uiaMainPath = Join-Path $uiaSource "Main.cpp"
+        $uiaMain = [System.IO.File]::ReadAllText($uiaMainPath)
+        $sharedArgumentsInclude = '#include "../../../Test/GacUISrc/SharedArguments.h"'
+        if (-not $uiaMain.Contains($sharedArgumentsInclude)) {
+            throw "UiaListApp's shared arguments include has changed. Update the release copy step."
+        }
+        $uiaMain = $uiaMain.Replace($sharedArgumentsInclude, '#include "SharedArguments.h"')
+        [System.IO.File]::WriteAllText($uiaMainPath, $uiaMain, [System.Text.UTF8Encoding]::new($false))
+
         # Build Tools
         Build-Sln .\Tools\Executables\Executables.sln Release x86
 
