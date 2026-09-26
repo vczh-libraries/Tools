@@ -38,6 +38,8 @@ case $1 in
     echo "    Generate makefile."
     echo "vbuild --help"
     echo "    Build the program."
+    echo "vgit"
+    echo "    Build GitTui and launch it in the current folder."
     echo "vssh --help"
     echo "    Quick way to setup ssh key for your github account."
     echo "vapt --help"

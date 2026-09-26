@@ -1,0 +1,10 @@
+#!/bin/bash
+
+GIT_TUI_DIR="${VCPROOT:?VCPROOT must point to Tools/Ubuntu}/../../GacUI/Tools/GitView/Linux/GitTui"
+
+(
+    cd -- "${GIT_TUI_DIR}" || exit 1
+    "${VCPROOT}/vl/cmd/vbuild" -b
+) || exit $?
+
+exec "${GIT_TUI_DIR}/Bin/GitTui" "$@"
