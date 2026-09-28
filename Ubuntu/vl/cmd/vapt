@@ -21,6 +21,7 @@ function Help {
     echo "        build-essential"
     echo "        compizconfig-settings-manager"
     echo "        dbus-x11"
+    echo "        emscripten"
     echo "--remove"
     echo "    Remove all required softwares"
 }
@@ -58,6 +59,7 @@ APTGET_TARGETS=(
     build-essential
     compizconfig-settings-manager
     dbus-x11
+    emscripten
     )
 # xfce4
 # xrdp
