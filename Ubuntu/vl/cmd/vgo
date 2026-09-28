@@ -90,6 +90,7 @@ function RefreshGithubUbuntu {
                 "vl/vmake-cpp"
                 "vl/wasm.sh"
                 "vl/wasm-unittest.html"
+                "vl/wasm-unittest.sh"
             )
 
             for FILE in "${FILES[@]}"; do
