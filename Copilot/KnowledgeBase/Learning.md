@@ -2,13 +2,13 @@
 
 # Orders
 
-- Verify generated artifacts with downstream consumer checks [25]
+- Verify generated artifacts with downstream consumer checks [27]
 - Keep design documentation aligned with code after refactoring [23]
-- Process staged tasks one by one with verification [22]
-- Proactively remove code made redundant by refactoring [21]
-- Port fixes from imports to source repositories [19]
+- Process staged tasks one by one with verification [23]
+- Proactively remove code made redundant by refactoring [22]
+- Port fixes from imports to source repositories [21]
 - Verify and localize portability on every target OS [18]
-- Crash early instead of adding error-tolerance fallbacks [15]
+- Crash early instead of adding error-tolerance fallbacks [16]
 - Extract abstractions only for real shared behavior [15]
 - Fix behavior at the owning state instead of patching symptoms [12]
 - Validate expectations against implementation and existing tests [12]
@@ -279,6 +279,8 @@ For a released VlppOS namespace change, validate Workflow through the ChatBot SO
 
 When relocating manually maintained configuration beside generated types, validate both development architectures and the normal and IncludeOnly release consumers. Generate prerequisite types before packing and verify that each canonical configuration implementation appears exactly once; a successful development build can otherwise conceal stale release dependencies.
 
+When a new platform backend is packed into an existing release pair, compile and run a separate consumer of that generated pair. A passing source-project build cannot prove that release guards expose supported APIs exactly once or that deliberately unavailable services still fail as specified.
+
 ## `vl::regex` separator regex: `L"[\\/\\\\]+"`
 
 In `vl::regex::Regex`, both `/` and `\\` are escaping characters, and incorrect escaping inside `[]` can throw errors like `Illegal character set definition.`
@@ -324,6 +326,8 @@ When splitting a monolithic implementation into focused files, delete empty sour
 For application refactors, remove helper wrappers that only duplicate an already-clear direct call. For example, direct `GetChannels()[WString::Unmanaged(RpcChannel)]` access is preferable to a `GetRpcChannel` helper when the intended behavior is still to fail if the channel is missing.
 
 When a shared event-information type can own a newly common field, move the field there and delete modifier-only wrapper types and parallel overload plumbing that no longer represent a distinct concept.
+
+When a documented build invariant guarantees that `CPP_TARGET` and its package outputs are files under `Bin`, removing `Bin` already cleans them. Remove redundant file-by-file cleanup instead of preserving commands for target layouts the build no longer supports.
 
 ## Keep design documentation aligned with code after refactoring
 
