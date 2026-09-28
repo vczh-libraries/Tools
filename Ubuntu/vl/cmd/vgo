@@ -88,6 +88,8 @@ function RefreshGithubUbuntu {
                 "vl/cmd/vutil_CppFromVcxproj"
                 "vl/makefile-cpp"
                 "vl/vmake-cpp"
+                "vl/wasm.sh"
+                "vl/wasm-unittest.html"
             )
 
             for FILE in "${FILES[@]}"; do
