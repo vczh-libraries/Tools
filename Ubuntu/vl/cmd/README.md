@@ -77,6 +77,9 @@ Useful variables:
 - `TARGETS`: make `all` dependencies, normally `("${CPP_TARGET}")`.
 - `CPP_COMPILE_OPTIONS`: extra compiler flags.
 - `CPP_LINK_OPTIONS`: extra linker flags for project-specific libraries.
+- `CPP_WASM_PTHREAD_POOL_SIZE`: optional number of preloaded Emscripten pthread workers; ignored by native builds.
+
+Wasm build modes require `WASM=YES` in a project-local `vbuild` file. This is an opt-in marker, not a shell script.
 
 There is no `IMPORTS` variable in the current samples. Imports are done by the V4 include directive.
 

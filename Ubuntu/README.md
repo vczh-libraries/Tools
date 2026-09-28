@@ -52,7 +52,7 @@ and the name changed from `vl.desktop` to `VL++ DevEnv`.
 
 ## WebAssembly Unit Tests
 
-Install Emscripten and Node.js with npm/npx, then run the repository-local wrapper from a project's `Test/Linux` folder. For Vlpp:
+Install Emscripten and Node.js, then run the repository-local wrapper from a project's `Test/Linux` folder. For Vlpp:
 
 ```bash
 cd Vlpp/Test/Linux
@@ -64,11 +64,11 @@ cd Vlpp/Test/Linux
 ./Bin/app.sh 1234
 ```
 
-Open [the local test page](http://127.0.0.1:8888/) for the default port, or `http://127.0.0.1:1234/` for the example override. The launcher serves its own folder even when invoked from another working directory. It runs [`http-server`](https://github.com/http-party/http-server#readme) through `npx --yes`, which downloads the package on first use, binds to `127.0.0.1`, and disables caching so rebuilds appear immediately. Keep the terminal running and stop the server with Ctrl-C when finished. Serve over HTTP with JavaScript-module and Wasm MIME types; `file://` is unsupported.
+Open [the local test page](http://127.0.0.1:8888/) for the default port, or `http://127.0.0.1:1234/` for the example override. The launcher serves the generated test files from its own folder using Node.js, even when invoked from another working directory. It binds to `127.0.0.1`, disables caching, and sends the COOP/COEP headers required for shared Wasm memory. Keep the terminal running and stop the server with Ctrl-C when finished. Serve over HTTP with JavaScript-module and Wasm MIME types; `file://` is unsupported.
 
 The output folder contains `app.html`, `app.mjs`, `app.wasm`, executable `app.sh`, an `index.html` symlink to `app.html`, and the configured `CPP_TARGET` (Vlpp uses `Bin/UnitTest`). The symlink makes `app.html` the default page at `/`. The target is a byte-identical copy of `app.wasm`, used by make. The page loads `app.mjs`, which loads `app.wasm`. It initializes a fresh dedicated worker and calls the sole application export, `wasm_main`, once. Console writes preserve text order, whitespace and color. Successful completion ends with one black italic `wasm_main returns 0.` line; caught C++ failures return nonzero, while module failures and runtime traps have no return value. The runner provides EOF for input.
 
-`--build-wasm` and `--full-build-wasm` are the long forms. With the installed Tools environment, run `vmake --make` followed by the corresponding `vbuild` command. `vgo uci Vlpp` copies the canonical wrapper, helper, HTML and launcher template into Vlpp's `.github/Ubuntu` folder.
+`--build-wasm` and `--full-build-wasm` are the long forms. All four Wasm modes require a file named `vbuild` in the current project folder containing `WASM=YES`. The file is read as text, never executed. Projects without this opt-in are rejected before building or cleaning. With the installed Tools environment, run `vmake --make` followed by the corresponding `vbuild` command. `vgo uci Vlpp` copies the canonical wrapper, helper, HTML and launcher template into Vlpp's `.github/Ubuntu` folder.
 
 Native commands from the same folder:
 
@@ -84,6 +84,6 @@ Bin/UnitTest /C
 
 Use `-f` for a full Clang build or `--full-build-gcc` for a full GCC build. Switching compiler or effective options invalidates incompatible objects, dependencies and the target before make evaluates them. An unchanged build does not compile or link. Missing Wasm package members, changed HTML or launcher templates, or a changed packaging helper are repaired on the next build; link/copy failures return nonzero and can be retried. The make target is published only after the HTML, executable launcher and default-page symlink are ready.
 
-Wasm compilation and linking use `-fexceptions`; linking also uses `--bind -sMODULARIZE=1 -sEXPORT_ES6=1 -sENVIRONMENT=worker --no-entry`. Native pthread, Linux uring and macOS framework flags are excluded. Keep the SDK's 32-bit `wchar_t` and convert `WString` to UTF-16 only at JavaScript boundaries. See [Emscripten compiler options](https://emscripten.org/docs/tools_reference/emcc.html), [modularized output](https://emscripten.org/docs/compiling/Modularized-Output.html), and [C++ exceptions](https://emscripten.org/docs/porting/exceptions.html).
+Wasm compilation and linking use `-fexceptions`; linking also uses `--bind -sMODULARIZE=1 -sEXPORT_ES6=1 -sENVIRONMENT=worker --no-entry`. Native Linux uring and macOS framework flags are excluded. A project using VlppOS threads sets `CPP_WASM_PTHREAD_POOL_SIZE=32` in `vmake`; only Wasm then adds `-pthread`, preloads that many workers, and generates `app.worker.js`. The finite pool reports exhaustion instead of silently deadlocking. Shared memory starts at 128 MiB and may grow. Missing worker output is repaired by the next build. Projects that omit this option retain single-threaded Wasm builds. Keep the SDK's 32-bit `wchar_t` and convert `WString` to UTF-16 only at JavaScript boundaries. See [Emscripten compiler options](https://emscripten.org/docs/tools_reference/emcc.html), [modularized output](https://emscripten.org/docs/compiling/Modularized-Output.html), and [C++ exceptions](https://emscripten.org/docs/porting/exceptions.html).
 
 Verified on Linux with Emscripten 3.1.6 and Firefox 146.0.1: Vlpp's 32 test files / 469 Wasm cases, 32 files / 465 native Clang and GCC cases, coverage, compiler switches, incremental dependencies, output repair, failure/retry, Unicode/color rendering, worker responsiveness, and terminal failure reporting. Windows and macOS were not executed in this verification.
