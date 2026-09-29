@@ -70,6 +70,8 @@ The output folder contains `app.html`, `app.mjs`, `app.wasm`, `app.debug.wasm`, 
 
 The page retains its worker through a `pagehide` listener and terminates it when the page leaves. This prevents Firefox from collecting the worker while asynchronous fixture loading or module initialization is pending.
 
+LLDB can inspect the Wasm symbols with `lldb Bin/app.wasm`; `image list -s` shows the automatically loaded companion. Live browser breakpoints and variable inspection require a browser DWARF debugger, such as the [Chrome C/C++ DevTools extension](https://developer.chrome.com/docs/devtools/wasm). Plain LLDB does not launch the browser application.
+
 `--build-wasm` and `--full-build-wasm` are the long forms. All four Wasm modes require a file named `vbuild` in the current project folder containing the quoted key `"WASM=YES"`. The file is JSON, never executed. The launcher receives its path as the first argument; relative paths in that configuration resolve from its containing folder. Projects without this opt-in are rejected before building or cleaning. With the installed Tools environment, run `vmake --make` followed by the corresponding `vbuild` command. `vgo uci Vlpp` copies the canonical wrapper, helper, HTML and launcher template into Vlpp's `.github/Ubuntu` folder.
 
 Native commands from the same folder:
