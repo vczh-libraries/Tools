@@ -50,9 +50,8 @@ async function main() {
         for (const pattern of [...includes, ...excludes]) opfsPath(pattern);
         if (includes.length) {
             for await (const match of glob(includes, { cwd: root, exclude: excludes })) {
-                const name = opfsPath(match.split(sep).join("/"));
-                const file = await containedFile(root, name);
-                if ((await stat(file)).isFile()) fixtures.add(name);
+                const file = await containedFile(root, match);
+                if ((await stat(file)).isFile()) fixtures.add(opfsPath(match.split(sep).join("/")));
             }
         }
     }
