@@ -30,7 +30,7 @@ async function main() {
         throw new Error('vbuild must contain a "WASM=YES" configuration object.');
     }
 
-    const fixtures = new Map();
+    const fixtures = new Set();
     const folders = new Set();
     let root;
     if (config.rootFolder !== undefined) {
@@ -52,7 +52,7 @@ async function main() {
             for await (const match of glob(includes, { cwd: root, exclude: excludes })) {
                 const name = opfsPath(match.split(sep).join("/"));
                 const file = await containedFile(root, name);
-                if ((await stat(file)).isFile()) fixtures.set(name, file);
+                if ((await stat(file)).isFile()) fixtures.add(name);
             }
         }
     }
