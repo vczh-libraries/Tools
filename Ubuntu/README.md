@@ -52,23 +52,23 @@ and the name changed from `vl.desktop` to `VL++ DevEnv`.
 
 ## WebAssembly Unit Tests
 
-Install Emscripten and Node.js, then run the repository-local wrapper from a project's `Test/Linux` folder. For Vlpp:
+Install Emscripten and Node.js 22.17 or newer, then run the repository-local wrapper from a project's `Test/Linux` folder. For Vlpp:
 
 ```bash
 cd Vlpp/Test/Linux
 ../../.github/Ubuntu/build.sh -bw
 # Full Wasm build:
 ../../.github/Ubuntu/build.sh -fbw
-./Bin/app.sh
+./Bin/app.sh ./vbuild
 # To use a different port instead:
-./Bin/app.sh 1234
+./Bin/app.sh ./vbuild 1234
 ```
 
 Open [the local test page](http://127.0.0.1:8888/) for the default port, or `http://127.0.0.1:1234/` for the example override. The launcher serves the generated test files from its own folder using Node.js, even when invoked from another working directory. It binds to `127.0.0.1`, disables caching, and sends the COOP/COEP headers required for shared Wasm memory. Keep the terminal running and stop the server with Ctrl-C when finished. Serve over HTTP with JavaScript-module and Wasm MIME types; `file://` is unsupported.
 
-The output folder contains `app.html`, `app.mjs`, `app.wasm`, executable `app.sh`, an `index.html` symlink to `app.html`, and the configured `CPP_TARGET` (Vlpp uses `Bin/UnitTest`). The symlink makes `app.html` the default page at `/`. The target is a byte-identical copy of `app.wasm`, used by make. The page loads `app.mjs`, which loads `app.wasm`. It initializes a fresh dedicated worker and calls the sole application export, `wasm_main`, once. Console writes preserve text order, whitespace and color. Successful completion ends with one black italic `wasm_main returns 0.` line; caught C++ failures return nonzero, while module failures and runtime traps have no return value. The runner installs `globalThis.vlConsoleRead = () => undefined` in the worker, providing EOF for input. `Console::TryRead()` maps `undefined` to an empty nullable and a JavaScript string to a present `WString`, including an empty string. Custom hosts can supply a synchronous read callback; UTF-16 conversion preserves Unicode and embedded zero code units, and callback failures are reported as C++ errors.
+The output folder contains `app.html`, `app.mjs`, `app.wasm`, executable `app.sh`, Node server `app.js`, an `index.html` symlink to `app.html`, and the configured `CPP_TARGET` (Vlpp uses `Bin/UnitTest`). The symlink makes `app.html` the default page at `/`. The target is a byte-identical copy of `app.wasm`, used by make. The page loads `app.mjs`, which loads `app.wasm`. It initializes a fresh dedicated worker and awaits the sole application export, `wasm_main`, once. Console writes preserve text order, whitespace and color. Successful completion ends with one black italic `wasm_main returns 0.` line; caught C++ failures return nonzero, while module failures and runtime traps have no return value. The runner installs `globalThis.vlConsoleRead = () => undefined` in the worker, providing EOF for input. `Console::TryRead()` maps `undefined` to an empty nullable and a JavaScript string to a present `WString`, including an empty string. Custom hosts can supply a synchronous read callback; UTF-16 conversion preserves Unicode and embedded zero code units, and callback failures are reported as C++ errors.
 
-`--build-wasm` and `--full-build-wasm` are the long forms. All four Wasm modes require a file named `vbuild` in the current project folder containing `WASM=YES`. The file is read as text, never executed. Projects without this opt-in are rejected before building or cleaning. With the installed Tools environment, run `vmake --make` followed by the corresponding `vbuild` command. `vgo uci Vlpp` copies the canonical wrapper, helper, HTML and launcher template into Vlpp's `.github/Ubuntu` folder.
+`--build-wasm` and `--full-build-wasm` are the long forms. All four Wasm modes require a file named `vbuild` in the current project folder containing the quoted key `"WASM=YES"`. The file is JSON, never executed. The launcher receives its path as the first argument; relative paths in that configuration resolve from its containing folder. Projects without this opt-in are rejected before building or cleaning. With the installed Tools environment, run `vmake --make` followed by the corresponding `vbuild` command. `vgo uci Vlpp` copies the canonical wrapper, helper, HTML and launcher template into Vlpp's `.github/Ubuntu` folder.
 
 Native commands from the same folder:
 
@@ -84,6 +84,34 @@ Bin/UnitTest /C
 
 Use `-f` for a full Clang build or `--full-build-gcc` for a full GCC build. Switching compiler or effective options invalidates incompatible objects, dependencies and the target before make evaluates them. An unchanged build does not compile or link. Missing Wasm package members, changed HTML or launcher templates, or a changed packaging helper are repaired on the next build; link/copy failures return nonzero and can be retried. The make target is published only after the HTML, executable launcher and default-page symlink are ready.
 
-Wasm compilation and linking use `-fexceptions`; linking also uses `--bind -sMODULARIZE=1 -sEXPORT_ES6=1 -sENVIRONMENT=worker --no-entry`. Native Linux uring and macOS framework flags are excluded. A project using VlppOS threads sets `CPP_WASM_PTHREAD_POOL_SIZE=32` in `vmake`; only Wasm then adds `-pthread`, preloads that many workers, and generates `app.worker.js`. The finite pool reports exhaustion instead of silently deadlocking. Shared memory starts at 128 MiB and may grow. Missing worker output is repaired by the next build. Projects that omit this option retain single-threaded Wasm builds. Keep the SDK's 32-bit `wchar_t` and convert `WString` to UTF-16 only at JavaScript boundaries. See [Emscripten compiler options](https://emscripten.org/docs/tools_reference/emcc.html), [modularized output](https://emscripten.org/docs/compiling/Modularized-Output.html), and [C++ exceptions](https://emscripten.org/docs/porting/exceptions.html).
+Wasm compilation and linking use `-fexceptions`; linking also uses `--bind -sMODULARIZE=1 -sEXPORT_ES6=1 -sENVIRONMENT=worker -sASYNCIFY=1 -sASYNCIFY_STACK_SIZE=65536 --no-entry`. Native Linux uring and macOS framework flags are excluded. A project using VlppOS threads sets `CPP_WASM_PTHREAD_POOL_SIZE=32` in `vmake`; only Wasm then adds `-pthread`, preloads that many workers, and generates `app.worker.js`. The finite pool reports exhaustion instead of silently deadlocking. Shared memory starts at 128 MiB and may grow. Missing worker output is repaired by the next build. Projects that omit this option retain single-threaded Wasm builds. Keep the SDK's 32-bit `wchar_t` and convert `WString` to UTF-16 only at JavaScript boundaries. See [Emscripten compiler options](https://emscripten.org/docs/tools_reference/emcc.html), [modularized output](https://emscripten.org/docs/compiling/Modularized-Output.html), and [C++ exceptions](https://emscripten.org/docs/porting/exceptions.html).
 
 Verified on Linux with Emscripten 3.1.6 and Firefox 146.0.1: Vlpp's 32 test files / 469 Wasm cases, 32 files / 465 native Clang and GCC cases, coverage, compiler switches, incremental dependencies, output repair, failure/retry, Unicode/color rendering, worker responsiveness, and terminal failure reporting. Windows and macOS were not executed in this verification.
+
+
+### OPFS filesystem and fixture configuration
+
+VlppOS supplies `OpfsFileSystemImpl` in `Source/FileSystem.Wasm.cpp` by default through the ordinary filesystem injection chain. It calls browser OPFS APIs from small `EM_ASYNC_JS` adapters; Asyncify preserves the synchronous C++ contract. Applications must link with `-sASYNCIFY=1` and await suspending Embind exports. No Emscripten C++ filesystem backend or app-specific filesystem callback is required. The browser must support OPFS in a secure context (localhost HTTP qualifies).
+
+The current directory is always `/`, the origin's private root. ReadOnly and ReadWrite streams load the complete existing file into `stream::MemoryStream`; ReadWrite creates a missing file and preserves existing bytes. WriteOnly starts empty. Closing a writable stream replaces the whole OPFS file, including truncation to an empty file. Close is idempotent. Filesystem failures use the existing boolean/unavailable-stream contract; a failed writable close reports a C++ error. File and folder rename copy then remove the source because directory move is not portable; this is not atomic, and existing destinations, root moves and moves into descendants are rejected. Native filesystem behavior is unchanged.
+
+The canonical runner files live in `Ubuntu/vl/wasm-unittest/` with their final names. `wasm.sh` copies these files unchanged; `vgo uci REPO` distributes them and removes the old flat templates.
+
+A project-local `vbuild` can be as small as `{"WASM=YES": {}}`. For fixture-dependent tests:
+
+```json
+{
+  "WASM=YES": {
+    "rootFolder": "../",
+    "folders": ["Output", "Empty/Nested"],
+    "includes": ["Resources/**/*.txt"],
+    "excludes": ["Resources/**/Excluded/*.txt"]
+  }
+}
+```
+
+Every field inside `WASM=YES` is optional. Without `rootFolder`, the other three fields are ignored. Without `includes`, no files are loaded. `rootFolder` maps to `/` in OPFS. Patterns use Node's built-in filesystem glob syntax; includes are combined without duplicates and excludes are subtracted. Folder names are literal relative paths, not patterns. Paths must remain under the configured root; symlinks escaping it are rejected.
+
+`GET /OPFS` returns `{ "files": [...], "folders": [...] }` with sorted paths, listing only explicitly requested empty leaf directories; parents are inferred. `GET /OPFS/path/to/file` serves binary content only for a selected file. The server accepts GET only and never writes browser changes to disk. Before loading the Wasm module, `app.html` deletes all existing OPFS entries for its origin, creates directories, and downloads the selected files. A prefill failure prevents test execution. Reloading starts fresh; use a dedicated origin for the test runner.
+
+Minimal library mappings: Vlpp uses `{}`; VlppOS uses `rootFolder: "../../"` and creates `/Output` in tests; VlppRegex maps `../`, creates `Output`, and includes exactly `Resources/Baseline/*.txt` (34 input files); VlppReflection maps `../../` and creates only `Metadata`, with no input files.
