@@ -132,6 +132,8 @@ Implementation injection is particularly valuable for unit testing file system o
 
 `OpfsFileSystemImpl` in `Source/FileSystem.Wasm.cpp` is the default `IFileSystemImpl` under `VCZH_WASM`, selected lazily by the ordinary injection chain. It calls JavaScript OPFS APIs directly through `EM_ASYNC_JS`; applications link with Asyncify and await suspending Embind exports. It does not use an Emscripten filesystem backend or require app-specific JavaScript callbacks.
 
+Pthread callers complete each asynchronous OPFS operation through an Emscripten-managed callback using `emscripten_sleep(0)`. This keeps returning workers joinable on Emscripten 3.1.6, whose plain promise resumption misses thread-exit handling. The continuation is confined to the OPFS boundary; ordinary thread sleeps retain their blocking semantics.
+
 `/` is the OPFS root and the fixed working directory. Paths use `/`, normalize `.` and `..`, replace the base when joined with an absolute path, and reject traversal above root. Names cross the JavaScript boundary as UTF-16 while C++ retains `WString`.
 
 `stream::FileStream` uses an internal `stream::MemoryStream`. ReadOnly and ReadWrite snapshot the entire file on open; ReadWrite creates missing files and preserves existing bytes. WriteOnly begins empty. Writable close replaces the complete OPFS content and may truncate it to zero; read-only close never writes. This differs from native ReadWrite's existing truncate-on-open behavior. Changes become visible to newly opened readers after close; already open readers retain their snapshots. Large files therefore require whole-file memory capacity.
