@@ -36,6 +36,7 @@ export default function(options = {}) {
     const workerUrl = URL.createObjectURL(new Blob([${JSON.stringify(worker)}], { type: 'text/javascript' }));
     const locateFile = options.locateFile;
     return Module({
+        mainScriptUrlOrBlob: import.meta.url,
         ...options,
         locateFile(file, prefix) {
             if (file === 'app.worker.js') return workerUrl;
