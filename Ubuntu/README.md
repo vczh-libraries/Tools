@@ -86,7 +86,7 @@ Bin/UnitTest /C
 Bin/UnitTest /C
 ```
 
-Use `-f` (also `-fb`) for a full Clang build or `--full-build-gcc` for a full GCC build. Native builds use `-O0` by default. Add `-o` or `--optimize` to select `-O2`, for example `build.sh -f -o` or `vbuild -b --optimize`. The option can precede or follow the build command; alone it selects an incremental native Clang build. It is rejected for Wasm builds, which retain their existing project-specific optimization settings (the compiler default when unspecified). Both modes retain `-g`; optimization does not define `NDEBUG` or disable C++ assertions. `vbuild -r` / `--read` still opens the coverage report.
+Use `-f` (also `-fb`) for a full Clang build or `--full-build-gcc` for a full GCC build. Native builds use `-O0` by default. Add `-o` or `--optimize` to select `-O2`, for example `build.sh -f -o` or `vbuild -b --optimize`. The option can precede or follow the build command; alone it selects an incremental native Clang build. It is rejected for Wasm builds, which always use `-O3` for compilation and linking. Both modes retain `-g`; optimization does not define `NDEBUG` or disable C++ assertions. `vbuild -r` / `--read` still opens the coverage report.
 
 Every native build produces `$(CPP_TARGET).debug`. On Linux this is a separate ELF debug file and the executable contains a `.gnu_debuglink` reference. Keep the pair together for automatic LLDB discovery. On macOS it is a dSYM bundle with a `$(CPP_TARGET).dSYM` symlink for LLDB. Use `image list -s` in LLDB to inspect the loaded symbol file, or `target symbols add PATH` to load it explicitly. The native Linux tools require `llvm-objcopy`; macOS uses `dsymutil` and `strip`.
 
