@@ -59,9 +59,9 @@ cd Vlpp/Test/Linux
 ../../.github/Ubuntu/build.sh -bw
 # Full Wasm build:
 ../../.github/Ubuntu/build.sh -fbw
-./Bin/app.sh ./vbuild
+./Bin/app.sh
 # To use a different port instead:
-./Bin/app.sh ./vbuild 1234
+./Bin/app.sh 1234
 ```
 
 Open [the local test page](http://127.0.0.1:8888/) for the default port, or `http://127.0.0.1:1234/` for the example override. The launcher serves the generated test files from its own folder using Node.js, even when invoked from another working directory. It binds to `127.0.0.1`, disables caching, and sends the COOP/COEP headers required for shared Wasm memory. Keep the terminal running and stop the server with Ctrl-C when finished. Serve over HTTP with JavaScript-module and Wasm MIME types; `file://` is unsupported.
@@ -72,7 +72,7 @@ The page retains its worker through a `pagehide` listener and terminates it when
 
 LLDB can inspect the Wasm symbols with `lldb Bin/app.wasm`; `image list -s` shows the automatically loaded companion. Live browser breakpoints and variable inspection require a browser DWARF debugger, such as the [Chrome C/C++ DevTools extension](https://developer.chrome.com/docs/devtools/wasm). Plain LLDB does not launch the browser application.
 
-`--build-wasm` and `--full-build-wasm` are the long forms. All four Wasm modes require a file named `vbuild` in the current project folder containing the quoted key `"WASM=YES"`. The file is JSON, never executed. The launcher receives its path as the first argument; relative paths in that configuration resolve from its containing folder. Projects without this opt-in are rejected before building or cleaning. With the installed Tools environment, run `vmake --make` followed by the corresponding `vbuild` command. `vgo uci Vlpp` copies the canonical wrapper, helper, HTML and launcher template into Vlpp's `.github/Ubuntu` folder.
+`--build-wasm` and `--full-build-wasm` are the long forms. All four Wasm modes require a file named `vbuild` in the current project folder containing the quoted key `"WASM=YES"`. The file is JSON, never executed. Run `app.sh [port]` from the generated `Bin` folder, or `./Bin/app.sh [port]` from the project folder; the port defaults to 8888. The launcher reads `../vbuild` relative to its own folder; relative paths in that configuration resolve from its containing folder. Projects without this opt-in are rejected before building or cleaning. With the installed Tools environment, run `vmake --make` followed by the corresponding `vbuild` command. `vgo uci Vlpp` copies the canonical wrapper, helper, HTML and launcher template into Vlpp's `.github/Ubuntu` folder.
 
 Native commands from the same folder:
 

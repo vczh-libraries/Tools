@@ -79,7 +79,7 @@ Useful variables:
 - `CPP_LINK_OPTIONS`: extra linker flags for project-specific libraries.
 - `CPP_WASM_PTHREAD_POOL_SIZE`: optional number of preloaded Emscripten pthread workers; ignored by native builds.
 
-Wasm build modes require the quoted `"WASM=YES"` key in a project-local JSON `vbuild` file. Pass this file to `Bin/app.sh ./vbuild [port]`; its optional OPFS mapping is documented in [the Ubuntu guide](../../README.md#opfs-filesystem-and-fixture-configuration).
+Wasm build modes require the quoted `"WASM=YES"` key in a project-local JSON `vbuild` file. Run `Bin/app.sh [port]` to serve the tests on port 8888 by default. The launcher locates `vbuild` in the parent of its own folder; its optional OPFS mapping is documented in [the Ubuntu guide](../../README.md#opfs-filesystem-and-fixture-configuration).
 
 There is no `IMPORTS` variable in the current samples. Imports are done by the V4 include directive.
 
