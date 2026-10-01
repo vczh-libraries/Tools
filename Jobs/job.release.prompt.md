@@ -58,7 +58,9 @@ Execute monorepo script `vgo vmake` followed by `vgo vbuild` to run CI for all r
 Execute single repo script `vgo vmake <repo-name>` (only when you updated MSBuild project files) followed by `vgo vbuild <repo-name>` to run CI for a specific repo.
 Execute `vsync --check` to find out how many repos have local changes.
 
-Guidelines for each repo will tell you to run `build.sh` to build any test project, but when you are in monorepo context, you can run `vmake --make` (only when you updated MSBuild project files) followed by `vbuild -b` to achieve the same goal. Both way require you to be in the test project folder.
+Guidelines for each repo will tell you to run `build.sh` to build any test project, but when you are in monorepo context, you can run `vmake --make` (only when you updated MSBuild project files) followed by `vbuild -b` to achieve the same goal. Both way require you to be in the test project folder:
+- For native builds, use `-o` to turn on optimization, making sure it works with optimization.
+- If a project has a `vbuild` configuration file and it has a "WASM=YES" key in it, it means it supports building with web assembly, you have to load the generated `app.html` in a browser and wait for the signal of success or failure.
 
 Linux build scripts do not prepare release. If any cross-repo issues are found (probably Linux specific issues), you can do manual release by:
 - Build `VlppParser2/Tools/CodePack`.
