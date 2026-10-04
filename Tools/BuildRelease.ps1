@@ -63,7 +63,14 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.h .\Tools\Executables\GacGen
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.cpp .\Tools\Executables\GacGen
 
-        Copy-UiaList-Sources
+        Copy-Item ..\GacUI\Tools\UiaList\UiaList\Source\*.h .\Tools\Executables\UiaList\Source -ErrorAction Stop
+        Copy-Item ..\GacUI\Tools\UiaList\UiaList\Source\*.cpp .\Tools\Executables\UiaList\Source -ErrorAction Stop
+        Copy-Item ..\GacUI\Tools\UiaList\UiaList\ViewModel\*.h .\Tools\Executables\UiaList\ViewModel -ErrorAction Stop
+        Copy-Item ..\GacUI\Tools\UiaList\UiaList\ViewModel\*.cpp .\Tools\Executables\UiaList\ViewModel -ErrorAction Stop
+        Copy-Item ..\GacUI\Tools\UiaList\UiaListApp\*.cpp .\Tools\Executables\UiaListApp -ErrorAction Stop
+        Copy-Item ..\GacUI\Tools\UiaList\UiaListApp\*.manifest .\Tools\Executables\UiaListApp -ErrorAction Stop
+        Copy-Item ..\GacUI\Tools\UiaList\UiaListCli\*.cpp .\Tools\Executables\UiaListCli -ErrorAction Stop
+        Copy-Item ..\GacUI\Tools\UiaList\UiaListCli\*.manifest .\Tools\Executables\UiaListCli -ErrorAction Stop
         Copy-Item ..\GacUI\Tools\GitView\GitView\Source\*.h .\Tools\Executables\GitTui\GitView\Source -ErrorAction Stop
         Copy-Item ..\GacUI\Tools\GitView\GitView\Source\*.cpp .\Tools\Executables\GitTui\GitView\Source -ErrorAction Stop
         Copy-Item ..\GacUI\Tools\GitView\GitView\Model\*.h .\Tools\Executables\GitTui\GitView\Model -ErrorAction Stop
@@ -133,27 +140,6 @@ function Build-Release-Update() {
     }
     finally {
         Pop-Location | Out-Null
-    }
-}
-
-function Copy-UiaList-Sources {
-    $uiaSource = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Tools\UiaList")
-    $uiaTarget = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tools\Executables")
-    foreach ($relative in @("UiaList\Source", "UiaList\ViewModel", "UiaListApp", "UiaListCli")) {
-        $destination = Join-Path $uiaTarget $relative
-        New-Item -ItemType Directory -Path $destination -Force | Out-Null
-        foreach ($extension in @("*.h", "*.cpp", "*.manifest")) {
-            Get-ChildItem -LiteralPath (Join-Path $uiaSource $relative) -Filter $extension -File | ForEach-Object {
-                Copy-Item -LiteralPath $_.FullName -Destination $destination -Force -ErrorAction Stop
-            }
-        }
-    }
-    foreach ($relative in @("UiaListApp\UiaList", "UiaListApp\Source")) {
-        $obsolete = [System.IO.Path]::GetFullPath((Join-Path $uiaTarget $relative))
-        if (-not $obsolete.StartsWith($uiaTarget + "\", [System.StringComparison]::OrdinalIgnoreCase)) {
-            throw "Unexpected obsolete UiaList source path: $obsolete"
-        }
-        if (Test-Path -LiteralPath $obsolete) { Remove-Item -LiteralPath $obsolete -Recurse -Force }
     }
 }
 
