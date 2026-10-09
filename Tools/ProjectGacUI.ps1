@@ -47,6 +47,12 @@ function Build-Tool-GacGen {
     Test-Single-Binary GacGen.exe
 }
 
+function Build-Tool-GacBuild {
+    Build-Sln $PSScriptRoot\..\..\GacUI\Tools\GacBuild\GacBuild.sln Release Win32
+    Copy-Tool-Binary $PSScriptRoot\..\..\GacUI\Tools\GacBuild\Bin\GacBuild.exe $PSScriptRoot\.Output\GacBuild.exe
+    Test-Single-Binary GacBuild.exe
+}
+
 function Update-GacUI-Skins {
     foreach ($skin in @("DarkSkin", "TuiSkin")) {
         Write-Host "Update GacUI::$skin ..."
@@ -74,8 +80,9 @@ function Release-GacUI {
     # GacGen uses the packed core, compiler and reflection code, but no skins.
     Release-Project GacUI
     Build-Tool-GacGen
+    Build-Tool-GacBuild
 
-    # Generate skins with the current tool, then publish both skin configurations.
+    # Generate skins with both current tools, then publish both skin configurations.
     Update-GacUI-Skins
     Release-Project GacUI
 }

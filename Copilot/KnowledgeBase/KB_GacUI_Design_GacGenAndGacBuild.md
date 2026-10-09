@@ -286,3 +286,11 @@ For automation built directly on GacGen, use all of these success checks:
 - Do not use process exit code alone for semantic validation. `SetupGacGenNativeController` returns zero after `GuiMain`, and many handled compiler errors return from `CompileResource` without changing that result.
 - For RPC code generation, consume `RpcMetadata.txt` and `RpcMetadata.d.ts` together from the ABI being targeted. If invoking `/C` directly, retain the sibling architecture staging directory until both compatible runs have completed.
 - Treat `.log` directories as generated caches and tool interchange, not authored source. Preserve them between incremental GacBuild runs; remove them when a full rebuild or stale-output recovery is required.
+
+## Build and Release Integration
+
+`<Tools repo>/Tools/ProjectGacUI.ps1` preserves the bootstrap sequence: copy metadata, pack the current GacUI sources, build and deploy GacGen and GacBuild, regenerate DarkSkin/TuiSkin through the wrapper, then pack the final sources. Neither generator depends on generated skins. Tool cleanup and deployment include GacBuild alongside GacGen and CppMerge.
+
+`<Tools repo>/Tools/BuildRelease.ps1` copies the owned GacBuild header and implementation files, including both native platform files, into `<Release repo>/Tools/Executables/GacBuild`. Release maintains its own project/filter files and Unix makefile. `<Release repo>/Tools/CopyExecutables.ps1` deploys the Windows executable; `<Release repo>/Tools/BuildExecutables.sh` builds and deploys the Unix executable. Released GacGen loads adjacent full `Reflection32.bin` and `Reflection64.bin`; development `Metadata.txt` selects core-only metadata.
+
+The Bash wrappers `<Release repo>/Tools/GacBuild.sh -FileName <driver-xml> [-Dump]` and `<Release repo>/Tools/GacGen.sh -FileName <resource-xml> [-MappingFileName <mapping>]` forward arguments unchanged to native GacBuild. They calculate absolute sibling executable paths, preserve the caller's working directory, and use `exec` to preserve the native exit status. Release updates replace PowerShell wrappers and executables while retaining the maintained Bash wrappers.

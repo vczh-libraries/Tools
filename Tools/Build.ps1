@@ -39,6 +39,7 @@ function Update-Binaries-And-Bundle {
     Remove-Item .\ParserGen.exe -Force | Out-Null
     Remove-Item .\GlrParserGen.exe -Force | Out-Null
     Remove-Item .\GacGen.exe -Force | Out-Null
+    Remove-Item .\GacBuild.exe -Force -ErrorAction SilentlyContinue | Out-Null
     Remove-Item .\Reflection32.bin -Force | Out-Null
     Remove-Item .\Reflection64.bin -Force | Out-Null
     Remove-Item .\ReflectionCore32.bin -Force | Out-Null

@@ -62,6 +62,8 @@ function Build-Release-Update() {
         Copy-Item ..\Workflow\Source\Cpp\WfMergeCpp.cpp .\Tools\Executables\CppMerge
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.h .\Tools\Executables\GacGen
         Copy-Item ..\GacUI\Tools\GacGen\GacGen\*.cpp .\Tools\Executables\GacGen
+        Copy-Item ..\GacUI\Tools\GacBuild\GacBuild\*.h .\Tools\Executables\GacBuild
+        Copy-Item ..\GacUI\Tools\GacBuild\GacBuild\*.cpp .\Tools\Executables\GacBuild
 
         Copy-Item ..\GacUI\Tools\UiaList\UiaList\Source\*.h .\Tools\Executables\UiaList\Source -ErrorAction Stop
         Copy-Item ..\GacUI\Tools\UiaList\UiaList\Source\*.cpp .\Tools\Executables\UiaList\Source -ErrorAction Stop
