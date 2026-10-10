@@ -34,6 +34,11 @@ Right click `vl.desktop` and select `Allow Launching`,
 now the icon of the file is changed,
 and the name changed from `vl.desktop` to `VL++ DevEnv`.
 
+The generated loader starts interactive Bash with `<Tools repo>/Ubuntu/vl/start.sh` as its rcfile.
+It reads the existing user Bash configuration before adding the repository prompt to the terminal's prompt hooks.
+For loaders generated before this startup change, replace the final `source` command with
+`exec bash --rcfile "${VCPROOT}/vl/start.sh" -i`. The existing desktop launcher can be reused.
+
 ## Prepare
 
 - Double click the desktop launcher.

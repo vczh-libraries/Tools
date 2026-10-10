@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# --rcfile replaces the normal user startup file. Only read it on initial startup.
+if [[ $- == *i* && "${1-}" != --reset && -r ~/.bashrc ]]; then
+    source ~/.bashrc
+fi
+
 export VROOT=${PWD}
 export PATH=${VCPROOT}/vl/cmd:${PATH}
 
@@ -9,7 +14,7 @@ done
 
 function vreset {
     pushd $VROOT > /dev/null
-    source ${VCPROOT}/vl/start.sh
+    source "${VCPROOT}/vl/start.sh" --reset
     popd > /dev/null
 }
 export -f vreset
@@ -68,7 +73,28 @@ function PromptCommand {
     PS1="${TITLE}${USER}${GITREF}$ "
 }
 export -f PromptCommand
-export PROMPT_COMMAND="PromptCommand"
+
+function VRegisterPromptCommand {
+    # Bash 5.1 and newer execute every element of a PROMPT_COMMAND array.
+    if (( BASH_VERSINFO[0] > 5 || (BASH_VERSINFO[0] == 5 && BASH_VERSINFO[1] >= 1) )); then
+        local VCOMMAND
+        for VCOMMAND in "${PROMPT_COMMAND[@]}"; do
+            if [[ "$VCOMMAND" == PromptCommand ]]; then
+                return
+            fi
+        done
+        PROMPT_COMMAND+=(PromptCommand)
+    else
+        # Keep the scalar form for older Bash, including the macOS system Bash.
+        case ";${PROMPT_COMMAND};" in
+            *";PromptCommand;"*) ;;
+            *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}PromptCommand" ;;
+        esac
+    fi
+}
+VRegisterPromptCommand
+unset -f VRegisterPromptCommand
+export PROMPT_COMMAND
 
 if [ -a ~/.ssh/id_rsa_vl ]; then
     eval "$(ssh-agent -s)"

@@ -2,4 +2,4 @@
 
 cd <PATH>
 export VCPROOT=<VCPROOT>
-source ${VCPROOT}/vl/start.sh
+exec bash --rcfile "${VCPROOT}/vl/start.sh" -i
