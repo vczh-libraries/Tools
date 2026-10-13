@@ -143,6 +143,7 @@ Add adaptive multi-level representations (compact to expanded) without duplicati
 - If shrinking below lower bound: loop `Layout_AdjustLevelDown` (calls target `LevelDown` + remeasure until fits or minimal).
 - If expanding beyond upper bound: loop `Layout_AdjustLevelUp` (speculative raise then rollback if overshoot) using `Layout_CompareSize` to test width/height axes indicated by direction bits.
 - After each level change, invokes `responsiveTarget->Layout_UpdateMinSize()` to refresh bounds used for subsequent comparisons.
+- Reevaluate both shrinking and growth on each bounds-calculation pass, even when the container size is unchanged. Virtualized children can introduce larger levels after the viewport settles, or a sibling can reduce an already-spacious viewport. The cached lower/upper bounds still prevent repeated attempts at a known level that cannot fit.
 
 ### 8.7 Invalidation & Events
 - Any level recalculation culminating at root triggers `InvokeOnCompositionStateChanged` (root determined when `responsiveParent == nullptr`).
