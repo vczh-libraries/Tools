@@ -105,6 +105,13 @@ function Build-Release-Update() {
         Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\App\FullControlTest . -Recurse | Out-Null
         Pop-Location
 
+        # FullControlTest templates reference concrete DarkSkin types.
+        $blackResourceFile = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\BlackSkin\UI\FullControlTest\Resource.xml")
+        $blackResource = [xml](Get-Content -LiteralPath $blackResourceFile -Raw)
+        $blackInclude = $blackResource.SelectSingleNode("/Resource/Folder[@name='GacGenConfig']/Folder[@name='Cpp']/Text[@name='NormalInclude']")
+        $blackInclude.InnerText = "GacUI.h;Skins/DarkSkin/DarkSkin.h"
+        $blackResource.Save($blackResourceFile)
+
         # ControlTemplate\TuiSkin
         Write-Host "Deploying Tutorial\GacUI_ControlTemplate\TuiSkin ..."
         $tuiTutorial = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\TuiSkin")
