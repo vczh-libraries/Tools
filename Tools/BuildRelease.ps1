@@ -105,6 +105,17 @@ function Build-Release-Update() {
         Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\App\FullControlTest . -Recurse | Out-Null
         Pop-Location
 
+        # Keep the packaged showcase's Windows clock painter synchronized with FullControlTest.
+        $blackTutorial = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\BlackSkin")
+        $rawElementSource = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Generated_FullControlTest")
+        $rawHeader = [System.IO.File]::ReadAllText((Join-Path $rawElementSource "FullControlTestRawElement.h"))
+        $rawHeader = $rawHeader.Replace('#include "../../../Source/GacUI.h"', '#include <GacUI.h>')
+        [System.IO.File]::WriteAllText((Join-Path $blackTutorial "FullControlTestRawElement.h"), $rawHeader, [System.Text.UTF8Encoding]::new($false))
+        $rawCpp = [System.IO.File]::ReadAllText((Join-Path $rawElementSource "FullControlTestRawElement.cpp"))
+        $rawCpp = $rawCpp.Replace('#include "../../../Source/PlatformProviders/Windows/Direct2D/Renderers/GuiGraphicsWindowsDirect2D.h"', "#if defined VCZH_MSVC`r`n#include <GacUI.Windows.h>")
+        $rawCpp = $rawCpp.Replace('#include "../../../Source/PlatformProviders/Windows/GDI/Renderers/GuiGraphicsWindowsGDI.h"', '')
+        [System.IO.File]::WriteAllText((Join-Path $blackTutorial "FullControlTestRawElement.Windows.cpp"), $rawCpp.TrimEnd() + "`r`n#endif`r`n", [System.Text.UTF8Encoding]::new($false))
+
         # FullControlTest templates reference concrete DarkSkin types.
         $blackResourceFile = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\BlackSkin\UI\FullControlTest\Resource.xml")
         $blackResource = [xml](Get-Content -LiteralPath $blackResourceFile -Raw)
