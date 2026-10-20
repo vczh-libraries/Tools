@@ -90,7 +90,23 @@ var text = "three" of variant<int, string>;
 
 Comparison is a partial ordering. Unordered payloads, including NaN, produce false for **==** and all relational operators, and true for **!=**. Pointer payloads retain the existing pointer-identity semantics.
 
+Function and enumerable payloads use the existing wrapper-identity comparison. Generated C++ can create new wrappers when boxing these payloads, so equality and collection membership can differ from the virtual machine. Do not rely on copied function or enumerable payloads having portable identity equality.
+
 Extract an option before arithmetic, logical operations, indexing, invocation or member access. Type tests with **is TYPE** or **is not TYPE**, and variant type queries, are unsupported. Reading a variant-valued field or property is supported; extracting a value makes a copy, and writing back requires assigning a complete valid variant.
+
+## Collection membership
+
+**value in values** and **value not in values** work with typed lists, arrays and enumerables. The item and collection element must have exactly the same ordered variant type. Membership compares their active payloads, just like **==**.
+```
+var number = 7 of variant<int, string>;
+var text = "seven" of variant<int, string>;
+var values : variant<int, string>[] = {number text};
+var found = number in values; /* true */
+var missing = (8 of variant<int, string>) not in values; /* true */
+```
+ A reordered variant type does not match the element type implicitly. Dictionaries and direct range expressions do not accept variant membership.
+
+Use the membership operators to search typed variant collections. The **Contains** and **IndexOf** methods still take **object** and do not accept variant arguments directly. See [Collection membership](../.././workflow/lang/type.md) for compatibility, empty collections and range examples. The separate unary operator [variant in value](../.././workflow/lang/variant.md) extracts a payload; it does not test membership.
 
 ## Bindings and RPC
 

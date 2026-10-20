@@ -226,8 +226,36 @@ var c = range (1, 5]; /* {2 3 4 5} of int{}     */
 var d = range [1, 5]; /* {1 2 3 4 5} of int{}   */
 ```
 
-- Round parenthesis means the value on that side is included.
-- Square parenthesis means the value on that side is not included.
+- A round parenthesis excludes the value on that side.
+- A square bracket includes the value on that side.
+
+### Collection membership
+
+**ITEM in COLLECTION** returns **true** when an equal item is found. **ITEM not in COLLECTION** returns the opposite result. The collection can be a list, read-only list, observable list, array supplied by C++, or enumerable. A dictionary itself is not accepted.
+```
+var values = {1 2 3};
+var found = 2 in values;       /* true */
+var missing = 4 not in values; /* true */
+```
+ Both operands are evaluated once. For an empty collection, **in** returns **false** and **not in** returns **true**.
+
+The item type and the collection's element type must be the same, or one must implicitly convert to the other. An untyped collection has element type **object**. A [variant item](../.././workflow/lang/variant.md) therefore requires a typed collection with exactly the same ordered variant type. An option value, a reordered variant, or a variant with only some common options does not satisfy this rule.
+
+Variant membership compares active payloads using the variant **==** rules. Equal numeric payloads can match even when different numeric options are active. NaN does not match any item, including itself.
+```
+var integer = 7 of variant<int, double>;
+var real = 7.0 of variant<int, double>;
+var values : variant<int, double>[] = {integer};
+var found = real in values; /* true */
+```
+ Collection methods such as **Contains** and **IndexOf** take **object** arguments. They do not accept a variant directly because variants do not implicitly convert to **object**. Use **ITEM in COLLECTION** to search a typed variant collection. Extracting the payload with **variant in ITEM** does not supply the variant value stored in that collection.
+
+A direct range expression tests its bounds:
+```
+var included = 1 in range [1, 5); /* true */
+var excluded = 5 not in range [1, 5); /* true */
+```
+ Round parentheses exclude an endpoint; square brackets include it. A variant item is not accepted with a direct range expression. Extract a suitable numeric option before testing a range.
 
 ### Iterating over lists
 
@@ -251,7 +279,7 @@ func main(): string
 {
     var xs = {1 2 3 4 5};
     var sum = 0;
-    for (x in revsersed xs)
+    for (x in reversed xs)
     {
         sum = sum + x;
     }

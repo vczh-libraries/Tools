@@ -2,7 +2,7 @@
 
 All supported expressions are listed below.
 
-[Variants](../.././workflow/lang/variant.md) have explicit rules for assignment, comparison, null testing, strong and weak casts, **of** inference, and **variant in** payload extraction. Ordinary numeric, pointer and object conversions do not select a variant option implicitly.
+[Variants](../.././workflow/lang/variant.md) have explicit rules for assignment, comparison, null testing, strong and weak casts, **of** inference, **variant in** payload extraction, and collection membership. Ordinary numeric, pointer and object conversions do not select a variant option implicitly.
 
 ## null, true, false
 
@@ -16,7 +16,7 @@ For **/d+**, if the place receiving an interger does not have an explicit type, 
 
 It is very easy to specify an expected integer type like: **0 of UInt64**.
 
-For **/d+./d+**, if the place receiving an interger does not have an explicit type, it is **double** when the Workflow compiler is running in a 64-bits process. An error is generated if the number exceeds the range supported by the expected type.
+For **/d+./d+**, if the place receiving a floating-point number does not have an explicit type, it is **double** on both 32-bit and 64-bit targets. An error is generated if the number exceeds the range supported by the expected type.
 
 ## "string"
 
@@ -50,7 +50,7 @@ See [Binary Operators](../.././workflow/lang/expr_binary.md).
 
 **C ? A : B** returns **A** when **C** is **true**.
 
-**C ? A : B** returns **B** when **A** is **true**.
+**C ? A : B** returns **B** when **C** is **false**.
 
 Only one of **A** or **B** will be evaluated according to the value of **C**.
 
@@ -78,13 +78,13 @@ You can use multiple arguments from **$1** to any number, but all numbers must b
 
 For example:
 ```
-var f: func(string, string):string = [$`Hello, $($1) and $($2)!`];
+var f: func(string, string):string = [$"Hello, $($1) and $($2)!"];
 ```
  is exactly the same as
 ```
 var f = func(a: string, b: string): string
 {
-    return `Hello, $(a) and $(b)!`;
+    return $"Hello, $(a) and $(b)!";
 }
 ```
 
@@ -145,7 +145,7 @@ See **Collection types** in [Types](../.././workflow/lang/type.md).
 
 ## Set testing expression: VALUE in OBJECT, VALUE not in OBJECT
 
-See **Collection types** in [Types](../.././workflow/lang/type.md).
+**VALUE in OBJECT** returns whether a collection contains an equal element. **VALUE not in OBJECT** returns the opposite result. See [Collection membership](../.././workflow/lang/type.md) for operand types, ranges, and examples.
 
 ## Constructor expression: {a b c}, {a:x b:y c:z}
 
@@ -211,9 +211,13 @@ func main(): string
 ```
  obviously uses the second **F**.
 
-## Static member accessing: OBJECT::MEMBER, ::MEMBER
+## Current instance: this
 
-See [Module](../.././workflow/lang/module.md).
+**this** refers to the current instance in instance member code. Use **this.MEMBER** to select an instance member when a local name would hide it. It is unavailable in global functions and static methods. See [Classes](../.././workflow/lang/class.md) and [Implementing an interface](../.././workflow/lang/interface_new.md).
+
+## Qualified member accessing: PARENT::MEMBER, ::MEMBER
+
+**PARENT::MEMBER** looks up a name inside a namespace or type, including static members. **::MEMBER** starts lookup at the root scope, so a local name cannot hide that root name. For example, **::system::DateTime** names the type in the root **system** namespace. See [Module](../.././workflow/lang/module.md) for namespaces and imports.
 
 ## Index expression: CONTAINER[KEY]
 
@@ -245,7 +249,7 @@ These expressions can cast objects between shared pointers and raw pointers.
 
 These expressions also test if **OBJECT** is actually or inherits **TYPE**, if not, then the expression fails.
 
-When **cast TYPE OBJECT** fails, it throws an expression.
+When **cast TYPE OBJECT** fails, it throws an exception.
 
 When **TYPE** is *****, it is inferred by the place receiving this expression.
 
@@ -274,6 +278,20 @@ This expression gives an explicit type **TYPE** to the expression **OBJECT**.
 It generates an error when it is not possible to do that.
 
 **null of int** generates such error, because **null** can never be **int**.
+
+## Type queries: typeof(TYPE), type(EXPRESSION)
+
+**typeof(TYPE)** returns the reflection type descriptor for a declared type. **type(EXPRESSION)** evaluates the expression and returns its runtime type descriptor. Both return **system::reflection::TypeDescriptor***. Variant types do not have a type descriptor and are rejected by these queries.
+
+These expressions are supported by the Workflow virtual machine; C++ generation rejects them. For example, both comparisons below return **true**:
+```
+typeof(bool) == type(true)
+typeof(string) == type("text")
+```
+
+## Coroutine context member: $.NAME
+
+Inside a provider coroutine, **$.NAME** accesses a member of the context returned by the provider's **QueryContext** method. It does not pause the coroutine. See [Context members](../.././workflow/lang/coroutine_custom.md) for the provider contract.
 
 ## Event expression: attach(EVENT, FUNCTION), detach(EVENT, HANDLER)
 

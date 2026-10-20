@@ -2,7 +2,7 @@
 
 ## Type inferences
 
-For **+**, **-** and **not**, the result has the same type as **VALUE**. **variant in VALUE** has type **object** and requires a statically variant operand.
+For **+**, **-** and **not**, the result has the same type as **VALUE**. **cast** returns the specified or inferred target type. **variant in VALUE** has type **object** and requires a statically variant operand.
 
 ## Definitions
 
@@ -16,6 +16,10 @@ For **+**, **-** and **not**, the result has the same type as **VALUE**. **varia
 - For signed integers, returns -1 * **VALUE**.
 - For floating-point numbers, returns -1 * **VALUE**.
 - It is not allowed on other types.
+
+### cast TYPE VALUE, cast * VALUE
+
+Explicitly convert **VALUE** to **TYPE**. In **cast * VALUE**, the target type comes from the place receiving the result. A conversion that is not allowed is a compiler error; an allowed conversion can still fail at runtime and throw an exception. See [strong casting expressions](../.././workflow/lang/expr.md) and [variant conversion rules](../.././workflow/lang/variant.md).
 
 ### variant in VALUE
 
