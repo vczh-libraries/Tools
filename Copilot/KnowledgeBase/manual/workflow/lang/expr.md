@@ -2,7 +2,7 @@
 
 All supported expressions are listed below.
 
-[Variants](../.././workflow/lang/variant.md) have explicit rules for assignment, comparison, null testing, strong and weak casts, and **of** inference. Ordinary numeric, pointer and object conversions do not select a variant option implicitly.
+[Variants](../.././workflow/lang/variant.md) have explicit rules for assignment, comparison, null testing, strong and weak casts, **of** inference, and **variant in** payload extraction. Ordinary numeric, pointer and object conversions do not select a variant option implicitly.
 
 ## null, true, false
 
@@ -40,7 +40,7 @@ After casting all of them to strings, these strings will be put inside the speci
 
 ## Unary operator expression: op VALUE
 
-See [Unary Operators](../.././workflow/lang/expr_unary.md).
+See [Unary Operators](../.././workflow/lang/expr_unary.md). **variant in VALUE** requires a variant operand and extracts its active payload as **object**.
 
 ## Binary operator expression: VALUE op VALUE
 
@@ -237,7 +237,7 @@ When **T** is a shared pointer type or a raw pointer type, the type of the point
 
 ## Strong casting expression: cast TYPE OBJECT, cast * OBJECT
 
-When either side is a variant, use the [exact-option rules](../.././workflow/lang/variant.md). A matching active option can contain null; a different active option throws even when its payload is null.
+When either side is a variant, use the [exact-option rules](../.././workflow/lang/variant.md). A matching active option can contain null; a different active option throws even when its payload is null. **cast object** requires an exact declared **object** option. It never boxes a complete variant; use **variant in** for general payload extraction.
 
 For class types or interface types, **TYPE** must be a pointer type.
 

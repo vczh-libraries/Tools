@@ -60,7 +60,7 @@ interface IVariantService
 }
 ```
 
-A variant explicitly escaped to **object** still contains the outer variant box. The JSON serializer rejects it with **Unsupported RPC JSON serialization value.**, including when reached through an object list or dictionary. It does not serialize the active payload and does not generate a variant schema.
+**variant in VALUE** explicitly extracts the active payload as **object**. That payload can be serialized only if its value is supported by RPC; extraction does not generate a variant schema. Workflow casts cannot box a complete variant as **object**. If native C++ code supplies such a box, the JSON serializer rejects it with **Unsupported RPC JSON serialization value.**, including when reached through an object list or dictionary. Extraction removes only one layer, so an object option holding a native-provided variant box still cannot be serialized.
 
 ## Service and Client Flow
 

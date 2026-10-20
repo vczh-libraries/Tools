@@ -22,6 +22,7 @@ Precedences of all kinds of expressions are listed below in descending precedenc
 - **-**
 - **not**
 - **cast**
+- **variant in** These unary operators group from right to left. For example, **cast int variant in value** means **cast int (variant in value)**.
 
 ## 3
 

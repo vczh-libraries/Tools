@@ -51,17 +51,29 @@ Null does not erase the active option. Strong extraction of a matching null poin
 
 **is null** and **is not null** require at least one null-bearing option and inspect the active payload. They do not test whether the outer variant box exists. A compiler-generated default, including an unassigned struct field, selects the first declared option and uses that option's default value. Thus a default **variant\<int, string\>** contains integer zero; a default **variant\<int?, string\>** contains an empty optional tagged as **int?**.
 
-## The object option and explicit escape
+## Extracting the active payload as object
+
+**variant in VALUE** extracts the active payload and has static type **object**. The compiler requires **VALUE** to have a variant type; an object containing a native-provided variant box is not accepted. The operand is evaluated once. Null pointer, empty optional and null object payloads produce null.
+```
+var number = 42 of variant<int, string>;
+var payload : object = variant in number;
+var result = cast int payload;
+```
+**result** is 42. The ordinary cast operates on the extracted integer payload.
+
+This operator has the same [precedence](../.././workflow/lang/expr_precedences.md) as unary **+**, **-**, **not** and **cast**. Unary operators group from right to left, so **cast int variant in number** first extracts the payload and then casts it. Calls, indexing and member access bind more tightly: **variant in values[0].Get()** extracts the returned variant. Use parentheses around a lower-precedence operand or around the extraction before a type test, such as **(variant in value) is null**.
+
+Extraction removes exactly one variant layer. If an **object** option contains a variant box supplied by native C++ code, the result is that inner box. It is not recursively extracted, and its static type remains **object**.
+
+## The object option
 
 An explicit **object** option takes precedence. Converting an object-typed value to such a variant selects that option without inspecting the payload. Casting that variant to **object** extracts only an active **object** option; another active option causes a runtime failure.
 
-If **object** is not an option, **cast object value** preserves the complete outer variant box. A later ordinary cast does not extract its payload. This function compiles but fails when called:
+If **object** is not an option, **cast object value** is a compiler error, just like a cast to any other undeclared option. Workflow has no conversion that boxes a complete variant as **object**. Use **variant in value** to extract the active payload instead. This function is rejected at compile time:
 ```
-func EscapedPayload():int
+func f(x:variant<int, string>):void
 {
-  var value = 1 of variant<int, string>;
-  var escaped : object = cast object value;
-  return cast int escaped;
+  var y = cast object x;
 }
 ```
  Casting an object-typed value back to a variant without an exact **object** option is rejected at compile time. There is no dynamic recovery cast.
@@ -82,7 +94,7 @@ Extract an option before arithmetic, logical operations, indexing, invocation or
 
 ## Bindings and RPC
 
-A [binding](../.././workflow/lang/bind.md) publishes through **ValueChanged(object)**. A direct variant result is therefore rejected. The authored expression must extract a payload or explicitly produce an allowed nonvariant result. Observing and caching a variant while producing such a result is supported.
+A [binding](../.././workflow/lang/bind.md) publishes through **ValueChanged(object)**. A direct variant result is therefore rejected. Use **bind(variant in source.Value)** to publish the active payload as **object**, or produce another allowed nonvariant result. Observing and caching a variant while producing such a result is supported.
 
-[RPC](../.././workflow/rpc.md) does not support variants, including variants contained in collection arguments, optional wrappers or struct fields. Escaping a variant to **object** does not make it JSON serializable.
+[RPC](../.././workflow/rpc.md) does not support variants, including variants contained in collection arguments, optional wrappers or struct fields. An extracted payload can be serialized only if its value is supported by RPC. A variant box supplied by native C++ code remains unsupported, including a box nested inside an extracted object payload.
 
