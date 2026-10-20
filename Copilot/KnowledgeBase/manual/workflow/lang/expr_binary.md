@@ -4,6 +4,8 @@
 
 Here assume **A** is the left operand, and **B** is the right operand.
 
+[Variant comparisons](../.././workflow/lang/variant.md) are an exception to the common-type rules below. They compare active payloads directly with a partial ordering, including mixed variant and nonvariant operands. Arithmetic, logical and collection operations on a variant are rejected until an option is extracted.
+
 When type of **A** can be implicitly converted to type of **B**, **A** will be cast to type of **B** before being applied to this operator.
 
 When type of **B** can be implicitly converted to type of **A**, **B** will be cast to type of **A** before being applied to this operator.

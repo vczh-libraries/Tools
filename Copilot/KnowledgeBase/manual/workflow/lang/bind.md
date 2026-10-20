@@ -2,6 +2,8 @@
 
 A data binding expressions **bind(EXPR)** observes the changing of **EXPR** by attaching callbacks to all involved events that are associated with properties.
 
+A binding sends its result to **ValueChanged(object)**, so it cannot return a [variant](../.././workflow/lang/variant.md) directly. Extract a payload or explicitly produce an allowed nonvariant result in the authored expression. Variant-valued properties can still be observed and cached while the expression returns a nonvariant value. An explicit cast to **object** follows the variant's object-option precedence.
+
 ## Defining a data binding
 
 When we say property **A** is associated with event **AChanged**, it means that the property must be declared in one of the following ways:

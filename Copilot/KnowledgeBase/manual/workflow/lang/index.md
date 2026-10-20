@@ -56,6 +56,7 @@
 - **uint**: [Types](../.././workflow/lang/type.md)
 - **using**: [Module](../.././workflow/lang/module.md), [Generic (interface)](../.././workflow/lang/interface_using.md)
 - **var**: [Functions and Variables](../.././workflow/lang/funcvar.md)
+- **variant**: [Variants](../.././workflow/lang/variant.md), [Types](../.././workflow/lang/type.md)
 - **void**: [Types](../.././workflow/lang/type.md)
 - **while**: [Statements](../.././workflow/lang/stat.md)
 - **xor**: [Binary Operators](../.././workflow/lang/expr_binary.md)

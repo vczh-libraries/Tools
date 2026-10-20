@@ -2,6 +2,8 @@
 
 All supported expressions are listed below.
 
+[Variants](../.././workflow/lang/variant.md) have explicit rules for assignment, comparison, null testing, strong and weak casts, and **of** inference. Ordinary numeric, pointer and object conversions do not select a variant option implicitly.
+
 ## null, true, false
 
 - **null** could be **T***, **T^** or **T?**.
@@ -227,13 +229,15 @@ See **Collection types** in [Types](../.././workflow/lang/type.md).
 - **A is T** returns true when **A** is **T**.
 - **A is not T** returns true when **A** is not **T**.
 
-**T** can be any type. If T is a class or an interface, it tests if the variable **A** is holding an object of or inherits that type. For example, **new C^() is C** returns **true**.
+Neither the source nor **T** can be a variant type. If T is a class or an interface, it tests if the variable **A** is holding an object of or inherits that type. For example, **new C^() is C** returns **true**.
 
 If **T** is a non-reference type, then typically **A** is **object**, this is the only case when you need to test such type.
 
 When **T** is a shared pointer type or a raw pointer type, the type of the pointer is also considered. For example, **new C^() is C*** returns **false**.
 
 ## Strong casting expression: cast TYPE OBJECT, cast * OBJECT
+
+When either side is a variant, use the [exact-option rules](../.././workflow/lang/variant.md). A matching active option can contain null; a different active option throws even when its payload is null.
 
 For class types or interface types, **TYPE** must be a pointer type.
 
@@ -246,6 +250,8 @@ When **cast TYPE OBJECT** fails, it throws an expression.
 When **TYPE** is *****, it is inferred by the place receiving this expression.
 
 ## Weak casting expression: OBJECT as TYPE, OBJECT as *
+
+For a variant source, use the [variant weak-cast rules](../.././workflow/lang/variant.md). The target must be an exact pointer option, or **T?** with an option of **T** or **T?**. A variant cannot be the target of a weak cast.
 
 For class types or interface types, **TYPE** must be a pointer type.
 
@@ -260,6 +266,8 @@ When **OBJECT as TYPE** fails, it returns **null**.
 When **TYPE** is *****, it is inferred by the place receiving this expression.
 
 ## Infer expression: OBJECT of TYPE
+
+With a variant target, a nonvariant source must exactly match one option. A variant source must have a subset of the target's options. This explicit expression preserves the active option; it does not enable an implicit conversion.
 
 This expression gives an explicit type **TYPE** to the expression **OBJECT**.
 

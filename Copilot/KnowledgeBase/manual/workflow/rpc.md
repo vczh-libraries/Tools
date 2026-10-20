@@ -50,6 +50,18 @@ RPC payloads must be serializable. Supported payload shapes are:
 
 Reserved framework types such as object references and RPC exceptions are part of the transport protocol and are not valid as ordinary RPC member payloads.
 
+[Variants](.././workflow/lang/variant.md) are not serializable by RPC. The compiler rejects them in method parameters and returns, properties and event arguments, including occurrences inside collection type arguments, nullable wrappers and struct fields. For example, this interface is rejected before RPC metadata or serializers are generated:
+```
+module test;
+@rpc:Interface
+interface IVariantService
+{
+  func Send(value:variant<int, string>):void;
+}
+```
+
+A variant explicitly escaped to **object** still contains the outer variant box. The JSON serializer rejects it with **Unsupported RPC JSON serialization value.**, including when reached through an object list or dictionary. It does not serialize the active payload and does not generate a variant schema.
+
 ## Service and Client Flow
 
 A server creates an implementation object and registers it with IRpcLifecycle. A client asks the lifecycle for the same service name and casts the returned object to the service interface.
