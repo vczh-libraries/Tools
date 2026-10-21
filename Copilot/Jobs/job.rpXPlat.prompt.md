@@ -1,0 +1,154 @@
+# Ensure GacUI Working Properly on Linux/macOS
+
+- If you are on Linux, the repo you are working on are `GacUI`, `GacJS` and `wGac`, you don't have to worry about `iGac` on Linux.
+- If you are on macOS, the repo you are working on are `GacUI`, `GacJS` and `iGac`, you don't have to worry about `wGac` on macOS.
+- `wGac` and `iGac` has very similar structure:
+  - When a `%ABC` folder is mentioned below, it means `wGac/WGacABC` or `iGac/MacABC`.
+  - When a repo name is not mentioned, it means `wGac` or `iGac`.
+- This task is usually executed after some changes have been made to `GacUI`, `import.sh` and `syncProj.sh` is required to update the repo first.
+
+## Goal
+
+- The current document is the source of truth, when unalignment happens, align to this document.
+- Maintain documents and scripts in `wGac` and `iGac`.
+- Makesure test apps build and work as expected.
+- Details of verification are in:
+  - `DebugRemoteProtocolWithNativeRenderer.md`
+  - `DebugRemoteProtocolWithGacJS.md`
+  - `DebugTuiControlTestSop.md`
+- You must fix any issue you see during verification.
+  - DO NOT preventively fix any issue, a fixing must be applied only when an issue is observed during verification.
+  - For unstable issues, try to run that specific verification item up to 5 times, it counts an issue when you see more than one failures.
+  - `import.sh` and `build.sh` must succeed.
+  - If `build.sh` hits dependency issues:
+    - In `wGac` repo `build-prerequisites-ubuntu.sh` should be fixed.
+    - In `iGac` repo cmake configurations should be fixed.
+
+## Native touch applicability
+
+wGac and iGac native providers do not support touch experience. Their touch-specific acquisition, Touching and TouchingList gesture checks may be skipped; keep excluded items in the test cards with blank results and this reason. Synthetic Core input does not establish native touch support. Raw Clock and existing mouse/keyboard checks still apply. This exclusion does not cover GacJS on Linux/macOS or Wasm browser input. Linux verification does not require running iGac and must not claim macOS coverage.
+
+## Maintain a Test Matrix Card
+
+You need to maintain test card in:
+- `<wGac repo>/TestMatrix_NativeRenderer.md` on Linux or `<iGac repo>/TestMatrix_NativeRenderer.md` on macOS for `<GacUI repo>/.github/Jobs/DebugRemoteProtocolWithNativeRenderer.md`
+- `<wGac repo>/TestMatrix_GacJS.md` on Linux or `<iGac repo>/TestMatrix_GacJS.md` on macOS for `<GacUI repo>/.github/Jobs/DebugRemoteProtocolWithGacJS.md`
+- `<wGac repo>/TestMatrix_Tui.md` on Linux or `<iGac repo>/TestMatrix_Tui.md` on macOS for `<GacUI repo>/.github/Jobs/DebugTuiControlTestSop.md`; keep one row per applicable SOP test section plus build/sync and unit-test results. Record native input separately from terminal-byte replay and explicitly record terminal or platform limitations.
+
+If these files already exist, delete them, and recreate them following the `### Test Matrix Card` section in each document.
+Copy the complete applicable TUI sample into the platform's declared TUI card. All run-specific observations, failures, fixes, evidence, platform limitations and completed legacy-terminal/Kitty comparison cards belong only in that file. The SOP and setup documents contain reusable procedures and blank samples; do not fill their sample cells or append verification results, terminal comparisons or run histories to them.
+During verification, test matrix cards should be updated in time:
+- When a test item starts, succeeds, fails, fixed, the file need to be updated immediately and saved, but no need to commit immediately, a commit is only required after all test items are done.
+- I will read the file to check the progress of your verification.
+Without explicitly instructed, you are required to complete every available test item in the matrix:
+- If some test items are excluded explicitly, you still need to keep complete test items in the test matrix card, but leave blanks for results of excluded items.
+
+## Helper Bash Scripts
+
+- `import.sh` copy released source file from `GacUI`, but `GacUI` might not be released yet, always run `CodePack` first if you are not sure.
+  - `GacUI/Source` is `CodePack`-ed to `GacUI/Release` and then copied to `Import`.
+  - `GacUI/Test/RemotingHelpers` is `CodePack`-ed to `GacUI/Release` and then copied to `Import-Test`.
+  - The remoting-helper output consists of the neutral `Test.RemotingHelpers.h` and `Test.RemotingHelpers.cpp`. Stdio redirection is supplied by `VlppOS.h`, `VlppOS.cpp`, and the matching imported VlppOS platform pair instead of `Test.RemotingHelpers*`.
+  - CodePack does not generate platform-specific helper headers.
+- `syncProj.sh` is supposed to maintain the structure described in `## Ensure Project Availability`.
+  - Unalignment usually happens here because `GacUI` is changing progressively, `wGac` and `iGac` will then catch up after `GacUI` finishes some features.
+  - `GacUI`, `wGac` and `iGac`, as well as `syncProj.sh`, might needs some manual fix.
+- `build.sh` builds the whole repo.
+- `test.sh` runs each app.
+- `test_core.sh` full-builds and runs the selected sibling GacUI Core-side app; it complements `test.sh`, which continues to run native platform apps and renderers.
+
+## Ensure Project Availability
+
+In `GacUI` there are GacUI XML Resources to build C++ code:
+- `FullControlTest`
+- `RemoteProtocolTest`
+- `TuiControlTest`
+- `RemoteViewModelTest`
+- `TuiControlTest` (with the separate released `TuiSkin` pair imported into `Import/Skins/TuiSkin`)
+XML resources and assets will be copied from `GacUI/Test/Resources/App/<APP-NAME>` to `Apps/<APP-NAME>/Resources`, but C++ files are generated from them locally.
+
+In `GacUI` there are important test apps:
+- `CppTest`, a test app with with `FullControlTest` running, no network protocol is involved.
+  - `test.sh --app:fct (--hosted)?`
+  - Its portable counterpart is `%FullControlTest`.
+- `CppTest_Tui`, the hosted terminal showcase using `TuiControllerBase` and `TuiSkin`.
+  - `test.sh --app:tui` runs `%TuiControlTest` in the foreground with inherited interactive stdin/stdout.
+  - Reject `--unblock`, `--hosted`, and renderer-only `--port` for this app. There is no HTTP automation endpoint, remote Core, or renderer replacement.
+  - `syncProj.sh` regenerates `Apps/TuiControlTest` and copies `CppTest_Tui/Main.cpp` to the portable `GuiMain.cpp`; keep only the platform entry point local.
+  - Follow `DebugTuiControlTestSop.md`, including terminal sizes, input capabilities, dialogs and every normal shutdown path.
+  - On macOS, `%TuiControlTest` is a foreground executable, not a Cocoa app bundle. `Mac/TUI/TuiCocoaController` reuses Cocoa clipboard/image/key-name/global-shortcut services with explicit callback ownership and a nonblocking AppKit pump under the TUI timer. Native terminal Command delivery and Carbon global registration are separate checks.
+- `CppTest_Rvm`, a test app with actual UI, connecting to a view model implementation hosted in `RemotingTest_RvmHost`.
+  - `test.sh --app:rvmt`
+  - `test_core.sh --app:cpptest_rvm --protocol:minihttp` starts this requester and then full-builds and starts its manual host.
+  - Its portable counterpart is `%CppTestRvm`.
+  - The wGac and iGac launchers still pass `/MiniHttp`; their portable `Main.cpp` files do not expose the mirrored `StartCliServer`, so these standalone targets require a manually started `/MiniHttp` host.
+- `RemotingTest_Rendering_Win32`, a test app as a native renderer in remote protocol, it connects to `RemotingTest_Core`.
+  - `test.sh --app:renderer (--port:<port>)?`
+  - Its portable counterparts are `wGac/RemotingTest_Rendering_Wayland` and `iGac/RemotingTest_Rendering_macOS`.
+  - The Windows `RemotingTest_Rendering_Win32` executable accepts `/AsPort:<port>` and defaults to 8888; pass `/AsPort:8889` when running beside Core. The portable wGac/iGac launchers retain their `--port:<port>` contract and default 8889. A concurrent takeover renderer needs a different automation port, such as 8890; this does not change the `/MiniHttp` Core connection on port 8888.
+- `RemotingTest_Core`, a test ap as the core app in remote protocol.
+  - It runs from `GacUI/Test/Linux/RemotingTest_Core`.
+  - `test_core.sh --app:fct|rpt|rvmt --protocol:minihttp [--cli]` full-builds the selected GacUI project and starts it.
+  - Renderer traffic always uses `/MiniHttp`. For `/RVMT`, host mode is independently either manual `/MiniHttp` or auto-launched `/Cli:<path>`.
+- `RemotingTest_RvmHost`, a CLI app hosts the implementation of `IViewModel` with `RemoteViewModelTest` is used.
+  - Requres `CppTest_Rvm` or `RemotingTest_Core /RVMT`.
+  - It runs from `GacUI/Test/Linux/RemotingTest_RvmHost`.
+  - Exact `/Cli` reserves stdin/stdout for UTF-8/Base64-framed protocol traffic and suppresses the ordinary banner.
+
+Only `/MiniHttp` is available as a renderer network protocol. The cross-platform stdio transport is also available for Core-to-host `/Cli` auto-launching; it does not replace `/MiniHttp` for renderers.
+Additionally, `test.sh --app:simple` runs a hello world GacUI app as a smoke test of the platform's local native renderer.
+
+## Maintaining Test App Mirrors
+
+Some test apps are just copied from `GacUI` with just a few local files.
+It means core files for test apps are shared between `GacUI`, `wGac` and `iGac`.
+To edit them, make the change in `GacUI` and run `import.sh` or `syncProj.sh` to update local files.
+It includes files from:
+- `GacUI/Test/RemotingHelpers`, which is `CodePack`-ed and `import.sh`-ed to `Import-Test`.
+  - It is also part of test apps, but it has reusable code to build future test apps.
+  - DO NOT bring any actual test app specific knowledge in these files. The only exception will be URL names using in network protocol.
+- `GuiMain.cpp` from ported test apps.
+  - Note that `GuiMain.cpp` in `GacUI` is using pre-`CodePack`-ed files, and in here is using `CodePack`-ed files.
+  - To handle include file path differences, use the following macros:
+    - `#if defined VCZH_MSVC` for code working in `GacUI`.
+    - `#if defined VCZH_GCC` for code working in both `wGac` and `iGac`.
+    - `#if defined VCZH_GCC && !defined VCZH_APPLE` for code working in only `wGac`.
+    - `#if defined VCZH_GCC && defined VCZH_APPLE` for code working in only `iGac`.
+
+`%Shared` is a project used by all test apps, it references `Import`, `Import-Test` with additional sharable local source files (mostly in `%`).
+
+Sometimes the test item fails because of lacking mature steps, instead of defect in the code.
+In this case we don't need to mark it with `(fixed)`, instead we can write the experience down in:
+- `<GacUI-repo>/.github/Learning/Learning_RpJob.md`
+Therefore reading this file is also important to avoid repeating mistakes and to improve the testing process.
+In this files there are 4 sections:
+- `## Shared`
+- `## Windows`
+- `## Linux (wGac repo specific)`
+- `## macOS (iGac repo specific)`
+If an issue is not tight to a specific platform, put the experience in the `## Shared` section.
+
+## Verification
+
+When executing this instruction files, it usually means `GacUI` itself alone on Windows has been properly verified.
+Try to limit changes in `GacUI` to only include making release or fixing cross-platform building issues:
+- Unless there are fundamental issues to fix.
+- You need to figure out why the code is just work in `GacUI` on Windows. Having correct answers to this question help you figure out root cause efficiently and precisely.
+
+Follow `DebugRemoteProtocolWithNativeRenderer.md`, `DebugRemoteProtocolWithGacJS.md`, and `DebugTuiControlTestSop.md` to make sure all test apps are behaving expectedly. TUI is an independent terminal matrix; it does not multiply the remote application/transport matrix.
+Without explicitly instructed, the complete matrix of all combinations of test apps, test UI loaded with remote protocol, and available network protocol choices, should be verified.
+
+Local test apps (aka remote protocol not involved) should also be verified, including:
+- `test.sh --app:fct` with or without `--hosted`:
+  - `DebugRemoteProtocolSop.md` already covers `FullControlTest` verifications, follow the instructions there.
+- `test.sh --app:tui`
+  - Follow `<GacUI repo>/.github/Jobs/DebugTuiControlTestSop.md` and record every TUI test item in `<wGac repo>/TestMatrix_Tui.md` on Linux or `<iGac repo>/TestMatrix_Tui.md` on macOS.
+Succeeded local test apps verification could be considered as a baseline, when issues are seen in remote protocol tests, you are much easier to trace their root cause.
+
+## Finishing
+
+Make sure to commit and push local changes across all affected repos.
+Conflict should be resolved by rebasing.
+`job.rpWindows.prompt.md` and `job.rpXPlat.prompt.md` could be running in different computers at the same time,
+so when you find the issue you just fixed, which is also resolved in remote commits,
+you need to undo your own, and verify the fix in remote commits again.
