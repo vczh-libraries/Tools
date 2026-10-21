@@ -48,6 +48,12 @@ For loaders generated before this startup change, replace the final `source` com
 - Use `vgo u` to sync all remote branches.
 - Use `vgo vmake` and `vgo vbuild` to run CI.
 
+Both CI commands stop before downstream repositories when a repository fails.
+`vgo vbuild` uses native `-O2` optimization and treats compiler warnings as failures.
+After fixing a failure, resume with `vgo vbuild REPO` for that repository and each
+remaining repository in dependency order. Run enabled WebAssembly suites separately
+using their browser launchers.
+
 ## Start to work
 
 - Double click the desktop launcher. Type `vhelp` to see all available commands.
