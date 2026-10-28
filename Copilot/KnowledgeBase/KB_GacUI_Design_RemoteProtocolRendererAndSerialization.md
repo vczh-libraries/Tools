@@ -251,8 +251,7 @@ RTF/HTML export uses the existing document serializers.
 The handler verifies the copied byte count and returns only after output close succeeds, preserving SaveDocument's
 synchronous modified-state contract.
 
-The ribbon installs missing built-in styles when its document changes. Loading a
-file preserves existing definitions; explicitly applying a gallery item installs
-its canonical definition in the current document before replacing the selected
-text's formatting. Keep the style catalog in private files so a subsequent load,
-including into the toolstrip editor, retains styles not yet applied to any text.
+Private documents loaded by CppTest are assumed to have been saved by CppTest.
+Keep their complete style catalog through save and load, including styles not yet
+applied to any text. The ribbon uses those definitions directly without restoring
+missing built-ins or replacing loaded definitions when a gallery item is chosen.
