@@ -154,7 +154,7 @@ $(CPP_TARGET): $(O_FILES)
 At make execution time, shared platform options are selected without changing the generated makefile:
 
 - Darwin enables Clang Blocks and links CoreFoundation and Network.framework.
-- Linux links liburing.
+- Linux links liburing and libanl for asynchronous DNS resolution.
 - Every compiler variant writes `Obj/*.d` dependency files for incremental header rebuilds.
 
 ## Adding Compiler or Linker Arguments
