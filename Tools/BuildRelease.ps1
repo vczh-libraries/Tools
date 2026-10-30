@@ -82,7 +82,7 @@ function Build-Release-Update() {
         Copy-Item ..\GacUI\Tools\GitView\GitTui\*.cpp .\Tools\Executables\GitTui\Source -ErrorAction Stop
 
         # Build Tools
-        Build-Sln .\Tools\Executables\Executables.sln Release x86
+        Build-Sln .\Tools\Executables\Executables.sln Release x64
 
         # Deploy
         Write-Host "Deploying Binaries ..."
@@ -105,9 +105,11 @@ function Build-Release-Update() {
         Copy-Item $PSScriptRoot\..\..\GacUI\Test\Resources\App\FullControlTest . -Recurse | Out-Null
         Pop-Location
 
-        # Keep the packaged showcase's Windows clock painter synchronized with FullControlTest.
+        # Keep the packaged showcase's event handlers and Windows clock painter synchronized with FullControlTest.
         $blackTutorial = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\BlackSkin")
         $rawElementSource = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Generated_FullControlTest")
+        Copy-Item -LiteralPath (Join-Path $rawElementSource "FullControlTestEventHandlers.h") -Destination $blackTutorial
+        Copy-Item -LiteralPath (Join-Path $rawElementSource "FullControlTestEventHandlers.cpp") -Destination $blackTutorial
         $rawHeader = [System.IO.File]::ReadAllText((Join-Path $rawElementSource "FullControlTestRawElement.h"))
         $rawHeader = $rawHeader.Replace('#include "../../../Source/GacUI.h"', '#include <GacUI.h>')
         [System.IO.File]::WriteAllText((Join-Path $blackTutorial "FullControlTestRawElement.h"), $rawHeader, [System.Text.UTF8Encoding]::new($false))
