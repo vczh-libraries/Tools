@@ -108,6 +108,8 @@ Windows popup Hide sends `WM_CLOSE` synchronously; normal windows retain posted 
 
 `GuiPopup::Closed` invalidates positioning, clears ownership, removes the popup from the opening list and detaches its native parent before public closure notifications. `GuiTooltip::Closed` first detaches temporary content, bypassing hover-based delayed dismissal. Menu closure notifications release menu-service, submenu-button and ALT state through their normal paths; dismissal does not execute commands.
 
+Owner-driven dismissal sets `closingForOwner` before Hide. `GuiPopup::BeforeClosing` still invokes the normal closing subscribers but clears cancellation for this mandatory path; an independent popup close remains cancellable. `Closed` clears the transient flag before public notifications and subsequent reuse.
+
 ### Platform-Specific Message Handling
 
 Despite different underlying implementations, modal windows work consistently across all platforms:
