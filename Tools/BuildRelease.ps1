@@ -110,6 +110,9 @@ function Build-Release-Update() {
         $rawElementSource = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\GacUI\Test\GacUISrc\Generated_FullControlTest")
         Copy-Item -LiteralPath (Join-Path $rawElementSource "FullControlTestEventHandlers.h") -Destination $blackTutorial
         Copy-Item -LiteralPath (Join-Path $rawElementSource "FullControlTestEventHandlers.cpp") -Destination $blackTutorial
+        $showcaseSource = Split-Path -Parent $rawElementSource
+        Copy-Item -LiteralPath (Join-Path $showcaseSource "SharedDocumentEditor.h") -Destination $blackTutorial
+        Copy-Item -LiteralPath (Join-Path $showcaseSource "SharedDocumentEditor.cpp") -Destination $blackTutorial
         $rawHeader = [System.IO.File]::ReadAllText((Join-Path $rawElementSource "FullControlTestRawElement.h"))
         $rawHeader = $rawHeader.Replace('#include "../../../Source/GacUI.h"', '#include <GacUI.h>')
         [System.IO.File]::WriteAllText((Join-Path $blackTutorial "FullControlTestRawElement.h"), $rawHeader, [System.Text.UTF8Encoding]::new($false))
@@ -128,6 +131,10 @@ function Build-Release-Update() {
         # ControlTemplate\TuiSkin
         Write-Host "Deploying Tutorial\GacUI_ControlTemplate\TuiSkin ..."
         $tuiTutorial = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\TuiSkin")
+        Copy-Item -LiteralPath (Join-Path $showcaseSource "SharedDocumentEditor.h") -Destination $tuiTutorial
+        Copy-Item -LiteralPath (Join-Path $showcaseSource "SharedDocumentEditor.cpp") -Destination $tuiTutorial
+        Copy-Item -LiteralPath (Join-Path $showcaseSource "Generated_TuiControlTest\TuiControlTestEventHandlers.h") -Destination $tuiTutorial
+        Copy-Item -LiteralPath (Join-Path $showcaseSource "Generated_TuiControlTest\TuiControlTestEventHandlers.cpp") -Destination $tuiTutorial
         $tuiResources = Join-Path $tuiTutorial "UI\TuiControlTest"
         if (-not $tuiResources.StartsWith($tuiTutorial + "\", [System.StringComparison]::OrdinalIgnoreCase)) {
             throw "Unexpected TuiControlTest resource target: $tuiResources"
