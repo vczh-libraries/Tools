@@ -121,6 +121,14 @@ function Build-Release-Update() {
         $rawCpp = $rawCpp.Replace('#include "../../../Source/PlatformProviders/Windows/GDI/Renderers/GuiGraphicsWindowsGDI.h"', '')
         [System.IO.File]::WriteAllText((Join-Path $blackTutorial "FullControlTestRawElement.Windows.cpp"), $rawCpp.TrimEnd() + "`r`n#endif`r`n", [System.Text.UTF8Encoding]::new($false))
 
+        $clockHeader = [System.IO.File]::ReadAllText((Join-Path $rawElementSource "FullControlTestRawClockInterpretor.h"))
+        $clockHeader = $clockHeader.Replace('#include "../../../Source/GacUI.h"', '#include <GacUI.h>')
+        [System.IO.File]::WriteAllText((Join-Path $blackTutorial "FullControlTestRawClockInterpretor.h"), $clockHeader, [System.Text.UTF8Encoding]::new($false))
+        $clockCpp = [System.IO.File]::ReadAllText((Join-Path $rawElementSource "FullControlTestRawClockInterpretor.cpp"))
+        $clockCpp = $clockCpp.Replace('#include "../../../Source/PlatformProviders/Windows/Direct2D/Renderers/GuiGraphicsWindowsDirect2D.h"', '#include <GacUI.Windows.h>')
+        $clockCpp = $clockCpp.Replace('#include "../../../Source/PlatformProviders/Windows/GDI/Renderers/GuiGraphicsWindowsGDI.h"', '')
+        [System.IO.File]::WriteAllText((Join-Path $blackTutorial "FullControlTestRawClockInterpretor.cpp"), $clockCpp, [System.Text.UTF8Encoding]::new($false))
+
         # FullControlTest templates reference concrete DarkSkin types.
         $blackResourceFile = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\..\Release\Tutorial\GacUI_ControlTemplate\BlackSkin\UI\FullControlTest\Resource.xml")
         $blackResource = [xml](Get-Content -LiteralPath $blackResourceFile -Raw)
