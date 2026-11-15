@@ -273,7 +273,8 @@ function VBuild {
             local BUILD_OUT
             BUILD_OUT="$( (vbuild --build -o) 2>&1 )"
             local BUILD_RC=$?
-            if printf "%s" "${BUILD_OUT}" | grep -E -i -q "(^|[^A-Za-z])(warning:|error:)"; then
+            # Read all output to avoid a false negative from printf's SIGPIPE under pipefail.
+            if printf "%s" "${BUILD_OUT}" | grep -E -i "(^|[^A-Za-z])(warning:|error:)" > /dev/null; then
                 {
                     printf "Build failed\n"
                     printf "Project: %s\n" "$1"
