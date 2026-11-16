@@ -46,7 +46,7 @@ Pay attention to the `REPO-ROOT/Release` folder, because of some `.gitignore` is
 
 ## Windows Specific
 
-Execute monorepo script `Tools/Tools/Build.ps1` to run CI for all repos in their dependency order until the first failure.
+Execute monorepo script `Tools/Tools/Build.ps1` to run CI for all repos in their dependency order until the first failure. If the script succeeded without failure, report the printed time table.
 Execute single repo script `Tools/Tools/Build.ps1 <repo-name>` to run CI for a specific repo.
 Execute `Tools/Tools/CheckRepo.ps1 CheckAll` to find out how many repos have local changes.
 
