@@ -7,6 +7,7 @@ function Build-VlppParser2 {
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_ParserGen"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_ParserGen_Compiler"
     Test-Vlpp-SubProject "VlppParser2" "ParserTest_ParserGen_Generated"
+    Test-Vlpp-Platform "VlppParser2" "BuiltInTest_Compiler" x64 "$PSScriptRoot\..\..\VlppParser2\Test\UnitTest\x64\Release"
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Json"
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Workflow"
     Test-Vlpp-SubProject "VlppParser2" "BuiltInTest_Xml"
