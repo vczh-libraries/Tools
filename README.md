@@ -10,6 +10,11 @@ Open PowerShell in folder `Tools` and run:
 
 - `.\Build.ps1`
 
+Pass `-Fast` to build the full release in the usual project order, or combine it with a single target such as `-Project GacUI -Fast`.
+Fast mode keeps library imports, releases and tool builds. It skips the library test builds before GacUI, runs GacUI metadata generation and tests on Win32 and x64, and skips the GacUI unit test executable.
+Release packaging, Workflow and XML checks, and Debug C++ tutorial builds and executable checks still run. The Release C++ tutorial builds are skipped.
+The Workflow RPC stdio check requires the existing Release x64 driver and service in `<Workflow repo>/Test/UnitTest/x64/Release`.
+
 ## Generate Repo Release in Windows
 
 To update all repos at the same time, open PowerShell in folder `Tools` and run:
