@@ -22,14 +22,16 @@ function Test-GacUI-Init {
     Test-GacUI-Platform-Init x64
 }
 
-function Build-GacUI {
+function Build-GacUI([switch]$Fast) {
     # Update metadata
     Test-GacUI-Init
     Test-GacUI-SubProject "Metadata_Generate"
     Test-GacUI-SubProject "Metadata_Test"
 
     # Run test cases
-    Test-GacUI-SubProject "UnitTest"
+    if (-not $Fast) {
+        Test-GacUI-SubProject "UnitTest"
+    }
 }
 
 function Import-GacUI {

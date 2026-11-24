@@ -1,5 +1,6 @@
 param (
-    [String]$Project = ""
+    [String]$Project = "",
+    [switch]$Fast
 )
 
 . $PSScriptRoot\Common.ps1
@@ -50,52 +51,66 @@ function Update-Binaries-And-Bundle {
     Update-Binaries-Prepare-CodePack
 }
 
-function Task-Vlpp {
+function Task-Vlpp([switch]$Fast) {
     Write-Title Build-Vlpp
     Import-Vlpp
-    Build-Vlpp
+    if (-not $Fast) {
+        Build-Vlpp
+    }
     Release-Vlpp
 }
 
-function Task-VlppOS {
+function Task-VlppOS([switch]$Fast) {
     Write-Title Build-VlppOS
     Import-VlppOS
-    Build-VlppOS
+    if (-not $Fast) {
+        Build-VlppOS
+    }
     Release-VlppOS
 }
 
-function Task-VlppRegex {
+function Task-VlppRegex([switch]$Fast) {
     Write-Title Build-VlppRegex
     Import-VlppRegex
-    Build-VlppRegex
+    if (-not $Fast) {
+        Build-VlppRegex
+    }
     Release-VlppRegex
 }
 
-function Task-VlppReflection {
+function Task-VlppReflection([switch]$Fast) {
     Write-Title Build-VlppReflection
     Import-VlppReflection
-    Build-VlppReflection
+    if (-not $Fast) {
+        Build-VlppReflection
+    }
     Release-VlppReflection
 }
 
-function Task-VlppParser {
+function Task-VlppParser([switch]$Fast) {
     Write-Title Build-VlppParser
     Import-VlppParser
-    Build-VlppParser
+    if (-not $Fast) {
+        Build-VlppParser
+    }
     Release-VlppParser
 }
 
-function Task-VlppParser2 {
+function Task-VlppParser2([switch]$Fast) {
     Write-Title Build-VlppParser2
     Import-VlppParser2
-    Build-VlppParser2
+    if (-not $Fast) {
+        Build-VlppParser2
+    }
     Release-VlppParser2
 }
 
-function Task-Workflow {
+function Task-Workflow([switch]$Fast) {
     Write-Title Build-Workflow
     Import-Workflow
-    Build-Workflow
+    if (-not $Fast) {
+        Build-Workflow
+    }
     $rpcStdioScript = Resolve-Path $PSScriptRoot\..\..\Workflow\Test\StartRpcStdio.ps1
     $rpcStdioSkipList = Resolve-Path $PSScriptRoot\..\..\Workflow\Test\StartRpcStdio_SharedMemspSkipList.txt
     $powerShell = (Get-Process -Id $PID).Path
@@ -106,10 +121,10 @@ function Task-Workflow {
     Release-Workflow
 }
 
-function Task-GacUI {
+function Task-GacUI([switch]$Fast) {
     Write-Title Build-GacUI
     Import-GacUI
-    Build-GacUI
+    Build-GacUI -Fast:$Fast
     Release-GacUI
 }
 
@@ -133,14 +148,14 @@ function Task-Verify-Xml {
     Build-Release-Verify-GacUI-Xml
 }
 
-function Task-Verify-Cpp {
+function Task-Verify-Cpp([switch]$Fast) {
     Write-Title Build-Release-Verify-GacUI-Cpp
-    Build-Release-Verify-GacUI-Cpp $False
+    Build-Release-Verify-GacUI-Cpp $False -Fast:$Fast
 }
 
-function Task-Verify-Cpp-OpenFolders {
+function Task-Verify-Cpp-OpenFolders([switch]$Fast) {
     Write-Title Build-Release-Verify-GacUI-Cpp
-    Build-Release-Verify-GacUI-Cpp $True
+    Build-Release-Verify-GacUI-Cpp $True -Fast:$Fast
 }
 
 function Task-Check-Unsubmitted-Repos {
@@ -170,34 +185,34 @@ try {
             Task-Update-Repos; [Console]::ResetColor()
 
             $time_vlpp = [DateTime]::Now
-            Task-Vlpp; [Console]::ResetColor()
+            Task-Vlpp -Fast:$Fast; [Console]::ResetColor()
 
             $time_vlpp_os = [DateTime]::Now
-            Task-VlppOS; [Console]::ResetColor()
+            Task-VlppOS -Fast:$Fast; [Console]::ResetColor()
 
             $time_vlpp_regex = [DateTime]::Now
-            Task-VlppRegex; [Console]::ResetColor()
+            Task-VlppRegex -Fast:$Fast; [Console]::ResetColor()
 
             $time_vlpp_reflection = [DateTime]::Now
-            Task-VlppReflection; [Console]::ResetColor()
+            Task-VlppReflection -Fast:$Fast; [Console]::ResetColor()
 
             $time_vlpp_parser = [DateTime]::Now
-            Task-VlppParser; [Console]::ResetColor()
+            Task-VlppParser -Fast:$Fast; [Console]::ResetColor()
 
             $time_vlpp_parser2 = [DateTime]::Now
-            Task-VlppParser2; [Console]::ResetColor()
+            Task-VlppParser2 -Fast:$Fast; [Console]::ResetColor()
 
             $time_workflow = [DateTime]::Now
-            Task-Workflow; [Console]::ResetColor()
+            Task-Workflow -Fast:$Fast; [Console]::ResetColor()
 
             $time_gacui = [DateTime]::Now
-            Task-GacUI; [Console]::ResetColor()
+            Task-GacUI -Fast:$Fast; [Console]::ResetColor()
 
             $time_release = [DateTime]::Now
             Task-Update-ReleaseRepo; [Console]::ResetColor()
             Task-Verify-Workflow; [Console]::ResetColor()
             Task-Verify-Xml; [Console]::ResetColor()
-            Task-Verify-Cpp; [Console]::ResetColor()
+            Task-Verify-Cpp -Fast:$Fast; [Console]::ResetColor()
 
             $time_finished = [DateTime]::Now
             Write-Title Finished!
@@ -217,35 +232,35 @@ try {
         }
         "Vlpp" {
             Update-Binaries-Prepare-CodePack
-            Task-Vlpp
+            Task-Vlpp -Fast:$Fast
         }
         "VlppOS" {
             Update-Binaries-Prepare-CodePack
-            Task-VlppOS
+            Task-VlppOS -Fast:$Fast
         }
         "VlppRegex" {
             Update-Binaries-Prepare-CodePack
-            Task-VlppRegex
+            Task-VlppRegex -Fast:$Fast
         }
         "VlppReflection" {
             Update-Binaries-Prepare-CodePack
-            Task-VlppReflection
+            Task-VlppReflection -Fast:$Fast
         }
         "VlppParser" {
             Update-Binaries-Prepare-CodePack
-            Task-VlppParser
+            Task-VlppParser -Fast:$Fast
         }
         "VlppParser2" {
             Update-Binaries-Prepare-CodePack
-            Task-VlppParser2
+            Task-VlppParser2 -Fast:$Fast
         }
         "Workflow" {
             Update-Binaries-Prepare-CodePack
-            Task-Workflow
+            Task-Workflow -Fast:$Fast
         }
         "GacUI" {
             Update-Binaries-Prepare-CodePack
-            Task-GacUI
+            Task-GacUI -Fast:$Fast
         }
         "Update-Prepare-CodePack" {
             Update-Binaries-Prepare-CodePack
@@ -254,7 +269,7 @@ try {
             Task-Update-ReleaseRepo
             Task-Verify-Workflow
             Task-Verify-Xml
-            Task-Verify-Cpp-OpenFolders
+            Task-Verify-Cpp-OpenFolders -Fast:$Fast
             Task-Check-Unsubmitted-Repos
         }
         "UpdateRelease" {
@@ -270,13 +285,13 @@ try {
             Task-Check-Unsubmitted-Repos
         }
         "VerifyReleaseCpp" {
-            Task-Verify-Cpp-OpenFolders
+            Task-Verify-Cpp-OpenFolders -Fast:$Fast
             Task-Check-Unsubmitted-Repos
         }
         "VerifyRelease" {
             Task-Verify-Workflow
             Task-Verify-Xml
-            Task-Verify-Cpp-OpenFolders
+            Task-Verify-Cpp-OpenFolders -Fast:$Fast
             Task-Check-Unsubmitted-Repos
         }
         default {

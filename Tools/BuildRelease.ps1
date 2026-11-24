@@ -225,7 +225,7 @@ function Build-Release-Verify-GacUI-Xml {
     }
 }
 
-function Build-Release-Verify-GacUI-Cpp([Bool] $PopupFolders) {
+function Build-Release-Verify-GacUI-Cpp([Bool] $PopupFolders, [switch]$Fast) {
     Push-Location $PSScriptRoot\..\..\Release | Out-Null
 
     try {
@@ -254,10 +254,12 @@ function Build-Release-Verify-GacUI-Cpp([Bool] $PopupFolders) {
         }
 
         # Release Build
-        Write-Host "Create Release Builds ..."
-        Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
-            if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\Console_Workflow\") -eq -1)) {
-                Build-Sln $_.FullName "Release" "Win32"
+        if (-not $Fast) {
+            Write-Host "Create Release Builds ..."
+            Get-ChildItem -Path .\Tutorial -Filter *.sln -Recurse | %{
+                if (($_.FullName.IndexOf("\Lib\") -eq -1) -and ($_.FullName.IndexOf("\Console_Workflow\") -eq -1)) {
+                    Build-Sln $_.FullName "Release" "Win32"
+                }
             }
         }
 
