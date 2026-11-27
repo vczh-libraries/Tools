@@ -10,6 +10,7 @@ You are going to add tags to all these repos:
 - GacJS
 - wGac
 - iGac
+- xgSkins
 The task will be provided in the request usually like:
 - job.tagCommit.prompt.md 1.2.3.4
 - job.tagCommit.prompt.md force 1.2.3.4
@@ -38,6 +39,7 @@ The following repos will use `Release TAG` as its description:
 - GacJS
 - wGac
 - iGac
+- xgSkins
 
 The following repos will use `Source TAG` as its description:
 - Vlpp
